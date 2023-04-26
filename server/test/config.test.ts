@@ -94,12 +94,12 @@ describe("Config", () => {
       expect(Config.getServerUrl()).toBe('http://dev.example.com');
     });
 
-    test('returns http://localhost:5000 when DEV_MODE is true and DEV_URL is not set', async () => {
+    test('returns http://localhost:6000 when DEV_MODE is true and DEV_URL is not set', async () => {
       jest.replaceProperty(process, 'env', {DEV_MODE: 'true'});
 
       const { default: Config } = await import('../src/config');
 
-      expect(Config.getServerUrl()).toBe('http://localhost:5000');
+      expect(Config.getServerUrl()).toBe('http://localhost:6000');
     });
   });
 

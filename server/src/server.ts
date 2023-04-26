@@ -147,7 +147,7 @@ function isPolisDev(uid?: any) {
 
 const polisFromAddress = Config.polisFromAddress;
 
-const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:5000
+const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:6000
 
 let akismet = akismetLib.client({
   blog: serverUrl,
@@ -1119,6 +1119,7 @@ function initializePolisHelpers() {
   let whitelistedDomains = [
     Config.getServerHostname(),
     ...Config.whitelistItems,
+    "localhost:6000",
     "localhost:5000",
     "localhost:5001",
     "facebook.com",

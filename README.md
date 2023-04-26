@@ -1,6 +1,40 @@
 # Polis
 
-Polis is an AI powered sentiment gathering platform. More organic than surveys and less effort than focus groups, Polis meets the basic human need to be understood, at scale.
+Setting up locally:
+
+1. Install Postgres, through Postgres.app (Mac) or your package manager.
+2. Setup env:
+
+```
+cp example.env .env
+cd server
+cp example.env .env
+```
+
+3. npm install everywhere
+4. From a `psql` console run:
+
+```
+create database "polis-dev";
+create user "polis-dev";
+alter role "polis-dev" superuser;
+```
+
+5. Run migrations
+
+```
+psql -d polis-dev -f postgres/migrations/000000_initial.sql
+psql -d polis-dev -f postgres/migrations/000001_update_pwreset_table.sql
+psql -d polis-dev -f postgres/migrations/000002_add_xid_constraint.sql
+psql -d polis-dev -f postgres/migrations/000003_add_origin_permanent_cookie_columns.sql
+psql -d polis-dev -f postgres/migrations/000004_drop_waitinglist_table.sql
+psql -d polis-dev -f postgres/migrations/000005_drop_slack_stripe_canvas.sql
+```
+
+6. Start servers
+
+7. Create user: http://localhost:8080/createuser
+
 
 For a detailed methods paper, see [Polis: Scaling Deliberation by Mapping High Dimensional Opinion Spaces][methods-paper].
 

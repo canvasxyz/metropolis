@@ -1,11 +1,11 @@
 import fs from "fs";
 import isTrue from "boolean";
 
-const devHostname = process.env.API_DEV_HOSTNAME || "localhost:5000";
+const devHostname = process.env.API_DEV_HOSTNAME || "localhost:6000";
 const devMode = isTrue(process.env.DEV_MODE) as boolean;
 const domainOverride = process.env.DOMAIN_OVERRIDE || null as string | null;
 const prodHostname = process.env.API_PROD_HOSTNAME || "pol.is";
-const serverPort = parseInt(process.env.API_SERVER_PORT || process.env.PORT || "5000", 10) as number;
+const serverPort = parseInt(process.env.API_SERVER_PORT || process.env.PORT || "6000", 10) as number;
 const shouldUseTranslationAPI = isTrue(process.env.SHOULD_USE_TRANSLATION_API) as boolean;
 
 export default {
@@ -15,7 +15,7 @@ export default {
 
   getServerNameWithProtocol: (req: any): string => {
     if (devMode) {
-      // usually localhost:5000
+      // usually localhost:6000
       return `${req.protocol}://${req.headers.host}`;
     }
     if (domainOverride) {

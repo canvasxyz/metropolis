@@ -85,6 +85,11 @@ module.exports = (env, options) => {
       './js/main',
       './css/polis_main.scss'
     ],
+    devServer: {
+      proxy: {
+        '/api': 'http://localhost:6000',
+      },
+    },
     output: {
       publicPath: '/',
       filename: `js/participation_bundle.[chunkhash:8].js`,

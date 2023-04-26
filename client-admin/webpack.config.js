@@ -37,6 +37,12 @@ module.exports = (env, options) => {
     },
     devServer: {
       historyApiFallback: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:6000',
+          secure: false,
+        }
+      },
       /**
       // TODO: Set up API proxy later for server component.
       // See: https://webpack.js.org/configuration/dev-server/#devserverproxy

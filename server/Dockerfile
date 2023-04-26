@@ -2,7 +2,7 @@
 # docker build -t polis-server:local .
 # To run locally, for example:
 # docker run --rm --name polis-server --env-file .env --network polis-dev_polis-net \
-#  -p 5000:5000 --target dev polis-server:local
+#  -p 6000:6000 --target dev polis-server:local
 #
 # For a dev build, use `--target dev`.
 # Should default to prod build, but you can also explicitly use `--target prod`
@@ -21,7 +21,7 @@ RUN apk add --no-cache --virtual .build \
 
 COPY package*.json ./
 
-EXPOSE 5000
+EXPOSE 6000
 
 
 # Define the development build
@@ -54,5 +54,3 @@ COPY . .
 RUN npm run build
 
 CMD npm run serve
-
-
