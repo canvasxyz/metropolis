@@ -2,7 +2,7 @@
 
 import React from 'react'
 import StaticLayout from './lander-layout'
-import TOSContent from '../../content/tos.md'
+import TOSContent from '../tos.md'
 
 class TOS extends React.Component {
   render() {

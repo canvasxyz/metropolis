@@ -2,7 +2,7 @@
 
 import React from 'react'
 import StaticLayout from './lander-layout'
-import PrivacyContent from '../../content/privacy.md'
+import PrivacyContent from '../privacy.md'
 
 class Privacy extends React.Component {
   render() {
