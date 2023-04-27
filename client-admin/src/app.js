@@ -12,26 +12,26 @@ import { Switch, Route, Link, Redirect } from 'react-router-dom'
 import { Flex, Box, jsx } from 'theme-ui'
 
 /* landing pages */
-import Home from './components/landing/home'
-import TOS from './components/landing/tos'
-import Privacy from './components/landing/privacy'
-import PasswordReset from './components/landing/password-reset'
-import PasswordResetInit from './components/landing/password-reset-init'
-import PasswordResetInitDone from './components/landing/password-reset-init-done'
-import SignIn from './components/landing/signin'
-import SignOut from './components/landing/signout'
-import CreateUser from './components/landing/createuser'
+import Home from './pages/landing/home'
+import TOS from './pages/landing/tos'
+import Privacy from './pages/landing/privacy'
+import PasswordReset from './pages/landing/password-reset'
+import PasswordResetInit from './pages/landing/password-reset-init'
+import PasswordResetInitDone from './pages/landing/password-reset-init-done'
+import SignIn from './pages/landing/signin'
+import SignOut from './pages/landing/signout'
+import CreateUser from './pages/landing/createuser'
 
 /* manage */
-import Conversations from './components/manage/conversations'
-import ConversationIntegrate from './components/manage/integrate'
-import ConversationAdmin from './components/manage/admin'
-import Account from './components/manage/account'
+import Conversations from './pages/manage/conversations'
+import ConversationIntegrate from './pages/manage/integrate'
+import ConversationAdmin from './pages/manage/admin'
+import Account from './pages/manage/account'
 
 /* participate */
-import Survey from './components/survey'
+import Survey from './pages/survey'
 
-import InteriorHeader from './components/interior-header'
+import InteriorHeader from './pages/interior-header'
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
