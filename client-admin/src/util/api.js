@@ -8,7 +8,7 @@ const basePath = ''
 
 // var pid = "unknownpid";
 
-function polisAjax(api, data, type) {
+function ajax(api, data, type) {
   if (!_.isString(api)) {
     throw new Error('api param should be a string')
   }
@@ -75,17 +75,14 @@ function polisAjax(api, data, type) {
   return promise
 }
 
-function polisPost(api, data) {
-  return polisAjax(api, data, 'POST')
+function post(api, data) {
+  return ajax(api, data, 'POST')
 }
 
-function polisGet(api, data) {
-  return polisAjax(api, data, 'GET')
+function get(api, data) {
+  return ajax(api, data, 'GET')
 }
 
-const PolisNet = {
-  polisAjax: polisAjax,
-  polisPost: polisPost,
-  polisGet: polisGet
-}
-export default PolisNet
+const api = { get, post, ajax }
+
+export default api

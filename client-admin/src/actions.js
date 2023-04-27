@@ -1,7 +1,7 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import $ from 'jquery'
-import PolisNet from './util/net'
+import api from './util/api'
 
 /* ======= Types ======= */
 export const REQUEST_USER = 'REQUEST_USER'
@@ -187,7 +187,7 @@ const userFetchError = (err) => {
 }
 
 const fetchUser = () => {
-  return PolisNet.polisGet('/api/v3/users', { errIfNoAuth: true })
+  return api.get('/api/v3/users', { errIfNoAuth: true })
 }
 
 export const populateUserStore = () => {
@@ -218,7 +218,7 @@ const signinError = (err) => {
 }
 
 const signinPost = (attrs) => {
-  return PolisNet.polisPost('/api/v3/auth/login', attrs)
+  return api.post('/api/v3/auth/login', attrs)
 }
 
 export const doSignin = (attrs) => {
@@ -256,7 +256,7 @@ const createUserError = (err) => {
 }
 
 const createUserPost = (attrs) => {
-  return PolisNet.polisPost('/api/v3/auth/new', attrs)
+  return api.post('/api/v3/auth/new', attrs)
 }
 
 export const doCreateUser = (attrs, dest) => {
@@ -297,7 +297,7 @@ const passwordResetInitError = (err) => {
 }
 
 const passwordResetInitPost = (attrs) => {
-  return PolisNet.polisPost('/api/v3/auth/pwresettoken', attrs)
+  return api.post('/api/v3/auth/pwresettoken', attrs)
 }
 
 export const doPasswordResetInit = (attrs) => {
@@ -340,7 +340,7 @@ const passwordResetError = (err) => {
 }
 
 const passwordResetPost = (attrs) => {
-  return PolisNet.polisPost('/api/v3/auth/password', attrs)
+  return api.post('/api/v3/auth/password', attrs)
 }
 
 export const doPasswordReset = (attrs) => {
@@ -822,7 +822,7 @@ const submitSeedCommentPostError = (err) => {
 }
 
 const postSeedComment = (comment) => {
-  return PolisNet.polisPost('/api/v3/comments', comment)
+  return api.post('/api/v3/comments', comment)
 }
 
 export const handleSeedCommentSubmit = (comment) => {
@@ -891,7 +891,7 @@ const submitSeedCommentPostTweetError = (err) => {
 }
 
 const postSeedCommentTweet = (o) => {
-  return PolisNet.polisPost('/api/v3/comments', o)
+  return api.post('/api/v3/comments', o)
 }
 
 export const handleSeedCommentTweetSubmit = (o) => {
@@ -965,7 +965,7 @@ const createConversationPostError = (err) => {
 }
 
 const postCreateConversation = () => {
-  return PolisNet.polisPost('/api/v3/conversations', {
+  return api.post('/api/v3/conversations', {
     is_draft: true,
     is_active: true
   })
