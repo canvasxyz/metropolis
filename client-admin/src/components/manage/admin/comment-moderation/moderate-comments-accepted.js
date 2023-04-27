@@ -2,17 +2,17 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {
-  changeCommentStatusToAccepted,
-  changeCommentCommentIsMeta
-} from '../../../actions'
 import { connect } from 'react-redux'
+import {
+  changeCommentStatusToRejected,
+  changeCommentCommentIsMeta
+} from '../../../../actions'
 import Comment from './comment'
 
-@connect((state) => state.mod_comments_rejected)
-class ModerateCommentsRejected extends React.Component {
-  onCommentAccepted(comment) {
-    this.props.dispatch(changeCommentStatusToAccepted(comment))
+@connect((state) => state.mod_comments_accepted)
+class ModerateCommentsAccepted extends React.Component {
+  onCommentRejected(comment) {
+    this.props.dispatch(changeCommentStatusToRejected(comment))
   }
 
   toggleIsMetaHandler(comment, is_meta) {
@@ -20,13 +20,13 @@ class ModerateCommentsRejected extends React.Component {
   }
 
   createCommentMarkup() {
-    const comments = this.props.rejected_comments.map((comment, i) => {
+    const comments = this.props.accepted_comments.map((comment, i) => {
       return (
         <Comment
           key={i}
-          acceptButton
-          acceptButtonText="accept"
-          acceptClickHandler={this.onCommentAccepted.bind(this)}
+          rejectButton
+          rejectClickHandler={this.onCommentRejected.bind(this)}
+          rejectButtonText="reject"
           isMetaCheckbox
           toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
           comment={comment}
@@ -39,17 +39,17 @@ class ModerateCommentsRejected extends React.Component {
   render() {
     return (
       <div>
-        {this.props.rejected_comments !== null
+        {this.props.accepted_comments !== null
           ? this.createCommentMarkup()
-          : 'Loading rejected comments...'}
+          : 'Loading accepted comments...'}
       </div>
     )
   }
 }
 
-ModerateCommentsRejected.propTypes = {
+ModerateCommentsAccepted.propTypes = {
   dispatch: PropTypes.func,
-  rejected_comments: PropTypes.arrayOf(PropTypes.object)
+  accepted_comments: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default ModerateCommentsRejected
+export default ModerateCommentsAccepted

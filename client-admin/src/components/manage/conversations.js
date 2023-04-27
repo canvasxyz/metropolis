@@ -9,8 +9,43 @@ import {
 } from '../../actions'
 
 import Url from '../../util/url'
-import { Box, Heading, Button, Text } from 'theme-ui'
-import Conversation from './conversation'
+import { Box, Heading, Button, Text, Card, jsx } from 'theme-ui'
+
+function Conversation({ c, i, goToConversation }) {
+  return (
+    <Card
+      sx={{ 'overflow-wrap': 'break-word', mb: [3] }}
+      key={i}>
+      <Text sx={{ fontWeight: 700, mb: [2] }}>{c.topic}</Text>
+      <Text>{c.description}</Text>
+      <Text data-test-id="embed-page">
+        {c.parent_url ? `Embedded on ${c.parent_url}` : null}
+      </Text>
+      <Text sx={{ mt: [2], mb: [2] }}>{c.participant_count} participants</Text>
+      <Text sx={{
+        color: 'primary',
+        cursor: 'pointer',
+        '&:hover': { textDecoration: 'underline' }
+      }} onClick={goToConversation.bind(this, true)}>Vote</Text>
+      <Text sx={{
+        color: 'primary',
+        cursor: 'pointer',
+        '&:hover': { textDecoration: 'underline' }
+      }} onClick={goToConversation.bind(this, false)}>Manage</Text>
+    </Card>
+  )
+}
+
+Conversation.propTypes = {
+  c: PropTypes.shape({
+    topic: PropTypes.string,
+    description: PropTypes.string,
+    parent_url: PropTypes.string,
+    participant_count: PropTypes.number
+  }),
+  i: PropTypes.number.isRequired,
+  goToConversation: PropTypes.func.isRequired
+}
 
 @connect((state) => state.conversations)
 class Conversations extends React.Component {
@@ -33,12 +68,16 @@ class Conversations extends React.Component {
   }
 
   goToConversation = (conversation_id) => {
-    return () => {
+    return (participate) => {
       if (this.props.history.pathname === 'other-conversations') {
         window.open(`${Url.urlPrefix}${conversation_id}`, '_blank')
         return
       }
-      this.props.history.push(`/m/${conversation_id}`)
+      if (participate) {
+        this.props.history.push(`/c/${conversation_id}`)
+      } else {
+        this.props.history.push(`/m/${conversation_id}`)
+      }
     }
   }
 

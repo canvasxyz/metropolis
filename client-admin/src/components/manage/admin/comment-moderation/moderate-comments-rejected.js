@@ -2,67 +2,54 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
 import {
   changeCommentStatusToAccepted,
-  changeCommentStatusToRejected,
   changeCommentCommentIsMeta
-} from '../../../actions'
+} from '../../../../actions'
+import { connect } from 'react-redux'
 import Comment from './comment'
 
-@connect((state) => state.mod_comments_unmoderated)
-class ModerateCommentsTodo extends React.Component {
+@connect((state) => state.mod_comments_rejected)
+class ModerateCommentsRejected extends React.Component {
   onCommentAccepted(comment) {
     this.props.dispatch(changeCommentStatusToAccepted(comment))
-  }
-
-  onCommentRejected(comment) {
-    this.props.dispatch(changeCommentStatusToRejected(comment))
   }
 
   toggleIsMetaHandler(comment, is_meta) {
     this.props.dispatch(changeCommentCommentIsMeta(comment, is_meta))
   }
 
-  createCommentMarkup(max) {
-
-    return this.props.unmoderated_comments.slice(0,max).map((comment, i) => {
+  createCommentMarkup() {
+    const comments = this.props.rejected_comments.map((comment, i) => {
       return (
         <Comment
           key={i}
           acceptButton
-          rejectButton
-          acceptClickHandler={this.onCommentAccepted.bind(this)}
-          rejectClickHandler={this.onCommentRejected.bind(this)}
           acceptButtonText="accept"
-          rejectButtonText="reject"
+          acceptClickHandler={this.onCommentAccepted.bind(this)}
           isMetaCheckbox
           toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
           comment={comment}
         />
       )
     })
-    
+    return comments
   }
 
   render() {
-    const max = 100;
     return (
       <div>
-        <div>
-          <p> Displays maximum {max} comments </p> 
-          {this.props.unmoderated_comments !== null
-            ? this.createCommentMarkup(max)
-            : 'Loading unmoderated comments...'}
-        </div>
+        {this.props.rejected_comments !== null
+          ? this.createCommentMarkup()
+          : 'Loading rejected comments...'}
       </div>
     )
   }
 }
 
-ModerateCommentsTodo.propTypes = {
+ModerateCommentsRejected.propTypes = {
   dispatch: PropTypes.func,
-  unmoderated_comments: PropTypes.arrayOf(PropTypes.object)
+  rejected_comments: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default ModerateCommentsTodo
+export default ModerateCommentsRejected

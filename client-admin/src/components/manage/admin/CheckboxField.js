@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Box, Flex, Text } from 'theme-ui'
 import PropTypes from 'prop-types'
 
-import { handleZidMetadataUpdate } from '../../actions'
+import { handleZidMetadataUpdate } from '../../../actions'
 
 export const CheckboxField = ({
   field,

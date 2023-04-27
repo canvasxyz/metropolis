@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Box, Heading } from 'theme-ui'
 
-import Spinner from '../framework/spinner'
+import Spinner from '../widgets/spinner'
 
 @connect((state) => state.user)
 class Account extends React.Component {

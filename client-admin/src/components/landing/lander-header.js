@@ -3,7 +3,7 @@ import { Component } from 'react'
 import { Flex, Box, jsx } from 'theme-ui'
 
 import { Link } from 'react-router-dom'
-import Logomark from '../framework/logomark'
+import Logomark from '../widgets/logomark'
 
 class Header extends Component {
   render() {

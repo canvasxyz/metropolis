@@ -3,11 +3,11 @@
 import ConversationHasCommentsCheck from './conversation-has-comments-check'
 import React from 'react'
 import PropTypes from 'prop-types'
-import Url from '../../util/url'
+import Url from '../../../util/url'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Heading } from 'theme-ui'
-import ComponentHelpers from '../../util/component-helpers'
+import ComponentHelpers from '../../../util/component-helpers'
 import NoPermission from './no-permission'
 
 @connect((state) => state.zid_metadata)

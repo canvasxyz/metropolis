@@ -2,7 +2,7 @@
 import React from 'react'
 import { Box, jsx } from 'theme-ui'
 import { Link } from 'react-router-dom'
-import Logomark from './framework/logomark'
+import Logomark from './widgets/logomark'
 
 class InteriorHeader extends React.Component {
   render() {

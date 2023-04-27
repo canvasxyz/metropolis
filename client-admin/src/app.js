@@ -11,23 +11,25 @@ import _ from 'lodash'
 import { Switch, Route, Link, Redirect } from 'react-router-dom'
 import { Flex, Box, jsx } from 'theme-ui'
 
-/* landers */
-import Home from './components/landers/home'
-import TOS from './components/landers/tos'
-import Privacy from './components/landers/privacy'
-import PasswordReset from './components/landers/password-reset'
-import PasswordResetInit from './components/landers/password-reset-init'
-import PasswordResetInitDone from './components/landers/password-reset-init-done'
-import SignIn from './components/landers/signin'
-import SignOut from './components/landers/signout'
-import CreateUser from './components/landers/createuser'
+/* landing pages */
+import Home from './components/landing/home'
+import TOS from './components/landing/tos'
+import Privacy from './components/landing/privacy'
+import PasswordReset from './components/landing/password-reset'
+import PasswordResetInit from './components/landing/password-reset-init'
+import PasswordResetInitDone from './components/landing/password-reset-init-done'
+import SignIn from './components/landing/signin'
+import SignOut from './components/landing/signout'
+import CreateUser from './components/landing/createuser'
 
-// /conversation-admin
-import ConversationAdminContainer from './components/conversation-admin/index'
+/* manage */
+import Conversations from './components/manage/conversations'
+import ConversationIntegrate from './components/manage/integrate'
+import ConversationAdmin from './components/manage/admin'
+import Account from './components/manage/account'
 
-import Conversations from './components/conversations-and-account/conversations'
-import Account from './components/conversations-and-account/account'
-import Integrate from './components/conversations-and-account/integrate'
+/* participate */
+import Survey from './components/survey'
 
 import InteriorHeader from './components/interior-header'
 
@@ -224,7 +226,13 @@ class App extends React.Component {
                         authed={this.isAuthed()}
                         exact
                         path="/integrate"
-                        component={Integrate}
+                        component={ConversationIntegrate}
+                      />
+                      <Route
+                        isLoading={this.isLoading()}
+                        path="/c/:conversation_id"
+                        authed={this.isAuthed()}
+                        component={Survey}
                       />
                     </Box>
                   </Flex>
@@ -236,7 +244,7 @@ class App extends React.Component {
               isLoading={this.isLoading()}
               path="/m/:conversation_id"
               authed={this.isAuthed()}
-              component={ConversationAdminContainer}
+              component={ConversationAdmin}
             />
           </InteriorHeader>
         </Switch>

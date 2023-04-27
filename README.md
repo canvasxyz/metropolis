@@ -35,6 +35,9 @@ psql -d polis-dev -f postgres/migrations/000005_drop_slack_stripe_canvas.sql
 
 7. Create user: http://localhost:8080/createuser
 
+Theming: https://theme-ui.com/
+
+---
 
 For a detailed methods paper, see [Polis: Scaling Deliberation by Mapping High Dimensional Opinion Spaces][methods-paper].
 

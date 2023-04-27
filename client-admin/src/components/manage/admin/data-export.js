@@ -3,10 +3,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { startDataExport } from '../../actions'
-import dateSetupUtil from '../../util/data-export-date-setup'
+import { startDataExport } from '../../../actions'
+import dateSetupUtil from '../../../util/data-export-date-setup'
 import { Heading } from 'theme-ui'
-import ComponentHelpers from '../../util/component-helpers'
+import ComponentHelpers from '../../../util/component-helpers'
 import NoPermission from './no-permission'
 
 @connect((state) => state.zid_metadata)

@@ -2,9 +2,9 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import strings from '../../strings/strings'
+import strings from '../../../strings/strings'
 import { connect } from 'react-redux'
-import { populateAllCommentStores } from '../../actions'
+import { populateAllCommentStores } from '../../../actions'
 
 @connect((state) => state.mod_comments_accepted)
 @connect((state) => state.mod_comments_rejected)

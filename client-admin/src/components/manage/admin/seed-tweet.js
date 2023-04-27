@@ -6,9 +6,9 @@ import { connect } from 'react-redux'
 import {
   handleSeedCommentTweetSubmit,
   seedCommentTweetChanged
-} from '../../actions'
+} from '../../../actions'
 import Radium from 'radium'
-import strings from '../../strings/strings'
+import strings from '../../../strings/strings'
 
 const styles = {
   card: {
