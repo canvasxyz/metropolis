@@ -12,11 +12,10 @@ import thunk from 'redux-thunk'
 import { ThemeProvider } from 'theme-ui'
 import theme from './theme'
 import App from './app'
-import rootReducer from '../reducers'
+import rootReducer from './reducers'
 
 const middleware = [thunk]
-const createStore = compose(applyMiddleware(...middleware))(createStore)
-const store = createStore(rootReducer)
+const store = compose(applyMiddleware(...middleware))(createStore)(rootReducer)
 
 class Root extends React.Component {
   render() {
