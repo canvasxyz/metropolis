@@ -28,4 +28,13 @@ s.share_but_no_visible_comments_warning =
 s.no_permission =
   'Your account does not have the permissions to view this page.'
 
-export default s
+function f(key) {
+  // strip whitespace from key
+  key = key.replace(/\s+$/, '').replace(/^\s+/, '')
+  if (typeof s[key] === 'undefined') {
+    return key
+  }
+  return s[key]
+}
+
+export default f

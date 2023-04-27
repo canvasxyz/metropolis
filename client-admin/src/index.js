@@ -5,15 +5,18 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { createStore, applyMiddleware, compose } from 'redux'
+import thunk from 'redux-thunk'
 
-import configureStore from './store'
 import { ThemeProvider } from 'theme-ui'
 import theme from './theme'
 import App from './app'
+import rootReducer from '../reducers'
 
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-
-const store = configureStore()
+const middleware = [thunk]
+const createStore = compose(applyMiddleware(...middleware))(createStore)
+const store = createStore(rootReducer)
 
 class Root extends React.Component {
   render() {

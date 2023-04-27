@@ -5,7 +5,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { handleSeedCommentSubmit, seedCommentChanged } from '../../../actions'
-import strings from '../../../strings/strings'
+import strings from '../../../intl'
 import { Box, Text, Button, jsx, Link } from 'theme-ui'
 
 @connect((state) => state.seed_comments)

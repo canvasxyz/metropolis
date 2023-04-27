@@ -8,7 +8,7 @@ import {
   seedCommentTweetChanged
 } from '../../../actions'
 import Radium from 'radium'
-import strings from '../../../strings/strings'
+import strings from '../../../intl'
 
 const styles = {
   card: {

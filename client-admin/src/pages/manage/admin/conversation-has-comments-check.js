@@ -2,7 +2,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import strings from '../../../strings/strings'
+import strings from '../../../intl'
 import { connect } from 'react-redux'
 import { populateAllCommentStores } from '../../../actions'
 
