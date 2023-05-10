@@ -117,9 +117,12 @@ class SignIn extends React.Component {
             onClick={this.handleLoginClicked.bind(this)}>
             {this.props.pending ? 'Signing in...' : 'Sign In'}
           </Button>
-          <Text sx={{ my: 4 }}>
+          <Text sx={{ mt: 4 }}>
             {'Forgot your password? '}
             <Link to={'/pwresetinit'}>Reset Password</Link>
+          </Text>
+          <Text sx={{ mt: 2, mb: 4 }}>
+            <Link to={'/createuser'}>Create User</Link>
           </Text>
         </form>
         {fbAppId && (
