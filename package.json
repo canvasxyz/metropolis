@@ -1,3 +1,13 @@
 {
-  "note": "Just a workaround, as bundlewatch needs a package.json file to read."
+  "private": true,
+  "scripts": {
+    "dev": "concurrently 'npm run dev --workspace=polis-client-admin' 'npm run dev --workspace=polis'",
+    "dev": "concurrently 'npm run start --workspace=polis-client-admin' 'npm run start --workspace=polis'"
+  },
+  "workspaces": [
+    "client-admin",
+    "client-participation",
+    "client-report",
+    "server"
+  ]
 }

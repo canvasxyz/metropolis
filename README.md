@@ -1,24 +1,9 @@
 # Polis
 
-[![E2E Tests](https://github.com/compdemocracy/polis/workflows/E2E%20Tests/badge.svg)][e2e-tests]
-
-- [ ] Remove FB_APP_ID
-- [ ] Remove Twitter ID
-- [ ] Remove GA_TRACKING_ID
-
 Setting up locally:
 
 1. Install Postgres, through Postgres.app (Mac) or your package manager.
-2. Setup env:
-
-```
-cp example.env .env
-cd server
-cp example.env .env
-```
-
-3. npm install everywhere
-4. From a `psql` console run:
+2. From a `psql` console run:
 
 ```
 create database "polis-dev";
@@ -26,7 +11,7 @@ create user "polis-dev";
 alter role "polis-dev" superuser;
 ```
 
-5. Run migrations ([️see also](docs/migrations.md))
+3. Run migrations ([️see also](docs/migrations.md))
 
 ```
 psql -d polis-dev -f postgres/migrations/000000_initial.sql
@@ -37,31 +22,33 @@ psql -d polis-dev -f postgres/migrations/000004_drop_waitinglist_table.sql
 psql -d polis-dev -f postgres/migrations/000005_drop_slack_stripe_canvas.sql
 ```
 
-6. Start servers
+4. Setup environment variables:
 
-7. Create user: http://localhost:8080/createuser
+```
+cp example.env .env
+cd server
+cp example.env .env
+```
 
-Theming: https://theme-ui.com/
+5. Install dependencies and run:
 
-8. Mail?
+```
+npm install
+npm run dev
+```
 
-Run maildev on port 1080, with SMTP on port 1025:
+6. Create user: http://localhost:8080/createuser
+
+7. Set up maildev. Runs on port 1080, with SMTP on port 1025:
 
 ```
 $ docker pull maildev/maildev:1.1.1
 $ docker run -p 1080:1080 -p 1025:1025 maildev/maildev
 ```
 
-9. Testing?
-
-BASEURL = https://127.0.0.1.sslip.io
-GIT_HASH = $(shell git rev-parse --short HEAD)
-
-10. Production config
-
-[️Configure](docs/configuration.md), esp:
-  - the domain name you'll be serving from
-  - enable and add API keys for 3rd party services (e.g. automatic comment translation, spam filtering, etc)
+[️Production configuration](docs/configuration.md):
+- Set up the domain name you'll be serving from
+- Enable and add API keys for 3rd party services (e.g. automatic comment translation, spam filtering, etc)
 - [🔏 Set up SSL/HTTPS](docs/ssl.md), to keep the site secure
 - [📈 Scale](docs/scaling.md) for large or many concurrent conversations
 

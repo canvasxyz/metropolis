@@ -1,7 +1,6 @@
 {
-  "name": "polis",
-  "version": "0.0.0",
-  "description": "polis =====",
+  "name": "polis-server",
+  "license": "AGPL-3.0",
   "main": "./dist/app.js",
   "scripts": {
     "build": "tsc",
@@ -18,12 +17,6 @@
     "test": "jest --forceExit test",
     "test:watch": "npm test -- --watchAll"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/pol-is/polisServer.git"
-  },
-  "author": "",
-  "license": "AGPL-3.0",
   "dependencies": {
     "@google-cloud/translate": "~1.0.0",
     "akismet": "~0.0.11",

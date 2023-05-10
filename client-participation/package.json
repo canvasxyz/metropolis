@@ -1,6 +1,6 @@
 {
   "name": "polis-client-participation",
-  "version": "1.0.0",
+  "license": "AGPL-3.0",
   "scripts": {
     "analyze": "webpack --mode=production --analyze",
     "build": "npm run build:prod",
