@@ -1119,6 +1119,8 @@ function initializePolisHelpers() {
   let whitelistedDomains = [
     Config.getServerHostname(),
     ...Config.whitelistItems,
+    "localhost:8080",
+    "localhost:8081",
     "localhost:6000",
     "localhost:5000",
     "localhost:5001",
