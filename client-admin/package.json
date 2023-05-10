@@ -44,15 +44,16 @@
     "prettier": "~2.2.1",
     "prettier-config-standard": "~4.0.0",
     "serve": "~11.3.2",
-    "webpack-bundle-analyzer": "~4.4.0",
-    "webpack-dev-server": "~4.6.0",
     "webpack": "~5.75.0",
-    "webpack-cli": "~5.0.1"
+    "webpack-bundle-analyzer": "~4.4.0",
+    "webpack-cli": "~5.0.1",
+    "webpack-dev-server": "~4.6.0"
   },
   "dependencies": {
     "d3-scale": "~3.2.3",
     "jquery": "~2.1.4",
     "lodash": "~4.17.21",
+    "object-assign": "^4.1.1",
     "prop-types": "~15.7.2",
     "react": "~16.14.0",
     "react-dom": "~16.14.0",
