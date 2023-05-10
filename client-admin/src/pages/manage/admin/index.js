@@ -29,7 +29,7 @@ class ConversationAdminContainer extends React.Component {
     this.props.dispatch(resetMetadataStore())
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.loadZidMetadata()
   }
 

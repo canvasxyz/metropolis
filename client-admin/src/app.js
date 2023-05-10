@@ -75,7 +75,7 @@ class App extends React.Component {
     this.props.dispatch(populateUserStore())
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.loadUserData()
     const mql = window.matchMedia(`(min-width: 800px)`)
     mql.addListener(this.mediaQueryChanged.bind(this))
@@ -111,7 +111,7 @@ class App extends React.Component {
     this.mediaQueryChanged()
   }
 
-  componentWillUnmount() {
+  UNSAFE_componentWillUnmount() {
     this.state.mql.removeListener(this.mediaQueryChanged.bind(this))
   }
 

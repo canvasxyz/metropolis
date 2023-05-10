@@ -34,7 +34,7 @@ class CommentModeration extends React.Component {
     this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getCommentsRepeatedly = setInterval(() => {
       this.loadComments()
     }, pollFrequency)
