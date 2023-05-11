@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
-import { Box, Heading, Button, Text, Input, Form } from 'theme-ui'
+import { Box, Heading, Button, Text, Input } from 'theme-ui'
 
 import api from '../../util/api';
+import type { Comment } from "../../util/types"
 
-const CommentCard = ({ comment, conversationId, onVoted, hasVoted }) => {
+type CommentCardProps = {
+    comment: Comment,
+    conversationId: string,
+    onVoted: Function,
+    hasVoted: boolean,
+}
+
+const CommentCard = ({ comment, conversationId, onVoted, hasVoted }: CommentCardProps) => {
   const { tid: commentId, txt, created, pid } = comment;
 
   const [voting, setVoting] = useState(false)
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
-  const agree = (commentId, starred = undefined, weight = 0) => {
+  const agree = (commentId: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
     api.post("api/v3/votes", {
       pid: "mypid",
@@ -24,7 +32,7 @@ const CommentCard = ({ comment, conversationId, onVoted, hasVoted }) => {
       .then(() => onVoted(commentId))
       .finally(() => setVoting(false))
   }
-  const disagree = (commentId, starred = undefined, weight = 0) => {
+  const disagree = (commentId: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
     api.post("api/v3/votes", {
       pid: "mypid",
@@ -38,7 +46,7 @@ const CommentCard = ({ comment, conversationId, onVoted, hasVoted }) => {
       .then(() => onVoted(commentId))
       .finally(() => setVoting(false))
   }
-  const skip = (tid, starred = undefined, weight = 0) => {
+  const skip = (tid: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
     api.post("api/v3/votes", {
       pid: "mypid",

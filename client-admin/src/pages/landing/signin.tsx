@@ -9,11 +9,24 @@ import { Heading, Box, Text, Button, jsx } from 'theme-ui'
 import StaticLayout from './lander-layout'
 
 import strings from '../../intl'
+import { UrlObject, UrlWithStringQuery } from 'url'
 
 const fbAppId = process.env.FB_APP_ID
 
-@connect((state) => state.signin)
-class SignIn extends React.Component {
+@(connect as any)((state) => state.signin)
+class SignIn extends React.Component<{
+  dispatch: Function
+  error: XMLHttpRequest
+  authed: boolean
+  pending: boolean
+  signInSuccessful: boolean
+  facebookError: string
+  location: UrlObject
+}, {
+  email: HTMLInputElement,
+  password: HTMLInputElement
+  facebook_password: HTMLInputElement
+}> {
   // eslint-disable-next-line node/handle-callback-err
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
@@ -29,15 +42,11 @@ class SignIn extends React.Component {
     console.log(error, errorInfo)
   }
 
-  // getDest() {
-  //   return this.props.location.pathname.slice("/signin".length);
-  // }
-
   handleLoginClicked(e) {
     e.preventDefault()
     const attrs = {
-      email: this.email.value,
-      password: this.password.value
+      email: this.state.email.value,
+      password: this.state.password.value
     }
 
     // var dest = this.getDest();
@@ -45,6 +54,10 @@ class SignIn extends React.Component {
     //   dest = "/";
     // }
     this.props.dispatch(doSignin(attrs))
+  }
+
+  getDest() {
+    return this.props.location.pathname.slice("/signin".length);
   }
 
   facebookButtonClicked() {
@@ -60,12 +73,12 @@ class SignIn extends React.Component {
     if (!dest.length) {
       dest = '/'
     }
-    const optionalPassword = this.facebook_password.value
+    const optionalPassword = this.state.facebook_password.value
     this.props.dispatch(doFacebookSignin(dest, optionalPassword))
   }
 
   maybeErrorMessage() {
-    let markup = ''
+    let markup = <div></div>
     if (this.props.error) {
       markup = <div>{strings(this.props.error.responseText)}</div>
     }
@@ -88,7 +101,7 @@ class SignIn extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="signinEmailInput"
-              ref={(c) => (this.email = c)}
+              ref={(c) => (this.setState({ email: c }))}
               placeholder="email"
               type="email"
             />
@@ -105,7 +118,7 @@ class SignIn extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="signinPasswordInput"
-              ref={(c) => (this.password = c)}
+              ref={(c) => (this.setState({ password: c }))}
               placeholder="password"
               type="password"
             />
@@ -125,7 +138,7 @@ class SignIn extends React.Component {
             <Link to={'/createuser'}>Create User</Link>
           </Text>
         </form>
-        {fbAppId && (
+        {/*fbAppId && (
           <Box sx={{ my: 4 }}>
             <Button
               id="facebookSigninButton"
@@ -138,7 +151,7 @@ class SignIn extends React.Component {
               privacy policy
             </Text>
           </Box>
-        )}
+        )*/}
       </Box>
     )
   }
@@ -157,7 +170,7 @@ class SignIn extends React.Component {
           }
         </p>
         <input
-          ref={(c) => (this.facebook_password = c)}
+          ref={(c) => (this.setState({ facebook_password: c }))}
           placeholder="polis password"
           type="password"
         />
@@ -177,12 +190,14 @@ class SignIn extends React.Component {
 
     return (
       <StaticLayout>
-        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
-          Sign In
-        </Heading>
-        {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
-          ? this.drawLoginForm()
-          : this.drawPasswordConnectFacebookForm()}{' '}
+        <div>
+          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
+            Sign In
+          </Heading>
+          {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
+            ? this.drawLoginForm()
+            : this.drawPasswordConnectFacebookForm()}
+        </div>
       </StaticLayout>
     )
   }
