@@ -31,6 +31,7 @@ class Root extends React.Component {
   }
 }
 
+// @ts-ignore
 window.$ = $
 
 ReactDOM.render(<Root />, document.getElementById('root'))
