@@ -8,7 +8,10 @@ class Privacy extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <PrivacyContent />
+        <React.Fragment>
+          <PrivacyContent />
+          Contact: admin@{document.location.host}
+        </React.Fragment>
       </StaticLayout>
     )
   }

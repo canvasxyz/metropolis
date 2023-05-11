@@ -8,7 +8,10 @@ class TOS extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <TOSContent />
+        <React.Fragment>
+          <TOSContent />
+          Contact: admin@{document.location.host}
+        </React.Fragment>
       </StaticLayout>
     )
   }
