@@ -3,6 +3,8 @@
 import $ from 'jquery'
 import api from './util/api'
 
+export type Action = any
+
 /* ======= Types ======= */
 export const REQUEST_USER = 'REQUEST_USER'
 export const RECEIVE_USER = 'RECEIVE_USER'
@@ -230,7 +232,7 @@ export const doSignin = (attrs) => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
           dispatch({ type: 'signin completed successfully' })
-          window.location = '/'
+          window.location.assign('/')
         }, 3000)
       },
       (err) => dispatch(signinError(err))
@@ -308,7 +310,7 @@ export const doPasswordResetInit = (attrs) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          window.location = '/pwresetinit/done'
+          window.location.assign('/pwresetinit/done')
         }, 3000)
 
         return dispatch(passwordResetInitSuccess())
@@ -351,7 +353,7 @@ export const doPasswordReset = (attrs) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          window.location = '/'
+          window.location.assign('/')
         }, 3000)
 
         return dispatch(passwordResetSuccess())
@@ -517,7 +519,17 @@ const processFacebookFriendsData = (
   return (fb_public_profile, friendsData) => {
     // alert(JSON.stringify(friendsData));
 
-    const data = {
+    type FBData = {
+      fb_public_profile: string
+      fb_friends_response: string
+      response: string
+      fb_email?: string
+      provided_email?: string
+      hname?: string
+      fb_granted_scopes?: unknown
+      password?: string
+    }
+    const data: FBData = {
       fb_public_profile: JSON.stringify(fb_public_profile),
       fb_friends_response: JSON.stringify(friendsData),
       response: JSON.stringify(response)
@@ -585,7 +597,7 @@ const callFacebookLoginAPI = (dest, dispatch, optionalPassword) => {
   )
 }
 
-export const doFacebookSignin = (dest, optionalPassword) => {
+export const doFacebookSignin = (dest, optionalPassword?) => {
   return (dispatch) => {
     dispatch(facebookSigninInitiated())
     return callFacebookLoginAPI(dest, dispatch, optionalPassword)
@@ -609,7 +621,7 @@ const signoutError = (err) => {
   }
 }
 
-const signoutPost = (dest) => {
+const signoutPost = (dest?) => {
   // relying on server to clear cookies
   return $.ajax({
     type: 'POST',
@@ -830,7 +842,7 @@ export const handleSeedCommentSubmit = (comment) => {
     dispatch(submitSeedCommentStart())
     return postSeedComment(comment)
       .then(
-        (res) => dispatch(submitSeedCommentPostSuccess(res)),
+        (res) => dispatch(submitSeedCommentPostSuccess()),
         (err) => dispatch(submitSeedCommentPostError(err))
       )
       .then(dispatch(populateAllCommentStores(comment.conversation_id)))
@@ -899,7 +911,7 @@ export const handleSeedCommentTweetSubmit = (o) => {
     dispatch(submitSeedCommentTweetStart())
     return postSeedCommentTweet(o)
       .then(
-        (res) => dispatch(submitSeedCommentPostTweetSuccess(res)),
+        (res) => dispatch(submitSeedCommentPostTweetSuccess()),
         (err) => dispatch(submitSeedCommentPostTweetError(err))
       )
       .then(dispatch(populateAllCommentStores(o.conversation_id)))
@@ -971,7 +983,7 @@ const postCreateConversation = () => {
   })
 }
 
-export const handleCreateConversationSubmit = (routeTo) => {
+export const handleCreateConversationSubmit = () => {
   return (dispatch) => {
     dispatch(createConversationStart())
     return postCreateConversation()
@@ -983,7 +995,7 @@ export const handleCreateConversationSubmit = (routeTo) => {
         (err) => dispatch(createConversationPostError(err))
       )
       .then((res) => {
-        window.location = '/m/' + res.conversation_id
+        window.location.assign('/m/' + res.conversation_id)
       })
   }
 }
@@ -1295,7 +1307,7 @@ const putCommentRejected = (comment) => {
 
 export const changeCommentStatusToRejected = (comment) => {
   return (dispatch) => {
-    dispatch(optimisticCommentRejected())
+    dispatch(optimisticCommentRejected(comment))
     return putCommentRejected(comment).then(
       (res) => {
         dispatch(rejectCommentSuccess(res))
@@ -1339,7 +1351,7 @@ const putCommentCommentIsMetaChange = (comment, is_meta) => {
 
 export const changeCommentCommentIsMeta = (comment, is_meta) => {
   return (dispatch) => {
-    dispatch(optimisticCommentIsMetaChanged())
+    dispatch(optimisticCommentIsMetaChanged(comment))
     return putCommentCommentIsMetaChange(comment, is_meta).then(
       (res) => {
         dispatch(commentIsMetaChangeSuccess(res))
@@ -1721,8 +1733,8 @@ export const startDataExport = (
       unixTimestamp,
       untilEnabled
     ).then(
-      (res) => dispatch(dataExportSuccess(res)),
-      (err) => dispatch(dataExportError(err))
+      (res) => dispatch(dataExportSuccess()),
+      (err) => dispatch(dataExportError())
     )
   }
 }

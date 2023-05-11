@@ -3,7 +3,7 @@
 
 import React from 'react'
 import { connect } from 'react-redux'
-import { doSignin, doFacebookSignin } from '../../actions'
+import { doSignin, doFacebookSignin, Action } from '../../actions'
 import { Link, Redirect } from 'react-router-dom'
 import { Heading, Box, Text, Button, jsx } from 'theme-ui'
 import StaticLayout from './lander-layout'
