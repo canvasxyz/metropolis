@@ -43,16 +43,6 @@ module.exports = (env, options) => {
           secure: false,
         }
       },
-      /**
-      // TODO: Set up API proxy later for server component.
-      // See: https://webpack.js.org/configuration/dev-server/#devserverproxy
-      proxy: {
-        '/api': {
-        target: 'https://pol.is',
-        secure: false,
-        },
-      },
-      **/
     },
     plugins: [
       new CopyPlugin({

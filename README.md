@@ -1,5 +1,21 @@
 # Polis
 
+Setting up dependencies:
+
+We recommend installing [nvm](https://github.com/creationix/nvm) so
+that you can easily switch between your favorite flavors of node.
+
+* Node `>= 16`
+* NPM `>= 8`
+
+If using nvm, run the commands below to install node and the application dependencies.
+
+```sh
+nvm install 18
+nvm use 18
+npm install
+```
+
 Setting up locally:
 
 1. Install Postgres, through Postgres.app (Mac) or your package manager.
@@ -52,7 +68,26 @@ $ docker run -p 1080:1080 -p 1025:1025 maildev/maildev
 - [🔏 Set up SSL/HTTPS](docs/ssl.md), to keep the site secure
 - [📈 Scale](docs/scaling.md) for large or many concurrent conversations
 
-For a detailed methods paper, see [Polis: Scaling Deliberation by Mapping High Dimensional Opinion Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558)
+### Facebook App Integration
 
+Optionally, you can [register with Facebook](https://developers.facebook.com/docs/development) and get a Facebook App ID
+to use the Facebook auth features.
+
+If you do so, set the FB_APP_ID environment variable in the top level `.env` file, or manually pass it in
+when building and running this application.
+
+### Twitter Integration
+
+To enable twitter widgets for user authentication, set the ENABLE_TWITTER_WIDGETS environment variable to `true` in the
+top level `.env` file, or manually pass it in when building and running this application.
+
+### Acknowledgements
+
+This platform is substantively based on the Polis platform developed by the Computational Democracy Project.
+For the Polis codebase, see [Github](https://github.com/compdemocracy/polis).
+
+For a detailed methods paper, see [Polis: Scaling Deliberation by
+Mapping High Dimensional Opinion
+Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558).
 
 (c) 2012-present, authors, under [AGPLv3 with additional permission under section 7](/LICENSE)

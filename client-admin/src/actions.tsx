@@ -493,7 +493,7 @@ const saveFacebookFriendsData = (data, dest, dispatch) => {
       ) {
         // Todo handle
 
-        // var password = prompt("A pol.is user "+data.fb_email+", the same email address as associted with your facebook account, already exists. Enter your pol.is password to enable facebook login for your pol.is account.");
+        // var password = prompt("A user for "+data.fb_email+", is already associated with your Facebook account. Log into that user to enable Facebook login.");
         // that.linkMode = true;
 
         dispatch(facebookSigninFailed('polis_err_user_with_this_email_exists')) // handle case user already exists enter your password
@@ -1709,9 +1709,7 @@ const dataExportGet = (
   unixTimestamp,
   untilEnabled
 ) => {
-  //       url += ("&unixTimestamp=" + ((ctx.date/1000) << 0));
-
-  /* https://pol.is/api/v3/dataExport?conversation_id=2arcefpshi&format=csv&unixTimestamp=1447362000 */
+  /* e.g. /api/v3/dataExport?conversation_id=2arcefpshi&format=csv&unixTimestamp=1447362000 */
   let url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
   if (untilEnabled) {
     url += `&unixTimestamp=${unixTimestamp}`

@@ -147,9 +147,9 @@ class SignIn extends React.Component<{
               Sign in with Facebook
             </Button>
             <Text sx={{ my: 2 }}>
-              If you click &apos;Sign in with Facebook&apos; and are not a pol.is
-              user, you will be registered and you agree to the pol.is terms and
-              privacy policy
+              If you click &apos;Sign in with Facebook&apos; and are not a
+              user, you will be registered and you agree to the terms and
+              privacy policy.
             </Text>
           </Box>
         )*/}
@@ -162,17 +162,17 @@ class SignIn extends React.Component<{
       <span>
         <p>
           {
-            'A pol.is user already exists with the email address associated with this Facebook account.'
+            'A user already exists with the email address associated with this Facebook account.'
           }
         </p>
         <p>
           {
-            'Please enter the password to your pol.is account to enable Facebook login.'
+            'Please log into that user account to enable Facebook login.'
           }
         </p>
         <input
           ref={(c) => this.facebook_password = c}
-          placeholder="polis password"
+          placeholder="password"
           type="password"
           autoComplete="current-password"
         />

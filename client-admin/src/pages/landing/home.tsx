@@ -26,7 +26,7 @@ const Index = () => {
             out the opinion space around a topic.
           </Text>
           <Text sx={{ my: 3 }}>
-            The tool is open-source, and based on Polis, a tool used by
+            The tool is open-source, and based on Polis, a platform used by
             governments, academics, and citizens around the world.
           </Text>
           <Box sx={{ mt: [4, null, 4] }}>

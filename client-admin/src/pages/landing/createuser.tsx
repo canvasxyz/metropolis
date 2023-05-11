@@ -179,9 +179,8 @@ class CreateUser extends React.Component<{
               Sign up with Facebook
             </Button>
             <Text>
-              If you click &apos;Sign in with Facebook&apos; and are not a pol.is
-              user, you will be registered and you agree to the pol.is terms and
-              privacy policy
+              If you click &apos;Sign in with Facebook&apos; and are not an existing
+              user, you will be registered automatically.
             </Text>
           </React.Fragment>
         )}
@@ -193,17 +192,17 @@ class CreateUser extends React.Component<{
     return (
       <Box>
         <Text>
-          A pol.is user already exists with the email address associated with
+          A user already exists with the email address associated with
           this Facebook account.
         </Text>
         <Text>
           {' '}
-          Please enter the password to your pol.is account to enable Facebook
+          Please log into that user account to enable Facebook
           login.
         </Text>
         <input
           ref={(c) => this.facebook_password = c}
-          placeholder="polis password"
+          placeholder="password"
           type="password"
         />
         <Button onClick={this.handleFacebookPasswordSubmit.bind(this)}>

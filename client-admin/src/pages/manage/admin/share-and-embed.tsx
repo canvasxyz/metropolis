@@ -85,7 +85,7 @@ class ShareAndEmbed extends React.Component<{
           <p>
             This embed code can only be used to embed a single conversation.{' '}
             <Link to="/integrate">
-              I want to integrate pol.is on my entire site.
+              I want to integrate the survey system across multiple pages on my site.
             </Link>
           </p>
           <div>
