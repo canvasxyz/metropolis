@@ -5,8 +5,7 @@ import { connect } from 'react-redux'
 
 import StaticLayout from './lander-layout'
 
-@(connect as any)()
-class PasswordResetInitDone extends React.Component {
+class PasswordResetInitDone extends React.Component<{}> {
   render() {
     return (
       <StaticLayout>
@@ -16,4 +15,4 @@ class PasswordResetInitDone extends React.Component {
   }
 }
 
-export default PasswordResetInitDone
+export default connect()(PasswordResetInitDone)

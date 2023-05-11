@@ -8,7 +8,9 @@ import type { Comment } from "../../util/types"
 
 // TODO: enforce comment too long on backend
 
-type SurveyProps = { conversation_id: string }
+type SurveyProps = {
+  conversation_id: string
+}
 
 function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
   const { conversation_id } = params

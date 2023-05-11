@@ -16,3 +16,10 @@ export type Comment = {
   lang: null | string,
   pid: string,
 }
+
+export type RootState = {
+  conversations: any
+  user: any
+  signout: any
+  signin: any
+}

@@ -10,6 +10,7 @@ import {
 } from '../../actions'
 
 import Url from '../../util/url'
+import { RootState } from '../../util/types'
 import { Box, Heading, Button, Text, Card, jsx } from 'theme-ui'
 
 function Conversation({ c, i, goToConversation }) {
@@ -48,8 +49,6 @@ Conversation.propTypes = {
   goToConversation: PropTypes.func.isRequired
 }
 
-
-@(connect as any)((state) => state.conversations)
 class Conversations extends React.Component<{
   dispatch: Function
   error: Response
@@ -197,4 +196,4 @@ Conversations.propTypes = {
   })
 }
 
-export default Conversations
+export default connect((state: RootState) => state.conversations)(Conversations)

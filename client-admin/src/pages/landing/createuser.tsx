@@ -9,12 +9,12 @@ import { Heading, Box, Text, Button, jsx } from 'theme-ui'
 import { Link } from 'react-router-dom'
 import StaticLayout from './lander-layout'
 import strings from '../../intl'
+import { RootState } from '../../util/types'
 import { UrlObject } from 'url'
 
 const fbAppId = process.env.FB_APP_ID
 
-@(connect as any)((state) => state.signin)
-class Createuser extends React.Component<{
+class CreateUser extends React.Component<{
   location: UrlObject
   dispatch: Function
   error: XMLHttpRequest
@@ -234,4 +234,4 @@ class Createuser extends React.Component<{
   }
 }
 
-export default Createuser
+export default connect((state: RootState) => state.signin)(CreateUser)

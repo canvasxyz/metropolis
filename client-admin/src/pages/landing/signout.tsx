@@ -7,11 +7,11 @@ import StaticLayout from './lander-layout'
 import { Heading } from 'theme-ui'
 
 import { doSignout } from '../../actions'
+import { RootState } from '../../util/types'
 
-@(connect as any)((state) => state.signout)
 class SignOut extends React.Component<{ dispatch: Function }, {}> {
   static propTypes: { dispatch: Function }
-  
+
   componentDidMount() {
     this.props.dispatch(doSignout('/home'))
   }
@@ -31,4 +31,4 @@ SignOut.propTypes = {
   dispatch: PropTypes.func
 }
 
-export default SignOut
+export default connect((state: RootState) => state.signout)(SignOut)

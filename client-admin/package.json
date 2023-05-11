@@ -9,8 +9,7 @@
     "build": "npm run build:prod",
     "start": "npm run dev",
     "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
-    "test": "jest"
+    "lint:fix": "eslint src --fix"
   },
   "devDependencies": {
     "@babel/core": "~7.16.0",
@@ -70,14 +69,5 @@
     "redux-thunk": "~2.3.0",
     "theme-ui": "~0.3.5",
     "victory": "~35.4.11"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "collectCoverageFrom": "src/**/*.js",
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text-summary"
-    ]
   }
 }

@@ -6,9 +6,9 @@ import { connect } from 'react-redux'
 import { Box, Heading } from 'theme-ui'
 
 import { User } from "../../util/types"
+import { RootState } from '../../util/types'
 import Spinner from '../widgets/spinner'
 
-@(connect as any)((state) => state.user)
 class Account extends React.Component<{
   user: User
 }, {
@@ -62,4 +62,4 @@ Account.propTypes = {
   })
 }
 
-export default Account
+export default connect((state: RootState) => state.user)(Account)

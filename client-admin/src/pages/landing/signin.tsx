@@ -9,18 +9,18 @@ import { Heading, Box, Text, Button, jsx } from 'theme-ui'
 import StaticLayout from './lander-layout'
 
 import strings from '../../intl'
+import { RootState } from '../../util/types'
 import { UrlObject, UrlWithStringQuery } from 'url'
 
 const fbAppId = process.env.FB_APP_ID
 
-@(connect as any)((state) => state.signin)
 class SignIn extends React.Component<{
   dispatch: Function
   error: XMLHttpRequest
   authed: boolean
-  pending: boolean
-  signInSuccessful: boolean
-  facebookError: string
+  pending?: boolean
+  signInSuccessful?: boolean
+  facebookError?: string
   location: UrlObject
 }, {
   email: HTMLInputElement,
@@ -203,4 +203,4 @@ class SignIn extends React.Component<{
   }
 }
 
-export default SignIn
+export default connect(((state: RootState) => state.signin))(SignIn)

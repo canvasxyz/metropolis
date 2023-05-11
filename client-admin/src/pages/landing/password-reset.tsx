@@ -7,7 +7,6 @@ import { doPasswordReset } from '../../actions'
 import StaticLayout from './lander-layout'
 import { UrlObject } from 'url'
 
-@(connect as any)()
 class PasswordReset extends React.Component<{ dispatch: Function, location: UrlObject }, {
   passwordRepeat: HTMLInputElement
   password: HTMLInputElement
@@ -60,4 +59,4 @@ PasswordReset.propTypes = {
   location: PropTypes.object
 }
 
-export default PasswordReset
+export default connect()(PasswordReset)

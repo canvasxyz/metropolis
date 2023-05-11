@@ -7,7 +7,6 @@ import { doPasswordResetInit } from '../../actions'
 
 import StaticLayout from './lander-layout'
 
-@(connect as any)()
 class PasswordResetInit extends React.Component<{ dispatch: Function }, {
   email: HTMLInputElement
 }> {
@@ -50,4 +49,4 @@ PasswordResetInit.propTypes = {
   dispatch: PropTypes.func
 }
 
-export default PasswordResetInit
+export default connect()(PasswordResetInit)

@@ -5,8 +5,8 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Box, Heading, Text } from 'theme-ui'
 import Url from '../../util/url'
+import { RootState } from '../../util/types'
 
-@(connect as any)((state) => state.user)
 class Integrate extends React.Component<{
   user: { site_ids: string[] }
 }, {
@@ -78,4 +78,4 @@ Integrate.propTypes = {
   })
 }
 
-export default Integrate
+export default connect((state: RootState) => state.user)(Integrate)

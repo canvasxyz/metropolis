@@ -5,6 +5,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { populateUserStore } from './actions'
+import type { User } from './util/types'
+import { RootState } from './util/types'
+
 
 import _ from 'lodash'
 
@@ -38,7 +41,7 @@ const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   }
   return (
     <Route
-      {...rest}
+    {...rest}
       render={(props) =>
         authed === true ? (
           <Component {...props} />
@@ -59,15 +62,27 @@ PrivateRoute.propTypes = {
   authed: PropTypes.bool
 }
 
-@connect((state) => {
-  return state.user
-})
-class App extends React.Component {
+class App extends React.Component<{
+  dispatch: Function
+  isLoggedIn: boolean,
+  location: { pathname: string },
+  user: User
+  error: XMLHttpRequest
+  status: number
+}, {
+  sidebarOpen: boolean
+}> {
+  static propTypes: {
+    dispatch: Function,
+    isLoggedIn: unknown
+    location: object,
+    user: object,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
       sidebarOpen: false
-      // sidebarDocked: true,
     }
   }
 
@@ -77,9 +92,6 @@ class App extends React.Component {
 
   UNSAFE_componentWillMount() {
     this.loadUserData()
-    const mql = window.matchMedia(`(min-width: 800px)`)
-    mql.addListener(this.mediaQueryChanged.bind(this))
-    this.setState({ mql: mql, docked: mql.matches })
   }
 
   isAuthed() {
@@ -107,18 +119,6 @@ class App extends React.Component {
     ) /* if isLoggedIn is undefined, the app is loading */
   }
 
-  componentDidMount() {
-    this.mediaQueryChanged()
-  }
-
-  UNSAFE_componentWillUnmount() {
-    this.state.mql.removeListener(this.mediaQueryChanged.bind(this))
-  }
-
-  mediaQueryChanged() {
-    this.setState({ sidebarDocked: this.state.mql.matches })
-  }
-
   onSetSidebarOpen(open) {
     this.setState({ sidebarOpen: open })
   }
@@ -130,7 +130,7 @@ class App extends React.Component {
   render() {
     const { location } = this.props
     return (
-      <>
+      <React.Fragment>
         <Switch>
           <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
           <Route exact path="/home" component={Home} />
@@ -159,11 +159,8 @@ class App extends React.Component {
           <Route exact path="/pwreset" component={PasswordReset} />
           <Route path="/pwreset/*" component={PasswordReset} />
           <Route exact path="/pwresetinit" component={PasswordResetInit} />
-          <Route
-            exact
-            path="/pwresetinit/done"
-            component={PasswordResetInitDone}
-          />
+
+          <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
           <Route exact path="/tos" component={TOS} />
           <Route exact path="/privacy" component={Privacy} />
 
@@ -251,9 +248,7 @@ class App extends React.Component {
                         component={ConversationIntegrate}
                       />
                       <Route
-                        isLoading={this.isLoading()}
                         path="/c/:conversation_id"
-                        authed={this.isAuthed()}
                         component={Survey}
                       />
                     </Box>
@@ -261,16 +256,15 @@ class App extends React.Component {
                 )
               }}
             />
-
             <PrivateRoute
+              authed={this.isAuthed()}
               isLoading={this.isLoading()}
               path="/m/:conversation_id"
-              authed={this.isAuthed()}
               component={ConversationAdmin}
             />
           </Box>
         </Switch>
-      </>
+      </React.Fragment>
     )
   }
 }
@@ -289,4 +283,4 @@ App.propTypes = {
   })
 }
 
-export default App
+export default connect((state: RootState) => state.user)(App)
