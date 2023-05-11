@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Flex, Box, jsx } from 'theme-ui'
 import { populateZidMetadataStore, resetMetadataStore } from '../../../actions'
 import { Switch, Route, Link } from 'react-router-dom'
+import { RootState } from '../../../util/types'
 
 import ConversationConfig from './conversation-config'
 import ConversationStats from './stats'
@@ -16,9 +17,14 @@ import ModerateComments from './comment-moderation/'
 import ShareAndEmbed from './share-and-embed'
 
 import Reports from './report/reports'
+import { UrlObject } from 'url'
 
-@connect((state) => state.zid_metadata)
-class ConversationAdminContainer extends React.Component {
+class ConversationAdminContainer extends React.Component<{
+  dispatch: Function
+  match: { url: string, path: string, params: { conversation_id: string } }
+  location: UrlObject
+}, {
+}> {
   loadZidMetadata() {
     this.props.dispatch(
       populateZidMetadataStore(this.props.match.params.conversation_id)
@@ -128,4 +134,4 @@ class ConversationAdminContainer extends React.Component {
   }
 }
 
-export default ConversationAdminContainer
+export default connect((state: RootState) => state.zid_metadata)(ConversationAdminContainer)

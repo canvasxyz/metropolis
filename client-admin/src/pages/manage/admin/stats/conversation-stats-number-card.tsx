@@ -4,7 +4,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Text, Flex } from 'theme-ui'
 
-class NumberCard extends React.Component {
+class NumberCard extends React.Component<{
+  datum: number | string
+  subheading: string
+}, {
+}> {
   render() {
     return (
       <Flex sx={{ my: [2] }}>
@@ -13,11 +17,6 @@ class NumberCard extends React.Component {
       </Flex>
     )
   }
-}
-
-NumberCard.propTypes = {
-  datum: PropTypes.number,
-  subheading: PropTypes.string
 }
 
 export default NumberCard

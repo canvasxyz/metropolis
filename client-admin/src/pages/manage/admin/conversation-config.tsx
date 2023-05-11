@@ -12,14 +12,22 @@ import ComponentHelpers from '../../../util/component-helpers'
 import NoPermission from './no-permission'
 import { Heading, Box, Text, jsx } from 'theme-ui'
 import emoji from 'react-easy-emoji'
+import { RootState } from '../../../util/types'
 
 import { CheckboxField } from './CheckboxField'
 import ModerateCommentsSeed from './seed-comment'
 // import ModerateCommentsSeedTweet from "./seed-tweet";
 
-@connect((state) => state.user)
-@connect((state) => state.zid_metadata)
-class ConversationConfig extends React.Component {
+class ConversationConfig extends React.Component<{
+  dispatch: Function
+  zid_metadata: { conversation_id: string, topic: string, description: string }
+  error: string,
+  loading: boolean
+}, {
+}> {
+  description: HTMLTextAreaElement
+  topic: HTMLInputElement
+
   handleStringValueChange(field) {
     return () => {
       let val = this[field].value
@@ -127,8 +135,8 @@ class ConversationConfig extends React.Component {
           Seed Comments
         </Heading>
         <ModerateCommentsSeed
-          params={{ conversation_id: this.props.zid_metadata.conversation_id }}
         />
+          {/* params={{ conversation_id: this.props.zid_metadata.conversation_id }} */}
 
         {/* <ModerateCommentsSeedTweet
           params={{ conversation_id: this.props.zid_metadata.conversation_id }}
@@ -204,7 +212,7 @@ class ConversationConfig extends React.Component {
   }
 }
 
-export default ConversationConfig
+export default connect((state: RootState) => state.user)(connect((state: RootState) => state.zid_metadata)(ConversationConfig))
 
 // checked={this.props.zid_metadata.is_data_open}
 // Comments, votes, and group data can be exported by any user

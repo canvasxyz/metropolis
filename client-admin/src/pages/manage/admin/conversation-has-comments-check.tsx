@@ -5,11 +5,20 @@ import PropTypes from 'prop-types'
 import strings from '../../../intl'
 import { connect } from 'react-redux'
 import { populateAllCommentStores } from '../../../actions'
+import { RootState } from '../../../util/types'
 
-@connect((state) => state.mod_comments_accepted)
-@connect((state) => state.mod_comments_rejected)
-@connect((state) => state.mod_comments_unmoderated)
-class ConversationHasCommentsCheck extends React.Component {
+class ConversationHasCommentsCheck extends React.Component<{
+  dispatch: Function
+  conversation_id: string,
+  strict_moderation: boolean,
+  unmoderated_comments: object[],
+  accepted_comments: object[],
+  rejected_comments: object[],
+}, {
+}> {
+  static propTypes: {
+  }
+
   componentDidMount() {
     this.props.dispatch(populateAllCommentStores(this.props.conversation_id))
   }
@@ -63,4 +72,4 @@ ConversationHasCommentsCheck.propTypes = {
   rejected_comments: PropTypes.arrayOf(PropTypes.object)
 }
 
-export default ConversationHasCommentsCheck
+export default connect((state: RootState) => state.mod_comments_accepted)(connect((state: RootState) => state.mod_comments_rejected)(connect((state: RootState) => state.mod_comments_unmoderated)(ConversationHasCommentsCheck)))

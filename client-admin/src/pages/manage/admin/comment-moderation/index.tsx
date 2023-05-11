@@ -8,36 +8,37 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { populateAllCommentStores } from '../../../../actions'
 import { Heading, Flex, Box, jsx } from 'theme-ui'
+import { RootState } from '../../../../util/types'
 
 import ModerateCommentsTodo from './moderate-comments-todo'
 import ModerateCommentsAccepted from './moderate-comments-accepted'
 import ModerateCommentsRejected from './moderate-comments-rejected'
 
 import { Switch, Route, Link } from 'react-router-dom'
-
-const mapStateToProps = (state, ownProps) => {
-  return {
-    unmoderated: state.mod_comments_unmoderated,
-    accepted: state.mod_comments_accepted,
-    rejected: state.mod_comments_rejected,
-    seed: state.seed_comments
-  }
-}
+import { UrlObject } from 'url'
 
 const pollFrequency = 60000
 
-@connect((state) => state.zid_metadata)
-@connect(mapStateToProps)
-class CommentModeration extends React.Component {
+class CommentModeration extends React.Component<{
+  dispatch: Function,
+  match: { params: { conversation_id: string }, url: string, path: string }
+  location: UrlObject
+  unmoderated: { unmoderated_comments: object[] }
+  accepted: { accepted_comments: object[] }
+  rejected: { rejected_comments: object[] }
+  seed: object[]
+}, {
+  getCommentsRepeatedly: ReturnType<typeof setInterval>
+}> {
   loadComments() {
     const { match } = this.props
     this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
   }
 
   UNSAFE_componentWillMount() {
-    this.getCommentsRepeatedly = setInterval(() => {
+    this.setState({ getCommentsRepeatedly: setInterval(() => {
       this.loadComments()
-    }, pollFrequency)
+    }, pollFrequency) })
   }
 
   componentDidMount() {
@@ -45,7 +46,7 @@ class CommentModeration extends React.Component {
   }
 
   componentWillUnmount() {
-    clearInterval(this.getCommentsRepeatedly)
+    clearInterval(this.state.getCommentsRepeatedly)
   }
 
   render() {
@@ -126,4 +127,11 @@ class CommentModeration extends React.Component {
   }
 }
 
-export default CommentModeration
+export default connect((state: RootState) => state.zid_metadata)(connect((state: RootState, ownProps) => {
+  return {
+    unmoderated: state.mod_comments_unmoderated,
+    accepted: state.mod_comments_accepted,
+    rejected: state.mod_comments_rejected,
+    seed: state.seed_comments
+  }
+})(CommentModeration))

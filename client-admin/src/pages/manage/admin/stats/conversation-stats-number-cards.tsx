@@ -4,37 +4,42 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import NumberCard from './conversation-stats-number-card'
 
-class NumberCards extends React.Component {
+class NumberCards extends React.Component<{
+  data: {
+    firstVoteTimes: number[],
+    firstCommentTimes: number[],
+    voteTimes: number[],
+    commentTimes: number[],
+  }
+}, {}> {
+  static propTypes: any
+
   render() {
     const data = this.props.data
     const averageVotes = (
       data.voteTimes.length / data.firstVoteTimes.length
-    ).toFixed(2)
+    )
     return (
       <div>
         <NumberCard
           datum={data.firstVoteTimes.length}
           subheading="participants voted"
-          icon="users"
         />
         <NumberCard
           datum={data.voteTimes.length}
           subheading="votes were cast"
-          icon="tags"
         />
         <NumberCard
-          datum={isNaN(averageVotes) ? 0 : averageVotes}
+          datum={isNaN(averageVotes) ? 0 : averageVotes.toFixed(2)}
           subheading="votes per participant on average"
         />
         <NumberCard
           datum={data.firstCommentTimes.length}
           subheading="commented"
-          icon="users"
         />
         <NumberCard
           datum={data.commentTimes.length}
           subheading="comments submitted"
-          icon="comments"
         />
       </div>
     )

@@ -11,16 +11,34 @@ import Commenters from './commenters'
 import { Heading, Box, jsx } from 'theme-ui'
 import ComponentHelpers from '../../../../util/component-helpers'
 import NoPermission from '../no-permission'
+import { RootState } from '../../../../util/types'
+import { UrlObject } from 'url'
 
-@connect((state) => state.stats)
-@connect((state) => state.zid_metadata)
-@connect((state) => state.stats)
-class ConversationStats extends React.Component {
+class ConversationStats extends React.Component<{
+  dispatch: Function
+  match: { params: { conversation_id: string }, location: UrlObject }
+  zid_metadata: { is_mod: boolean }
+  conversation_stats: { firstCommentTimes: number[], firstVoteTimes: number[], voteTimes: number[], commentTimes: number[] }
+}, {
+  months: any[]
+  years: any[]
+  days: any[]
+  tzs: any[]
+  until?: number
+}> {
+  getStatsRepeatedly: ReturnType<typeof setInterval>
+  chartSize: number
+  refs: {
+    exportSelectYear: HTMLSelectElement
+    exportSelectMonth: HTMLSelectElement
+    exportSelectDay: HTMLSelectElement
+    exportSelectHour: HTMLSelectElement
+  }
+
   constructor(props) {
     super(props)
     const times = dateSetupUtil()
     this.chartSize = 500
-    this.chartMargins = { top: 20, right: 20, bottom: 50, left: 70 }
     this.state = Object.assign({}, times)
   }
 
@@ -97,16 +115,14 @@ class ConversationStats extends React.Component {
         <Voters
           firstVoteTimes={conversation_stats.firstVoteTimes}
           size={this.chartSize}
-          margin={this.chartMargins}
         />
         <Commenters
           firstCommentTimes={conversation_stats.firstCommentTimes}
           size={this.chartSize}
-          margin={this.chartMargins}
         />
       </div>
     )
   }
 }
 
-export default ConversationStats
+export default connect((state: RootState) => state.stats)(connect((state: RootState) => state.zid_metadata)(ConversationStats))

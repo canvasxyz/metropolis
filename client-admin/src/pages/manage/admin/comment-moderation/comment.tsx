@@ -4,13 +4,25 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Flex, Box, Text, Button, Card, Link } from 'theme-ui'
+import { RootState } from '../../../../util/types'
 
-@connect((state) => {
-  return {
-    conversation: state.zid_metadata.zid_metadata
-  }
-})
-class Comment extends React.Component {
+class Comment extends React.Component<{
+  dispatch: Function,
+  acceptClickHandler: Function,
+  rejectClickHandler: Function,
+  toggleIsMetaHandler: Function,
+  acceptButton: boolean,
+  acceptButtonText: string,
+  rejectButton: boolean,
+  rejectButtonText: string,
+  isMetaCheckbox: boolean,
+  comment: { txt: string, is_meta: boolean }
+}, {
+}> {
+  is_meta: HTMLInputElement
+
+  static propTypes: any
+
   onAcceptClicked() {
     this.props.acceptClickHandler(this.props.comment)
   }
@@ -56,13 +68,15 @@ class Comment extends React.Component {
                 {this.props.isMetaCheckbox ? 'metadata' : null}
               </Link>
               {this.props.isMetaCheckbox ? (
-                <input
-                  type="checkbox"
-                  label="metadata"
-                  ref={(c) => (this.is_meta = c)}
-                  checked={this.props.comment.is_meta}
-                  onChange={this.onIsMetaClicked.bind(this)}
-                />
+                <label>
+                  <input
+                    type="checkbox"
+                    ref={(c) => (this.is_meta = c)}
+                    checked={this.props.comment.is_meta}
+                    onChange={this.onIsMetaClicked.bind(this)}
+                  />
+                  metadata
+                </label>
               ) : null}
             </Flex>
           </Flex>
@@ -88,4 +102,4 @@ Comment.propTypes = {
   })
 }
 
-export default Comment
+export default connect((state: RootState) => { conversation: state.zid_metadata.zid_metadata })(Comment)

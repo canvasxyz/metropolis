@@ -22,4 +22,11 @@ export type RootState = {
   user: any
   signout: any
   signin: any
+  zid_metadata: any
+  seed_comments_tweet: any
+  mod_comments_rejected: any
+  mod_comments_accepted: any
+  mod_comments_unmoderated: any
+  seed_comments: any
+  stats: any
 }

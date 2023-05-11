@@ -6,7 +6,19 @@ import { VictoryChart } from 'victory-chart'
 import { VictoryBar } from 'victory-bar'
 import { VictoryAxis } from 'victory-axis'
 
-class VotesDistribution extends React.Component {
+class VotesDistribution extends React.Component<{
+  chartWidth: number,
+  chartHeight: number,
+  data: {
+    votesHistogram: Array<{ n_votes: number, n_ptpts: number }>
+  }
+}, {}> {
+  static propTypes: {
+    chartWidth: unknown,
+    chartHeight: unknown,
+    data: object,
+  }
+  
   render() {
     return (
       <VictoryChart

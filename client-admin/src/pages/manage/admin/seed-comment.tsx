@@ -7,9 +7,18 @@ import { connect } from 'react-redux'
 import { handleSeedCommentSubmit, seedCommentChanged } from '../../../actions'
 import strings from '../../../intl'
 import { Box, Text, Button, jsx, Link } from 'theme-ui'
+import { RootState } from '../../../util/types'
 
-@connect((state) => state.seed_comments)
-class ModerateCommentsSeed extends React.Component {
+class ModerateCommentsSeed extends React.Component<{
+  dispatch: Function
+  params: { conversation_id: string }
+  success: boolean
+  loading?: boolean
+  seedText: string
+  error?: string
+}> {
+  seed_form: HTMLTextAreaElement
+
   constructor(props) {
     super(props)
     this.state = {
@@ -72,7 +81,7 @@ class ModerateCommentsSeed extends React.Component {
               borderColor: 'mediumGray'
             }}
             onChange={this.handleTextareaChange.bind(this)}
-            maxLength="400"
+            maxLength={400}
             data-test-id="seed_form"
             value={seedText}
             ref={(c) => (this.seed_form = c)}
@@ -89,6 +98,4 @@ class ModerateCommentsSeed extends React.Component {
   }
 }
 
-export default ModerateCommentsSeed
-
-// value={this.props.seedText}
+export default connect((state: RootState) => state.seed_comments)(ModerateCommentsSeed)

@@ -7,10 +7,14 @@ import { jsx, Box, Heading } from 'theme-ui'
 import { VictoryChart, VictoryArea } from 'victory'
 import victoryTheme from './victoryTheme'
 
-class Commenters extends React.Component {
+class Voters extends React.Component<{
+  size: number
+  firstVoteTimes: Array<number>
+}> {
   render() {
-    const { size, firstCommentTimes } = this.props
-    if (firstCommentTimes.length <= 1) return null /* handle seed commenter */
+    const { size, firstVoteTimes } = this.props
+    if (firstVoteTimes.length <= 1)
+      return null /* no area chart with 1 data point */
     return (
       <Box sx={{ mt: [5] }}>
         <Heading
@@ -20,7 +24,7 @@ class Commenters extends React.Component {
             lineHeight: 'body',
             my: [2]
           }}>
-          Commenters over time, by time of first comment
+          Voters over time, by time of first vote
         </Heading>
         <VictoryChart
           theme={victoryTheme}
@@ -30,7 +34,7 @@ class Commenters extends React.Component {
           scale={{ x: 'time' }}>
           <VictoryArea
             style={{ data: { fill: '#03a9f4' } }}
-            data={firstCommentTimes.map((d, i) => {
+            data={firstVoteTimes.map((d, i) => {
               return { x: new Date(d), y: i }
             })}
           />
@@ -40,4 +44,4 @@ class Commenters extends React.Component {
   }
 }
 
-export default Commenters
+export default Voters

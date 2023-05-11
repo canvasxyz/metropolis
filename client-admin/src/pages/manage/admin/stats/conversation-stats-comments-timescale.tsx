@@ -8,40 +8,48 @@ import { VictoryLine } from 'victory-line'
 import { VictoryAxis } from 'victory-axis'
 import { scaleLinear, scaleTime } from 'd3-scale'
 
-class VotesTimescale extends React.Component {
+class CommentsTimescale extends React.Component<{
+  chartWidth: number,
+  chartHeight: number,
+  data: { commentTimes: number[] }
+}, {
+}> {
+  static propTypes: {
+  }
+
   render() {
     return (
       <VictoryChart
         width={this.props.chartWidth}
         height={this.props.chartHeight}
         scale={{
-          x: scaleTime(this.props.data.voteTimes),
+          x: scaleTime(this.props.data.commentTimes),
           y: scaleLinear()
         }}>
         <VictoryLine
           style={{
             data: {
               strokeWidth: 2,
-              stroke: 'gold'
+              stroke: 'tomato'
             }
           }}
-          data={this.props.data.voteTimes.map((timestamp, i) => {
+          data={this.props.data.commentTimes.map((timestamp, i) => {
             return { x: timestamp, y: i }
           })}
         />
         <VictoryAxis orientation="bottom" />
-        <VictoryAxis dependentAxis label={'Votes'} orientation={'left'} />
+        <VictoryAxis dependentAxis label={'Comments'} orientation={'left'} />
       </VictoryChart>
     )
   }
 }
 
-VotesTimescale.propTypes = {
+CommentsTimescale.propTypes = {
   chartWidth: PropTypes.number,
   chartHeight: PropTypes.number,
   data: PropTypes.shape({
-    voteTimes: PropTypes.arrayOf(PropTypes.number)
+    commentTimes: PropTypes.arrayOf(PropTypes.number)
   })
 }
 
-export default VotesTimescale
+export default CommentsTimescale

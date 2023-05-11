@@ -4,14 +4,24 @@ import ConversationHasCommentsCheck from './conversation-has-comments-check'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Url from '../../../util/url'
+import { RootState } from '../../../util/types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Heading } from 'theme-ui'
 import ComponentHelpers from '../../../util/component-helpers'
 import NoPermission from './no-permission'
 
-@connect((state) => state.zid_metadata)
-class ShareAndEmbed extends React.Component {
+class ShareAndEmbed extends React.Component<{
+  dispatch: Function,
+  match: { params: { conversation_id: string } },
+  zid_metadata: {
+    parent_url: string,
+    strict_moderation: boolean
+  }
+}, {
+}> {
+  static propTypes: {
+  }
   constructEmbeddedOnMarkup() {
     return (
       <p data-test-id="embed-page">
@@ -31,7 +41,7 @@ class ShareAndEmbed extends React.Component {
       return <NoPermission />
     }
 
-    const { match } = this.props
+    const { match, dispatch } = this.props
     return (
       <div>
         <Heading
@@ -44,8 +54,12 @@ class ShareAndEmbed extends React.Component {
           Distribute
         </Heading>
         <ConversationHasCommentsCheck
+          dispatch={dispatch}
           conversation_id={match.params.conversation_id}
           strict_moderation={this.props.zid_metadata.strict_moderation}
+          unmoderated_comments={[]}
+          rejected_comments={[]}
+          accepted_comments={[]}
         />
         <div>
           <p> Share </p>
@@ -97,4 +111,4 @@ ShareAndEmbed.propTypes = {
   })
 }
 
-export default ShareAndEmbed
+export default connect((state: RootState) => state.zid_metadata)(ShareAndEmbed)

@@ -18,7 +18,3 @@ class Reports extends React.Component {
 }
 
 export default Reports
-
-//
-// <Route path=":report_id" component={Container}>
-// </Route>

@@ -8,9 +8,25 @@ import dateSetupUtil from '../../../util/data-export-date-setup'
 import { Heading } from 'theme-ui'
 import ComponentHelpers from '../../../util/component-helpers'
 import NoPermission from './no-permission'
+import { RootState } from '../../../util/types'
 
-@connect((state) => state.zid_metadata)
-class DataExport extends React.Component {
+class DataExport extends React.Component<{
+  dispatch: Function
+  zid_metadata: { conversation_id: string }
+}, {
+  showHelpMessage: boolean
+  untilEnabled?: boolean
+  days: Array<{ name: string, selected: boolean }>
+  years: Array<{ name: string, selected: boolean }>
+  months: Array<{ num: number, name: string, selected?: boolean }>
+  tzs: Array<{ name: string, selected: boolean }>
+}> {
+  static propTypes: any
+  exportSelectYear: HTMLSelectElement
+  exportSelectMonth: HTMLSelectElement
+  exportSelectDay: HTMLSelectElement
+  exportSelectHour: HTMLSelectElement
+    
   constructor(props) {
     super(props)
     const times = dateSetupUtil()
@@ -34,7 +50,7 @@ class DataExport extends React.Component {
         startDataExport(
           this.props.zid_metadata.conversation_id,
           format,
-          (dddate / 1000) << 0,
+          (+dddate / 1000) << 0,
           !!this.state.untilEnabled
         )
       )
@@ -76,7 +92,7 @@ class DataExport extends React.Component {
           <p> Until: </p>
           <input onClick={this.handleUntilToggled.bind(this)} type="checkbox" />
           <select
-            disabled={this.state.untilEnabled ? '' : 'disabled'}
+            disabled={this.state.untilEnabled ? false : true}
             ref={(c) => (this.exportSelectYear = c)}>
             {this.state.years.map((year, i) => {
               return (
@@ -87,7 +103,7 @@ class DataExport extends React.Component {
             })}
           </select>
           <select
-            disabled={this.state.untilEnabled ? '' : 'disabled'}
+            disabled={this.state.untilEnabled ? false : true}
             ref={(c) => (this.exportSelectMonth = c)}>
             {this.state.months.map((month, i) => {
               return (
@@ -98,7 +114,7 @@ class DataExport extends React.Component {
             })}
           </select>
           <select
-            disabled={this.state.untilEnabled ? '' : 'disabled'}
+            disabled={this.state.untilEnabled ? false : true}
             ref={(c) => (this.exportSelectDay = c)}>
             {this.state.days.map((day, i) => {
               return (
@@ -110,7 +126,7 @@ class DataExport extends React.Component {
             })}
           </select>
           <select
-            disabled={this.state.untilEnabled ? '' : 'disabled'}
+            disabled={this.state.untilEnabled ? false : true}
             ref={(c) => (this.exportSelectHour = c)}>
             {this.state.tzs.map((tz, i) => {
               return (
@@ -142,4 +158,4 @@ DataExport.propTypes = {
   })
 }
 
-export default DataExport
+export default connect((state: RootState) => state.zid_metadata)(DataExport)

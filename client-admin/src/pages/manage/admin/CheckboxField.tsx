@@ -4,6 +4,7 @@ import { Box, Flex, Text } from 'theme-ui'
 import PropTypes from 'prop-types'
 
 import { handleZidMetadataUpdate } from '../../../actions'
+import { RootState } from '../../../util/types'
 
 export const CheckboxField = ({
   field,
@@ -11,7 +12,7 @@ export const CheckboxField = ({
   children,
   isIntegerBool = false
 }) => {
-  const { zid_metadata } = useSelector((state) => state.zid_metadata)
+  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
   const [state, setState] = useState(zid_metadata[field])
   const dispatch = useDispatch()
 
@@ -34,19 +35,21 @@ export const CheckboxField = ({
   return (
     <Flex sx={{ alignItems: 'flex-start', mb: [3] }}>
       <Box sx={{ flexShrink: 0, position: 'relative', top: -0.5 }}>
-        <input
-          type="checkbox"
-          label={label}
-          data-test-id={field}
-          checked={
-            isIntegerBool ? zid_metadata[field] === 1 : zid_metadata[field]
-          }
-          onChange={
-            isIntegerBool
-              ? () => handleIntegerBoolValueChange(field)
-              : () => handleBoolValueChange(field)
-          }
-        />
+        <label>
+          <input
+            type="checkbox"
+            data-test-id={field}
+            checked={
+              isIntegerBool ? zid_metadata[field] === 1 : zid_metadata[field]
+            }
+            onChange={
+              isIntegerBool
+                ? () => handleIntegerBoolValueChange(field)
+                : () => handleBoolValueChange(field)
+            }
+          />
+          {label}
+        </label>
       </Box>
       <Box sx={{ ml: [2], flexShrink: 0, maxWidth: '35em' }}>
         <Text>{children}</Text>
@@ -54,6 +57,7 @@ export const CheckboxField = ({
     </Flex>
   )
 }
+
 CheckboxField.propTypes = {
   field: PropTypes.string.isRequired,
   label: PropTypes.string,

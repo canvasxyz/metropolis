@@ -7,8 +7,8 @@ import {
   handleSeedCommentTweetSubmit,
   seedCommentTweetChanged
 } from '../../../actions'
-import Radium from 'radium'
 import strings from '../../../intl'
+import { RootState } from '../../../util/types'
 
 const styles = {
   card: {
@@ -21,9 +21,17 @@ const styles = {
   }
 }
 
-@connect((state) => state.seed_comments_tweet)
-@Radium
-class ModerateCommentsSeed extends React.Component {
+class ModerateCommentsSeed extends React.Component<{
+  dispatch: Function
+  error: string,
+  success: any,
+  loading: any,
+  seedTweetText: string,
+  params: { conversation_id: string }
+}, {
+}> {
+  seed_form_tweet: HTMLTextAreaElement
+
   constructor(props) {
     super(props)
     this.state = {
@@ -92,8 +100,8 @@ class ModerateCommentsSeed extends React.Component {
           <textarea
             value={this.props.seedTweetText}
             onChange={this.handleTextareaChange.bind(this)}
-            rows="1"
-            maxLength="200"
+            rows={1}
+            maxLength={200}
             style={{
               width: '100%',
               maxWidth: 400,
@@ -123,18 +131,7 @@ class ModerateCommentsSeed extends React.Component {
   }
 }
 
-ModerateCommentsSeed.propTypes = {
-  dispatch: PropTypes.func,
-  error: PropTypes.string,
-  success: PropTypes.any,
-  loading: PropTypes.any,
-  seedTweetText: PropTypes.string,
-  params: PropTypes.shape({
-    conversation_id: PropTypes.string
-  })
-}
-
-export default ModerateCommentsSeed
+export default connect((state: RootState) => state.seed_comments_tweet)(ModerateCommentsSeed)
 
 /*
   todo

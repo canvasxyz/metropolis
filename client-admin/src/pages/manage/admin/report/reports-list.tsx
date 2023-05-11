@@ -4,13 +4,24 @@ import api from '../../../../util/api'
 import React from 'react'
 import PropTypes from 'prop-types'
 import Url from '../../../../util/url'
+import { RootState } from '../../../../util/types'
 import { connect } from 'react-redux'
 import { Heading, Box, Button } from 'theme-ui'
 import ComponentHelpers from '../../../../util/component-helpers'
 import NoPermission from '../no-permission'
 
-@connect((state) => state.zid_metadata)
-class ReportsList extends React.Component {
+class ReportsList extends React.Component<{
+  match: { params: { conversation_id: string } }
+  zid_metadata: { is_mod: boolean }
+}, {
+  loading: boolean
+  reports: Array<{ report_id: string }>
+}> {
+  static propTypes: {
+    match: object,
+    zid_metadata: object,
+  }
+
   constructor(props) {
     super(props)
     this.state = {
@@ -101,4 +112,4 @@ ReportsList.propTypes = {
   })
 }
 
-export default ReportsList
+export default connect((state: RootState) => state.zid_metadata)(ReportsList)
