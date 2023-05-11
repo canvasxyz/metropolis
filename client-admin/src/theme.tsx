@@ -1,11 +1,9 @@
 export default {
   space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
   fonts: {
-    body:
-      // 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif',
-      "'Space Mono', monospace",
-    heading: 'inherit',
-    monospace: "'Space Mono', monospace"
+    heading: "Space Mono, monospace",
+    body: "Manrope, sans-serif",
+    monospace: "Space Mono, monospace"
   },
   fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
   fontWeights: {
@@ -13,20 +11,12 @@ export default {
     heading: 700,
     bold: 700
   },
-  sizes: {
-    maxWidth: {
-      paragraph: '35em' // right syntax? https://theme-ui.com/theme-spec
-    }
-  },
   lineHeights: {
     body: 1.5,
     heading: 1.125
   },
   colors: {
-    // text: "#FFF",
     text: '#60656F',
-    // background: "#03a9f4",
-    // primary: "#FFF",
     background: '#FFF',
     primary: '#03a9f4',
     secondary: '#F6F7F8',
@@ -84,7 +74,7 @@ export default {
     primary: {
       color: 'background',
       bg: 'primary',
-      fontFamily: 'body',
+      fontFamily: 'monospace',
       cursor: 'pointer'
     }
   },
@@ -120,6 +110,6 @@ export default {
       borderBottom: 'solid',
       borderWidth: 2,
       borderColor: 'background'
-    }
+    },
   }
 }

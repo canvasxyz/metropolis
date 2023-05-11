@@ -20,7 +20,7 @@ class SignOut extends React.Component<{ dispatch: Function }, {}> {
     return (
       <StaticLayout>
         <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
-          Signing Out
+          Signing Out...
         </Heading>
       </StaticLayout>
     )

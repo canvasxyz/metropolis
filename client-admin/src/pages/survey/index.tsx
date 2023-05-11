@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { connect } from 'react-redux'
-import { Box, Heading, Button, Text, Input } from 'theme-ui'
+import { Box, Heading, Button, Text, Input, jsx } from 'theme-ui'
 
 import api from '../../util/api';
 import CommentCard from './comment_card';
 import type { Comment } from "../../util/types"
 
 // TODO: enforce comment too long on backend
+/** @jsx jsx */
 
 type SurveyProps = {
   conversation_id: string
@@ -81,11 +82,24 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
       </Heading>
       <Box sx={{ mb: [3, null, 4] }}>
         <form onSubmit={(e) => e.preventDefault()}>
-          <Input ref={inputRef} placeholder="Write a new card here..."/>
+          <Input
+            sx={{
+              fontFamily: 'body',
+              fontSize: [2],
+              width: '35em',
+              borderRadius: 2,
+              padding: [2],
+              border: '1px solid',
+              borderColor: 'mediumGray',
+              mb: [3]
+            }}
+            ref={inputRef}
+            placeholder="Write a new card here..."
+          />
           <Button onClick={() => {
             submitComment(inputRef.current.value).then(() => inputRef.current.value = '')
           }}>Add new comment</Button>
-          <Button sx={{ ml: 1 }}>Agree</Button>
+          <Button sx={{ ml: 3 }}>Agree</Button>
           <Button sx={{ ml: 1 }}>Disagree</Button>
           <Button sx={{ ml: 1 }}>Skip</Button>
         </form>

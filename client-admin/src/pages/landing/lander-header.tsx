@@ -15,7 +15,8 @@ class Header extends Component {
             width: '100%',
             paddingTop: '2rem',
             paddingBottom: '1.45rem',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            fontFamily: "monospace"
           }}>
           <Box sx={{ zIndex: 1000 }}>
             <Link sx={{ variant: 'links.nav' }} to="/home">
