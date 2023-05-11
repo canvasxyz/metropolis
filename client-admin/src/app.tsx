@@ -56,7 +56,7 @@ const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
 }
 
 PrivateRoute.propTypes = {
-  component: PropTypes.element,
+  component: PropTypes.oneOfType([PropTypes.elementType, PropTypes.element]),
   isLoading: PropTypes.bool,
   location: PropTypes.object,
   authed: PropTypes.bool
