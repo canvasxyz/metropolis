@@ -72,16 +72,14 @@ class ConversationConfig extends React.Component<{
         </Heading>
         <Box sx={{ mb: [4] }}>
           {this.props.loading ? (
-            <Text>{emoji('💾')} Saving</Text>
+            <Text>Saving...</Text>
           ) : (
-            <Text>{emoji('⚡')} Up to date</Text>
+            <Text>⚡ Up to date</Text>
           )}
           {this.props.error ? <Text>Error Saving</Text> : null}
         </Box>
 
-        <CheckboxField field="is_active" label="Conversation Is Open">
-          Conversation is open. Unchecking disables both voting and commenting.
-        </CheckboxField>
+        <CheckboxField field="is_active" label="Conversation is open">Unchecking disables voting and commenting</CheckboxField>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>Topic</Text>

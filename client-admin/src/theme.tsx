@@ -20,7 +20,8 @@ export default {
     background: '#FFF',
     primary: '#62a6ef',
     secondary: '#F6F7F8',
-    mediumGray: '#60656F'
+    mediumGray: '#60656F',
+    lightGray: '#8f8f8f'
   },
   links: {
     nav: {

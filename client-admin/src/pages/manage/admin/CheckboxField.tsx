@@ -9,7 +9,7 @@ import { RootState } from '../../../util/types'
 export const CheckboxField = ({
   field,
   label = '',
-  children,
+  children = '',
   isIntegerBool = false
 }) => {
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
@@ -33,8 +33,7 @@ export const CheckboxField = ({
   }
 
   return (
-    <Flex sx={{ alignItems: 'flex-start', mb: [3] }}>
-      <Box sx={{ flexShrink: 0, position: 'relative', top: -0.5 }}>
+    <Box sx={{ mb: [3] }}>
         <label>
           <input
             type="checkbox"
@@ -48,19 +47,18 @@ export const CheckboxField = ({
                 : () => handleBoolValueChange(field)
             }
           />
-          {label}
+          &nbsp;<strong>{label}</strong>
         </label>
-      </Box>
-      <Box sx={{ ml: [2], flexShrink: 0, maxWidth: '35em' }}>
-        <Text>{children}</Text>
-      </Box>
-    </Flex>
+      <Text sx={{ display: "inline", ml: [2], color: 'lightGray' }}>
+        {children}
+      </Text>
+    </Box>
   )
 }
 
 CheckboxField.propTypes = {
   field: PropTypes.string.isRequired,
   label: PropTypes.string,
-  children: PropTypes.string.isRequired,
+  children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
   isIntegerBool: PropTypes.bool
 }
