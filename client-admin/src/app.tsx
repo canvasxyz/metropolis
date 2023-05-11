@@ -27,7 +27,6 @@ import CreateUser from './pages/landing/createuser'
 
 /* manage */
 import Conversations from './pages/manage/conversations'
-import ConversationIntegrate from './pages/manage/integrate'
 import ConversationAdmin from './pages/manage/admin'
 import Account from './pages/manage/account'
 
@@ -198,11 +197,6 @@ class App extends React.Component<{
                         </Link>
                       </Box>
                       <Box sx={{ mb: [3] }}>
-                        <Link sx={{ variant: 'links.nav' }} to={`/integrate`}>
-                          Integrate
-                        </Link>
-                      </Box>
-                      <Box sx={{ mb: [3] }}>
                         <Link sx={{ variant: 'links.nav' }} to={`/account`}>
                           Account
                         </Link>
@@ -235,13 +229,6 @@ class App extends React.Component<{
                         exact
                         path="/account"
                         component={Account}
-                      />
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/integrate"
-                        component={ConversationIntegrate}
                       />
                       <Route
                         path="/c/:conversation_id"
