@@ -5,7 +5,7 @@ const setupBasedOnCurrentDate = () => {
   const month = d.getMonth() + 1 || 12
   const year = d.getUTCFullYear() || 2030
   const dayOfMonth = d.getDate() || 31
-  let tzKey = d.getTimezoneOffset() || 480
+  let tzKey: number | string = d.getTimezoneOffset() || 480
   tzKey = tzKey / 60
   const tzWasNegative = tzKey < 0
   tzKey = Math.abs(tzKey)
@@ -18,6 +18,11 @@ const setupBasedOnCurrentDate = () => {
     tzKey = 'UTC-' + tzKey + '00'
   }
 
+  type Month = {
+    num: number,
+    name: string,
+    selected?: boolean,
+  }
   const months = [
     { num: 1, name: 'january' },
     { num: 2, name: 'february' },
@@ -31,7 +36,7 @@ const setupBasedOnCurrentDate = () => {
     { num: 10, name: 'october' },
     { num: 11, name: 'november' },
     { num: 12, name: 'december' }
-  ].map(function (m) {
+  ].map(function (m: Month) {
     if (m.num === month) {
       m.selected = true
     }
@@ -88,7 +93,7 @@ const setupBasedOnCurrentDate = () => {
   ].map(function (s) {
     return {
       name: s,
-      selected: s === tzKey
+      selected: s === tzKey.toString()
     }
   })
 
