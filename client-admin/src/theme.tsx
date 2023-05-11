@@ -18,7 +18,7 @@ export default {
   colors: {
     text: '#60656F',
     background: '#FFF',
-    primary: '#03a9f4',
+    primary: '#62a6ef',
     secondary: '#F6F7F8',
     mediumGray: '#60656F'
   },
