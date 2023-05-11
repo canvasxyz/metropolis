@@ -26,7 +26,7 @@ class Header extends Component {
               Polis
             </Link>
           </Box>
-          <Box>
+          <Box sx={{ mt: [1] }}>
             <Link sx={{ variant: 'links.nav' }} to="/signin">
               Sign in
             </Link>

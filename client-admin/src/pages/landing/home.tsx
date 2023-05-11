@@ -6,46 +6,34 @@ const Index = () => {
   return (
     <Layout>
       <React.Fragment>
-        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
-          Input Crowd, Output Meaning
-        </Heading>
         <Heading
-          as="h3"
+          as="h1"
           sx={{
-            fontSize: [3, null, 4],
-            lineHeight: 'body',
-            mb: [4, null, 5]
+            fontSize: [3, null, 5],
+            lineHeight: 1.3,
+            mt: [4],
+            mb: [4]
           }}>
-          Polis is a real-time system for gathering, analyzing and understanding
-          what large groups of people think in their own words, enabled by
-          advanced statistics and machine learning.
+            A tool for collaborative intelligence
         </Heading>
         <Box sx={{ mb: [4, null, 5] }}>
-          <Text>
-            Polis has been used all over the world by governments, academics,
-            independent media and citizens, and is completely open source.
+          <Text sx={{ my: 3 }}>
+            Polis is a tool for gathering, analyzing, and
+            understanding what groups of people think.
           </Text>
-        </Box>
-        <Heading
-          as="h3"
-          sx={{ fontSize: [4], lineHeight: 'body', mb: [2, null, 3] }}>
-          Get Started
-        </Heading>
-        <Box sx={{ mb: [4, null, 5] }}>
-          <Link href="/createuser">Sign up</Link>
-          {' or '}
-          <Link href="/signin">Sign in</Link>
-        </Box>
-        <Heading
-          as="h3"
-          sx={{ fontSize: [4], lineHeight: 'body', my: [2, null, 3] }}>
-          Contribute
-        </Heading>
-        <Box sx={{ mb: [4, null, 5] }}>
-          Explore the code and join the developer community{' '}
-          <Link target="_blank" href="https://github.com/compdemocracy/">
-            on Github
-          </Link>
+          <Text sx={{ my: 3 }}>
+            Starting from a prompt, groups contribute and vote on cards that map
+            out the opinion space around a topic.
+          </Text>
+          <Text sx={{ my: 3 }}>
+            The tool is open-source, and based on Polis, a tool used by
+            governments, academics, and citizens around the world.
+          </Text>
+          <Box sx={{ mt: [4, null, 4] }}>
+            <Link href="/createuser">Sign up</Link>
+            {' or '}
+            <Link href="/signin">Sign in</Link>
+          </Box>
         </Box>
       </React.Fragment>
     </Layout>

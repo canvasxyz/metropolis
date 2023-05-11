@@ -62,9 +62,9 @@ class Comment extends React.Component<{
             </Box>
             <Flex sx={{ alignItems: 'center' }}>
               <Link
-                target="_blank"
+                title="Identifying information that should not be considered in the survey"
                 sx={{ mr: [2] }}
-                href="https://compdemocracy.org/metadata">
+                href="#">
                 {this.props.isMetaCheckbox ? 'metadata' : null}
               </Link>
               {this.props.isMetaCheckbox ? (

@@ -80,7 +80,7 @@ class SignIn extends React.Component<{
   maybeErrorMessage() {
     let markup = <div></div>
     if (this.props.error) {
-      markup = <div>{strings(this.props.error.responseText)}</div>
+      markup = <div sx={{ color: "#d8403a" }}>{strings(this.props.error.responseText)}</div>
     }
     return markup
   }
@@ -104,6 +104,7 @@ class SignIn extends React.Component<{
               ref={(c) => this.email = c}
               placeholder="email"
               type="email"
+              autoComplete="off"
             />
           </Box>
           <Box sx={{ my: [2] }}>
@@ -125,7 +126,7 @@ class SignIn extends React.Component<{
           </Box>
           {this.maybeErrorMessage()}
           <Button
-            sx={{ my: [2] }}
+            sx={{ mt: [4], my: [2] }}
             id="signinButton"
             onClick={this.handleLoginClicked.bind(this)}>
             {this.props.pending ? 'Signing in...' : 'Sign In'}
@@ -192,7 +193,7 @@ class SignIn extends React.Component<{
     return (
       <StaticLayout>
         <React.Fragment>
-          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
+          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
             Sign In
           </Heading>
           {this.props.facebookError !== 'polis_err_user_with_this_email_exists'

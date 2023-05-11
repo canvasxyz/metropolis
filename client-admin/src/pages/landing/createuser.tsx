@@ -67,7 +67,7 @@ class CreateUser extends React.Component<{
   maybeErrorMessage() {
     let markup = <React.Fragment/>
     if (this.props.error) {
-      markup = <div>{strings(this.props.error.responseText)}</div>
+      markup = <div sx={{ color: "#d8403a" }}>{strings(this.props.error.responseText)}</div>
     }
     return markup
   }
@@ -147,17 +147,11 @@ class CreateUser extends React.Component<{
           </Box>
           {this.maybeErrorMessage()}
 
-          <Box>
+          <Box sx={{ mt: [3], mb: [3] }}>
             I agree to the{' '}
-            <a href="https://pol.is/tos" tabIndex={110}>
-              pol.is terms
-            </a>{' '}
+            <a href="tos" tabIndex={110}>terms of service</a>{' '}
             and{' '}
-            <a href="https://pol.is/privacy" tabIndex={111}>
-              {' '}
-              privacy agreement
-            </a>
-            .
+            <a href="/privacy" tabIndex={111}>privacy policy</a>.
           </Box>
           <Button
             sx={{ my: [2] }}
@@ -223,7 +217,7 @@ class CreateUser extends React.Component<{
     return (
       <StaticLayout>
         <React.Fragment>
-          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
+          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
             Create Account
           </Heading>
           {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
