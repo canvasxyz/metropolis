@@ -7,9 +7,9 @@ import { doPasswordResetInit } from '../../actions'
 
 import StaticLayout from './lander-layout'
 
-class PasswordResetInit extends React.Component<{ dispatch: Function }, {
+class PasswordResetInit extends React.Component<{ dispatch: Function }, {}> {
   email: HTMLInputElement
-}> {
+
   static propTypes: {
     dispatch: Function
   }
@@ -18,7 +18,7 @@ class PasswordResetInit extends React.Component<{ dispatch: Function }, {
     e.preventDefault()
 
     const attrs = {
-      email: this.state.email.value
+      email: this.email.value
     }
 
     this.props.dispatch(doPasswordResetInit(attrs))
@@ -31,7 +31,7 @@ class PasswordResetInit extends React.Component<{ dispatch: Function }, {
           <h1>Password Reset</h1>
           <form>
             <input
-              ref={(c) => (this.setState({ email: c }))}
+              ref={(c) => this.email = c}
               placeholder="email"
               type="text"
             />

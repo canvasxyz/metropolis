@@ -22,11 +22,11 @@ class SignIn extends React.Component<{
   signInSuccessful?: boolean
   facebookError?: string
   location: UrlObject
-}, {
-  email: HTMLInputElement,
+}> {
+  email: HTMLInputElement
   password: HTMLInputElement
   facebook_password: HTMLInputElement
-}> {
+
   // eslint-disable-next-line node/handle-callback-err
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
@@ -45,8 +45,8 @@ class SignIn extends React.Component<{
   handleLoginClicked(e) {
     e.preventDefault()
     const attrs = {
-      email: this.state.email.value,
-      password: this.state.password.value
+      email: this.email.value,
+      password: this.password.value
     }
 
     // var dest = this.getDest();
@@ -73,7 +73,7 @@ class SignIn extends React.Component<{
     if (!dest.length) {
       dest = '/'
     }
-    const optionalPassword = this.state.facebook_password.value
+    const optionalPassword = this.facebook_password.value
     this.props.dispatch(doFacebookSignin(dest, optionalPassword))
   }
 
@@ -101,7 +101,7 @@ class SignIn extends React.Component<{
                 borderColor: 'mediumGray'
               }}
               id="signinEmailInput"
-              ref={(c) => (this.setState({ email: c }))}
+              ref={(c) => this.email = c}
               placeholder="email"
               type="email"
             />
@@ -118,7 +118,7 @@ class SignIn extends React.Component<{
                 borderColor: 'mediumGray'
               }}
               id="signinPasswordInput"
-              ref={(c) => (this.setState({ password: c }))}
+              ref={(c) => this.password = c }
               placeholder="password"
               type="password"
             />
@@ -170,7 +170,7 @@ class SignIn extends React.Component<{
           }
         </p>
         <input
-          ref={(c) => (this.setState({ facebook_password: c }))}
+          ref={(c) => this.facebook_password = c}
           placeholder="polis password"
           type="password"
         />

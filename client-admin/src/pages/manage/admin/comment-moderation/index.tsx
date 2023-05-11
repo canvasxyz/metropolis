@@ -27,18 +27,17 @@ class CommentModeration extends React.Component<{
   accepted: { accepted_comments: object[] }
   rejected: { rejected_comments: object[] }
   seed: object[]
-}, {
-  getCommentsRepeatedly: ReturnType<typeof setInterval>
 }> {
+  getCommentsRepeatedly: ReturnType<typeof setInterval>
   loadComments() {
     const { match } = this.props
     this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
   }
 
   UNSAFE_componentWillMount() {
-    this.setState({ getCommentsRepeatedly: setInterval(() => {
+    this.getCommentsRepeatedly = setInterval(() => {
       this.loadComments()
-    }, pollFrequency) })
+    }, pollFrequency)
   }
 
   componentDidMount() {
@@ -46,7 +45,7 @@ class CommentModeration extends React.Component<{
   }
 
   componentWillUnmount() {
-    clearInterval(this.state.getCommentsRepeatedly)
+    clearInterval(this.getCommentsRepeatedly)
   }
 
   render() {
