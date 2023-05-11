@@ -33,7 +33,7 @@ module.exports = (env, options) => {
       clean: true,
     },
     resolve: {
-      extensions: [".js", ".css", ".png", ".svg"],
+      extensions: [".tsx", ".ts", ".js", ".css", ".png", ".svg"],
     },
     devServer: {
       historyApiFallback: true,
@@ -139,6 +139,11 @@ module.exports = (env, options) => {
     },
     module: {
       rules: [
+        {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: 'ts-loader',
+        },
         {
           test: /\.m?js$/,
           exclude: /node_modules/,
