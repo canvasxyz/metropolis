@@ -8,7 +8,7 @@ const basePath = ''
 
 // var pid = "unknownpid";
 
-function ajax(api, data, type) {
+function ajax(api, data, type, params) {
   if (!_.isString(api)) {
     throw new Error('api param should be a string')
   }
@@ -35,8 +35,7 @@ function ajax(api, data, type) {
     url: url,
     contentType: 'application/json; charset=utf-8',
     headers: {
-      // "Cache-Control": "no-cache"  // no-cache
-      'Cache-Control': 'max-age=0'
+      "Cache-Control": params?.noCache ? "no-cache" : 'max-age=0'
     },
     xhrFields: {
       withCredentials: true
@@ -75,12 +74,12 @@ function ajax(api, data, type) {
   return promise
 }
 
-function post(api, data) {
-  return ajax(api, data, 'POST')
+function post(api, data, params?) {
+  return ajax(api, data, 'POST', params)
 }
 
-function get(api, data) {
-  return ajax(api, data, 'GET')
+function get(api, data, params?) {
+  return ajax(api, data, 'GET', params)
 }
 
 const api = { get, post, ajax }

@@ -86,24 +86,20 @@ class App extends React.Component<{
     }
   }
 
-  loadUserData() {
-    this.props.dispatch(populateUserStore())
-  }
-
   UNSAFE_componentWillMount() {
-    this.loadUserData()
+    this.props.dispatch(populateUserStore())
   }
 
   isAuthed() {
     let authed = false
 
-    if (!_.isUndefined(this.props.isLoggedIn) && this.props.isLoggedIn) {
+    if (this.props.isLoggedIn) {
       authed = true
     }
 
     if (
-      (this.props.error && this.props.status === 401) ||
-      this.props.status === 403
+      (this.props.error && this.props.status === 401)
+      // || this.props.status === 403
     ) {
       authed = false
     }
@@ -276,7 +272,7 @@ App.propTypes = {
     pathname: PropTypes.string
   }),
   user: PropTypes.shape({
-    uid: PropTypes.string,
+    uid: PropTypes.number,
     email: PropTypes.string,
     created: PropTypes.number,
     hname: PropTypes.string

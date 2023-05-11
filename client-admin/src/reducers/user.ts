@@ -11,6 +11,7 @@ const user = (
   },
   action
 ) => {
+  console.log('u', state, action.type)
   switch (action.type) {
     case types.REQUEST_USER:
       return Object.assign({}, state, {

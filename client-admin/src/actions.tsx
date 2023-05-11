@@ -189,7 +189,7 @@ const userFetchError = (err) => {
 }
 
 const fetchUser = () => {
-  return api.get('/api/v3/users', { errIfNoAuth: true })
+  return api.get('/api/v3/users', { errIfNoAuth: true }, { noCache: true })
 }
 
 export const populateUserStore = () => {

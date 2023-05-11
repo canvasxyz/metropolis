@@ -173,6 +173,7 @@ class SignIn extends React.Component<{
           ref={(c) => this.facebook_password = c}
           placeholder="polis password"
           type="password"
+          autoComplete="current-password"
         />
         <button onClick={this.handleFacebookPasswordSubmit.bind(this)}>
           {'Connect Facebook Account'}

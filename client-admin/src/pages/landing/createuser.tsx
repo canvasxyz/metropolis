@@ -125,6 +125,7 @@ class CreateUser extends React.Component<{
               ref={(c) => this.password = c}
               placeholder="password"
               type="password"
+              autoComplete="new-password"
             />
           </Box>
           <Box sx={{ my: [2] }}>

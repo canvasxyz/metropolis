@@ -180,10 +180,10 @@ class Conversations extends React.Component<{
 
 Conversations.propTypes = {
   dispatch: PropTypes.func,
-  error: PropTypes.shape({
+  error: PropTypes.oneOfType([PropTypes.bool, PropTypes.shape({
     status: PropTypes.number,
     statusText: PropTypes.string
-  }),
+  })]),
   loading: PropTypes.bool,
   conversations: PropTypes.arrayOf(
     PropTypes.shape({
