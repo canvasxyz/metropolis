@@ -5,10 +5,19 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Box, Heading } from 'theme-ui'
 
+import { User } from "../../util/types"
 import Spinner from '../widgets/spinner'
 
-@connect((state) => state.user)
-class Account extends React.Component {
+@(connect as any)((state) => state.user)
+class Account extends React.Component<{
+  user: User
+}, {
+
+}> {
+  static propTypes: {
+    user: object
+  }
+
   buildAccountMarkup() {
     return (
       <>

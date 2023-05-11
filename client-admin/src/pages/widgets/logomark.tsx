@@ -2,7 +2,7 @@
 import React from 'react'
 import { jsx } from 'theme-ui'
 
-class Logomark extends React.Component {
+class Logomark extends React.Component<{ style: React.CSSProperties, fill: string }> {
   render() {
     return (
       <svg

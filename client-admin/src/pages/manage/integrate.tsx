@@ -6,8 +6,15 @@ import { connect } from 'react-redux'
 import { Box, Heading, Text } from 'theme-ui'
 import Url from '../../util/url'
 
-@connect((state) => state.user)
-class Integrate extends React.Component {
+@(connect as any)((state) => state.user)
+class Integrate extends React.Component<{
+  user: { site_ids: string[] }
+}, {
+}> {
+  static propTypes: {
+    user: unknown
+  }
+
   render() {
     const userSiteId = this.props.user === null
      ? '__loading, try refreshing__'

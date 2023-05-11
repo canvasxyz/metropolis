@@ -1,3 +1,10 @@
+export type User = {
+  hname: string,
+  email: string,
+  hasFacebook: boolean,
+  hasTwitter: boolean
+}
+
 export type Comment = {
   txt: string
   tid: string
