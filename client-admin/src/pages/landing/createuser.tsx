@@ -9,11 +9,24 @@ import { Heading, Box, Text, Button, jsx } from 'theme-ui'
 import { Link } from 'react-router-dom'
 import StaticLayout from './lander-layout'
 import strings from '../../intl'
+import { UrlObject } from 'url'
 
 const fbAppId = process.env.FB_APP_ID
 
-@connect((state) => state.signin)
-class Createuser extends React.Component {
+@(connect as any)((state) => state.signin)
+class Createuser extends React.Component<{
+  location: UrlObject
+  dispatch: Function
+  error: XMLHttpRequest
+  pending: boolean
+  facebookError: string
+}, {
+  hname: HTMLInputElement
+  email: HTMLInputElement
+  password: HTMLInputElement
+  password2: HTMLInputElement
+  facebook_password: HTMLInputElement
+}> {
   getDest() {
     return this.props.location.pathname.slice('/createuser'.length)
   }
@@ -21,9 +34,9 @@ class Createuser extends React.Component {
   handleLoginClicked(e) {
     e.preventDefault()
     const attrs = {
-      hname: this.hname.value,
-      email: this.email.value,
-      password: this.password.value,
+      hname: this.state.hname.value,
+      email: this.state.email.value,
+      password: this.state.password.value,
       gatekeeperTosPrivacy: true
     }
 
@@ -47,12 +60,12 @@ class Createuser extends React.Component {
     if (!dest.length) {
       dest = '/'
     }
-    const optionalPassword = this.facebook_password.value
+    const optionalPassword = this.state.facebook_password.value
     this.props.dispatch(doFacebookSignin(dest, optionalPassword))
   }
 
   maybeErrorMessage() {
-    let markup = ''
+    let markup = <React.Fragment/>
     if (this.props.error) {
       markup = <div>{strings(this.props.error.responseText)}</div>
     }
@@ -75,7 +88,7 @@ class Createuser extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="createUserNameInput"
-              ref={(c) => (this.hname = c)}
+              ref={(c) => (this.setState({ hname: c }))}
               placeholder="name"
               type="text"
             />
@@ -92,7 +105,7 @@ class Createuser extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="createUserEmailInput"
-              ref={(c) => (this.email = c)}
+              ref={(c) => (this.setState({ email: c }))}
               placeholder="email"
               type="email"
             />
@@ -109,7 +122,7 @@ class Createuser extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="createUserPasswordInput"
-              ref={(c) => (this.password = c)}
+              ref={(c) => (this.setState({ password: c }))}
               placeholder="password"
               type="password"
             />
@@ -126,7 +139,7 @@ class Createuser extends React.Component {
                 borderColor: 'mediumGray'
               }}
               id="createUserPasswordRepeatInput"
-              ref={(c) => (this.password2 = c)}
+              ref={(c) => (this.setState({ password2: c }))}
               placeholder="repeat password"
               type="password"
             />
@@ -135,11 +148,11 @@ class Createuser extends React.Component {
 
           <Box>
             I agree to the{' '}
-            <a href="https://pol.is/tos" tabIndex="110">
+            <a href="https://pol.is/tos" tabIndex={110}>
               pol.is terms
             </a>{' '}
             and{' '}
-            <a href="https://pol.is/privacy" tabIndex="111">
+            <a href="https://pol.is/privacy" tabIndex={111}>
               {' '}
               privacy agreement
             </a>
@@ -155,7 +168,7 @@ class Createuser extends React.Component {
         <Box sx={{ mb: [4] }}>
           Already have an account?{' '}
           <Link
-            tabIndex="6"
+            tabIndex={6}
             to={'/signin' + this.getDest()}
             data-section="signup-select">
             Sign in
@@ -163,7 +176,7 @@ class Createuser extends React.Component {
         </Box>
 
         {fbAppId && (
-          <>
+          <React.Fragment>
             <Button
               sx={{ my: [2] }}
               id="signupFacebookButton"
@@ -175,7 +188,7 @@ class Createuser extends React.Component {
               user, you will be registered and you agree to the pol.is terms and
               privacy policy
             </Text>
-          </>
+          </React.Fragment>
         )}
       </Box>
     )
@@ -194,7 +207,7 @@ class Createuser extends React.Component {
           login.
         </Text>
         <input
-          ref={(c) => (this.facebook_password = c)}
+          ref={(c) => (this.setState({ facebook_password: c }))}
           placeholder="polis password"
           type="password"
         />
@@ -208,14 +221,14 @@ class Createuser extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <div>
+        <React.Fragment>
           <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
             Create Account
           </Heading>
           {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
             ? this.drawForm()
             : this.drawPasswordConnectFacebookForm()}
-        </div>
+        </React.Fragment>
       </StaticLayout>
     )
   }

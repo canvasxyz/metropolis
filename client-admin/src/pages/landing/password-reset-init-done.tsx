@@ -5,14 +5,12 @@ import { connect } from 'react-redux'
 
 import StaticLayout from './lander-layout'
 
-@connect()
+@(connect as any)()
 class PasswordResetInitDone extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <div>
-          <p>Check your email for a password reset link</p>
-        </div>
+        <p>Check your email for a password reset link</p>
       </StaticLayout>
     )
   }

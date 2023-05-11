@@ -7,13 +7,19 @@ import { doPasswordResetInit } from '../../actions'
 
 import StaticLayout from './lander-layout'
 
-@connect()
-class PasswordResetInit extends React.Component {
+@(connect as any)()
+class PasswordResetInit extends React.Component<{ dispatch: Function }, {
+  email: HTMLInputElement
+}> {
+  static propTypes: {
+    dispatch: Function
+  }
+
   handleClick(e) {
     e.preventDefault()
 
     const attrs = {
-      email: this.email.value
+      email: this.state.email.value
     }
 
     this.props.dispatch(doPasswordResetInit(attrs))
@@ -22,17 +28,19 @@ class PasswordResetInit extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <h1> Password Reset</h1>
-        <form>
-          <input
-            ref={(c) => (this.email = c)}
-            placeholder="email"
-            type="text"
-          />
-          <button onClick={this.handleClick.bind(this)}>
-            Send password reset email
-          </button>
-        </form>
+        <React.Fragment>
+          <h1>Password Reset</h1>
+          <form>
+            <input
+              ref={(c) => (this.setState({ email: c }))}
+              placeholder="email"
+              type="text"
+            />
+            <button onClick={this.handleClick.bind(this)}>
+              Send password reset email
+            </button>
+          </form>
+        </React.Fragment>
       </StaticLayout>
     )
   }

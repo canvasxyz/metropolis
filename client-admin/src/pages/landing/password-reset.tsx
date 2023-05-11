@@ -5,17 +5,23 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { doPasswordReset } from '../../actions'
 import StaticLayout from './lander-layout'
+import { UrlObject } from 'url'
 
-@connect()
-class PasswordReset extends React.Component {
+@(connect as any)()
+class PasswordReset extends React.Component<{ dispatch: Function, location: UrlObject }, {
+  passwordRepeat: HTMLInputElement
+  password: HTMLInputElement
+}> {
+  static propTypes: { dispatch: Function, location: object }
+
   handleClick(e) {
     e.preventDefault()
     const attrs = {
-      newPassword: this.password.value,
+      newPassword: this.state.password.value,
       pwresettoken: this.props.location.pathname.slice('/pwreset/'.length)
     }
 
-    if (attrs.newPassword !== this.passwordRepeat.value) {
+    if (attrs.newPassword !== this.state.passwordRepeat.value) {
       alert('Passwords need to match')
       return
     }
@@ -26,22 +32,24 @@ class PasswordReset extends React.Component {
   render() {
     return (
       <StaticLayout>
-        <h1>Password Reset</h1>
-        <form>
-          <input
-            ref={(c) => (this.password = c)}
-            placeholder="new password"
-            type="password"
-          />
-          <input
-            ref={(c) => (this.passwordRepeat = c)}
-            placeholder="repeat new password"
-            type="password"
-          />
-          <button onClick={this.handleClick.bind(this)}>
-            Set new password
-          </button>
-        </form>
+        <React.Fragment>
+          <h1>Password Reset</h1>
+          <form>
+            <input
+              ref={(c) => (this.setState({ password: c }))}
+              placeholder="new password"
+              type="password"
+            />
+            <input
+              ref={(c) => (this.setState({ passwordRepeat: c }))}
+              placeholder="repeat new password"
+              type="password"
+            />
+            <button onClick={this.handleClick.bind(this)}>
+              Set new password
+            </button>
+          </form>
+        </React.Fragment>
       </StaticLayout>
     )
   }

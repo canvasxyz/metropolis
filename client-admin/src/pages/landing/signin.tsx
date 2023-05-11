@@ -190,14 +190,14 @@ class SignIn extends React.Component<{
 
     return (
       <StaticLayout>
-        <div>
+        <React.Fragment>
           <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6, null, 7] }}>
             Sign In
           </Heading>
           {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
             ? this.drawLoginForm()
             : this.drawPasswordConnectFacebookForm()}
-        </div>
+        </React.Fragment>
       </StaticLayout>
     )
   }
