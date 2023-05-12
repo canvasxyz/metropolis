@@ -179,9 +179,14 @@ class App extends React.Component<{
                 />
                 Polis
               </Link>
-              <Link id="signoutLink" sx={{ variant: 'links.header' }} to="/signout">
-                sign out
-              </Link>
+              <Box sx={{ flex: 1 }}></Box>
+              {this.props.user ?
+               <Link sx={{ variant: 'links.header' }} to="/signout">
+                 Sign out
+               </Link> :
+               <Link sx={{ variant: 'links.header' }} to="/signin">
+                 Sign in
+               </Link>}
             </Box>
             <Route
               render={(routeProps) => {
