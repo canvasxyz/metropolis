@@ -56,6 +56,8 @@
     "webpack-dev-server": "~4.6.0"
   },
   "dependencies": {
+    "@types/facebook-js-sdk": "^3.3.6",
+    "@types/mdx": "^2.0.5",
     "d3-scale": "~3.2.3",
     "jquery": "~2.1.4",
     "lodash": "~4.17.21",

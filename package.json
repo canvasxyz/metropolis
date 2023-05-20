@@ -2,12 +2,15 @@
   "private": true,
   "scripts": {
     "dev": "concurrently 'npm run dev --workspace=polis-client-admin' 'npm run dev --workspace=polis'",
-    "dev": "concurrently 'npm run start --workspace=polis-client-admin' 'npm run start --workspace=polis'"
+    "start": "concurrently 'npm run start --workspace=polis-client-admin' 'npm run start --workspace=polis'"
   },
   "workspaces": [
     "client-admin",
     "client-participation",
     "client-report",
     "server"
-  ]
+  ],
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
 }

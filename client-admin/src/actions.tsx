@@ -405,7 +405,7 @@ const getFriends = () => {
     })
   }
 
-  FB.api('/me/friends', (response) => {
+  FB.api('/me/friends', (response: any) => {
     if (response && !response.error) {
       const friendsSoFar = response.data
       if (response.data.length && response.paging.next) {
@@ -427,7 +427,7 @@ const getFriends = () => {
 const getInfo = () => {
   const dfd = $.Deferred()
 
-  FB.api('/me', (response) => {
+  FB.api('/me', (response: any) => {
     // {"id":"10152802017421079"
     //   "email":"michael@bjorkegren.com"
     //   "first_name":"Mike"
@@ -446,7 +446,7 @@ const getInfo = () => {
 
     if (response && !response.error) {
       if (response.location && response.location.id) {
-        FB.api('/' + response.location.id, (locationResponse) => {
+        FB.api('/' + response.location.id, (locationResponse: any) => {
           if (locationResponse) {
             response.locationInfo = locationResponse
           }
