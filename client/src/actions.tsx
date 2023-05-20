@@ -228,7 +228,7 @@ export const doSignin = (attrs) => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
           dispatch({ type: "signin completed successfully" })
-          window.location.assign("/")
+          window.location.assign("/conversations")
         }, 3000)
       },
       (err) => dispatch(signinError(err))
@@ -617,7 +617,7 @@ export const doSignout = (dest) => {
         setTimeout(() => {
           // Force page to load so we can be sure the old user"s state is cleared from memory
           // delay a bit so the cookies have time to clear too.
-          window.location = dest || "/home"
+          window.location = dest || "/"
         }, 1000)
       },
       (err) => dispatch(signoutError(err))

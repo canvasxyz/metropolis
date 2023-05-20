@@ -140,17 +140,8 @@ class Conversations extends React.Component<
 
     return (
       <Box>
-        <Heading
-          as="h3"
-          sx={{
-            fontSize: [3, null, 4],
-            lineHeight: "body",
-            mb: [3, null, 4],
-          }}
-        >
-          All Conversations
-        </Heading>
-        <Box sx={{ mb: [3, null, 4] }}>
+        <Heading as="h1">All Conversations</Heading>
+        <Box sx={{ mt: [4], mb: [3, null, 4] }}>
           <Button onClick={this.onNewClicked.bind(this)}>Create new conversation</Button>
         </Box>
         <Box>

@@ -2419,7 +2419,7 @@ function initializePolisHelpers() {
 
 You may have used another email address to create your account.
 
-If you need to create a new account, you can do that here ${server}/home
+If you need to create a new account, you can do that here ${server}/
 
 Feel free to reply to this email if you need help.`;
 
@@ -6341,7 +6341,6 @@ Email verified! You can close this tab or hit the back button.
     let uid = req.p.uid;
 
     if (req.p.errIfNoAuth && !uid) {
-      fail(res, 401, "polis_error_auth_needed");
       return;
     }
 

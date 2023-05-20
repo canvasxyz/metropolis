@@ -1,4 +1,3 @@
-// Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** @jsx jsx */
 
 import React from "react"
@@ -6,7 +5,6 @@ import { connect } from "react-redux"
 import { doSignin, doFacebookSignin, Action } from "../../actions"
 import { Link, Redirect } from "react-router-dom"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
-import StaticLayout from "./lander-layout"
 
 import strings from "../../intl"
 import { RootState } from "../../util/types"
@@ -134,10 +132,14 @@ class SignIn extends React.Component<{
           </Button>
           <Text sx={{ mt: 4 }}>
             {"Forgot your password? "}
-            <Link to={"/pwresetinit"}>Reset Password</Link>
+            <Link sx={{ variant: "styles.a" }} to={"/pwresetinit"}>
+              Reset Password
+            </Link>
           </Text>
           <Text sx={{ mt: 2, mb: 4 }}>
-            <Link to={"/createuser"}>Create User</Link>
+            <Link sx={{ variant: "styles.a" }} to={"/createuser"}>
+              Create User
+            </Link>
           </Text>
         </form>
         {/*fbAppId && (
@@ -182,20 +184,18 @@ class SignIn extends React.Component<{
     const { signInSuccessful, authed } = this.props
 
     if (signInSuccessful || authed) {
-      return <Redirect to={"/"} />
+      return <Redirect to={"/conversations"} />
     }
 
     return (
-      <StaticLayout>
-        <React.Fragment>
-          <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
-            Sign In
-          </Heading>
-          {this.props.facebookError !== "polis_err_user_with_this_email_exists"
-            ? this.drawLoginForm()
-            : this.drawPasswordConnectFacebookForm()}
-        </React.Fragment>
-      </StaticLayout>
+      <React.Fragment>
+        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
+          Sign In
+        </Heading>
+        {this.props.facebookError !== "polis_err_user_with_this_email_exists"
+          ? this.drawLoginForm()
+          : this.drawPasswordConnectFacebookForm()}
+      </React.Fragment>
     )
   }
 }

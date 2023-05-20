@@ -1,4 +1,3 @@
-// Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** @jsx jsx */
 
 import React from "react"
@@ -13,8 +12,13 @@ import _ from "lodash"
 import { Switch, Route, Link, Redirect } from "react-router-dom"
 import { Flex, Box, jsx } from "theme-ui"
 
+import Header from "./pages/header"
+import Footer from "./pages/footer"
+
+/* public home page */
+import Home from "./pages/home"
+
 /* landing pages */
-import Home from "./pages/landing/home"
 import TOS from "./pages/landing/tos"
 import Privacy from "./pages/landing/privacy"
 import PasswordReset from "./pages/landing/password-reset"
@@ -24,7 +28,7 @@ import SignIn from "./pages/landing/signin"
 import SignOut from "./pages/landing/signout"
 import CreateUser from "./pages/landing/createuser"
 
-/* manage */
+/* conversations */
 import Conversations from "./pages/manage/conversations"
 import ConversationAdmin from "./pages/manage/admin"
 import Account from "./pages/manage/account"
@@ -127,129 +131,88 @@ class App extends React.Component<
       <React.Fragment>
         <Switch>
           <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
-          <Route exact path="/home" component={Home} />
-          <Route
-            exact
-            path="/signin"
-            render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-          />
-          <Route
-            exact
-            path="/signin/*"
-            render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-          />
-          <Route
-            exact
-            path="/signin/**/*"
-            render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-          />
-          <Route exact path="/signout" component={SignOut} />
-          <Route exact path="/signout/*" component={SignOut} />
-          <Route exact path="/signout/**/*" component={SignOut} />
-          <Route exact path="/createuser" component={CreateUser} />
-          <Route exact path="/createuser/*" component={CreateUser} />
-          <Route exact path="/createuser/**/*" component={CreateUser} />
-
-          <Route exact path="/pwreset" component={PasswordReset} />
-          <Route path="/pwreset/*" component={PasswordReset} />
-          <Route exact path="/pwresetinit" component={PasswordResetInit} />
-
-          <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
-          <Route exact path="/tos" component={TOS} />
-          <Route exact path="/privacy" component={Privacy} />
-
-          <Box>
+          <Box
+            sx={{
+              margin: `0 auto`,
+              maxWidth: "45em",
+              padding: `0 1.0875rem 1.45rem`,
+            }}
+          >
+            <Header user={this.props.user} />
             <Box
               sx={{
-                width: "100%",
-                backgroundColor: "primary",
-                color: "background",
-                zIndex: 1000,
-                py: [3],
-                px: [4],
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
+                pt: "1px", // prevent margins from spilling over
+                pb: "1em",
+                minHeight: "calc(100vh - 10.2em)",
               }}
             >
-              <Link sx={{ variant: "links.header" }} to="/">
-                <Logomark
-                  style={{ marginRight: 10, position: "relative", top: 6 }}
-                  fill={"white"}
-                />
-                Polis
-              </Link>
-              <Box sx={{ flex: 1 }}></Box>
-              {this.props.user ? (
-                <Link sx={{ variant: "links.header" }} to="/signout">
-                  Sign out
-                </Link>
-              ) : (
-                <Link sx={{ variant: "links.header" }} to="/signin">
-                  Sign in
-                </Link>
-              )}
+              <Route exact path="/" render={() => <Home user={this.props.user} />} />
+              <Route
+                exact
+                path="/signin"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route
+                exact
+                path="/signin/*"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route
+                exact
+                path="/signin/**/*"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route exact path="/signout" component={SignOut} />
+              <Route exact path="/signout/*" component={SignOut} />
+              <Route exact path="/signout/**/*" component={SignOut} />
+              <Route exact path="/createuser" component={CreateUser} />
+              <Route exact path="/createuser/*" component={CreateUser} />
+              <Route exact path="/createuser/**/*" component={CreateUser} />
+
+              <Route exact path="/pwreset" component={PasswordReset} />
+              <Route path="/pwreset/*" component={PasswordReset} />
+              <Route exact path="/pwresetinit" component={PasswordResetInit} />
+
+              <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
+              <Route exact path="/tos" component={TOS} />
+              <Route exact path="/privacy" component={Privacy} />
+
+              <Route
+                render={(routeProps) => {
+                  if (routeProps.location.pathname.split("/")[1] === "m") {
+                    return null
+                  }
+                  return (
+                    <Flex>
+                      <Box>
+                        <PrivateRoute
+                          isLoading={this.isLoading()}
+                          authed={this.isAuthed()}
+                          exact
+                          path="/conversations"
+                          component={Conversations}
+                        />
+                        <PrivateRoute
+                          isLoading={this.isLoading()}
+                          authed={this.isAuthed()}
+                          exact
+                          path="/account"
+                          component={Account}
+                        />
+                        <Route path="/c/:conversation_id" component={Survey} />
+                      </Box>
+                    </Flex>
+                  )
+                }}
+              />
+              <PrivateRoute
+                authed={this.isAuthed()}
+                isLoading={this.isLoading()}
+                path="/m/:conversation_id"
+                component={ConversationAdmin}
+              />
             </Box>
-            <Route
-              render={(routeProps) => {
-                if (routeProps.location.pathname.split("/")[1] === "m") {
-                  return null
-                }
-                return (
-                  <Flex>
-                    <Box sx={{ mr: [5], p: [4], flex: "0 0 auto" }}>
-                      <Box sx={{ mb: [3] }}>
-                        <Link sx={{ variant: "links.nav" }} to={`/`}>
-                          Conversations
-                        </Link>
-                      </Box>
-                      <Box sx={{ mb: [3] }}>
-                        <Link sx={{ variant: "links.nav" }} to={`/account`}>
-                          Account
-                        </Link>
-                      </Box>
-                    </Box>
-                    <Box
-                      sx={{
-                        p: [4],
-                        flex: "0 0 auto",
-                        maxWidth: "35em",
-                        mx: [4],
-                      }}
-                    >
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/"
-                        component={Conversations}
-                      />
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/conversations"
-                        component={Conversations}
-                      />
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/account"
-                        component={Account}
-                      />
-                      <Route path="/c/:conversation_id" component={Survey} />
-                    </Box>
-                  </Flex>
-                )
-              }}
-            />
-            <PrivateRoute
-              authed={this.isAuthed()}
-              isLoading={this.isLoading()}
-              path="/m/:conversation_id"
-              component={ConversationAdmin}
-            />
+            <Footer />
           </Box>
         </Switch>
       </React.Fragment>

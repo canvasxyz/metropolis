@@ -1611,7 +1611,7 @@ helpersInitialized.then(
       })
     );
     // Duplicate url for content at root. Needed so we have something for "About" to link to.
-    app.get(/^\/about$/, makeRedirectorTo("/home"));
+    app.get(/^\/about$/, makeRedirectorTo("/"));
     app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
     app.get(
       /^\/s\/CTE\/?$/,

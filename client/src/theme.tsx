@@ -1,5 +1,5 @@
 export default {
-  space: [0, 4, 8, 16, 32, 64, 128, 256, 512],
+  space: [0, 4, 8, 16, 24, 32, 42, 56, 72, 96, 128, 256, 512],
   fonts: {
     heading: "Space Grotesk, monospace",
     body: "Inter, sans-serif",
@@ -22,8 +22,26 @@ export default {
     secondary: "#F6F7F8",
     mediumGray: "#60656F",
     lightGray: "#8f8f8f",
+    primaryActive: "#59a2f1",
+    secondaryActive: "#e0e4e7",
+    mediumGrayActive: "#43474e",
+    lightGrayActive: "#7a7c7e",
   },
   links: {
+    button: {
+      px: [3],
+      py: [2],
+      borderRadius: "4px",
+      backgroundColor: "primary",
+      textDecoration: "none",
+      color: "background",
+      "&:hover": {
+        bg: "primaryActive",
+      },
+      bg: "primary",
+      fontFamily: "monospace",
+      cursor: "pointer",
+    },
     nav: {
       color: "inherit",
       "&.active": {
@@ -35,6 +53,7 @@ export default {
         borderBottomColor: "primary",
       },
       textDecoration: "none",
+      mr: [4],
       fontSize: [2],
       fontWeight: "bold",
       cursor: "pointer",
@@ -51,24 +70,12 @@ export default {
         borderBottomColor: "primary",
       },
       textDecoration: "none",
+      mr: [4],
       fontSize: [2],
       fontWeight: "bold",
       cursor: "pointer",
       borderBottom: "2px solid",
       borderBottomColor: "mediumGray",
-    },
-    header: {
-      color: "inherit",
-      "&.active": {
-        color: "background",
-      },
-      "&:hover": {
-        color: "background",
-      },
-      textDecoration: "none",
-      fontSize: [2],
-      fontWeight: "bold",
-      cursor: "pointer",
     },
   },
   buttons: {
@@ -96,6 +103,9 @@ export default {
     },
     a: {
       color: "primary",
+      "&:visited": {
+        color: "primary",
+      },
       "&:active": {
         color: "primary",
       },
@@ -106,7 +116,6 @@ export default {
         borderColor: "primary",
       },
       textDecoration: "none",
-      fontWeight: "bold",
       cursor: "pointer",
       borderBottom: "solid",
       borderWidth: 2,
