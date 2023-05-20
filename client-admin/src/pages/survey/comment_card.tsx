@@ -1,79 +1,82 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { connect } from 'react-redux'
-import { Box, Heading, Button, Text, Input } from 'theme-ui'
+import React, { useEffect, useState, useRef } from "react"
+import { connect } from "react-redux"
+import { Box, Heading, Button, Text, Input } from "theme-ui"
 
-import api from '../../util/api';
+import api from "../../util/api"
 import type { Comment } from "../../util/types"
 
 type CommentCardProps = {
-    comment: Comment,
-    conversationId: string,
-    onVoted: Function,
-    hasVoted: boolean,
+  comment: Comment
+  conversationId: string
+  onVoted: Function
+  hasVoted: boolean
 }
 
 const CommentCard = ({ comment, conversationId, onVoted, hasVoted }: CommentCardProps) => {
-  const { tid: commentId, txt, created, pid } = comment;
+  const { tid: commentId, txt, created, pid } = comment
 
   const [voting, setVoting] = useState(false)
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
   const agree = (commentId: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
-    api.post("api/v3/votes", {
-      pid: "mypid",
-      conversation_id: conversationId,
-      agid: 1,
-      weight,
-      vote: -1,
-      tid: commentId
-      // starred: boolean
-    })
+    api
+      .post("api/v3/votes", {
+        pid: "mypid",
+        conversation_id: conversationId,
+        agid: 1,
+        weight,
+        vote: -1,
+        tid: commentId,
+        // starred: boolean
+      })
       .then(() => onVoted(commentId))
       .finally(() => setVoting(false))
   }
   const disagree = (commentId: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
-    api.post("api/v3/votes", {
-      pid: "mypid",
-      conversation_id: conversationId,
-      agid: 1,
-      weight,
-      vote: 1,
-      tid: commentId
-      // starred: boolean
-    })
+    api
+      .post("api/v3/votes", {
+        pid: "mypid",
+        conversation_id: conversationId,
+        agid: 1,
+        weight,
+        vote: 1,
+        tid: commentId,
+        // starred: boolean
+      })
       .then(() => onVoted(commentId))
       .finally(() => setVoting(false))
   }
   const skip = (tid: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
-    api.post("api/v3/votes", {
-      pid: "mypid",
-      conversation_id: conversationId,
-      agid: 1,
-      weight,
-      vote: 0,
-      tid: tid
-      // starred: boolean
-    })
+    api
+      .post("api/v3/votes", {
+        pid: "mypid",
+        conversation_id: conversationId,
+        agid: 1,
+        weight,
+        vote: 0,
+        tid: tid,
+        // starred: boolean
+      })
       .then(() => onVoted(commentId))
       .finally(() => setVoting(false))
   }
 
   return (
-    <Box sx={{
-      opacity: hasVoted ? 0.5 : 1,
-      pointerEvents: hasVoted ? 'none' : 'initial',
-      display: "inline-block",
-      border: "1px solid #ddd",
-      width: 400,
-      p: [20],
-      mb: [3, null, 4]
-    }}>
-      <Text sx={{ mb: 4 }}>
-        {txt}
-      </Text>
+    <Box
+      sx={{
+        opacity: hasVoted ? 0.5 : 1,
+        pointerEvents: hasVoted ? "none" : "initial",
+        display: "inline-block",
+        border: "1px solid #ddd",
+        width: 400,
+        p: [20],
+        mb: [3, null, 4],
+      }}
+    >
+      <Text sx={{ mb: 4 }}>{txt}</Text>
       <Button sx={{ mr: 2 }} onClick={agree.bind(null, commentId)}>
         Agree
       </Button>
@@ -84,10 +87,10 @@ const CommentCard = ({ comment, conversationId, onVoted, hasVoted }: CommentCard
         Skip
       </Button>
     </Box>
-  );
+  )
 }
 
-export default CommentCard;
+export default CommentCard
 
 // // find representatives?
 // function getXids(conversationId) {

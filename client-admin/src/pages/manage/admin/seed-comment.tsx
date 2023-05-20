@@ -2,12 +2,12 @@
 
 /** @jsx jsx */
 
-import React from 'react'
-import { connect } from 'react-redux'
-import { handleSeedCommentSubmit, seedCommentChanged } from '../../../actions'
-import strings from '../../../intl'
-import { Box, Text, Button, jsx, Link } from 'theme-ui'
-import { RootState } from '../../../util/types'
+import React from "react"
+import { connect } from "react-redux"
+import { handleSeedCommentSubmit, seedCommentChanged } from "../../../actions"
+import strings from "../../../intl"
+import { Box, Text, Button, jsx, Link } from "theme-ui"
+import { RootState } from "../../../util/types"
 
 class ModerateCommentsSeed extends React.Component<{
   dispatch: Function
@@ -23,17 +23,17 @@ class ModerateCommentsSeed extends React.Component<{
     super(props)
     this.state = {
       showErrorDialogue: false,
-      showSuccessDialogue: false
+      showSuccessDialogue: false,
     }
   }
 
   handleSubmitSeed() {
     const comment = {
       txt: this.seed_form.value,
-      pid: 'mypid',
+      pid: "mypid",
       conversation_id: this.props.params.conversation_id,
       // vote: 0,
-      is_seed: true
+      is_seed: true,
     }
     this.props.dispatch(handleSeedCommentSubmit(comment))
   }
@@ -43,14 +43,14 @@ class ModerateCommentsSeed extends React.Component<{
   }
 
   getButtonText() {
-    let text = 'Submit'
+    let text = "Submit"
 
     if (this.props.success) {
-      text = 'Success!'
+      text = "Success!"
     }
 
     if (this.props.loading) {
-      text = 'Saving...'
+      text = "Saving..."
     }
 
     return text
@@ -60,21 +60,19 @@ class ModerateCommentsSeed extends React.Component<{
     const { seedText } = this.props
     return (
       <Box sx={{ mb: [4] }}>
-        <Text sx={{ mb: [2] }}>
-          Add starter comments for participants to vote on:
-        </Text>
+        <Text sx={{ mb: [2] }}>Add starter comments for participants to vote on:</Text>
         <Box sx={{ mb: [2] }}>
           <textarea
             sx={{
-              fontFamily: 'body',
+              fontFamily: "body",
               fontSize: [2],
-              width: '35em',
-              height: '7em',
-              resize: 'none',
+              width: "35em",
+              height: "7em",
+              resize: "none",
               padding: [2],
               borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'mediumGray'
+              border: "1px solid",
+              borderColor: "mediumGray",
             }}
             onChange={this.handleTextareaChange.bind(this)}
             maxLength={400}
@@ -84,9 +82,7 @@ class ModerateCommentsSeed extends React.Component<{
           />
         </Box>
         <Box>
-          <Button onClick={this.handleSubmitSeed.bind(this)}>
-            {this.getButtonText()}
-          </Button>
+          <Button onClick={this.handleSubmitSeed.bind(this)}>{this.getButtonText()}</Button>
           {this.props.error ? <Text>{strings(this.props.error)}</Text> : null}
         </Box>
       </Box>

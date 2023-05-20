@@ -2,54 +2,47 @@
 
 /** @jsx jsx */
 
-import React from 'react'
-import { connect } from 'react-redux'
-import {
-  handleZidMetadataUpdate,
-  optimisticZidMetadataUpdateOnTyping
-} from '../../../actions'
-import ComponentHelpers from '../../../util/component-helpers'
-import NoPermission from './no-permission'
-import { Heading, Box, Text, jsx } from 'theme-ui'
-import emoji from 'react-easy-emoji'
-import { RootState } from '../../../util/types'
+import React from "react"
+import { connect } from "react-redux"
+import { handleZidMetadataUpdate, optimisticZidMetadataUpdateOnTyping } from "../../../actions"
+import ComponentHelpers from "../../../util/component-helpers"
+import NoPermission from "./no-permission"
+import { Heading, Box, Text, jsx } from "theme-ui"
+import emoji from "react-easy-emoji"
+import { RootState } from "../../../util/types"
 
-import { CheckboxField } from './CheckboxField'
-import ModerateCommentsSeed from './seed-comment'
+import { CheckboxField } from "./CheckboxField"
+import ModerateCommentsSeed from "./seed-comment"
 // import ModerateCommentsSeedTweet from "./seed-tweet";
 
-class ConversationConfig extends React.Component<{
-  dispatch: Function
-  zid_metadata: { conversation_id: string, topic: string, description: string }
-  error: string,
-  loading: boolean
-}, {
-}> {
+class ConversationConfig extends React.Component<
+  {
+    dispatch: Function
+    zid_metadata: { conversation_id: string; topic: string; description: string }
+    error: string
+    loading: boolean
+  },
+  {}
+> {
   description: HTMLTextAreaElement
   topic: HTMLInputElement
 
   handleStringValueChange(field) {
     return () => {
       let val = this[field].value
-      if (field === 'help_bgcolor' || field === 'help_color') {
+      if (field === "help_bgcolor" || field === "help_color") {
         if (!val.length) {
-          val = 'default'
+          val = "default"
         }
       }
-      this.props.dispatch(
-        handleZidMetadataUpdate(this.props.zid_metadata, field, val)
-      )
+      this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
     }
   }
 
   handleConfigInputTyping(field) {
     return (e) => {
       this.props.dispatch(
-        optimisticZidMetadataUpdateOnTyping(
-          this.props.zid_metadata,
-          field,
-          e.target.value
-        )
+        optimisticZidMetadataUpdateOnTyping(this.props.zid_metadata, field, e.target.value)
       )
     }
   }
@@ -65,38 +58,37 @@ class ConversationConfig extends React.Component<{
           as="h3"
           sx={{
             fontSize: [3, null, 4],
-            lineHeight: 'body',
-            mb: [3, null, 4]
-          }}>
+            lineHeight: "body",
+            mb: [3, null, 4],
+          }}
+        >
           Configure
         </Heading>
         <Box sx={{ mb: [4] }}>
-          {this.props.loading ? (
-            <Text>Saving...</Text>
-          ) : (
-            <Text>⚡ Up to date</Text>
-          )}
+          {this.props.loading ? <Text>Saving...</Text> : <Text>⚡ Up to date</Text>}
           {this.props.error ? <Text>Error Saving</Text> : null}
         </Box>
 
-        <CheckboxField field="is_active" label="Conversation is open">Unchecking disables voting and commenting</CheckboxField>
+        <CheckboxField field="is_active" label="Conversation is open">
+          Unchecking disables voting and commenting
+        </CheckboxField>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>Topic</Text>
           <input
             ref={(c) => (this.topic = c)}
             sx={{
-              fontFamily: 'body',
+              fontFamily: "body",
               fontSize: [2],
-              width: '35em',
+              width: "35em",
               borderRadius: 2,
               padding: [2],
-              border: '1px solid',
-              borderColor: 'mediumGray'
+              border: "1px solid",
+              borderColor: "mediumGray",
             }}
             data-test-id="topic"
-            onBlur={this.handleStringValueChange('topic').bind(this)}
-            onChange={this.handleConfigInputTyping('topic').bind(this)}
+            onBlur={this.handleStringValueChange("topic").bind(this)}
+            onChange={this.handleConfigInputTyping("topic").bind(this)}
             defaultValue={this.props.zid_metadata.topic}
           />
         </Box>
@@ -106,19 +98,19 @@ class ConversationConfig extends React.Component<{
           <textarea
             ref={(c) => (this.description = c)}
             sx={{
-              fontFamily: 'body',
+              fontFamily: "body",
               fontSize: [2],
-              width: '35em',
-              height: '7em',
-              resize: 'none',
+              width: "35em",
+              height: "7em",
+              resize: "none",
               padding: [2],
               borderRadius: 2,
-              border: '1px solid',
-              borderColor: 'mediumGray'
+              border: "1px solid",
+              borderColor: "mediumGray",
             }}
             data-test-id="description"
-            onBlur={this.handleStringValueChange('description').bind(this)}
-            onChange={this.handleConfigInputTyping('description').bind(this)}
+            onBlur={this.handleStringValueChange("description").bind(this)}
+            onChange={this.handleConfigInputTyping("description").bind(this)}
             defaultValue={this.props.zid_metadata.description}
           />
         </Box>
@@ -127,14 +119,14 @@ class ConversationConfig extends React.Component<{
           as="h6"
           sx={{
             fontSize: [1, null, 2],
-            lineHeight: 'body',
-            my: [3, null, 4]
-          }}>
+            lineHeight: "body",
+            my: [3, null, 4],
+          }}
+        >
           Seed Comments
         </Heading>
-        <ModerateCommentsSeed
-        />
-          {/* params={{ conversation_id: this.props.zid_metadata.conversation_id }} */}
+        <ModerateCommentsSeed />
+        {/* params={{ conversation_id: this.props.zid_metadata.conversation_id }} */}
 
         {/* <ModerateCommentsSeedTweet
           params={{ conversation_id: this.props.zid_metadata.conversation_id }}
@@ -144,9 +136,10 @@ class ConversationConfig extends React.Component<{
           as="h6"
           sx={{
             fontSize: [1, null, 2],
-            lineHeight: 'body',
-            my: [3, null, 4]
-          }}>
+            lineHeight: "body",
+            my: [3, null, 4],
+          }}
+        >
           Customize the user interface
         </Heading>
 
@@ -165,11 +158,11 @@ class ConversationConfig extends React.Component<{
         <CheckboxField
           field="subscribe_type"
           label="Prompt participants to subscribe to updates"
-          isIntegerBool>
-          Prompt participants to subscribe to updates. A prompt is shown to
-          users once they finish voting on all available comments. If enabled,
-          participants may optionally provide their email address to receive
-          notifications when there are new comments to vote on.
+          isIntegerBool
+        >
+          Prompt participants to subscribe to updates. A prompt is shown to users once they finish
+          voting on all available comments. If enabled, participants may optionally provide their
+          email address to receive notifications when there are new comments to vote on.
         </CheckboxField>
 
         <CheckboxField field="auth_opt_fb" label="Facebook login prompt">
@@ -184,9 +177,10 @@ class ConversationConfig extends React.Component<{
           as="h6"
           sx={{
             fontSize: [1, null, 2],
-            lineHeight: 'body',
-            my: [3, null, 4]
-          }}>
+            lineHeight: "body",
+            my: [3, null, 4],
+          }}
+        >
           Schemes
         </Heading>
 
@@ -194,23 +188,21 @@ class ConversationConfig extends React.Component<{
           No comments shown without moderator approval
         </CheckboxField>
 
-        <CheckboxField
-          field="auth_needed_to_write"
-          label="Require Auth to Comment">
-          Participants cannot submit comments without first connecting either
-          Facebook or Twitter
+        <CheckboxField field="auth_needed_to_write" label="Require Auth to Comment">
+          Participants cannot submit comments without first connecting either Facebook or Twitter
         </CheckboxField>
 
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
-          Participants cannot vote without first connecting either Facebook or
-          Twitter
+          Participants cannot vote without first connecting either Facebook or Twitter
         </CheckboxField>
       </Box>
     )
   }
 }
 
-export default connect((state: RootState) => state.user)(connect((state: RootState) => state.zid_metadata)(ConversationConfig))
+export default connect((state: RootState) => state.user)(
+  connect((state: RootState) => state.zid_metadata)(ConversationConfig)
+)
 
 // checked={this.props.zid_metadata.is_data_open}
 // Comments, votes, and group data can be exported by any user

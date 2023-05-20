@@ -2,13 +2,13 @@
 
 /** @jsx jsx */
 
-import React from 'react'
-import { jsx, Box, Heading } from 'theme-ui'
-import { VictoryChart, VictoryArea } from 'victory'
-import victoryTheme from './victoryTheme'
+import React from "react"
+import { jsx, Box, Heading } from "theme-ui"
+import { VictoryChart, VictoryArea } from "victory"
+import victoryTheme from "./victoryTheme"
 
 class Commenters extends React.Component<{
-  size: number,
+  size: number
   firstCommentTimes: number[]
 }> {
   render() {
@@ -20,9 +20,10 @@ class Commenters extends React.Component<{
           as="h6"
           sx={{
             fontSize: [2, null, 3],
-            lineHeight: 'body',
-            my: [2]
-          }}>
+            lineHeight: "body",
+            my: [2],
+          }}
+        >
           Commenters over time, by time of first comment
         </Heading>
         <VictoryChart
@@ -30,9 +31,10 @@ class Commenters extends React.Component<{
           height={size}
           width={size}
           domainPadding={{ x: 0, y: [0, 20] }}
-          scale={{ x: 'time' }}>
+          scale={{ x: "time" }}
+        >
           <VictoryArea
-            style={{ data: { fill: '#03a9f4' } }}
+            style={{ data: { fill: "#03a9f4" } }}
             data={firstCommentTimes.map((d, i) => {
               return { x: new Date(d), y: i }
             })}

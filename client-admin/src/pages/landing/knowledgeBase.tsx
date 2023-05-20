@@ -1,7 +1,7 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Box, Link } from 'theme-ui'
-import emoji from 'react-easy-emoji'
+import React from "react"
+import PropTypes from "prop-types"
+import { Box, Link } from "theme-ui"
+import emoji from "react-easy-emoji"
 
 const KnowledgeBase = ({ e, url, txt }) => {
   return (
@@ -17,7 +17,7 @@ const KnowledgeBase = ({ e, url, txt }) => {
 KnowledgeBase.propTypes = {
   e: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
-  txt: PropTypes.string.isRequired
+  txt: PropTypes.string.isRequired,
 }
 
 export default KnowledgeBase

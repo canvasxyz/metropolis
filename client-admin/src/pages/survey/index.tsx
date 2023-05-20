@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react'
-import { connect } from 'react-redux'
-import { Box, Heading, Button, Text, Input, jsx } from 'theme-ui'
+import React, { useEffect, useState, useRef } from "react"
+import { connect } from "react-redux"
+import { Box, Heading, Button, Text, Input, jsx } from "theme-ui"
 
-import api from '../../util/api';
-import CommentCard from './comment_card';
+import api from "../../util/api"
+import CommentCard from "./comment_card"
 import type { Comment } from "../../util/types"
 
 // TODO: enforce comment too long on backend
@@ -13,7 +13,7 @@ type SurveyProps = {
   conversation_id: string
 }
 
-function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
+function Survey({ match: { params } }: { match: { params: SurveyProps } }) {
   const { conversation_id } = params
 
   const inputRef = useRef<HTMLInputElement>()
@@ -23,18 +23,18 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
   useEffect(() => {
     Promise.all([
       api.get("api/v3/comments", {
-        lastServerToken: (new Date(0)).getTime(),
+        lastServerToken: new Date(0).getTime(),
         not_voted_by_pid: "mypid",
         conversation_id,
       }),
       api.get("api/v3/comments", {
-        lastServerToken: (new Date(0)).getTime(),
+        lastServerToken: new Date(0).getTime(),
         conversation_id,
-      })
+      }),
     ]).then(([unvotedComments, allComments]) => {
-        const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
+      const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
       setUnvotedComments(unvotedComments)
-        setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
+      setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
     })
   }, [])
 
@@ -45,11 +45,12 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
       vote: 0,
       txt: txt.replace(/\n/g, " "), // replace newlines with whitespace
       agid: 1,
-    };
+    }
 
-    return api.post("api/v3/comments", params)
+    return api
+      .post("api/v3/comments", params)
       .fail((xhr: XMLHttpRequest, evt: string, err: string) => alert(err))
-      .then(({ tid, currentPid }: { tid: string, currentPid: string }) => {
+      .then(({ tid, currentPid }: { tid: string; currentPid: string }) => {
         const comment: Comment = {
           txt: params.txt,
           tid,
@@ -75,30 +76,35 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
         as="h3"
         sx={{
           fontSize: [3, null, 4],
-          lineHeight: 'body',
-          mb: [3, null, 4]
-        }}>
+          lineHeight: "body",
+          mb: [3, null, 4],
+        }}
+      >
         This Conversation
       </Heading>
       <Box sx={{ mb: [3, null, 4] }}>
         <form onSubmit={(e) => e.preventDefault()}>
           <Input
             sx={{
-              fontFamily: 'body',
+              fontFamily: "body",
               fontSize: [2],
-              width: '35em',
+              width: "35em",
               borderRadius: 2,
               padding: [2],
-              border: '1px solid',
-              borderColor: 'mediumGray',
-              mb: [3]
+              border: "1px solid",
+              borderColor: "mediumGray",
+              mb: [3],
             }}
             ref={inputRef}
             placeholder="Write a new card here..."
           />
-          <Button onClick={() => {
-            submitComment(inputRef.current.value).then(() => inputRef.current.value = '')
-          }}>Add new comment</Button>
+          <Button
+            onClick={() => {
+              submitComment(inputRef.current.value).then(() => (inputRef.current.value = ""))
+            }}
+          >
+            Add new comment
+          </Button>
           <Button sx={{ ml: 3 }}>Agree</Button>
           <Button sx={{ ml: 1 }}>Disagree</Button>
           <Button sx={{ ml: 1 }}>Skip</Button>
@@ -106,7 +112,7 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
       </Box>
       <Text sx={{ mb: 3 }}>{votedComments.length + unvotedComments.length} comments</Text>
       <Text sx={{ mb: 3 }}>{unvotedComments.length} comments remaining to vote</Text>
-      {unvotedComments.map((comment) =>
+      {unvotedComments.map((comment) => (
         <CommentCard
           key={comment.tid}
           comment={comment}
@@ -114,8 +120,8 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
           onVoted={onVoted}
           hasVoted={false}
         />
-      )}
-      {votedComments.map((comment) =>
+      ))}
+      {votedComments.map((comment) => (
         <CommentCard
           key={comment.tid}
           comment={comment}
@@ -123,8 +129,9 @@ function Survey({ match: { params }}: { match: { params: SurveyProps } }) {
           onVoted={onVoted}
           hasVoted={true}
         />
-      )}
-    </Box>);
+      ))}
+    </Box>
+  )
 }
 
-export default Survey;
+export default Survey

@@ -1,13 +1,13 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import * as types from '../actions'
-import _ from 'lodash'
+import * as types from "../actions"
+import _ from "lodash"
 
 const accepted_comments = (
   state = {
     loading: false,
     comments: null,
-    error: null
+    error: null,
   },
   action
 ) => {
@@ -15,18 +15,18 @@ const accepted_comments = (
     case types.REQUEST_COMMENTS:
       return Object.assign({}, state, {
         loading: true,
-        error: null
+        error: null,
       })
     case types.RECEIVE_COMMENTS:
       return Object.assign({}, state, {
         loading: false,
         error: null,
-        comments: _.sortBy(action.data, 'tid')
+        comments: _.sortBy(action.data, "tid"),
       })
     case types.COMMENTS_FETCH_ERROR:
       return Object.assign({}, state, {
         loading: false,
-        error: action.data
+        error: action.data,
       })
     default:
       return state

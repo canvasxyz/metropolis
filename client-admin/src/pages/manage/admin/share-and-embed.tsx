@@ -1,35 +1,33 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import ConversationHasCommentsCheck from './conversation-has-comments-check'
-import React from 'react'
-import PropTypes from 'prop-types'
-import Url from '../../../util/url'
-import { RootState } from '../../../util/types'
-import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Heading } from 'theme-ui'
-import ComponentHelpers from '../../../util/component-helpers'
-import NoPermission from './no-permission'
+import ConversationHasCommentsCheck from "./conversation-has-comments-check"
+import React from "react"
+import PropTypes from "prop-types"
+import Url from "../../../util/url"
+import { RootState } from "../../../util/types"
+import { connect } from "react-redux"
+import { Link } from "react-router-dom"
+import { Heading } from "theme-ui"
+import ComponentHelpers from "../../../util/component-helpers"
+import NoPermission from "./no-permission"
 
-class ShareAndEmbed extends React.Component<{
-  dispatch: Function,
-  match: { params: { conversation_id: string } },
-  zid_metadata: {
-    parent_url: string,
-    strict_moderation: boolean
-  }
-}, {
-}> {
-  static propTypes: {
-  }
+class ShareAndEmbed extends React.Component<
+  {
+    dispatch: Function
+    match: { params: { conversation_id: string } }
+    zid_metadata: {
+      parent_url: string
+      strict_moderation: boolean
+    }
+  },
+  {}
+> {
+  static propTypes: {}
   constructEmbeddedOnMarkup() {
     return (
       <p data-test-id="embed-page">
-        {'Embedded on: '}
-        <a
-          style={{ color: 'black' }}
-          target="blank"
-          href={this.props.zid_metadata.parent_url}>
+        {"Embedded on: "}
+        <a style={{ color: "black" }} target="blank" href={this.props.zid_metadata.parent_url}>
           {this.props.zid_metadata.parent_url}
         </a>
       </p>
@@ -48,9 +46,10 @@ class ShareAndEmbed extends React.Component<{
           as="h3"
           sx={{
             fontSize: [3, null, 4],
-            lineHeight: 'body',
-            mb: [3, null, 4]
-          }}>
+            lineHeight: "body",
+            mb: [3, null, 4],
+          }}
+        >
           Distribute
         </Heading>
         <ConversationHasCommentsCheck
@@ -64,9 +63,7 @@ class ShareAndEmbed extends React.Component<{
         <div>
           <p> Share </p>
           <p>
-            <a
-              target="blank"
-              href={Url.urlPrefix + match.params.conversation_id}>
+            <a target="blank" href={Url.urlPrefix + match.params.conversation_id}>
               {Url.urlPrefix + match.params.conversation_id}
             </a>
           </p>
@@ -75,24 +72,20 @@ class ShareAndEmbed extends React.Component<{
           <p> Embed</p>
           <div>
             <pre>
-              {'<div'}
+              {"<div"}
               {" class='polis'"}
               {" data-conversation_id='" + match.params.conversation_id + "'>"}
-              {'</div>\n'}
+              {"</div>\n"}
               {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
             </pre>
           </div>
           <p>
-            This embed code can only be used to embed a single conversation.{' '}
+            This embed code can only be used to embed a single conversation.{" "}
             <Link to="/integrate">
               I want to integrate the survey system across multiple pages on my site.
             </Link>
           </p>
-          <div>
-            {this.props.zid_metadata.parent_url
-              ? this.constructEmbeddedOnMarkup()
-              : ''}
-          </div>
+          <div>{this.props.zid_metadata.parent_url ? this.constructEmbeddedOnMarkup() : ""}</div>
         </div>
       </div>
     )
@@ -102,13 +95,13 @@ class ShareAndEmbed extends React.Component<{
 ShareAndEmbed.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      conversation_id: PropTypes.string
-    })
+      conversation_id: PropTypes.string,
+    }),
   }),
   zid_metadata: PropTypes.shape({
     parent_url: PropTypes.string,
-    strict_moderation: PropTypes.bool
-  })
+    strict_moderation: PropTypes.bool,
+  }),
 }
 
 export default connect((state: RootState) => state.zid_metadata)(ShareAndEmbed)

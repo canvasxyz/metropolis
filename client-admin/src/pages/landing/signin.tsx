@@ -1,16 +1,16 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** @jsx jsx */
 
-import React from 'react'
-import { connect } from 'react-redux'
-import { doSignin, doFacebookSignin, Action } from '../../actions'
-import { Link, Redirect } from 'react-router-dom'
-import { Heading, Box, Text, Button, jsx } from 'theme-ui'
-import StaticLayout from './lander-layout'
+import React from "react"
+import { connect } from "react-redux"
+import { doSignin, doFacebookSignin, Action } from "../../actions"
+import { Link, Redirect } from "react-router-dom"
+import { Heading, Box, Text, Button, jsx } from "theme-ui"
+import StaticLayout from "./lander-layout"
 
-import strings from '../../intl'
-import { RootState } from '../../util/types'
-import { UrlObject, UrlWithStringQuery } from 'url'
+import strings from "../../intl"
+import { RootState } from "../../util/types"
+import { UrlObject, UrlWithStringQuery } from "url"
 
 const fbAppId = process.env.FB_APP_ID
 
@@ -34,7 +34,7 @@ class SignIn extends React.Component<{
   }
 
   componentDidMount() {
-    this.props.dispatch({ type: 'signin reset state' })
+    this.props.dispatch({ type: "signin reset state" })
   }
 
   componentDidCatch(error, errorInfo) {
@@ -46,7 +46,7 @@ class SignIn extends React.Component<{
     e.preventDefault()
     const attrs = {
       email: this.email.value,
-      password: this.password.value
+      password: this.password.value,
     }
 
     // var dest = this.getDest();
@@ -57,13 +57,13 @@ class SignIn extends React.Component<{
   }
 
   getDest() {
-    return this.props.location.pathname.slice("/signin".length);
+    return this.props.location.pathname.slice("/signin".length)
   }
 
   facebookButtonClicked() {
     let dest = this.getDest()
     if (!dest.length) {
-      dest = '/'
+      dest = "/"
     }
     this.props.dispatch(doFacebookSignin(dest))
   }
@@ -71,7 +71,7 @@ class SignIn extends React.Component<{
   handleFacebookPasswordSubmit() {
     let dest = this.getDest()
     if (!dest.length) {
-      dest = '/'
+      dest = "/"
     }
     const optionalPassword = this.facebook_password.value
     this.props.dispatch(doFacebookSignin(dest, optionalPassword))
@@ -92,16 +92,16 @@ class SignIn extends React.Component<{
           <Box sx={{ my: [2] }}>
             <input
               sx={{
-                fontFamily: 'body',
+                fontFamily: "body",
                 fontSize: [2],
-                width: '35em',
+                width: "35em",
                 borderRadius: 2,
                 padding: [2],
-                border: '1px solid',
-                borderColor: 'mediumGray'
+                border: "1px solid",
+                borderColor: "mediumGray",
               }}
               id="signinEmailInput"
-              ref={(c) => this.email = c}
+              ref={(c) => (this.email = c)}
               placeholder="email"
               type="email"
               autoComplete="off"
@@ -110,16 +110,16 @@ class SignIn extends React.Component<{
           <Box sx={{ my: [2] }}>
             <input
               sx={{
-                fontFamily: 'body',
+                fontFamily: "body",
                 fontSize: [2],
-                width: '35em',
+                width: "35em",
                 borderRadius: 2,
                 padding: [2],
-                border: '1px solid',
-                borderColor: 'mediumGray'
+                border: "1px solid",
+                borderColor: "mediumGray",
               }}
               id="signinPasswordInput"
-              ref={(c) => this.password = c }
+              ref={(c) => (this.password = c)}
               placeholder="password"
               type="password"
             />
@@ -128,15 +128,16 @@ class SignIn extends React.Component<{
           <Button
             sx={{ mt: [4], my: [2] }}
             id="signinButton"
-            onClick={this.handleLoginClicked.bind(this)}>
-            {this.props.pending ? 'Signing in...' : 'Sign In'}
+            onClick={this.handleLoginClicked.bind(this)}
+          >
+            {this.props.pending ? "Signing in..." : "Sign In"}
           </Button>
           <Text sx={{ mt: 4 }}>
-            {'Forgot your password? '}
-            <Link to={'/pwresetinit'}>Reset Password</Link>
+            {"Forgot your password? "}
+            <Link to={"/pwresetinit"}>Reset Password</Link>
           </Text>
           <Text sx={{ mt: 2, mb: 4 }}>
-            <Link to={'/createuser'}>Create User</Link>
+            <Link to={"/createuser"}>Create User</Link>
           </Text>
         </form>
         {/*fbAppId && (
@@ -161,23 +162,17 @@ class SignIn extends React.Component<{
     return (
       <span>
         <p>
-          {
-            'A user already exists with the email address associated with this Facebook account.'
-          }
+          {"A user already exists with the email address associated with this Facebook account."}
         </p>
-        <p>
-          {
-            'Please log into that user account to enable Facebook login.'
-          }
-        </p>
+        <p>{"Please log into that user account to enable Facebook login."}</p>
         <input
-          ref={(c) => this.facebook_password = c}
+          ref={(c) => (this.facebook_password = c)}
           placeholder="password"
           type="password"
           autoComplete="current-password"
         />
         <button onClick={this.handleFacebookPasswordSubmit.bind(this)}>
-          {'Connect Facebook Account'}
+          {"Connect Facebook Account"}
         </button>
       </span>
     )
@@ -187,7 +182,7 @@ class SignIn extends React.Component<{
     const { signInSuccessful, authed } = this.props
 
     if (signInSuccessful || authed) {
-      return <Redirect to={'/'} />
+      return <Redirect to={"/"} />
     }
 
     return (
@@ -196,7 +191,7 @@ class SignIn extends React.Component<{
           <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
             Sign In
           </Heading>
-          {this.props.facebookError !== 'polis_err_user_with_this_email_exists'
+          {this.props.facebookError !== "polis_err_user_with_this_email_exists"
             ? this.drawLoginForm()
             : this.drawPasswordConnectFacebookForm()}
         </React.Fragment>
@@ -205,4 +200,4 @@ class SignIn extends React.Component<{
   }
 }
 
-export default connect(((state: RootState) => state.signin))(SignIn)
+export default connect((state: RootState) => state.signin)(SignIn)

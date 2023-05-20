@@ -10,32 +10,32 @@ const setupBasedOnCurrentDate = () => {
   const tzWasNegative = tzKey < 0
   tzKey = Math.abs(tzKey)
   if (tzKey < 10) {
-    tzKey = '0' + tzKey
+    tzKey = "0" + tzKey
   }
   if (tzWasNegative) {
-    tzKey = 'UTC+' + tzKey + '00'
+    tzKey = "UTC+" + tzKey + "00"
   } else {
-    tzKey = 'UTC-' + tzKey + '00'
+    tzKey = "UTC-" + tzKey + "00"
   }
 
   type Month = {
-    num: number,
-    name: string,
-    selected?: boolean,
+    num: number
+    name: string
+    selected?: boolean
   }
   const months = [
-    { num: 1, name: 'january' },
-    { num: 2, name: 'february' },
-    { num: 3, name: 'march' },
-    { num: 4, name: 'april' },
-    { num: 5, name: 'may' },
-    { num: 6, name: 'june' },
-    { num: 7, name: 'july' },
-    { num: 8, name: 'august' },
-    { num: 9, name: 'september' },
-    { num: 10, name: 'october' },
-    { num: 11, name: 'november' },
-    { num: 12, name: 'december' }
+    { num: 1, name: "january" },
+    { num: 2, name: "february" },
+    { num: 3, name: "march" },
+    { num: 4, name: "april" },
+    { num: 5, name: "may" },
+    { num: 6, name: "june" },
+    { num: 7, name: "july" },
+    { num: 8, name: "august" },
+    { num: 9, name: "september" },
+    { num: 10, name: "october" },
+    { num: 11, name: "november" },
+    { num: 12, name: "december" },
   ].map(function (m: Month) {
     if (m.num === month) {
       m.selected = true
@@ -53,56 +53,56 @@ const setupBasedOnCurrentDate = () => {
     days.push({ name: day, selected: day === dayOfMonth })
   }
   const tzs = [
-    'UTC-1200',
-    'UTC-1100',
-    'UTC-1000',
-    'UTC-0900',
-    'UTC-0800',
-    'UTC-0700',
-    'UTC-0600',
-    'UTC-0500',
-    'UTC-0430',
-    'UTC-0400',
-    'UTC-0330',
-    'UTC-0300',
-    'UTC-0200',
-    'UTC-0100',
-    'UTC+0000',
-    'UTC+0100',
-    'UTC+0200',
-    'UTC+0300',
-    'UTC+0330',
-    'UTC+0400',
-    'UTC+0430',
-    'UTC+0500',
-    'UTC+0530',
-    'UTC+0600',
-    'UTC+0630',
-    'UTC+0700',
-    'UTC+0800',
-    'UTC+0830',
-    'UTC+0900',
-    'UTC+0930',
-    'UTC+1000',
-    'UTC+1030',
-    'UTC+1100',
-    'UTC+1200',
-    'UTC+1245',
-    'UTC+1300',
-    'UTC+1400'
+    "UTC-1200",
+    "UTC-1100",
+    "UTC-1000",
+    "UTC-0900",
+    "UTC-0800",
+    "UTC-0700",
+    "UTC-0600",
+    "UTC-0500",
+    "UTC-0430",
+    "UTC-0400",
+    "UTC-0330",
+    "UTC-0300",
+    "UTC-0200",
+    "UTC-0100",
+    "UTC+0000",
+    "UTC+0100",
+    "UTC+0200",
+    "UTC+0300",
+    "UTC+0330",
+    "UTC+0400",
+    "UTC+0430",
+    "UTC+0500",
+    "UTC+0530",
+    "UTC+0600",
+    "UTC+0630",
+    "UTC+0700",
+    "UTC+0800",
+    "UTC+0830",
+    "UTC+0900",
+    "UTC+0930",
+    "UTC+1000",
+    "UTC+1030",
+    "UTC+1100",
+    "UTC+1200",
+    "UTC+1245",
+    "UTC+1300",
+    "UTC+1400",
   ].map(function (s) {
     return {
       name: s,
-      selected: s === tzKey.toString()
+      selected: s === tzKey.toString(),
     }
   })
 
   return {
-    format: 'csv',
+    format: "csv",
     months: months,
     years: years,
     days: days,
-    tzs: tzs
+    tzs: tzs,
   }
 }
 

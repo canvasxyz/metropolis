@@ -4,7 +4,7 @@ const conversation_config = (
   state = {
     loading: false,
     conversation_config: null,
-    update_error: null
+    update_error: null,
   },
   action
 ) => {

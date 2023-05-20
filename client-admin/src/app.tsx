@@ -1,38 +1,37 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /** @jsx jsx */
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import { populateUserStore } from './actions'
-import type { User } from './util/types'
-import { RootState } from './util/types'
+import React from "react"
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
+import { populateUserStore } from "./actions"
+import type { User } from "./util/types"
+import { RootState } from "./util/types"
 
+import _ from "lodash"
 
-import _ from 'lodash'
-
-import { Switch, Route, Link, Redirect } from 'react-router-dom'
-import { Flex, Box, jsx } from 'theme-ui'
+import { Switch, Route, Link, Redirect } from "react-router-dom"
+import { Flex, Box, jsx } from "theme-ui"
 
 /* landing pages */
-import Home from './pages/landing/home'
-import TOS from './pages/landing/tos'
-import Privacy from './pages/landing/privacy'
-import PasswordReset from './pages/landing/password-reset'
-import PasswordResetInit from './pages/landing/password-reset-init'
-import PasswordResetInitDone from './pages/landing/password-reset-init-done'
-import SignIn from './pages/landing/signin'
-import SignOut from './pages/landing/signout'
-import CreateUser from './pages/landing/createuser'
+import Home from "./pages/landing/home"
+import TOS from "./pages/landing/tos"
+import Privacy from "./pages/landing/privacy"
+import PasswordReset from "./pages/landing/password-reset"
+import PasswordResetInit from "./pages/landing/password-reset-init"
+import PasswordResetInitDone from "./pages/landing/password-reset-init-done"
+import SignIn from "./pages/landing/signin"
+import SignOut from "./pages/landing/signout"
+import CreateUser from "./pages/landing/createuser"
 
 /* manage */
-import Conversations from './pages/manage/conversations'
-import ConversationAdmin from './pages/manage/admin'
-import Account from './pages/manage/account'
+import Conversations from "./pages/manage/conversations"
+import ConversationAdmin from "./pages/manage/admin"
+import Account from "./pages/manage/account"
 
 /* participate */
-import Survey from './pages/survey'
-import Logomark from './pages/widgets/logomark'
+import Survey from "./pages/survey"
+import Logomark from "./pages/widgets/logomark"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
@@ -40,14 +39,12 @@ const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   }
   return (
     <Route
-    {...rest}
+      {...rest}
       render={(props) =>
         authed === true ? (
           <Component {...props} />
         ) : (
-          <Redirect
-            to={{ pathname: '/signin', state: { from: props.location } }}
-          />
+          <Redirect to={{ pathname: "/signin", state: { from: props.location } }} />
         )
       }
     />
@@ -58,30 +55,33 @@ PrivateRoute.propTypes = {
   component: PropTypes.oneOfType([PropTypes.elementType, PropTypes.element]),
   isLoading: PropTypes.bool,
   location: PropTypes.object,
-  authed: PropTypes.bool
+  authed: PropTypes.bool,
 }
 
-class App extends React.Component<{
-  dispatch: Function
-  isLoggedIn: boolean,
-  location: { pathname: string },
-  user: User
-  error: XMLHttpRequest
-  status: number
-}, {
-  sidebarOpen: boolean
-}> {
+class App extends React.Component<
+  {
+    dispatch: Function
+    isLoggedIn: boolean
+    location: { pathname: string }
+    user: User
+    error: XMLHttpRequest
+    status: number
+  },
+  {
+    sidebarOpen: boolean
+  }
+> {
   static propTypes: {
-    dispatch: Function,
+    dispatch: Function
     isLoggedIn: unknown
-    location: object,
-    user: object,
+    location: object
+    user: object
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      sidebarOpen: false
+      sidebarOpen: false,
     }
   }
 
@@ -97,7 +97,8 @@ class App extends React.Component<{
     }
 
     if (
-      (this.props.error && this.props.status === 401)
+      this.props.error &&
+      this.props.status === 401
       // || this.props.status === 403
     ) {
       authed = false
@@ -109,9 +110,7 @@ class App extends React.Component<{
   isLoading() {
     const { isLoggedIn } = this.props
 
-    return _.isUndefined(
-      isLoggedIn
-    ) /* if isLoggedIn is undefined, the app is loading */
+    return _.isUndefined(isLoggedIn) /* if isLoggedIn is undefined, the app is loading */
   }
 
   onSetSidebarOpen(open) {
@@ -162,47 +161,50 @@ class App extends React.Component<{
           <Box>
             <Box
               sx={{
-                width: '100%',
-                backgroundColor: 'primary',
-                color: 'background',
+                width: "100%",
+                backgroundColor: "primary",
+                color: "background",
                 zIndex: 1000,
                 py: [3],
                 px: [4],
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-              <Link sx={{ variant: 'links.header' }} to="/">
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Link sx={{ variant: "links.header" }} to="/">
                 <Logomark
-                  style={{ marginRight: 10, position: 'relative', top: 6 }}
-                  fill={'white'}
+                  style={{ marginRight: 10, position: "relative", top: 6 }}
+                  fill={"white"}
                 />
                 Polis
               </Link>
               <Box sx={{ flex: 1 }}></Box>
-              {this.props.user ?
-               <Link sx={{ variant: 'links.header' }} to="/signout">
-                 Sign out
-               </Link> :
-               <Link sx={{ variant: 'links.header' }} to="/signin">
-                 Sign in
-               </Link>}
+              {this.props.user ? (
+                <Link sx={{ variant: "links.header" }} to="/signout">
+                  Sign out
+                </Link>
+              ) : (
+                <Link sx={{ variant: "links.header" }} to="/signin">
+                  Sign in
+                </Link>
+              )}
             </Box>
             <Route
               render={(routeProps) => {
-                if (routeProps.location.pathname.split('/')[1] === 'm') {
+                if (routeProps.location.pathname.split("/")[1] === "m") {
                   return null
                 }
                 return (
                   <Flex>
-                    <Box sx={{ mr: [5], p: [4], flex: '0 0 auto' }}>
+                    <Box sx={{ mr: [5], p: [4], flex: "0 0 auto" }}>
                       <Box sx={{ mb: [3] }}>
-                        <Link sx={{ variant: 'links.nav' }} to={`/`}>
+                        <Link sx={{ variant: "links.nav" }} to={`/`}>
                           Conversations
                         </Link>
                       </Box>
                       <Box sx={{ mb: [3] }}>
-                        <Link sx={{ variant: 'links.nav' }} to={`/account`}>
+                        <Link sx={{ variant: "links.nav" }} to={`/account`}>
                           Account
                         </Link>
                       </Box>
@@ -210,10 +212,11 @@ class App extends React.Component<{
                     <Box
                       sx={{
                         p: [4],
-                        flex: '0 0 auto',
-                        maxWidth: '35em',
-                        mx: [4]
-                      }}>
+                        flex: "0 0 auto",
+                        maxWidth: "35em",
+                        mx: [4],
+                      }}
+                    >
                       <PrivateRoute
                         isLoading={this.isLoading()}
                         authed={this.isAuthed()}
@@ -235,10 +238,7 @@ class App extends React.Component<{
                         path="/account"
                         component={Account}
                       />
-                      <Route
-                        path="/c/:conversation_id"
-                        component={Survey}
-                      />
+                      <Route path="/c/:conversation_id" component={Survey} />
                     </Box>
                   </Flex>
                 )
@@ -261,14 +261,14 @@ App.propTypes = {
   dispatch: PropTypes.func,
   isLoggedIn: PropTypes.bool,
   location: PropTypes.shape({
-    pathname: PropTypes.string
+    pathname: PropTypes.string,
   }),
   user: PropTypes.shape({
     uid: PropTypes.number,
     email: PropTypes.string,
     created: PropTypes.number,
-    hname: PropTypes.string
-  })
+    hname: PropTypes.string,
+  }),
 }
 
 export default connect((state: RootState) => state.user)(App)

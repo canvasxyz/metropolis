@@ -1,158 +1,154 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import $ from 'jquery'
-import api from './util/api'
+import $ from "jquery"
+import api from "./util/api"
 
 export type Action = any
 
 /* ======= Types ======= */
-export const REQUEST_USER = 'REQUEST_USER'
-export const RECEIVE_USER = 'RECEIVE_USER'
-export const USER_FETCH_ERROR = 'USER_FETCH_ERROR'
+export const REQUEST_USER = "REQUEST_USER"
+export const RECEIVE_USER = "RECEIVE_USER"
+export const USER_FETCH_ERROR = "USER_FETCH_ERROR"
 
-export const CREATE_NEW_CONVERSATION = 'CREATE_NEW_CONVERSATION'
-export const CREATE_NEW_CONVERSATION_SUCCESS = 'CREATE_NEW_CONVERSATION_SUCCESS'
-export const CREATE_NEW_CONVERSATION_ERROR = 'CREATE_NEW_CONVERSATION_ERROR'
+export const CREATE_NEW_CONVERSATION = "CREATE_NEW_CONVERSATION"
+export const CREATE_NEW_CONVERSATION_SUCCESS = "CREATE_NEW_CONVERSATION_SUCCESS"
+export const CREATE_NEW_CONVERSATION_ERROR = "CREATE_NEW_CONVERSATION_ERROR"
 
-export const REQUEST_CONVERSATIONS = 'REQUEST_CONVERSATIONS'
-export const RECEIVE_CONVERSATIONS = 'RECEIVE_CONVERSATIONS'
-export const CONVERSATIONS_FETCH_ERROR = 'CONVERSATIONS_FETCH_ERROR'
+export const REQUEST_CONVERSATIONS = "REQUEST_CONVERSATIONS"
+export const RECEIVE_CONVERSATIONS = "RECEIVE_CONVERSATIONS"
+export const CONVERSATIONS_FETCH_ERROR = "CONVERSATIONS_FETCH_ERROR"
 
 /* zid for clarity - this is conversation config */
-export const REQUEST_ZID_METADATA = 'REQUEST_ZID_METADATA'
-export const RECEIVE_ZID_METADATA = 'RECEIVE_ZID_METADATA'
-export const ZID_METADATA_FETCH_ERROR = 'ZID_METADATA_FETCH_ERROR'
-export const ZID_METADATA_RESET = 'ZID_METADATA_RESET'
+export const REQUEST_ZID_METADATA = "REQUEST_ZID_METADATA"
+export const RECEIVE_ZID_METADATA = "RECEIVE_ZID_METADATA"
+export const ZID_METADATA_FETCH_ERROR = "ZID_METADATA_FETCH_ERROR"
+export const ZID_METADATA_RESET = "ZID_METADATA_RESET"
 
-export const UPDATE_ZID_METADATA_STARTED = 'UPDATE_ZID_METADATA_STARTED'
-export const UPDATE_ZID_METADATA_SUCCESS = 'UPDATE_ZID_METADATA_SUCCESS'
-export const UPDATE_ZID_METADATA_ERROR = 'UPDATE_ZID_METADATA_ERROR'
+export const UPDATE_ZID_METADATA_STARTED = "UPDATE_ZID_METADATA_STARTED"
+export const UPDATE_ZID_METADATA_SUCCESS = "UPDATE_ZID_METADATA_SUCCESS"
+export const UPDATE_ZID_METADATA_ERROR = "UPDATE_ZID_METADATA_ERROR"
 
-export const OPTIMISTIC_ZID_METADATA_UPDATE = 'OPTIMISTIC_ZID_METADATA_UPDATE'
+export const OPTIMISTIC_ZID_METADATA_UPDATE = "OPTIMISTIC_ZID_METADATA_UPDATE"
 
 /* report */
-export const UPDATE_REPORT_STARTED = 'UPDATE_REPORT_STARTED'
-export const UPDATE_REPORT_SUCCESS = 'UPDATE_REPORT_SUCCESS'
-export const UPDATE_REPORT_ERROR = 'UPDATE_REPORT_ERROR'
+export const UPDATE_REPORT_STARTED = "UPDATE_REPORT_STARTED"
+export const UPDATE_REPORT_SUCCESS = "UPDATE_REPORT_SUCCESS"
+export const UPDATE_REPORT_ERROR = "UPDATE_REPORT_ERROR"
 
-export const OPTIMISTIC_REPORT_UPDATE = 'OPTIMISTIC_REPORT_UPDATE'
+export const OPTIMISTIC_REPORT_UPDATE = "OPTIMISTIC_REPORT_UPDATE"
 
 /* moderation */
-export const REQUEST_COMMENTS = 'REQUEST_COMMENTS'
-export const RECEIVE_COMMENTS = 'RECEIVE_COMMENTS'
-export const COMMENTS_FETCH_ERROR = 'COMMENTS_FETCH_ERROR'
+export const REQUEST_COMMENTS = "REQUEST_COMMENTS"
+export const RECEIVE_COMMENTS = "RECEIVE_COMMENTS"
+export const COMMENTS_FETCH_ERROR = "COMMENTS_FETCH_ERROR"
 
-export const REQUEST_UNMODERATED_COMMENTS = 'REQUEST_UNMODERATED_COMMENTS'
-export const RECEIVE_UNMODERATED_COMMENTS = 'RECEIVE_UNMODERATED_COMMENTS'
-export const UNMODERATED_COMMENTS_FETCH_ERROR =
-  'UNMODERATED_COMMENTS_FETCH_ERROR'
+export const REQUEST_UNMODERATED_COMMENTS = "REQUEST_UNMODERATED_COMMENTS"
+export const RECEIVE_UNMODERATED_COMMENTS = "RECEIVE_UNMODERATED_COMMENTS"
+export const UNMODERATED_COMMENTS_FETCH_ERROR = "UNMODERATED_COMMENTS_FETCH_ERROR"
 
-export const REQUEST_ACCEPTED_COMMENTS = 'REQUEST_ACCEPTED_COMMENTS'
-export const RECEIVE_ACCEPTED_COMMENTS = 'RECEIVE_ACCEPTED_COMMENTS'
-export const ACCEPTED_COMMENTS_FETCH_ERROR = 'ACCEPTED_COMMENTS_FETCH_ERROR'
+export const REQUEST_ACCEPTED_COMMENTS = "REQUEST_ACCEPTED_COMMENTS"
+export const RECEIVE_ACCEPTED_COMMENTS = "RECEIVE_ACCEPTED_COMMENTS"
+export const ACCEPTED_COMMENTS_FETCH_ERROR = "ACCEPTED_COMMENTS_FETCH_ERROR"
 
-export const REQUEST_REJECTED_COMMENTS = 'REQUEST_REJECTED_COMMENTS'
-export const RECEIVE_REJECTED_COMMENTS = 'RECEIVE_REJECTED_COMMENTS'
-export const REJECTED_COMMENTS_FETCH_ERROR = 'REJECTED_COMMENTS_FETCH_ERROR'
+export const REQUEST_REJECTED_COMMENTS = "REQUEST_REJECTED_COMMENTS"
+export const RECEIVE_REJECTED_COMMENTS = "RECEIVE_REJECTED_COMMENTS"
+export const REJECTED_COMMENTS_FETCH_ERROR = "REJECTED_COMMENTS_FETCH_ERROR"
 
-export const ACCEPT_COMMENT = 'ACCEPT_COMMENT'
-export const ACCEPT_COMMENT_SUCCESS = 'ACCEPT_COMMENT_SUCCESS'
-export const ACCEPT_COMMENT_ERROR = 'ACCEPT_COMMENT_ERROR'
+export const ACCEPT_COMMENT = "ACCEPT_COMMENT"
+export const ACCEPT_COMMENT_SUCCESS = "ACCEPT_COMMENT_SUCCESS"
+export const ACCEPT_COMMENT_ERROR = "ACCEPT_COMMENT_ERROR"
 
-export const REJECT_COMMENT = 'REJECT_COMMENT'
-export const REJECT_COMMENT_SUCCESS = 'REJECT_COMMENT_SUCCESS'
-export const REJECT_COMMENT_ERROR = 'REJECT_COMMENT_ERROR'
+export const REJECT_COMMENT = "REJECT_COMMENT"
+export const REJECT_COMMENT_SUCCESS = "REJECT_COMMENT_SUCCESS"
+export const REJECT_COMMENT_ERROR = "REJECT_COMMENT_ERROR"
 
-export const COMMENT_IS_META = 'COMMENT_IS_META'
-export const COMMENT_IS_META_SUCCESS = 'COMMENT_IS_META_SUCCESS'
-export const COMMENT_IS_META_ERROR = 'COMMENT_IS_META_ERROR'
+export const COMMENT_IS_META = "COMMENT_IS_META"
+export const COMMENT_IS_META_SUCCESS = "COMMENT_IS_META_SUCCESS"
+export const COMMENT_IS_META_ERROR = "COMMENT_IS_META_ERROR"
 
-export const REQUEST_PARTICIPANTS = 'REQUEST_PARTICIPANTS'
-export const RECEIVE_PARTICIPANTS = 'RECEIVE_PARTICIPANTS'
-export const PARTICIPANTS_FETCH_ERROR = 'PARTICIPANTS_FETCH_ERROR'
+export const REQUEST_PARTICIPANTS = "REQUEST_PARTICIPANTS"
+export const RECEIVE_PARTICIPANTS = "RECEIVE_PARTICIPANTS"
+export const PARTICIPANTS_FETCH_ERROR = "PARTICIPANTS_FETCH_ERROR"
 
-export const REQUEST_DEFAULT_PARTICIPANTS = 'REQUEST_DEFAULT_PARTICIPANTS'
-export const RECEIVE_DEFAULT_PARTICIPANTS = 'RECEIVE_DEFAULT_PARTICIPANTS'
-export const DEFAULT_PARTICIPANTS_FETCH_ERROR =
-  'DEFAULT_PARTICIPANTS_FETCH_ERROR'
+export const REQUEST_DEFAULT_PARTICIPANTS = "REQUEST_DEFAULT_PARTICIPANTS"
+export const RECEIVE_DEFAULT_PARTICIPANTS = "RECEIVE_DEFAULT_PARTICIPANTS"
+export const DEFAULT_PARTICIPANTS_FETCH_ERROR = "DEFAULT_PARTICIPANTS_FETCH_ERROR"
 
-export const REQUEST_FEATURED_PARTICIPANTS = 'REQUEST_FEATURED_PARTICIPANTS'
-export const RECEIVE_FEATURED_PARTICIPANTS = 'RECEIVE_FEATURED_PARTICIPANTS'
-export const FEATURED_PARTICIPANTS_FETCH_ERROR =
-  'FEATURED_PARTICIPANTS_FETCH_ERROR'
+export const REQUEST_FEATURED_PARTICIPANTS = "REQUEST_FEATURED_PARTICIPANTS"
+export const RECEIVE_FEATURED_PARTICIPANTS = "RECEIVE_FEATURED_PARTICIPANTS"
+export const FEATURED_PARTICIPANTS_FETCH_ERROR = "FEATURED_PARTICIPANTS_FETCH_ERROR"
 
-export const REQUEST_HIDDEN_PARTICIPANTS = 'REQUEST_HIDDEN_PARTICIPANTS'
-export const RECEIVE_HIDDEN_PARTICIPANTS = 'RECEIVE_HIDDEN_PARTICIPANTS'
-export const HIDDEN_PARTICIPANTS_FETCH_ERROR = 'HIDDEN_PARTICIPANTS_FETCH_ERROR'
+export const REQUEST_HIDDEN_PARTICIPANTS = "REQUEST_HIDDEN_PARTICIPANTS"
+export const RECEIVE_HIDDEN_PARTICIPANTS = "RECEIVE_HIDDEN_PARTICIPANTS"
+export const HIDDEN_PARTICIPANTS_FETCH_ERROR = "HIDDEN_PARTICIPANTS_FETCH_ERROR"
 
 /* participant actions */
-export const FEATURE_PARTICIPANT = 'FEATURE_PARTICIPANT'
-export const FEATURE_PARTICIPANT_SUCCESS = 'FEATURE_PARTICIPANT_SUCCESS'
-export const FEATURE_PARTICIPANT_ERROR = 'FEATURE_PARTICIPANT_ERROR'
+export const FEATURE_PARTICIPANT = "FEATURE_PARTICIPANT"
+export const FEATURE_PARTICIPANT_SUCCESS = "FEATURE_PARTICIPANT_SUCCESS"
+export const FEATURE_PARTICIPANT_ERROR = "FEATURE_PARTICIPANT_ERROR"
 
-export const HIDE_PARTICIPANT = 'HIDE_PARTICIPANT'
-export const HIDE_PARTICIPANT_SUCCESS = 'HIDE_PARTICIPANT_SUCCESS'
-export const HIDE_PARTICIPANT_ERROR = 'HIDE_PARTICIPANT_ERROR'
+export const HIDE_PARTICIPANT = "HIDE_PARTICIPANT"
+export const HIDE_PARTICIPANT_SUCCESS = "HIDE_PARTICIPANT_SUCCESS"
+export const HIDE_PARTICIPANT_ERROR = "HIDE_PARTICIPANT_ERROR"
 
 /* submit seed comment */
-export const SEED_COMMENT_LOCAL_UPDATE = 'SEED_COMMENT_LOCAL_UPDATE'
-export const SUBMIT_SEED_COMMENT = 'SUBMIT_SEED_COMMENT'
-export const SUBMIT_SEED_COMMENT_SUCCESS = 'SUBMIT_SEED_COMMENT_SUCCESS'
-export const SUBMIT_SEED_COMMENT_ERROR = 'SUBMIT_SEED_COMMENT_ERROR'
+export const SEED_COMMENT_LOCAL_UPDATE = "SEED_COMMENT_LOCAL_UPDATE"
+export const SUBMIT_SEED_COMMENT = "SUBMIT_SEED_COMMENT"
+export const SUBMIT_SEED_COMMENT_SUCCESS = "SUBMIT_SEED_COMMENT_SUCCESS"
+export const SUBMIT_SEED_COMMENT_ERROR = "SUBMIT_SEED_COMMENT_ERROR"
 
 /* submit tweet seed comment */
-export const SEED_COMMENT_TWEET_LOCAL_UPDATE = 'SEED_COMMENT_TWEET_LOCAL_UPDATE'
-export const SUBMIT_SEED_COMMENT_TWEET = 'SUBMIT_SEED_COMMENT_TWEET'
-export const SUBMIT_SEED_COMMENT_TWEET_SUCCESS =
-  'SUBMIT_SEED_COMMENT_TWEET_SUCCESS'
-export const SUBMIT_SEED_COMMENT_TWEET_ERROR = 'SUBMIT_SEED_COMMENT_TWEET_ERROR'
+export const SEED_COMMENT_TWEET_LOCAL_UPDATE = "SEED_COMMENT_TWEET_LOCAL_UPDATE"
+export const SUBMIT_SEED_COMMENT_TWEET = "SUBMIT_SEED_COMMENT_TWEET"
+export const SUBMIT_SEED_COMMENT_TWEET_SUCCESS = "SUBMIT_SEED_COMMENT_TWEET_SUCCESS"
+export const SUBMIT_SEED_COMMENT_TWEET_ERROR = "SUBMIT_SEED_COMMENT_TWEET_ERROR"
 
-export const REQUEST_SEED_COMMENTS = 'REQUEST_SEED_COMMENTS'
-export const RECEIVE_SEED_COMMENTS = 'RECEIVE_SEED_COMMENTS'
-export const SEED_COMMENTS_FETCH_ERROR = 'SEED_COMMENTS_FETCH_ERROR'
+export const REQUEST_SEED_COMMENTS = "REQUEST_SEED_COMMENTS"
+export const RECEIVE_SEED_COMMENTS = "RECEIVE_SEED_COMMENTS"
+export const SEED_COMMENTS_FETCH_ERROR = "SEED_COMMENTS_FETCH_ERROR"
 
 /* conversation stats */
-export const REQUEST_CONVERSATION_STATS = 'REQUEST_CONVERSATION_STATS'
-export const RECEIVE_CONVERSATION_STATS = 'RECEIVE_CONVERSATION_STATS'
-export const CONVERSATION_STATS_FETCH_ERROR = 'CONVERSATION_STATS_FETCH_ERROR'
+export const REQUEST_CONVERSATION_STATS = "REQUEST_CONVERSATION_STATS"
+export const RECEIVE_CONVERSATION_STATS = "RECEIVE_CONVERSATION_STATS"
+export const CONVERSATION_STATS_FETCH_ERROR = "CONVERSATION_STATS_FETCH_ERROR"
 
-export const DATA_EXPORT_STARTED = 'DATA_EXPORT_STARTED'
-export const DATA_EXPORT_SUCCESS = 'DATA_EXPORT_SUCCESS'
-export const DATA_EXPORT_ERROR = 'DATA_EXPORT_ERROR'
+export const DATA_EXPORT_STARTED = "DATA_EXPORT_STARTED"
+export const DATA_EXPORT_SUCCESS = "DATA_EXPORT_SUCCESS"
+export const DATA_EXPORT_ERROR = "DATA_EXPORT_ERROR"
 
-export const CREATEUSER_INITIATED = 'CREATEUSER_INITIATED'
+export const CREATEUSER_INITIATED = "CREATEUSER_INITIATED"
 // export const CREATEUSER_SUCCESSFUL = "CREATEUSER_SUCCESSFUL";
-export const CREATEUSER_ERROR = 'CREATEUSER_ERROR'
+export const CREATEUSER_ERROR = "CREATEUSER_ERROR"
 
-export const SIGNIN_INITIATED = 'SIGNIN_INITIATED'
+export const SIGNIN_INITIATED = "SIGNIN_INITIATED"
 // export const SIGNIN_SUCCESSFUL = "SIGNIN_SUCCESSFUL";
-export const SIGNIN_ERROR = 'SIGNIN_ERROR'
+export const SIGNIN_ERROR = "SIGNIN_ERROR"
 
-export const SIGNOUT_INITIATED = 'SIGNOUT_INITIATED'
-export const SIGNOUT_SUCCESSFUL = 'SIGNOUT_SUCCESSFUL'
-export const SIGNOUT_ERROR = 'SIGNOUT_ERROR'
+export const SIGNOUT_INITIATED = "SIGNOUT_INITIATED"
+export const SIGNOUT_SUCCESSFUL = "SIGNOUT_SUCCESSFUL"
+export const SIGNOUT_ERROR = "SIGNOUT_ERROR"
 
-export const PWRESET_INIT_INITIATED = 'PWRESET_INIT_INITIATED'
-export const PWRESET_INIT_SUCCESS = 'PWRESET_INIT_SUCCESS'
-export const PWRESET_INIT_ERROR = 'PWRESET_INIT_ERROR'
+export const PWRESET_INIT_INITIATED = "PWRESET_INIT_INITIATED"
+export const PWRESET_INIT_SUCCESS = "PWRESET_INIT_SUCCESS"
+export const PWRESET_INIT_ERROR = "PWRESET_INIT_ERROR"
 
-export const PWRESET_INITIATED = 'PWRESET_INITIATED'
-export const PWRESET_SUCCESS = 'PWRESET_SUCCESS'
-export const PWRESET_ERROR = 'PWRESET_ERROR'
+export const PWRESET_INITIATED = "PWRESET_INITIATED"
+export const PWRESET_SUCCESS = "PWRESET_SUCCESS"
+export const PWRESET_ERROR = "PWRESET_ERROR"
 
-export const FACEBOOK_SIGNIN_INITIATED = 'FACEBOOK_SIGNIN_INITIATED'
-export const FACEBOOK_SIGNIN_SUCCESSFUL = 'FACEBOOK_SIGNIN_SUCCESSFUL'
-export const FACEBOOK_SIGNIN_FAILED = 'FACEBOOK_SIGNIN_FAILED'
+export const FACEBOOK_SIGNIN_INITIATED = "FACEBOOK_SIGNIN_INITIATED"
+export const FACEBOOK_SIGNIN_SUCCESSFUL = "FACEBOOK_SIGNIN_SUCCESSFUL"
+export const FACEBOOK_SIGNIN_FAILED = "FACEBOOK_SIGNIN_FAILED"
 
-export const SUBMIT_CONTRIB = 'SUBMIT_CONTRIB'
-export const SUBMIT_CONTRIB_SUCCESS = 'SUBMIT_CONTRIB_SUCCESS'
-export const SUBMIT_CONTRIB_ERROR = 'SUBMIT_CONTRIB_ERROR'
+export const SUBMIT_CONTRIB = "SUBMIT_CONTRIB"
+export const SUBMIT_CONTRIB_SUCCESS = "SUBMIT_CONTRIB_SUCCESS"
+export const SUBMIT_CONTRIB_ERROR = "SUBMIT_CONTRIB_ERROR"
 
 /* MATH */
 
-export const REQUEST_MATH = 'REQUEST_MATH'
-export const RECEIVE_MATH = 'RECEIVE_MATH'
-export const MATH_FETCH_ERROR = 'MATH_FETCH_ERROR'
+export const REQUEST_MATH = "REQUEST_MATH"
+export const RECEIVE_MATH = "RECEIVE_MATH"
+export const MATH_FETCH_ERROR = "MATH_FETCH_ERROR"
 
 /* ======= Actions ======= */
 
@@ -169,14 +165,14 @@ export const MATH_FETCH_ERROR = 'MATH_FETCH_ERROR'
 
 const requestUser = () => {
   return {
-    type: REQUEST_USER
+    type: REQUEST_USER,
   }
 }
 
 const receiveUser = (data) => {
   return {
     type: RECEIVE_USER,
-    data: data
+    data: data,
   }
 }
 
@@ -184,12 +180,12 @@ const userFetchError = (err) => {
   return {
     type: USER_FETCH_ERROR,
     status: err.status,
-    data: err
+    data: err,
   }
 }
 
 const fetchUser = () => {
-  return api.get('/api/v3/users', { errIfNoAuth: true }, { noCache: true })
+  return api.get("/api/v3/users", { errIfNoAuth: true }, { noCache: true })
 }
 
 export const populateUserStore = () => {
@@ -206,7 +202,7 @@ export const populateUserStore = () => {
 
 const signinInitiated = () => {
   return {
-    type: SIGNIN_INITIATED
+    type: SIGNIN_INITIATED,
   }
 }
 
@@ -215,12 +211,12 @@ const signinInitiated = () => {
 const signinError = (err) => {
   return {
     type: SIGNIN_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const signinPost = (attrs) => {
-  return api.post('/api/v3/auth/login', attrs)
+  return api.post("/api/v3/auth/login", attrs)
 }
 
 export const doSignin = (attrs) => {
@@ -231,8 +227,8 @@ export const doSignin = (attrs) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          dispatch({ type: 'signin completed successfully' })
-          window.location.assign('/')
+          dispatch({ type: "signin completed successfully" })
+          window.location.assign("/")
         }, 3000)
       },
       (err) => dispatch(signinError(err))
@@ -244,7 +240,7 @@ export const doSignin = (attrs) => {
 
 const createUserInitiated = () => {
   return {
-    type: CREATEUSER_INITIATED
+    type: CREATEUSER_INITIATED,
   }
 }
 
@@ -253,12 +249,12 @@ const createUserInitiated = () => {
 const createUserError = (err) => {
   return {
     type: CREATEUSER_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const createUserPost = (attrs) => {
-  return api.post('/api/v3/auth/new', attrs)
+  return api.post("/api/v3/auth/new", attrs)
 }
 
 export const doCreateUser = (attrs, dest) => {
@@ -269,7 +265,7 @@ export const doCreateUser = (attrs, dest) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          window.location = dest || ''
+          window.location = dest || ""
         }, 3000)
       },
       (err) => dispatch(createUserError(err))
@@ -281,25 +277,25 @@ export const doCreateUser = (attrs, dest) => {
 
 const passwordResetInitInitiated = () => {
   return {
-    type: PWRESET_INIT_INITIATED
+    type: PWRESET_INIT_INITIATED,
   }
 }
 
 const passwordResetInitSuccess = () => {
   return {
-    type: PWRESET_INIT_SUCCESS
+    type: PWRESET_INIT_SUCCESS,
   }
 }
 
 const passwordResetInitError = (err) => {
   return {
     type: PWRESET_INIT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const passwordResetInitPost = (attrs) => {
-  return api.post('/api/v3/auth/pwresettoken', attrs)
+  return api.post("/api/v3/auth/pwresettoken", attrs)
 }
 
 export const doPasswordResetInit = (attrs) => {
@@ -310,7 +306,7 @@ export const doPasswordResetInit = (attrs) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          window.location.assign('/pwresetinit/done')
+          window.location.assign("/pwresetinit/done")
         }, 3000)
 
         return dispatch(passwordResetInitSuccess())
@@ -324,25 +320,25 @@ export const doPasswordResetInit = (attrs) => {
 
 const passwordResetInitiated = () => {
   return {
-    type: PWRESET_INITIATED
+    type: PWRESET_INITIATED,
   }
 }
 
 const passwordResetSuccess = () => {
   return {
-    type: PWRESET_SUCCESS
+    type: PWRESET_SUCCESS,
   }
 }
 
 const passwordResetError = (err) => {
   return {
     type: PWRESET_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const passwordResetPost = (attrs) => {
-  return api.post('/api/v3/auth/password', attrs)
+  return api.post("/api/v3/auth/password", attrs)
 }
 
 export const doPasswordReset = (attrs) => {
@@ -353,7 +349,7 @@ export const doPasswordReset = (attrs) => {
         setTimeout(() => {
           // Force page to load so we can be sure the password is cleared from memory
           // delay a bit so the cookie has time to set
-          window.location.assign('/')
+          window.location.assign("/")
         }, 3000)
 
         return dispatch(passwordResetSuccess())
@@ -367,7 +363,7 @@ export const doPasswordReset = (attrs) => {
 
 const facebookSigninInitiated = () => {
   return {
-    type: FACEBOOK_SIGNIN_INITIATED
+    type: FACEBOOK_SIGNIN_INITIATED,
   }
 }
 
@@ -375,14 +371,14 @@ const facebookSigninInitiated = () => {
 // eslint-disable-next-line no-unused-vars
 const facebookSigninSuccessful = () => {
   return {
-    type: FACEBOOK_SIGNIN_SUCCESSFUL
+    type: FACEBOOK_SIGNIN_SUCCESSFUL,
   }
 }
 
 const facebookSigninFailed = (errorCode) => {
   return {
     type: FACEBOOK_SIGNIN_FAILED,
-    errorCode: errorCode
+    errorCode: errorCode,
   }
 }
 
@@ -405,14 +401,11 @@ const getFriends = () => {
     })
   }
 
-  FB.api('/me/friends', (response: any) => {
+  FB.api("/me/friends", (response: any) => {
     if (response && !response.error) {
       const friendsSoFar = response.data
       if (response.data.length && response.paging.next) {
-        getMoreFriends(friendsSoFar, response.paging.next).then(
-          dfd.resolve,
-          dfd.reject
-        )
+        getMoreFriends(friendsSoFar, response.paging.next).then(dfd.resolve, dfd.reject)
       } else {
         dfd.resolve(friendsSoFar || [])
       }
@@ -427,7 +420,7 @@ const getFriends = () => {
 const getInfo = () => {
   const dfd = $.Deferred()
 
-  FB.api('/me', (response: any) => {
+  FB.api("/me", (response: any) => {
     // {"id":"10152802017421079"
     //   "email":"michael@bjorkegren.com"
     //   "first_name":"Mike"
@@ -446,7 +439,7 @@ const getInfo = () => {
 
     if (response && !response.error) {
       if (response.location && response.location.id) {
-        FB.api('/' + response.location.id, (locationResponse: any) => {
+        FB.api("/" + response.location.id, (locationResponse: any) => {
           if (locationResponse) {
             response.locationInfo = locationResponse
           }
@@ -465,38 +458,35 @@ const getInfo = () => {
 
 const saveFacebookFriendsData = (data, dest, dispatch) => {
   $.ajax({
-    url: '/api/v3/auth/facebook',
-    contentType: 'application/json; charset=utf-8',
+    url: "/api/v3/auth/facebook",
+    contentType: "application/json; charset=utf-8",
     headers: {
-      'Cache-Control': 'max-age=0'
+      "Cache-Control": "max-age=0",
     },
     xhrFields: {
-      withCredentials: true
+      withCredentials: true,
     },
-    dataType: 'json',
+    dataType: "json",
     data: JSON.stringify(data),
-    type: 'POST'
+    type: "POST",
   }).then(
     () => {
       setTimeout(() => {
         // Force page to load so we can be sure the old user"s state is cleared from memory
         // delay a bit so the cookies have time to clear too.
-        window.location = dest || '/'
+        window.location = dest || "/"
       }, 1000)
     },
     (err) => {
       console.dir(err)
 
-      if (
-        err.responseText &&
-        /polis_err_user_with_this_email_exists/.test(err.responseText)
-      ) {
+      if (err.responseText && /polis_err_user_with_this_email_exists/.test(err.responseText)) {
         // Todo handle
 
         // var password = prompt("A user for "+data.fb_email+", is already associated with your Facebook account. Log into that user to enable Facebook login.");
         // that.linkMode = true;
 
-        dispatch(facebookSigninFailed('polis_err_user_with_this_email_exists')) // handle case user already exists enter your password
+        dispatch(facebookSigninFailed("polis_err_user_with_this_email_exists")) // handle case user already exists enter your password
 
         // that.model.set({
         //   create: false, // don"t show create account stuff, account exists.
@@ -504,18 +494,13 @@ const saveFacebookFriendsData = (data, dest, dispatch) => {
         //   email: data.fb_email,
         // });
       } else {
-        alert('error logging in with Facebook')
+        alert("error logging in with Facebook")
       }
     }
   )
 }
 
-const processFacebookFriendsData = (
-  response,
-  dest,
-  dispatch,
-  optionalPassword
-) => {
+const processFacebookFriendsData = (response, dest, dispatch, optionalPassword) => {
   return (fb_public_profile, friendsData) => {
     // alert(JSON.stringify(friendsData));
 
@@ -532,7 +517,7 @@ const processFacebookFriendsData = (
     const data: FBData = {
       fb_public_profile: JSON.stringify(fb_public_profile),
       fb_friends_response: JSON.stringify(friendsData),
-      response: JSON.stringify(response)
+      response: JSON.stringify(response),
     }
 
     // cleaner as fb_email: fb_public_profile.email ? fb_public_profile.email : null
@@ -540,23 +525,16 @@ const processFacebookFriendsData = (
     if (fb_public_profile.email) {
       data.fb_email = fb_public_profile.email
     } else {
-      data.provided_email = prompt('Please enter your email address.')
+      data.provided_email = prompt("Please enter your email address.")
     }
 
-    const hname = [
-      fb_public_profile.first_name,
-      fb_public_profile.last_name
-    ].join(' ')
+    const hname = [fb_public_profile.first_name, fb_public_profile.last_name].join(" ")
 
     if (hname.length) {
       data.hname = hname
     }
 
-    if (
-      response &&
-      response.authResponse &&
-      response.authResponse.grantedScopes
-    ) {
+    if (response && response.authResponse && response.authResponse.grantedScopes) {
       data.fb_granted_scopes = response.authResponse.grantedScopes
     }
 
@@ -578,7 +556,7 @@ const onFbLoginOk = (response, dest, dispatch, optionalPassword) => {
 }
 
 const callFacebookLoginAPI = (dest, dispatch, optionalPassword) => {
-  console.log('ringing facebook...')
+  console.log("ringing facebook...")
 
   FB.login(
     (res) => {
@@ -589,10 +567,10 @@ const callFacebookLoginAPI = (dest, dispatch, optionalPassword) => {
       scope: [
         // "taggable_friends", // requires review.
         // invitable_friends NOTE: only for games with a fb Canvas presence, so don"t use this
-        'public_profile',
-        'user_friends',
-        'email'
-      ].join(',')
+        "public_profile",
+        "user_friends",
+        "email",
+      ].join(","),
     }
   )
 }
@@ -608,7 +586,7 @@ export const doFacebookSignin = (dest, optionalPassword?) => {
 
 const signoutInitiated = () => {
   return {
-    type: SIGNOUT_INITIATED
+    type: SIGNOUT_INITIATED,
   }
 }
 
@@ -617,17 +595,17 @@ const signoutInitiated = () => {
 const signoutError = (err) => {
   return {
     type: SIGNOUT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const signoutPost = (dest?) => {
   // relying on server to clear cookies
   return $.ajax({
-    type: 'POST',
-    url: '/api/v3/auth/deregister',
+    type: "POST",
+    url: "/api/v3/auth/deregister",
     data: {},
-    dataType: 'text' // server returns an empty response, so can"t parse as JSON
+    dataType: "text", // server returns an empty response, so can"t parse as JSON
   })
 }
 
@@ -639,7 +617,7 @@ export const doSignout = (dest) => {
         setTimeout(() => {
           // Force page to load so we can be sure the old user"s state is cleared from memory
           // delay a bit so the cookies have time to clear too.
-          window.location = dest || '/home'
+          window.location = dest || "/home"
         }, 1000)
       },
       (err) => dispatch(signoutError(err))
@@ -651,26 +629,26 @@ export const doSignout = (dest) => {
 
 const requestConversations = () => {
   return {
-    type: REQUEST_CONVERSATIONS
+    type: REQUEST_CONVERSATIONS,
   }
 }
 
 const receiveConversations = (data) => {
   return {
     type: RECEIVE_CONVERSATIONS,
-    data: data
+    data: data,
   }
 }
 
 const conversationsError = (err) => {
   return {
     type: CONVERSATIONS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchConversations = () => {
-  return $.get('/api/v3/conversations?include_all_conversations_i_am_in=true')
+  return $.get("/api/v3/conversations?include_all_conversations_i_am_in=true")
 }
 
 export const populateConversationsStore = () => {
@@ -689,33 +667,33 @@ const requestZidMetadata = (conversation_id) => {
   return {
     type: REQUEST_ZID_METADATA,
     data: {
-      conversation_id: conversation_id
-    }
+      conversation_id: conversation_id,
+    },
   }
 }
 
 const receiveZidMetadata = (data) => {
   return {
     type: RECEIVE_ZID_METADATA,
-    data: data
+    data: data,
   }
 }
 
 const zidMetadataFetchError = (err) => {
   return {
     type: ZID_METADATA_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 export const resetMetadataStore = () => {
   return {
-    type: ZID_METADATA_RESET
+    type: ZID_METADATA_RESET,
   }
 }
 
 const fetchZidMetadata = (conversation_id) => {
-  return $.get('/api/v3/conversations?conversation_id=' + conversation_id)
+  return $.get("/api/v3/conversations?conversation_id=" + conversation_id)
 }
 
 export const populateZidMetadataStore = (conversation_id) => {
@@ -736,10 +714,7 @@ export const populateZidMetadataStore = (conversation_id) => {
     }
 
     // don"t fetch again if we already have data loaded for that conversation.
-    if (
-      hasConversationId &&
-      state.zid_metadata.zid_metadata.conversation_id === conversation_id
-    ) {
+    if (hasConversationId && state.zid_metadata.zid_metadata.conversation_id === conversation_id) {
       return
     }
 
@@ -755,21 +730,21 @@ export const populateZidMetadataStore = (conversation_id) => {
 
 const updateZidMetadataStarted = () => {
   return {
-    type: UPDATE_ZID_METADATA_STARTED
+    type: UPDATE_ZID_METADATA_STARTED,
   }
 }
 
 const updateZidMetadataSuccess = (data) => {
   return {
     type: UPDATE_ZID_METADATA_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const updateZidMetadataError = (err) => {
   return {
     type: UPDATE_ZID_METADATA_ERROR,
-    data: err
+    data: err,
   }
 }
 
@@ -777,13 +752,13 @@ const updateZidMetadata = (zm, field, value) => {
   const data = {}
   data[field] = value
   return $.ajax({
-    url: '/api/v3/conversations',
-    method: 'PUT',
-    contentType: 'application/json; charset=utf-8',
-    headers: { 'Cache-Control': 'max-age=0' },
+    url: "/api/v3/conversations",
+    method: "PUT",
+    contentType: "application/json; charset=utf-8",
+    headers: { "Cache-Control": "max-age=0" },
     xhrFields: { withCredentials: true },
-    dataType: 'json',
-    data: JSON.stringify(Object.assign({}, zm, data))
+    dataType: "json",
+    data: JSON.stringify(Object.assign({}, zm, data)),
   })
 }
 
@@ -800,7 +775,7 @@ export const optimisticZidMetadataUpdateOnTyping = (zm, field, value) => {
   zm[field] = value
   return {
     type: OPTIMISTIC_ZID_METADATA_UPDATE,
-    data: zm
+    data: zm,
   }
 }
 
@@ -809,32 +784,32 @@ export const optimisticZidMetadataUpdateOnTyping = (zm, field, value) => {
 export const seedCommentChanged = (text) => {
   return {
     type: SEED_COMMENT_LOCAL_UPDATE,
-    text: text
+    text: text,
   }
 }
 
 const submitSeedCommentStart = () => {
   return {
-    type: SUBMIT_SEED_COMMENT
+    type: SUBMIT_SEED_COMMENT,
   }
 }
 
 const submitSeedCommentPostSuccess = () => {
-  console.log('seed comment post success')
+  console.log("seed comment post success")
   return {
-    type: SUBMIT_SEED_COMMENT_SUCCESS
+    type: SUBMIT_SEED_COMMENT_SUCCESS,
   }
 }
 
 const submitSeedCommentPostError = (err) => {
   return {
     type: SUBMIT_SEED_COMMENT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const postSeedComment = (comment) => {
-  return api.post('/api/v3/comments', comment)
+  return api.post("/api/v3/comments", comment)
 }
 
 export const handleSeedCommentSubmit = (comment) => {
@@ -853,7 +828,7 @@ export const handleSeedCommentSubmit = (comment) => {
 // eslint-disable-next-line no-unused-vars
 const makeStandardStart = (type) => {
   return {
-    type: type
+    type: type,
   }
 }
 
@@ -862,7 +837,7 @@ const makeStandardStart = (type) => {
 const makeStandardError = (type, err) => {
   return {
     type: type,
-    data: err
+    data: err,
   }
 }
 
@@ -871,7 +846,7 @@ const makeStandardError = (type, err) => {
 const makeStandardSuccess = (type, data) => {
   return {
     type: type,
-    data: data
+    data: data,
   }
 }
 
@@ -880,30 +855,30 @@ const makeStandardSuccess = (type, data) => {
 export const seedCommentTweetChanged = (text) => {
   return {
     type: SEED_COMMENT_TWEET_LOCAL_UPDATE,
-    text: text
+    text: text,
   }
 }
 const submitSeedCommentTweetStart = () => {
   return {
-    type: SUBMIT_SEED_COMMENT_TWEET
+    type: SUBMIT_SEED_COMMENT_TWEET,
   }
 }
 
 const submitSeedCommentPostTweetSuccess = () => {
   return {
-    type: SUBMIT_SEED_COMMENT_TWEET_SUCCESS
+    type: SUBMIT_SEED_COMMENT_TWEET_SUCCESS,
   }
 }
 
 const submitSeedCommentPostTweetError = (err) => {
   return {
     type: SUBMIT_SEED_COMMENT_TWEET_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const postSeedCommentTweet = (o) => {
-  return api.post('/api/v3/comments', o)
+  return api.post("/api/v3/comments", o)
 }
 
 export const handleSeedCommentTweetSubmit = (o) => {
@@ -958,28 +933,28 @@ export const handleSeedCommentTweetSubmit = (o) => {
 
 const createConversationStart = () => {
   return {
-    type: CREATE_NEW_CONVERSATION
+    type: CREATE_NEW_CONVERSATION,
   }
 }
 
 const createConversationPostSuccess = (res) => {
   return {
     type: CREATE_NEW_CONVERSATION_SUCCESS,
-    data: res
+    data: res,
   }
 }
 
 const createConversationPostError = (err) => {
   return {
     type: CREATE_NEW_CONVERSATION_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const postCreateConversation = () => {
-  return api.post('/api/v3/conversations', {
+  return api.post("/api/v3/conversations", {
     is_draft: true,
-    is_active: true
+    is_active: true,
   })
 }
 
@@ -995,7 +970,7 @@ export const handleCreateConversationSubmit = () => {
         (err) => dispatch(createConversationPostError(err))
       )
       .then((res) => {
-        window.location.assign('/m/' + res.conversation_id)
+        window.location.assign("/m/" + res.conversation_id)
       })
   }
 }
@@ -1004,31 +979,31 @@ export const handleCreateConversationSubmit = () => {
 
 const requestComments = () => {
   return {
-    type: REQUEST_COMMENTS
+    type: REQUEST_COMMENTS,
   }
 }
 
 const receiveComments = (data) => {
   return {
     type: RECEIVE_COMMENTS,
-    data: data
+    data: data,
   }
 }
 
 const commentsFetchError = (err) => {
   return {
     type: COMMENTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchAllComments = (conversation_id) => {
   // let includeSocial = "include_social=true&";
-  const includeSocial = ''
+  const includeSocial = ""
   return $.get(
-    '/api/v3/comments?moderation=true&include_voting_patterns=false&' +
+    "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
-      'conversation_id=' +
+      "conversation_id=" +
       conversation_id
   )
 }
@@ -1047,31 +1022,26 @@ export const populateCommentsStore = (conversation_id) => {
 
 const requestMath = () => {
   return {
-    type: REQUEST_MATH
+    type: REQUEST_MATH,
   }
 }
 
 const receiveMath = (data) => {
   return {
     type: RECEIVE_MATH,
-    data: data
+    data: data,
   }
 }
 
 const mathFetchError = (err) => {
   return {
     type: MATH_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchMath = (conversation_id, math_tick) => {
-  return $.get(
-    '/api/v3/math/pca2?&math_tick=' +
-      math_tick +
-      '&conversation_id=' +
-      conversation_id
-  )
+  return $.get("/api/v3/math/pca2?&math_tick=" + math_tick + "&conversation_id=" + conversation_id)
 }
 
 export const populateMathStore = (conversation_id) => {
@@ -1089,31 +1059,31 @@ export const populateMathStore = (conversation_id) => {
 
 const requestUnmoderatedComments = () => {
   return {
-    type: REQUEST_UNMODERATED_COMMENTS
+    type: REQUEST_UNMODERATED_COMMENTS,
   }
 }
 
 const receiveUnmoderatedComments = (data) => {
   return {
     type: RECEIVE_UNMODERATED_COMMENTS,
-    data: data
+    data: data,
   }
 }
 
 const unmoderatedCommentsFetchError = (err) => {
   return {
     type: UNMODERATED_COMMENTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchUnmoderatedComments = (conversation_id) => {
   // let includeSocial = "include_social=true&";
-  const includeSocial = ''
+  const includeSocial = ""
   return $.get(
-    '/api/v3/comments?moderation=true&include_voting_patterns=false&' +
+    "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
-      'mod=0&conversation_id=' +
+      "mod=0&conversation_id=" +
       conversation_id
   )
 }
@@ -1132,31 +1102,31 @@ export const populateUnmoderatedCommentsStore = (conversation_id) => {
 
 const requestAcceptedComments = () => {
   return {
-    type: REQUEST_ACCEPTED_COMMENTS
+    type: REQUEST_ACCEPTED_COMMENTS,
   }
 }
 
 const receiveAcceptedComments = (data) => {
   return {
     type: RECEIVE_ACCEPTED_COMMENTS,
-    data: data
+    data: data,
   }
 }
 
 const acceptedCommentsFetchError = (err) => {
   return {
     type: ACCEPTED_COMMENTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchAcceptedComments = (conversation_id) => {
   // let includeSocial = "include_social=true&";
-  const includeSocial = ''
+  const includeSocial = ""
   return $.get(
-    '/api/v3/comments?moderation=true&include_voting_patterns=false&mod=1&' +
+    "/api/v3/comments?moderation=true&include_voting_patterns=false&mod=1&" +
       includeSocial +
-      'conversation_id=' +
+      "conversation_id=" +
       conversation_id
   )
 }
@@ -1175,31 +1145,31 @@ export const populateAcceptedCommentsStore = (conversation_id) => {
 
 const requestRejectedComments = () => {
   return {
-    type: REQUEST_REJECTED_COMMENTS
+    type: REQUEST_REJECTED_COMMENTS,
   }
 }
 
 const receiveRejectedComments = (data) => {
   return {
     type: RECEIVE_REJECTED_COMMENTS,
-    data: data
+    data: data,
   }
 }
 
 const rejectedCommentsFetchError = (err) => {
   return {
     type: REJECTED_COMMENTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchRejectedComments = (conversation_id) => {
   // let includeSocial = "include_social=true&";
-  const includeSocial = ''
+  const includeSocial = ""
   return $.get(
-    '/api/v3/comments?moderation=true&include_voting_patterns=false&' +
+    "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
-      'mod=-1&conversation_id=' +
+      "mod=-1&conversation_id=" +
       conversation_id
   )
 }
@@ -1234,29 +1204,29 @@ export const populateAllCommentStores = (conversation_id) => {
 const optimisticCommentAccepted = (comment) => {
   return {
     type: ACCEPT_COMMENT,
-    comment: comment
+    comment: comment,
   }
 }
 
 const acceptCommentSuccess = (data) => {
   return {
     type: ACCEPT_COMMENT_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const acceptCommentError = (err) => {
   return {
     type: ACCEPT_COMMENT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putCommentAccepted = (comment) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/comments',
-    data: Object.assign(comment, { mod: 1 })
+    method: "PUT",
+    url: "/api/v3/comments",
+    data: Object.assign(comment, { mod: 1 }),
   })
 }
 
@@ -1279,29 +1249,29 @@ export const changeCommentStatusToAccepted = (comment) => {
 const optimisticCommentRejected = (comment) => {
   return {
     type: REJECT_COMMENT,
-    comment: comment
+    comment: comment,
   }
 }
 
 const rejectCommentSuccess = (data) => {
   return {
     type: REJECT_COMMENT_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const rejectCommentError = (err) => {
   return {
     type: REJECT_COMMENT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putCommentRejected = (comment) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/comments',
-    data: Object.assign(comment, { mod: -1 })
+    method: "PUT",
+    url: "/api/v3/comments",
+    data: Object.assign(comment, { mod: -1 }),
   })
 }
 
@@ -1323,29 +1293,29 @@ export const changeCommentStatusToRejected = (comment) => {
 const optimisticCommentIsMetaChanged = (comment) => {
   return {
     type: COMMENT_IS_META,
-    comment: comment
+    comment: comment,
   }
 }
 
 const commentIsMetaChangeSuccess = (data) => {
   return {
     type: COMMENT_IS_META_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const commentIsMetaChangeError = (err) => {
   return {
     type: COMMENT_IS_META_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putCommentCommentIsMetaChange = (comment, is_meta) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/comments',
-    data: Object.assign(comment, { is_meta: is_meta })
+    method: "PUT",
+    url: "/api/v3/comments",
+    data: Object.assign(comment, { is_meta: is_meta }),
   })
 }
 
@@ -1366,26 +1336,26 @@ export const changeCommentCommentIsMeta = (comment, is_meta) => {
 
 const requestParticipants = () => {
   return {
-    type: REQUEST_PARTICIPANTS
+    type: REQUEST_PARTICIPANTS,
   }
 }
 
 const receiveParticipants = (data) => {
   return {
     type: RECEIVE_PARTICIPANTS,
-    data: data
+    data: data,
   }
 }
 
 const participantsFetchError = (err) => {
   return {
     type: PARTICIPANTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchParticipants = (conversation_id) => {
-  return $.get('/api/v3/ptptois?conversation_id=' + conversation_id)
+  return $.get("/api/v3/ptptois?conversation_id=" + conversation_id)
 }
 
 export const populateParticipantsStore = (conversation_id) => {
@@ -1402,26 +1372,26 @@ export const populateParticipantsStore = (conversation_id) => {
 
 const requestDefaultParticipants = () => {
   return {
-    type: REQUEST_DEFAULT_PARTICIPANTS
+    type: REQUEST_DEFAULT_PARTICIPANTS,
   }
 }
 
 const receiveDefaultParticipants = (data) => {
   return {
     type: RECEIVE_DEFAULT_PARTICIPANTS,
-    data: data
+    data: data,
   }
 }
 
 const defaultParticipantFetchError = (err) => {
   return {
     type: DEFAULT_PARTICIPANTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchDefaultParticipants = (conversation_id) => {
-  return $.get('/api/v3/ptptois?mod=0&conversation_id=' + conversation_id)
+  return $.get("/api/v3/ptptois?mod=0&conversation_id=" + conversation_id)
 }
 
 export const populateDefaultParticipantStore = (conversation_id) => {
@@ -1438,26 +1408,26 @@ export const populateDefaultParticipantStore = (conversation_id) => {
 
 const requestFeaturedParticipants = () => {
   return {
-    type: REQUEST_FEATURED_PARTICIPANTS
+    type: REQUEST_FEATURED_PARTICIPANTS,
   }
 }
 
 const receiveFeaturedParticipants = (data) => {
   return {
     type: RECEIVE_FEATURED_PARTICIPANTS,
-    data: data
+    data: data,
   }
 }
 
 const featuredParticipantFetchError = (err) => {
   return {
     type: FEATURED_PARTICIPANTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchFeaturedParticipants = (conversation_id) => {
-  return $.get('/api/v3/ptptois?mod=1&conversation_id=' + conversation_id)
+  return $.get("/api/v3/ptptois?mod=1&conversation_id=" + conversation_id)
 }
 
 export const populateFeaturedParticipantStore = (conversation_id) => {
@@ -1474,26 +1444,26 @@ export const populateFeaturedParticipantStore = (conversation_id) => {
 
 const requestHiddenParticipants = () => {
   return {
-    type: REQUEST_HIDDEN_PARTICIPANTS
+    type: REQUEST_HIDDEN_PARTICIPANTS,
   }
 }
 
 const receiveHiddenParticipants = (data) => {
   return {
     type: RECEIVE_HIDDEN_PARTICIPANTS,
-    data: data
+    data: data,
   }
 }
 
 const hiddenParticipantFetchError = (err) => {
   return {
     type: HIDDEN_PARTICIPANTS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchHiddenParticipants = (conversation_id) => {
-  return $.get('/api/v3/ptptois?mod=-1&conversation_id=' + conversation_id)
+  return $.get("/api/v3/ptptois?mod=-1&conversation_id=" + conversation_id)
 }
 
 export const populateHiddenParticipantStore = (conversation_id) => {
@@ -1523,29 +1493,29 @@ export const populateAllParticipantStores = (conversation_id) => {
 const optimisticFeatureParticipant = (participant) => {
   return {
     type: FEATURE_PARTICIPANT,
-    participant: participant
+    participant: participant,
   }
 }
 
 const featureParticipantSuccess = (data) => {
   return {
     type: FEATURE_PARTICIPANT_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const featureParticipantError = (err) => {
   return {
     type: FEATURE_PARTICIPANT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putFeatureParticipant = (participant) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/ptptois',
-    data: Object.assign(participant, { mod: 1 })
+    method: "PUT",
+    url: "/api/v3/ptptois",
+    data: Object.assign(participant, { mod: 1 }),
   })
 }
 
@@ -1563,29 +1533,29 @@ export const changeParticipantStatusToFeatured = (participant) => {
 const optimisticHideParticipant = (participant) => {
   return {
     type: FEATURE_PARTICIPANT,
-    participant: participant
+    participant: participant,
   }
 }
 
 const hideParticipantSuccess = (data) => {
   return {
     type: FEATURE_PARTICIPANT_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
 const hideParticipantError = (err) => {
   return {
     type: FEATURE_PARTICIPANT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putHideParticipant = (participant) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/ptptois',
-    data: Object.assign(participant, { mod: -1 })
+    method: "PUT",
+    url: "/api/v3/ptptois",
+    data: Object.assign(participant, { mod: -1 }),
   })
 }
 
@@ -1603,7 +1573,7 @@ export const changeParticipantStatusToHidden = (participant) => {
 const optimisticUnmoderateParticipant = (participant) => {
   return {
     type: FEATURE_PARTICIPANT,
-    participant: participant
+    participant: participant,
   }
 }
 
@@ -1612,7 +1582,7 @@ const optimisticUnmoderateParticipant = (participant) => {
 const unmoderateParticipantSuccess = (data) => {
   return {
     type: FEATURE_PARTICIPANT_SUCCESS,
-    data: data
+    data: data,
   }
 }
 
@@ -1621,15 +1591,15 @@ const unmoderateParticipantSuccess = (data) => {
 const unmoderateParticipantError = (err) => {
   return {
     type: FEATURE_PARTICIPANT_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const putUnmoderateParticipant = (participant) => {
   return $.ajax({
-    method: 'PUT',
-    url: '/api/v3/ptptois',
-    data: Object.assign(participant, { mod: 0 })
+    method: "PUT",
+    url: "/api/v3/ptptois",
+    data: Object.assign(participant, { mod: 0 }),
   })
 }
 
@@ -1647,29 +1617,29 @@ export const changeParticipantStatusToUnmoderated = (participant) => {
 
 const requestConversationStats = () => {
   return {
-    type: REQUEST_CONVERSATION_STATS
+    type: REQUEST_CONVERSATION_STATS,
   }
 }
 
 const receiveConversationStats = (data) => {
   return {
     type: RECEIVE_CONVERSATION_STATS,
-    data: data
+    data: data,
   }
 }
 
 const conversationStatsFetchError = (err) => {
   return {
     type: CONVERSATION_STATS_FETCH_ERROR,
-    data: err
+    data: err,
   }
 }
 
 const fetchConversationStats = (conversation_id, until) => {
   return $.get(
-    '/api/v3/conversationStats?conversation_id=' +
+    "/api/v3/conversationStats?conversation_id=" +
       conversation_id +
-      (until ? '&until=' + until : '')
+      (until ? "&until=" + until : "")
   )
 }
 
@@ -1687,28 +1657,23 @@ export const populateConversationStatsStore = (conversation_id, until) => {
 
 const dataExportStarted = () => {
   return {
-    type: DATA_EXPORT_STARTED
+    type: DATA_EXPORT_STARTED,
   }
 }
 
 const dataExportSuccess = () => {
   return {
-    type: DATA_EXPORT_SUCCESS
+    type: DATA_EXPORT_SUCCESS,
   }
 }
 
 const dataExportError = () => {
   return {
-    type: DATA_EXPORT_ERROR
+    type: DATA_EXPORT_ERROR,
   }
 }
 
-const dataExportGet = (
-  conversation_id,
-  format,
-  unixTimestamp,
-  untilEnabled
-) => {
+const dataExportGet = (conversation_id, format, unixTimestamp, untilEnabled) => {
   /* e.g. /api/v3/dataExport?conversation_id=2arcefpshi&format=csv&unixTimestamp=1447362000 */
   let url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
   if (untilEnabled) {
@@ -1717,20 +1682,10 @@ const dataExportGet = (
   return $.get(url)
 }
 
-export const startDataExport = (
-  conversation_id,
-  format,
-  unixTimestamp,
-  untilEnabled
-) => {
+export const startDataExport = (conversation_id, format, unixTimestamp, untilEnabled) => {
   return (dispatch) => {
     dispatch(dataExportStarted())
-    return dataExportGet(
-      conversation_id,
-      format,
-      unixTimestamp,
-      untilEnabled
-    ).then(
+    return dataExportGet(conversation_id, format, unixTimestamp, untilEnabled).then(
       (res) => dispatch(dataExportSuccess()),
       (err) => dispatch(dataExportError())
     )

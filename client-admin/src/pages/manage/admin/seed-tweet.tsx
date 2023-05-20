@@ -1,49 +1,48 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import {
-  handleSeedCommentTweetSubmit,
-  seedCommentTweetChanged
-} from '../../../actions'
-import strings from '../../../intl'
-import { RootState } from '../../../util/types'
+import React from "react"
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
+import { handleSeedCommentTweetSubmit, seedCommentTweetChanged } from "../../../actions"
+import strings from "../../../intl"
+import { RootState } from "../../../util/types"
 
 const styles = {
   card: {
-    margin: '10px 20px 10px 20px',
-    backgroundColor: 'rgb(253,253,253)',
+    margin: "10px 20px 10px 20px",
+    backgroundColor: "rgb(253,253,253)",
     borderRadius: 3,
     padding: 10,
-    WebkitBoxShadow: '3px 3px 6px -1px rgba(220,220,220,1)',
-    BoxShadow: '3px 3px 6px -1px rgba(220,220,220,1)'
-  }
+    WebkitBoxShadow: "3px 3px 6px -1px rgba(220,220,220,1)",
+    BoxShadow: "3px 3px 6px -1px rgba(220,220,220,1)",
+  },
 }
 
-class ModerateCommentsSeed extends React.Component<{
-  dispatch: Function
-  error: string,
-  success: any,
-  loading: any,
-  seedTweetText: string,
-  params: { conversation_id: string }
-}, {
-}> {
+class ModerateCommentsSeed extends React.Component<
+  {
+    dispatch: Function
+    error: string
+    success: any
+    loading: any
+    seedTweetText: string
+    params: { conversation_id: string }
+  },
+  {}
+> {
   seed_form_tweet: HTMLTextAreaElement
 
   constructor(props) {
     super(props)
     this.state = {
       showErrorDialogue: false,
-      showSuccessDialogue: false
+      showSuccessDialogue: false,
     }
   }
 
   handleSubmitSeed() {
     const val = this.seed_form_tweet.value
     const match = val && val.match(/[a-zA-Z0-9]+$/)
-    let tweet_id = ''
+    let tweet_id = ""
     if (match && match.length) {
       tweet_id = match[0]
     }
@@ -52,7 +51,7 @@ class ModerateCommentsSeed extends React.Component<{
       twitter_tweet_id: tweet_id,
       conversation_id: this.props.params.conversation_id,
       // vote: -1, // the tweeter of the tweet will auto-agree. An account will be created for them if needed.
-      is_seed: true
+      is_seed: true,
     }
     this.props.dispatch(handleSeedCommentTweetSubmit(o))
   }
@@ -69,14 +68,14 @@ class ModerateCommentsSeed extends React.Component<{
   }
 
   getButtonText() {
-    let text = 'Submit'
+    let text = "Submit"
 
     if (this.props.success) {
-      text = 'Success!'
+      text = "Success!"
     }
 
     if (this.props.loading) {
-      text = 'Saving...'
+      text = "Saving..."
     }
 
     return text
@@ -91,10 +90,11 @@ class ModerateCommentsSeed extends React.Component<{
         <p
           style={{
             marginTop: 5,
-            fontSize: 16
-          }}>
-          {' '}
-          Paste in a Tweet URL. It will be imported for participants to vote on.{' '}
+            fontSize: 16,
+          }}
+        >
+          {" "}
+          Paste in a Tweet URL. It will be imported for participants to vote on.{" "}
         </p>
         <div onKeyPress={this.handleKey.bind(this)}>
           <textarea
@@ -103,14 +103,14 @@ class ModerateCommentsSeed extends React.Component<{
             rows={1}
             maxLength={200}
             style={{
-              width: '100%',
+              width: "100%",
               maxWidth: 400,
-              resize: 'none',
-              border: '1px solid lightgrey',
+              resize: "none",
+              border: "1px solid lightgrey",
               marginBottom: 15,
               borderRadius: 3,
               fontSize: 16,
-              padding: 10
+              padding: 10,
             }}
             ref={(c) => (this.seed_form_tweet = c)}
           />
@@ -118,14 +118,15 @@ class ModerateCommentsSeed extends React.Component<{
         <div>
           <button
             style={{
-              backgroundColor: '#03a9f4',
-              color: 'white'
+              backgroundColor: "#03a9f4",
+              color: "white",
             }}
-            onClick={this.handleSubmitSeed.bind(this)}>
+            onClick={this.handleSubmitSeed.bind(this)}
+          >
             {this.getButtonText()}
           </button>
         </div>
-        {this.props.error ? <div>{strings(this.props.error)}</div> : ''}
+        {this.props.error ? <div>{strings(this.props.error)}</div> : ""}
       </div>
     )
   }

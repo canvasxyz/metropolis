@@ -1,22 +1,20 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
-import {
-  changeCommentStatusToRejected,
-  changeCommentCommentIsMeta
-} from '../../../../actions'
-import Comment from './comment'
-import { RootState } from '../../../../util/types'
+import React from "react"
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
+import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../../../../actions"
+import Comment from "./comment"
+import { RootState } from "../../../../util/types"
 
-class ModerateCommentsAccepted extends React.Component<{
-  dispatch: Function,
-  accepted_comments: object[]
-}, {
-}> {
-  static propTypes: {
-  }
+class ModerateCommentsAccepted extends React.Component<
+  {
+    dispatch: Function
+    accepted_comments: object[]
+  },
+  {}
+> {
+  static propTypes: {}
 
   onCommentRejected(comment) {
     this.props.dispatch(changeCommentStatusToRejected(comment))
@@ -48,7 +46,7 @@ class ModerateCommentsAccepted extends React.Component<{
       <div>
         {this.props.accepted_comments !== null
           ? this.createCommentMarkup()
-          : 'Loading accepted comments...'}
+          : "Loading accepted comments..."}
       </div>
     )
   }
@@ -56,7 +54,7 @@ class ModerateCommentsAccepted extends React.Component<{
 
 ModerateCommentsAccepted.propTypes = {
   dispatch: PropTypes.func,
-  accepted_comments: PropTypes.arrayOf(PropTypes.object)
+  accepted_comments: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default connect((state: RootState) => state.mod_comments_accepted)(ModerateCommentsAccepted)

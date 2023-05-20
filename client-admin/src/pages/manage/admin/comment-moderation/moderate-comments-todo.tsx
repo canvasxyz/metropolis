@@ -1,23 +1,24 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from 'react'
-import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import React from "react"
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
 import {
   changeCommentStatusToAccepted,
   changeCommentStatusToRejected,
-  changeCommentCommentIsMeta
-} from '../../../../actions'
-import Comment from './comment'
-import { RootState, Comment as CommentType } from '../../../../util/types'
+  changeCommentCommentIsMeta,
+} from "../../../../actions"
+import Comment from "./comment"
+import { RootState, Comment as CommentType } from "../../../../util/types"
 
-class ModerateCommentsTodo extends React.Component<{
-  dispatch: Function,
-  unmoderated_comments: CommentType[],
-}, {
-}> {
-  static propTypes: {
-  }
+class ModerateCommentsTodo extends React.Component<
+  {
+    dispatch: Function
+    unmoderated_comments: CommentType[]
+  },
+  {}
+> {
+  static propTypes: {}
 
   onCommentAccepted(comment) {
     this.props.dispatch(changeCommentStatusToAccepted(comment))
@@ -32,8 +33,7 @@ class ModerateCommentsTodo extends React.Component<{
   }
 
   createCommentMarkup(max) {
-
-    return this.props.unmoderated_comments.slice(0,max).map((comment, i) => {
+    return this.props.unmoderated_comments.slice(0, max).map((comment, i) => {
       return (
         <Comment
           key={i}
@@ -49,18 +49,17 @@ class ModerateCommentsTodo extends React.Component<{
         />
       )
     })
-
   }
 
   render() {
-    const max = 100;
+    const max = 100
     return (
       <div>
         <div>
           <p> Displays maximum {max} comments </p>
           {this.props.unmoderated_comments !== null
             ? this.createCommentMarkup(max)
-            : 'Loading unmoderated comments...'}
+            : "Loading unmoderated comments..."}
         </div>
       </div>
     )
@@ -69,7 +68,7 @@ class ModerateCommentsTodo extends React.Component<{
 
 ModerateCommentsTodo.propTypes = {
   dispatch: PropTypes.func,
-  unmoderated_comments: PropTypes.arrayOf(PropTypes.object)
+  unmoderated_comments: PropTypes.arrayOf(PropTypes.object),
 }
 
 export default connect((state: RootState) => state.mod_comments_unmoderated)(ModerateCommentsTodo)

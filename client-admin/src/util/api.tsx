@@ -1,19 +1,19 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import URLs from './url'
-import _ from 'lodash'
+import URLs from "./url"
+import _ from "lodash"
 
 const urlPrefix = URLs.urlPrefix
-const basePath = ''
+const basePath = ""
 
 // var pid = "unknownpid";
 
 function ajax(api, data, type, params) {
   if (!_.isString(api)) {
-    throw new Error('api param should be a string')
+    throw new Error("api param should be a string")
   }
 
-  if (api && api.length && api[0] === '/') {
+  if (api && api.length && api[0] === "/") {
     api = api.slice(1)
   }
 
@@ -33,28 +33,28 @@ function ajax(api, data, type, params) {
   let promise
   const config = {
     url: url,
-    contentType: 'application/json; charset=utf-8',
+    contentType: "application/json; charset=utf-8",
     headers: {
-      "Cache-Control": params?.noCache ? "no-cache" : 'max-age=0'
+      "Cache-Control": params?.noCache ? "no-cache" : "max-age=0",
     },
     xhrFields: {
-      withCredentials: true
+      withCredentials: true,
     },
     // crossDomain: true,
-    dataType: 'json'
+    dataType: "json",
   }
-  if (type === 'GET') {
+  if (type === "GET") {
     promise = $.ajax(
       $.extend(config, {
-        type: 'GET',
-        data: data
+        type: "GET",
+        data: data,
       })
     )
-  } else if (type === 'POST') {
+  } else if (type === "POST") {
     promise = $.ajax(
       $.extend(config, {
-        type: 'POST',
-        data: JSON.stringify(data)
+        type: "POST",
+        data: JSON.stringify(data),
       })
     )
   }
@@ -63,7 +63,7 @@ function ajax(api, data, type, params) {
     // sendEvent("Error", api, jqXHR.status);
 
     // logger.error("SEND ERROR");
-    console.dir('polisAjax promise failed: ', arguments)
+    console.dir("polisAjax promise failed: ", arguments)
     if (jqXHR.status === 403) {
       // eb.trigger(eb.authNeeded);
     }
@@ -75,11 +75,11 @@ function ajax(api, data, type, params) {
 }
 
 function post(api, data, params?) {
-  return ajax(api, data, 'POST', params)
+  return ajax(api, data, "POST", params)
 }
 
 function get(api, data, params?) {
-  return ajax(api, data, 'GET', params)
+  return ajax(api, data, "GET", params)
 }
 
 const api = { get, post, ajax }
