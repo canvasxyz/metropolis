@@ -9,7 +9,7 @@ const Index = () => {
         <Heading
           as="h1"
           sx={{
-            fontSize: [3, null, 5],
+            fontSize: [4, null, 5],
             lineHeight: 1.3,
             mt: [4],
             mb: [4],
