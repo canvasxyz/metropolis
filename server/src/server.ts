@@ -13353,7 +13353,7 @@ Thanks for using Polis!
     //     // });
     //     getStaticFile("./unsupportedBrowser.html", res);
     // } else {
-    let port = Config.staticFilesParticipationPort;
+    let port = Config.staticFilesPort;
     // set the host header too, since S3 will look at that (or the routing proxy will patch up the request.. not sure which)
     if (req && req.headers && req.headers.host) req.headers.host = hostname;
     routingProxy.web(req, res, {
@@ -13560,11 +13560,10 @@ Thanks for using Polis!
 
   // serve up index.html in response to anything starting with a number
   let hostname: string = Config.staticFilesHost;
-  let staticFilesParticipationPort: number = Config.staticFilesParticipationPort;
-  let staticFilesAdminPort: number = Config.staticFilesAdminPort;
+  let staticFilesPort: number = Config.staticFilesPort;
   let fetchUnsupportedBrowserPage = makeFileFetcher(
     hostname,
-    staticFilesParticipationPort,
+    staticFilesPort,
     "/unsupportedBrowser.html",
     {
       "Content-Type": "text/html",
@@ -13641,7 +13640,7 @@ Thanks for using Polis!
   function ifDefinedFirstElseSecond(first: any, second: boolean) {
     return _.isUndefined(first) ? second : first;
   }
-  let fetch404Page = makeFileFetcher(hostname, staticFilesAdminPort, "/404.html", {
+  let fetch404Page = makeFileFetcher(hostname, staticFilesPort, "/404.html", {
     "Content-Type": "text/html",
   });
 
@@ -13693,7 +13692,7 @@ Thanks for using Polis!
           req,
           res,
           preloadData,
-          staticFilesParticipationPort,
+          staticFilesPort,
           buildNumber
         );
       })
@@ -13707,7 +13706,7 @@ Thanks for using Polis!
   }
   let fetchIndexForAdminPage = makeFileFetcher(
     hostname,
-    staticFilesAdminPort,
+    staticFilesPort,
     "/index_admin.html",
     {
       "Content-Type": "text/html",
@@ -13715,7 +13714,7 @@ Thanks for using Polis!
   );
   let fetchIndexForReportPage = makeFileFetcher(
     hostname,
-    staticFilesAdminPort,
+    staticFilesPort,
     "/index_report.html",
     {
       "Content-Type": "text/html",
@@ -13986,8 +13985,7 @@ Thanks for using Polis!
     makeFileFetcher,
     makeRedirectorTo,
     pidCache,
-    staticFilesAdminPort,
-    staticFilesParticipationPort,
+    staticFilesPort,
     proxy,
     redirectIfHasZidButNoConversationId,
     redirectIfNotHttps,

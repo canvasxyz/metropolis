@@ -13,14 +13,12 @@ First things first, it helps to understand a bit how the system is set up.
 |----------------|------|--------|
 | [`server`][dir-server] | Node.js | The main server. Handles client web requests (page loads, vote activity, etc.) |
 | [`math`][dir-math] | Clojure/JVM | The math engine.  |
-| [`client-participation`][dir-participation] | Javascript | The client code for end-users. |
-| [`client-admin`][dir-admin] | Javascript | The client code for administrators. |
+| [`client`][dir-client] | Javascript | The client code. |
 | [`client-report`][dir-report] | Node.js | The code for detailed analytics reports. |
 
    [dir-server]: /server
    [dir-math]: /math
-   [dir-participation]: /client-participation
-   [dir-admin]: /client-admin
+   [dir-client]: /client
    [dir-report]: /client-report
 
 While this document will try to outline some of the more important configuration steps and options, you'll need to see
@@ -80,8 +78,6 @@ If you are deploying to a custom domain (not pol.is) then you need to update bot
 - **`HTTP_PORT`** typically 80. Port exposed by Nginx reverse proxy.
 - **`HTTPS_PORT`** typically 443. Port exposed by Nginx reverse proxy.
 - **`STATIC_FILES_PORT`** typically 8080. Used internally within a docker network and/or behind a proxy.
-- **`STATIC_FILES_ADMIN_PORT`** same as **`STATIC_FILES_PORT`** unless you are hosting client-admin separately from file-server. Useful in local development.
-- **`STATIC_FILES_PARTICIPATION_PORT`** same as **`STATIC_FILES_PORT`** unless you are hosting client-participation separately from file-server. Useful in local development.
 
 ### Email Addresses
 
@@ -118,7 +114,7 @@ If you are deploying to a custom domain (not pol.is) then you need to update bot
 
 - **`AKISMET_ANTISPAM_API_KEY`** Comment spam detection and filtering.
 - **`AWS_REGION`** Used for S3 data import/export.
-- **`ENABLE_TWITTER_WIDGETS`** set to `true` to enable twitter widgets on the client-admin authentication pages.
+- **`ENABLE_TWITTER_WIDGETS`** set to `true` to enable twitter widgets on the client authentication pages.
 - **`FB_APP_ID`** Must register with Facebook to get an ID to enable Facebook App connectivity.
 - **`GA_TRACKING_ID`** For using Google Analytics on client pages.
 - **`GOOGLE_CREDENTIALS_BASE64`** Required if using Google Translate API. (See below).

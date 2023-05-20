@@ -28,10 +28,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - name: "Install & Build: client-admin"
-      working-directory: client-admin
+    - name: "Install & Build: client"
+      working-directory: client
       run: npm install
 
-    - name: "ESLint: client-admin"
-      working-directory: client-admin
+    - name: "ESLint: client"
+      working-directory: client
       run: npm run lint

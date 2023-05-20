@@ -99,7 +99,7 @@ flavors of node.
 
   Look at the "scripts" section of package.json, or run `npm run` to see additional run options.
 
-7\. Navigate to `localhost:6000`. If you are running the **client-admin** application, or the dockerized
+7\. Navigate to `localhost:6000`. If you are running the **client** application, or the dockerized
   **file-server** you will see the Polis web application. Otherwise you will be limited to interacting with the API
   directly via [Postman](https://www.postman.com/) or other tools.
 

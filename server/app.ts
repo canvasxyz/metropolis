@@ -55,8 +55,7 @@ helpersInitialized.then(
       makeFileFetcher,
       makeRedirectorTo,
       pidCache,
-      staticFilesAdminPort,
-      staticFilesParticipationPort,
+      staticFilesPort,
       proxy,
       redirectIfHasZidButNoConversationId,
       redirectIfNotHttps,
@@ -1506,7 +1505,7 @@ helpersInitialized.then(
     );
 
     function makeFetchIndexWithoutPreloadData() {
-      let port = staticFilesParticipationPort;
+      let port = staticFilesPort;
       return function (req, res) {
         return fetchIndexWithoutPreloadData(req, res, port);
       };
@@ -1542,13 +1541,13 @@ helpersInitialized.then(
     app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
     app.get(
       /^\/dist\/admin_bundle.js$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/dist/admin_bundle.js", {
+      makeFileFetcher(hostname, staticFilesPort, "/dist/admin_bundle.js", {
         "Content-Type": "application/javascript",
       })
     );
     app.get(
       /^\/__webpack_hmr$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/__webpack_hmr", {
+      makeFileFetcher(hostname, staticFilesPort, "/__webpack_hmr", {
         "Content-Type": "eventsource",
       })
     );
@@ -1583,31 +1582,31 @@ helpersInitialized.then(
 
     app.get(
       /^\/embed$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/embed.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/embed.html", {
         "Content-Type": "text/html",
       })
     );
     app.get(
       /^\/embedPreprod$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/embedPreprod.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/embedPreprod.html", {
         "Content-Type": "text/html",
       })
     );
     app.get(
       /^\/embedReport$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/embedReport.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/embedReport.html", {
         "Content-Type": "text/html",
       })
     );
     app.get(
       /^\/embedReportPreprod$/,
-      makeFileFetcher(hostname, staticFilesAdminPort, "/embedReportPreprod.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/embedReportPreprod.html", {
         "Content-Type": "text/html",
       })
     );
     app.get(
       /^\/styleguide$/,
-      makeFileFetcher(hostname, staticFilesParticipationPort, "/styleguide.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/styleguide.html", {
         "Content-Type": "text/html",
       })
     );
@@ -1616,7 +1615,7 @@ helpersInitialized.then(
     app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
     app.get(
       /^\/s\/CTE\/?$/,
-      makeFileFetcher(hostname, staticFilesParticipationPort, "/football.html", {
+      makeFileFetcher(hostname, staticFilesPort, "/football.html", {
         "Content-Type": "text/html",
       })
     );
@@ -1624,7 +1623,7 @@ helpersInitialized.then(
       /^\/twitterAuthReturn(\/.*)?$/,
       makeFileFetcher(
         hostname,
-        staticFilesParticipationPort,
+        staticFilesPort,
         "/twitterAuthReturn.html",
         {
           "Content-Type": "text/html",
@@ -1669,7 +1668,7 @@ helpersInitialized.then(
       // 404 everything else
       app.get(
         /^\/[^(api\/)]?.*/,
-        makeFileFetcher(hostname, staticFilesAdminPort, "/404.html", {
+        makeFileFetcher(hostname, staticFilesPort, "/404.html", {
           "Content-Type": "text/html",
         })
       );

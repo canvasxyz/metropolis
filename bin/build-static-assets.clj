@@ -18,7 +18,7 @@
 (defn logged-command [& args]
     (println "Executing command:" (pr-str args))
     (apply process/process args))
-  
+
 
 (defn image-name [client-dir]
   (str "polis/" client-dir))
@@ -79,7 +79,7 @@
   "Remove the old container to clean up after ourselves"
   [client-dir]
   (logged-command ['docker 'rm (container-name client-dir)]))
-  
+
 
 
 (defn build-and-cp-client
@@ -95,10 +95,10 @@
   (monitor-execution (cp-client client-dir))
   (monitor-execution (stop-containers client-dir))
   (monitor-execution (clean-containers client-dir)))
-  ;; once that has completed, 
+  ;; once that has completed,
 
 (def processes
-  (for [client-dir ["client-admin" "client-participation"]];; "client-report"]] ; leaving client-report off for now
+  (for [client-dir ["client"]];; "client-report"]] ; leaving client-report off for now
     (async/thread
       (build-and-cp-client client-dir)
       (println "Finished building:" client-dir))))
@@ -110,4 +110,3 @@
   (async/<!! proc))
 
 ;; QED
-
