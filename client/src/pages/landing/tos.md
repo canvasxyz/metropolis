@@ -1,5 +1,6 @@
 # Terms of Use
-Last Updated: 2023/05/11
+
+Last Updated: May 23, 2023
 
 Welcome, and thank you for your interest in Polis (the "Company") and our Web site (the "Site"), as well as all related web sites, networks, embeddable widgets, downloadable software, mobile applications (including tablet applications), and other services provided by us and on which a link to these Terms of Use is displayed (collectively, together with the Site, our "Service").
 
@@ -31,25 +32,26 @@ These Terms of Use are a legally binding contract between you and the Company re
 
 4. **User Content**
 
-  1. **User Content Generally**.
+   **User Content Generally**.
   Certain features of the Service may permit users to post content, including messages, questions, responses, data, text, and other types of works (collectively, "User Content") and to publish User Content on the Service.
   You retain copyright and any other proprietary rights that you may hold in the User Content that you post to the Service, but grant the limited licenses below.
 
-  2. **Limited License Grant to the Company.**
+  **Limited License Grant to the Company.**
   By posting or publishing User Content, you grant the Company a worldwide, irrevocable, perpetual, non-exclusive, royalty-free, fully-paid-up right and license (with the right to sublicense) to host, store, transfer, display, perform, reproduce, modify, and distribute your User Content, in whole or in part, in any media formats and through any media channels (now known or hereafter developed).
   Any such use of your User Content by the Company may be without any compensation paid to you.
 
-  3. **Limited License Grant to Other Users.**
+  **Limited License Grant to Other Users.**
   By posting User Content or sharing User Content with another user of the Service, you hereby grant to other users of the Service a non-exclusive license to access and use such User Content as permitted by these Terms and the functionality of the Service.
 
-  4. **User Content Representations and Warranties.**
+  **User Content Representations and Warranties.**
   You are solely responsible for your User Content and the consequences of posting or publishing User Content.
   By posting and publishing User Content, you affirm, represent, and warrant that:
     * you are the creator and owner of, or have the necessary licenses, rights, consents, and permissions to use and to authorize the Company and users of the Service to use and distribute your User Content as necessary to exercise the licenses granted by you in this Section 4 and in the manner contemplated by the Company and these Terms;
     * and your User Content, and the use thereof as contemplated herein, does not and will not: (i) infringe, violate, or misappropriate any third-party right, including any copyright, trademark, patent, trade secret, moral right, privacy right, right of publicity, or any other intellectual property or proprietary right;
     * or (ii) slander, defame, libel, or invade the right of privacy, publicity or other property rights of any other person.
 
-  5. **User Content Disclaimer.**
+  **User Content Disclaimer.**
+
   We are under no obligation to edit or control User Content that you or other users post or publish, and will not be in any way responsible or liable for User Content.
   The Company may, however, at any time and without prior notice, screen, remove, edit, or block any User Content that in our sole judgment violates these Terms or is otherwise objectionable.
   You understand that when using the Service you will be exposed to User Content from a variety of sources and acknowledge that User Content may be inaccurate, offensive, indecent or objectionable.
@@ -58,7 +60,7 @@ These Terms of Use are a legally binding contract between you and the Company re
   If notified by a user or content owner that User Content allegedly does not conform to these Terms, we may investigate the allegation and determine in our sole discretion whether to remove the User Content, which we reserve the right to do at any time and without notice.
   For clarity, the Company does not permit copyright-infringing activities on the Service.
 
-  6. **DMCA Takedown Requests.**
+  **DMCA Takedown Requests.**
   If you believe your copyright-protected work was posted to our Service without authorization, you may notify in accordance with the Digital Millenium Copyright Act at the email address listed at the end of this document.
 
 5. **Prohibited Conduct.**
@@ -147,7 +149,7 @@ We reserve the right, at our own expense, to assume the exclusive defense and co
 
 16. **Dispute Resolution and Arbitration**
 
-  1. **Generally.**
+  **Generally.**
   In the interest of resolving disputes between you and the Company in the most expedient and cost effective manner, you and the Company agree that any and all disputes arising in connection with these Terms shall be resolved by binding arbitration.
   Arbitration is more informal than a lawsuit in court.
   Arbitration uses a neutral arbitrator instead of a judge or jury, may allow for more limited discovery than in court, and can be subject to very limited review by courts.
@@ -155,29 +157,30 @@ We reserve the right, at our own expense, to assume the exclusive defense and co
   Our agreement to arbitrate disputes includes, but is not limited to all claims arising out of or relating to any aspect of these Terms, whether based in contract, tort, statute, fraud, misrepresentation or any other legal theory, and regardless of whether the claims arise during or after the termination of these Terms.
   YOU UNDERSTAND AND AGREE THAT, BY ENTERING INTO THESE TERMS, YOU AND THE COMPANY ARE EACH WAIVING THE RIGHT TO A TRIAL BY JURY OR TO PARTICIPATE IN A CLASS ACTION.
 
-  2. **Exceptions.**
+  **Exceptions.**
   Notwithstanding subsection 16.1, we both agree that nothing herein will be deemed to waive, preclude, or otherwise limit either of our right to (i) bring an individual action in small claims court, (ii) pursue enforcement actions through applicable federal, state, or local agencies where such actions are available, (iii) seek injunctive relief in a court of law, or (iv) to file suit in a court of law to address intellectual property infringement claims.
-  3. **Arbitrator.**
+
+  **Arbitrator.**
   Any arbitration between you and the Company will be governed by the Commercial Dispute Resolution Procedures and the Supplementary Procedures for Consumer Related Disputes (collectively, "AAA Rules") of the American Arbitration Association ("AAA"), as modified by these Terms, and will be administered by the AAA.
   The AAA Rules and filing forms are available online at www.adr.org, by calling the AAA at 1-800-778-7879, or by contacting the Company.
 
-  4. **Notice; Process.**
+  **Notice; Process.**
   A party who intends to seek arbitration must first send a written notice of the dispute to the other, by certified mail or Federal Express (signature required), or in the event that we do not have a physical address on file for you, by electronic mail ("Notice").
   The address of the Company for Notice is: 110 Greene St 9G, New York, NY, 10012.
   The Notice must (i) describe the nature and basis of the claim or dispute; and (ii) set forth the specific relief sought ("Demand").
   We agree to use good faith efforts to resolve the claim directly, but if we do not reach an agreement to do so within 30 days after the Notice is received, you or the Company may commence an arbitration proceeding.
 
-  5. **Fees.**
+  **Fees.**
   The fees for filing for arbitration will be borne by the party that does not substantially prevail at arbitration, or otherwise split at the arbitrator’s direction.
 
-  6. **No Class Actions.**
+  **No Class Actions.**
   YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
   Further, unless both you and the Company agree otherwise, the arbitrator may not consolidate more than one person's claims, and may not otherwise preside over any form of a representative or class proceeding.
 
-  7. **Modifications.**
+  **Modifications.**
   In the event that the Company makes any future change to this arbitration provision (other than a change to the address of the Company for Notice), you may reject any such change by sending us written notice within 30 days of the change to the address of the Company for Notice, in which case your account with the Company shall be immediately terminated and this arbitration provision, as in effect immediately prior to the amendments you reject shall survive.
 
-  8. **Enforceability.**
+  **Enforceability.**
   If Subsection 16.6 is found to be unenforceable or if the entirety of this Section 16 is found to be unenforceable, then the entirety of this Section 16 shall be null and void and, in such case, the parties agree that the exclusive jurisdiction and venue described in Section 14 shall govern any action arising out of or related to these Terms.
 
 17. **Consent to Electronic Communications.**

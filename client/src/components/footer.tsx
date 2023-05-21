@@ -8,7 +8,7 @@ class Header extends Component {
       <Box sx={{ fontFamily: "monospace" }}>
         (c) {new Date().getFullYear()} Authors
         <Link sx={{ ml: 4 }} href="tos">
-          TOS
+          Terms
         </Link>{" "}
         <Link sx={{ ml: 3 }} href="privacy">
           Privacy

@@ -140,7 +140,7 @@ class App extends React.Component<
             <Box
               sx={{
                 pt: "1px", // prevent margins from spilling over
-                pb: "1em",
+                pb: "3em",
                 minHeight: "calc(100vh - 10.2em)",
               }}
             >

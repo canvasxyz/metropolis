@@ -1,5 +1,6 @@
 # Privacy Policy
-Last Updated: 2023/05/11
+
+Last Updated: May 21, 2023
 
 This privacy policy (this "Policy") describes the collection of personal information by Polis (the "Company"), from users of our Web site (the "Site"), as well as all related applications, widgets, software, tools, and other services provided by us and on which a link to this Policy is displayed (collectively, together with the Site, our "Services").
 
@@ -33,23 +34,24 @@ These include the following:
  We may indicate that some personal information is required for you to register for the account or to create the profile, while some is optional.
 
 2. **Integrated Services**
-You may be given the option to access or register for the Services through the use of your user name and passwords for certain services provided by third parties (each an 'Integrated Service'), such as through the use of your Facebook credentials through Facebook Connect.
 
-By doing this, you authorize us to access and store the credentials you provide, your name, email address(es), date of birth, gender, current city, profile picture URL and other information that the Integrated Service makes available to us, and to use and disclose it in accordance with this Policy.
+  You may be given the option to access or register for the Services through the use of your user name and passwords for certain services provided by third parties (each an 'Integrated Service'), such as through the use of your Facebook credentials through Facebook Connect.
 
-You should check your Facebook or other Integrated Service privacy settings to understand and change the information sent to us through Facebook Connect or other Integrated Services.
+  By doing this, you authorize us to access and store the credentials you provide, your name, email address(es), date of birth, gender, current city, profile picture URL and other information that the Integrated Service makes available to us, and to use and disclose it in accordance with this Policy.
 
-Please review each Integrated Service's terms of use and privacy policies carefully before using their services and connecting to our Services"
+  You should check your Facebook or other Integrated Service privacy settings to understand and change the information sent to us through Facebook Connect or other Integrated Services.
+
+  Please review each Integrated Service's terms of use and privacy policies carefully before using their services and connecting to our Services"
 
 3. **Interactive Features**
 
-Our Services may contain interactive functionality that allows you to engage with other users on the Services, post questions to other users, answer questions of other users, post comments to questions and other forums, to upload other content (the 'User Materials'), participate in surveys, and otherwise to interact with the Services and with other users.
+  Our Services may contain interactive functionality that allows you to engage with other users on the Services, post questions to other users, answer questions of other users, post comments to questions and other forums, to upload other content (the 'User Materials'), participate in surveys, and otherwise to interact with the Services and with other users.
 
-If you use any interactive functionality on our Services that request or permit you to provide us with personal information (including, for example, any services that allow you to post User Materials on any of our Services), we collect the Personal Information that you provide to us in the course of using these interactive features.
+  If you use any interactive functionality on our Services that request or permit you to provide us with personal information (including, for example, any services that allow you to post User Materials on any of our Services), we collect the Personal Information that you provide to us in the course of using these interactive features.
 
 4. **Correspondence.**
 
-If you contact us by e-mail, using a contact form on the Services, or by mail, fax, or other means, we collect the Personal Information contained within, and associated with, your correspondence.
+  If you contact us by e-mail, using a contact form on the Services, or by mail, fax, or other means, we collect the Personal Information contained within, and associated with, your correspondence.
 
 ### Automatically Collected Information
 
