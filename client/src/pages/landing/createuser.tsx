@@ -172,7 +172,7 @@ class CreateUser extends React.Component<{
             to={"/signin" + this.getDest()}
             data-section="signup-select"
           >
-            Sign in
+            Sign In
           </Link>
         </Box>
 

@@ -5,7 +5,7 @@ export default {
     body: "Inter, sans-serif",
     monospace: "Space Mono, monospace",
   },
-  fontSizes: [12, 14, 16, 20, 24, 32, 48, 64, 96],
+  fontSizes: [12, 14, 16, 20, 24, 36, 48, 64, 96],
   fontWeights: {
     body: 400,
     heading: 700,
@@ -128,7 +128,7 @@ export default {
       "&:hover": {
         color: "primary",
         borderBottom: "solid",
-        borderWidth: 2,
+        borderWidth: 1.5,
         borderColor: "primary",
       },
       textDecoration: "none",

@@ -138,7 +138,7 @@ class SignIn extends React.Component<{
           </Text>
           <Text sx={{ mt: 2, mb: 4 }}>
             <Link sx={{ variant: "styles.a" }} to={"/createuser"}>
-              Create User
+              Create Account
             </Link>
           </Text>
         </form>

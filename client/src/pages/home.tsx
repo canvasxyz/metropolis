@@ -11,7 +11,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         sx={{
           fontSize: [5],
           lineHeight: 1.2,
-          mb: [4],
+          my: [5],
           maxWidth: "20em",
         }}
       >
@@ -19,13 +19,16 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       </Heading>
       <Box sx={{ mb: [4, null, 5] }}>
         <Text sx={{ my: 3 }}>
-          Polis is a tool for gathering and understanding what a group thinks, and a social platform
-          for ideas. Starting from a prompt, you can contribute and vote on cards that map out the
-          space around a topic, and explore it with a team, group, or public community.
+          Polis is a tool for gathering and understanding what a group thinks &mdash; an extended
+          mind for groups.
         </Text>
         <Text sx={{ my: 3 }}>
-          Based on a platform developed by the Computational Democracy Project and used by
-          governments, academics, and citizens around the world.
+          Starting from a prompt, you can contribute and vote on cards that map out the space around
+          a topic, and explore it with a team, group, or public community.
+        </Text>
+        <Text sx={{ my: 3 }}>
+          Based on a platform developed by the Computational Democracy Project used by governments,
+          academics, and citizens around the world.
         </Text>
         {user ? (
           <Box sx={{ mt: [6] }}>
