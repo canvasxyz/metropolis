@@ -34,5 +34,7 @@ export type RootState = {
 export type Conversation = {
   conversation_id: string
   is_archived: boolean
+  topic: string
+  description: string
   // TODO ...
 }

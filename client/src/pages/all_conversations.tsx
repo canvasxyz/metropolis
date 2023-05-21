@@ -14,7 +14,7 @@ import {
 import Url from "../util/url"
 import { RootState, Conversation } from "../util/types"
 import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser, TbAccessible } from "react-icons/tb"
+import { TbExternalLink, TbUser } from "react-icons/tb"
 
 function ConversationRow({ c, i, dispatch }) {
   return (
@@ -29,7 +29,17 @@ function ConversationRow({ c, i, dispatch }) {
           borderTop: i === 0 ? "1px solid #e6e7e8" : "none",
         }}
       >
-        <Box sx={{ flex: "1 1 auto", ml: [3] }}>
+        <Box>
+          <img
+            src="/polldoc.png"
+            sx={{
+              width: 16,
+              mt: "3px",
+              filter: c.is_archived ? "grayscale(1) opacity(0.4)" : undefined,
+            }}
+          />
+        </Box>
+        <Box sx={{ flex: "1 1 auto", ml: [3], maxWidth: "50%" }}>
           {c.is_archived ? (
             <Text sx={{ color: "lightGray" }}>{c.topic}</Text>
           ) : (
@@ -47,15 +57,12 @@ function ConversationRow({ c, i, dispatch }) {
           <Text data-test-id="embed-page">
             {c.parent_url ? `Embedded on ${c.parent_url}` : null}
           </Text>
-          <Text>{c.description}</Text>
+          <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
         </Box>
         {!c.is_archived ? (
           <React.Fragment>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
-              <Text>
-                {c.is_active ? "Voting Open " : ""}
-                <TbAccessible />
-              </Text>
+              <Text>{c.is_active ? "Voting Open" : "Voting Closed"}</Text>
             </Box>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
               <Text>
@@ -170,7 +177,7 @@ class Conversations extends React.Component<
 
     return (
       <Box sx={{ mb: [5] }}>
-        <Heading as="h1">All Conversations</Heading>
+        <Heading as="h1">Manage Conversations</Heading>
         <Box sx={{ mt: [4], mb: [6] }}>
           <Button
             onClick={() => {

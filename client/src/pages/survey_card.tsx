@@ -4,15 +4,17 @@ import { Box, Heading, Button, Text, Input } from "theme-ui"
 
 import api from "../util/api"
 import type { Comment } from "../util/types"
+import { TbCheck, TbX } from "react-icons/tb"
 
 type SurveyCardProps = {
   comment: Comment
   conversationId: string
   onVoted: Function
   hasVoted: boolean
+  stacked: boolean
 }
 
-const SurveyCard = ({ comment, conversationId, onVoted, hasVoted }: SurveyCardProps) => {
+const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: SurveyCardProps) => {
   const { tid: commentId, txt, created, pid } = comment
 
   const [voting, setVoting] = useState(false)
@@ -67,25 +69,34 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted }: SurveyCardPr
   return (
     <Box
       sx={{
-        opacity: hasVoted ? 0.5 : 1,
-        pointerEvents: hasVoted ? "none" : "initial",
-        display: "inline-block",
-        border: "1px solid #ddd",
-        width: 400,
-        p: [20],
-        mb: [3, null, 4],
+        position: "relative",
+        border: "1px solid",
+        borderColor: "lighterGray",
+        borderRadius: "8px",
+        bg: "background",
+        boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
+        width: "100%",
+        height: "180px",
+        px: "40px",
+        py: "36px",
+        // mb: [3, null, 4],
+        mb: stacked ? "-177px" : undefined,
       }}
     >
       <Text sx={{ mb: 4 }}>{txt}</Text>
-      <Button sx={{ mr: 2 }} onClick={agree.bind(null, commentId)}>
-        Agree
-      </Button>
-      <Button sx={{ mr: 2 }} onClick={disagree.bind(null, commentId)}>
-        Disagree
-      </Button>
-      <Button sx={{ mr: 2 }} onClick={skip.bind(null, commentId)}>
-        Skip
-      </Button>
+      <Box sx={{ position: "absolute", bottom: "36px" }}>
+        <Button sx={{ mr: 2 }} onClick={agree.bind(null, commentId)}>
+          <TbCheck />
+          &nbsp;Agree
+        </Button>
+        <Button sx={{ mr: 2 }} onClick={disagree.bind(null, commentId)}>
+          <TbX />
+          &nbsp;Disagree
+        </Button>
+        <Button variant="secondary" sx={{ mr: 2 }} onClick={skip.bind(null, commentId)}>
+          Skip
+        </Button>
+      </Box>
     </Box>
   )
 }

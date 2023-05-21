@@ -22,10 +22,11 @@ export default {
     secondary: "#F6F7F8",
     mediumGray: "#8f8f8f",
     lightGray: "#afafaf",
-    primaryActive: "#59a2f1",
+    lighterGray: "#eee",
+    primaryActive: "#5398e2",
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#43474e",
-    lightGrayActive: "#7a7c7e",
+    lightGrayActive: "#9f9f9f",
   },
   links: {
     text: {
@@ -98,6 +99,18 @@ export default {
     primary: {
       color: "background",
       bg: "primary",
+      "&:hover": {
+        bg: "primaryActive",
+      },
+      fontFamily: "monospace",
+      cursor: "pointer",
+    },
+    secondary: {
+      color: "background",
+      bg: "lightGray",
+      "&:hover": {
+        bg: "lightGrayActive",
+      },
       fontFamily: "monospace",
       cursor: "pointer",
     },
