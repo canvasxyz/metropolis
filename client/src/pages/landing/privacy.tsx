@@ -1,5 +1,5 @@
 import React from "react"
-import PrivacyContent from "../privacy.md"
+import PrivacyContent from "./privacy.md"
 
 class Privacy extends React.Component {
   render() {

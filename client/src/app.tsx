@@ -12,8 +12,9 @@ import _ from "lodash"
 import { Switch, Route, Link, Redirect } from "react-router-dom"
 import { Flex, Box, jsx } from "theme-ui"
 
-import Header from "./pages/header"
-import Footer from "./pages/footer"
+import Header from "./components/header"
+import Footer from "./components/footer"
+import Logomark from "./components/logomark"
 
 /* public home page */
 import Home from "./pages/home"
@@ -29,13 +30,10 @@ import SignOut from "./pages/landing/signout"
 import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
-import Conversations from "./pages/manage/conversations"
-import ConversationAdmin from "./pages/manage/admin"
-import Account from "./pages/manage/account"
-
-/* participate */
+import AllConversations from "./pages/all_conversations"
+import ConversationAdmin from "./pages/admin"
+import Account from "./pages/account"
 import Survey from "./pages/survey"
-import Logomark from "./pages/widgets/logomark"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
@@ -190,7 +188,7 @@ class App extends React.Component<
                           authed={this.isAuthed()}
                           exact
                           path="/conversations"
-                          component={Conversations}
+                          component={AllConversations}
                         />
                         <PrivateRoute
                           isLoading={this.isLoading()}
