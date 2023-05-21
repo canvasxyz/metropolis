@@ -8445,9 +8445,15 @@ Email verified! You can close this tab or hit the back button.
         }
         let conv = rows[0];
         pgQueryP(
-          "update conversations set is_active = false where zid = ($1);",
+          "update conversations set is_archived = true where zid = ($1);",
           [conv.zid]
         )
+          .then(function () {
+            res.status(200).json({});
+          })
+          .catch(function (err: any) {
+            fail(res, 500, "polis_err_closing_conversation2", err);
+          });
       })
       .catch(function (err: any) {
         fail(res, 500, "polis_err_closing_conversation", err);
@@ -8481,7 +8487,7 @@ Email verified! You can close this tab or hit the back button.
         }
         let conv = rows[0];
         pgQueryP(
-          "update conversations set is_active = true where zid = ($1);",
+          "update conversations set is_archived = false where zid = ($1);",
           [conv.zid]
         )
           .then(function () {
@@ -9535,6 +9541,7 @@ Email verified! You can close this tab or hit the back button.
                     }
                     data.forEach(function (conv: {
                       is_owner: boolean;
+                      is_archived: boolean;
                       owner: any;
                       mod_url: string;
                       conversation_id: string;

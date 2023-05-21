@@ -1,5 +1,7 @@
+/** @jsx jsx */
+
 import React from "react"
-import { Heading, Box, Text, Link, Button } from "theme-ui"
+import { Heading, Box, Text, Link, Button, jsx } from "theme-ui"
 
 const Index: React.FC<{ user? }> = ({ user }) => {
   return (

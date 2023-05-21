@@ -54,12 +54,7 @@ class ConversationAdminContainer extends React.Component<
 
     return (
       <Flex>
-        <Box sx={{ mr: [5], p: [4], flex: "0 0 275" }}>
-          <Box sx={{ mb: [3] }}>
-            <Link sx={{ variant: "links.nav" }} to={`/`}>
-              All
-            </Link>
-          </Box>
+        <Box sx={{ mr: [5], pt: [5], flex: "0 0 275", maxWidth: "50px" }}>
           <Box sx={{ mb: [3] }}>
             <Link sx={{ variant: url ? "links.nav" : "links.activeNav" }} to={`${match.url}`}>
               Configure

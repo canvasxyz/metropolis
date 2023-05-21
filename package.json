@@ -1,7 +1,7 @@
 {
   "private": true,
   "scripts": {
-    "dev": "concurrently -n cli,srv -c cyan,red 'npm run dev --workspace=polis-client' 'npm run dev --workspace=polis-server'",
+    "dev": "concurrently -n cli,srv,tsc -c cyan,red,red 'npm run dev --workspace=polis-client' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server'",
     "start": "concurrently -n cli,srv -c cyan,red 'npm run start --workspace=polis-client' 'npm run start --workspace=polis-server'"
   },
   "workspaces": [

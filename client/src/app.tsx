@@ -181,25 +181,23 @@ class App extends React.Component<
                     return null
                   }
                   return (
-                    <Flex>
-                      <Box>
-                        <PrivateRoute
-                          isLoading={this.isLoading()}
-                          authed={this.isAuthed()}
-                          exact
-                          path="/conversations"
-                          component={AllConversations}
-                        />
-                        <PrivateRoute
-                          isLoading={this.isLoading()}
-                          authed={this.isAuthed()}
-                          exact
-                          path="/account"
-                          component={Account}
-                        />
-                        <Route path="/c/:conversation_id" component={Survey} />
-                      </Box>
-                    </Flex>
+                    <Box>
+                      <PrivateRoute
+                        isLoading={this.isLoading()}
+                        authed={this.isAuthed()}
+                        exact
+                        path="/conversations"
+                        component={AllConversations}
+                      />
+                      <PrivateRoute
+                        isLoading={this.isLoading()}
+                        authed={this.isAuthed()}
+                        exact
+                        path="/account"
+                        component={Account}
+                      />
+                      <Route path="/c/:conversation_id" component={Survey} />
+                    </Box>
                   )
                 }}
               />

@@ -20,14 +20,30 @@ export default {
     background: "#FFF",
     primary: "#62a6ef",
     secondary: "#F6F7F8",
-    mediumGray: "#60656F",
-    lightGray: "#8f8f8f",
+    mediumGray: "#8f8f8f",
+    lightGray: "#afafaf",
     primaryActive: "#59a2f1",
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#43474e",
     lightGrayActive: "#7a7c7e",
   },
   links: {
+    text: {
+      fontWeight: "600",
+      color: "primary",
+      "&:visited": {
+        color: "primary",
+      },
+      "&:active": {
+        color: "primary",
+      },
+      "&:hover": {
+        color: "primary",
+        textDecoration: "underline",
+      },
+      textDecoration: "none",
+      cursor: "pointer",
+    },
     button: {
       px: [3],
       py: [2],

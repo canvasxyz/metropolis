@@ -1,55 +1,103 @@
-// Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/** @jsx jsx */
 
-import { RouteComponentProps } from "react-router-dom"
+import { RouteComponentProps, Link } from "react-router-dom"
 import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { populateConversationsStore, handleCreateConversationSubmit } from "../actions"
+import {
+  populateConversationsStore,
+  handleCreateConversationSubmit,
+  handleCloseConversation,
+  handleReopenConversation,
+} from "../actions"
 
 import Url from "../util/url"
-import { RootState } from "../util/types"
-import { Box, Heading, Button, Text, Card, jsx } from "theme-ui"
+import { RootState, Conversation } from "../util/types"
+import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
+import { TbExternalLink, TbUser, TbAccessible } from "react-icons/tb"
 
-function Conversation({ c, i, goToConversation }) {
+function ConversationRow({ c, i, dispatch }) {
   return (
-    <Card sx={{ "overflow-wrap": "break-word", mb: [3] }} key={i}>
-      <Text sx={{ fontWeight: 700, mb: [2] }}>{c.topic}</Text>
-      <Text>{c.description}</Text>
-      <Text data-test-id="embed-page">{c.parent_url ? `Embedded on ${c.parent_url}` : null}</Text>
-      <Text sx={{ mt: [2], mb: [2] }}>{c.participant_count} participants</Text>
-      <Text
+    <Box>
+      <Flex
         sx={{
-          color: "primary",
-          cursor: "pointer",
-          "&:hover": { textDecoration: "underline" },
+          "overflow-wrap": "break-word",
+          py: [3],
+          bb: [1],
+          width: "100%",
+          borderBottom: "1px solid #e6e7e8",
+          borderTop: i === 0 ? "1px solid #e6e7e8" : "none",
         }}
-        onClick={goToConversation.bind(this, true)}
       >
-        Vote
-      </Text>
-      <Text
-        sx={{
-          color: "primary",
-          cursor: "pointer",
-          "&:hover": { textDecoration: "underline" },
-        }}
-        onClick={goToConversation.bind(this, false)}
-      >
-        Manage
-      </Text>
-    </Card>
+        <Box sx={{ flex: "1 1 auto", ml: [3] }}>
+          {c.is_archived ? (
+            <Text sx={{ color: "lightGray" }}>{c.topic}</Text>
+          ) : (
+            <Link
+              sx={{
+                variant: "links.text",
+                cursor: "pointer",
+                fontWeight: 600,
+              }}
+              to={`/c/${c.conversation_id}`}
+            >
+              {c.topic}
+            </Link>
+          )}
+          <Text data-test-id="embed-page">
+            {c.parent_url ? `Embedded on ${c.parent_url}` : null}
+          </Text>
+          <Text>{c.description}</Text>
+        </Box>
+        {!c.is_archived ? (
+          <React.Fragment>
+            <Box sx={{ ml: [4], color: "mediumGray" }}>
+              <Text>
+                {c.is_active ? "Voting Open " : ""}
+                <TbAccessible />
+              </Text>
+            </Box>
+            <Box sx={{ ml: [4], color: "mediumGray" }}>
+              <Text>
+                {c.participant_count}
+                <TbUser />
+              </Text>
+            </Box>
+            <Box sx={{ ml: [3] }}>
+              <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}`}>
+                Edit
+              </Link>
+            </Box>
+            <Box sx={{ ml: [3], mr: [3] }}>
+              <Text
+                sx={{ variant: "links.text" }}
+                onClick={() => {
+                  if (confirm("Archive this conversation?")) {
+                    dispatch(handleCloseConversation(c.conversation_id))
+                  }
+                }}
+              >
+                Close
+              </Text>
+            </Box>
+          </React.Fragment>
+        ) : (
+          <Box sx={{ ml: [3], mr: [3] }}>
+            <Text
+              sx={{ variant: "links.text", fontWeight: "400", color: "lightGray" }}
+              onClick={() => {
+                if (confirm("Reopen this archived conversation?")) {
+                  dispatch(handleReopenConversation(c.conversation_id))
+                }
+              }}
+            >
+              Reopen
+            </Text>
+          </Box>
+        )}
+      </Flex>
+    </Box>
   )
-}
-
-Conversation.propTypes = {
-  c: PropTypes.shape({
-    topic: PropTypes.string,
-    description: PropTypes.string,
-    parent_url: PropTypes.string,
-    participant_count: PropTypes.number,
-  }),
-  i: PropTypes.number.isRequired,
-  goToConversation: PropTypes.func.isRequired,
 }
 
 class Conversations extends React.Component<
@@ -57,7 +105,7 @@ class Conversations extends React.Component<
     dispatch: Function
     error: Response
     loading: boolean
-    conversations: Array<{ conversation_id: string }>
+    conversations: Array<Conversation>
     history: any
   },
   {
@@ -81,28 +129,10 @@ class Conversations extends React.Component<
     }
   }
 
-  onNewClicked() {
-    this.props.dispatch(handleCreateConversationSubmit())
-  }
-
   componentDidMount() {
     this.props.dispatch(populateConversationsStore())
     // loading true or just do that in constructor
     // check your connectivity and try again
-  }
-
-  goToConversation = (conversation_id) => {
-    return (participate) => {
-      if (this.props.history.pathname === "other-conversations") {
-        window.open(`${Url.urlPrefix}${conversation_id}`, "_blank")
-        return
-      }
-      if (participate) {
-        this.props.history.push(`/c/${conversation_id}`)
-      } else {
-        this.props.history.push(`/m/${conversation_id}`)
-      }
-    }
   }
 
   filterCheck(c) {
@@ -139,10 +169,18 @@ class Conversations extends React.Component<
     const { conversations } = this.props
 
     return (
-      <Box>
+      <Box sx={{ mb: [5] }}>
         <Heading as="h1">All Conversations</Heading>
-        <Box sx={{ mt: [4], mb: [3, null, 4] }}>
-          <Button onClick={this.onNewClicked.bind(this)}>Create new conversation</Button>
+        <Box sx={{ mt: [4], mb: [6] }}>
+          <Button
+            onClick={() => {
+              const title = prompt("Title of new conversation?")
+              if (!title || !title.trim()) return
+              this.props.dispatch(handleCreateConversationSubmit(title))
+            }}
+          >
+            Create new conversation
+          </Button>
         </Box>
         <Box>
           <Box sx={{ mb: [3] }}>{this.props.loading ? "Loading conversations..." : null}</Box>
@@ -150,16 +188,33 @@ class Conversations extends React.Component<
             <Text>{"Error loading conversations: " + err.status + " " + err.statusText}</Text>
           ) : null}
           {conversations
-            ? conversations.map((c, i) => {
-                return this.filterCheck(c) ? (
-                  <Conversation
-                    key={c.conversation_id}
-                    c={c}
-                    i={i}
-                    goToConversation={this.goToConversation(c.conversation_id)}
-                  />
-                ) : null
-              })
+            ? conversations
+                .filter((c) => !c.is_archived)
+                .map((c, i) =>
+                  this.filterCheck(c) ? (
+                    <ConversationRow
+                      key={c.conversation_id}
+                      i={i}
+                      c={c}
+                      dispatch={this.props.dispatch}
+                    />
+                  ) : null
+                )
+            : null}
+          <br />
+          {conversations
+            ? conversations
+                .filter((c) => c.is_archived)
+                .map((c, i) =>
+                  this.filterCheck(c) ? (
+                    <ConversationRow
+                      key={c.conversation_id}
+                      i={i}
+                      c={c}
+                      dispatch={this.props.dispatch}
+                    />
+                  ) : null
+                )
             : null}
         </Box>
       </Box>

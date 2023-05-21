@@ -28,6 +28,18 @@ const conversations = (
         error: action.data,
         conversations: null,
       })
+    case types.CLOSE_CONVERSATION_SUCCESS:
+      return Object.assign({}, state, {
+        conversations: state.conversations.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_archived: true } : c
+        ),
+      })
+    case types.REOPEN_CONVERSATION_SUCCESS:
+      return Object.assign({}, state, {
+        conversations: state.conversations.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_archived: false } : c
+        ),
+      })
     default:
       return state
   }

@@ -8,6 +8,7 @@ import { Provider } from "react-redux"
 import { BrowserRouter as Router, Route } from "react-router-dom"
 import { createStore, applyMiddleware, compose } from "redux"
 import thunk from "redux-thunk"
+import { IconContext } from "react-icons"
 
 import { ThemeProvider } from "theme-ui"
 import theme from "./theme"
@@ -21,11 +22,13 @@ class Root extends React.Component {
   render() {
     return (
       <ThemeProvider theme={theme}>
-        <Provider store={store}>
-          <Router>
-            <Route render={(routeProps) => <App {...routeProps} />}></Route>
-          </Router>
-        </Provider>
+        <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
+          <Provider store={store}>
+            <Router>
+              <Route render={(routeProps) => <App {...routeProps} />}></Route>
+            </Router>
+          </Provider>
+        </IconContext.Provider>
       </ThemeProvider>
     )
   }

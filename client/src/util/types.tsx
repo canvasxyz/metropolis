@@ -30,3 +30,9 @@ export type RootState = {
   seed_comments: any
   stats: any
 }
+
+export type Conversation = {
+  conversation_id: string
+  is_archived: boolean
+  // TODO ...
+}

@@ -18,6 +18,12 @@ export const REQUEST_CONVERSATIONS = "REQUEST_CONVERSATIONS"
 export const RECEIVE_CONVERSATIONS = "RECEIVE_CONVERSATIONS"
 export const CONVERSATIONS_FETCH_ERROR = "CONVERSATIONS_FETCH_ERROR"
 
+export const CLOSE_CONVERSATION_SUCCESS = "CLOSE_CONVERSATION_SUCCESS"
+export const CLOSE_CONVERSATION_ERROR = "CLOSE_CONVERSATION_ERROR"
+
+export const REOPEN_CONVERSATION_SUCCESS = "REOPEN_CONVERSATION_SUCCESS"
+export const REOPEN_CONVERSATION_ERROR = "REOPEN_CONVERSATION_ERROR"
+
 /* zid for clarity - this is conversation config */
 export const REQUEST_ZID_METADATA = "REQUEST_ZID_METADATA"
 export const RECEIVE_ZID_METADATA = "RECEIVE_ZID_METADATA"
@@ -951,17 +957,18 @@ const createConversationPostError = (err) => {
   }
 }
 
-const postCreateConversation = () => {
+const postCreateConversation = (topic) => {
   return api.post("/api/v3/conversations", {
+    topic,
     is_draft: true,
     is_active: true,
   })
 }
 
-export const handleCreateConversationSubmit = () => {
+export const handleCreateConversationSubmit = (topic) => {
   return (dispatch) => {
     dispatch(createConversationStart())
-    return postCreateConversation()
+    return postCreateConversation(topic)
       .then(
         (res) => {
           dispatch(createConversationPostSuccess(res))
@@ -972,6 +979,42 @@ export const handleCreateConversationSubmit = () => {
       .then((res) => {
         window.location.assign("/m/" + res.conversation_id)
       })
+  }
+}
+
+const postCloseConversation = (conversation_id) => {
+  return api.post("/api/v3/conversation/close", {
+    conversation_id,
+  })
+}
+
+export const handleCloseConversation = (conversation_id) => {
+  return (dispatch) => {
+    return postCloseConversation(conversation_id).then(
+      (res) => {
+        dispatch({ type: CLOSE_CONVERSATION_SUCCESS, data: conversation_id })
+        return res
+      },
+      (err) => dispatch({ type: CLOSE_CONVERSATION_ERROR, data: err })
+    )
+  }
+}
+
+const postReopenConversation = (conversation_id) => {
+  return api.post("/api/v3/conversation/reopen", {
+    conversation_id,
+  })
+}
+
+export const handleReopenConversation = (conversation_id) => {
+  return (dispatch) => {
+    return postReopenConversation(conversation_id).then(
+      (res) => {
+        dispatch({ type: REOPEN_CONVERSATION_SUCCESS, data: conversation_id })
+        return res
+      },
+      (err) => dispatch({ type: REOPEN_CONVERSATION_ERROR, data: err })
+    )
   }
 }
 
