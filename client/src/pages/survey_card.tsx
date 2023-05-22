@@ -4,7 +4,7 @@ import { Box, Heading, Button, Text, Input } from "theme-ui"
 
 import api from "../util/api"
 import type { Comment } from "../util/types"
-import { TbCheck, TbX } from "react-icons/tb"
+import { TbCheck, TbEdit, TbX } from "react-icons/tb"
 
 type SurveyCardProps = {
   comment: Comment
@@ -18,6 +18,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
   const { tid: commentId, txt, created, pid } = comment
 
   const [voting, setVoting] = useState(false)
+  const [editingVote, setEditingVote] = useState(false)
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
   const agree = (commentId: string, starred: boolean = undefined, weight = 0) => {
@@ -85,17 +86,71 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
     >
       <Text sx={{ mb: 4 }}>{txt}</Text>
       <Box sx={{ position: "absolute", bottom: "36px" }}>
-        <Button sx={{ mr: 2 }} onClick={agree.bind(null, commentId)}>
-          <TbCheck />
-          &nbsp;Agree
-        </Button>
-        <Button sx={{ mr: 2 }} onClick={disagree.bind(null, commentId)}>
-          <TbX />
-          &nbsp;Disagree
-        </Button>
-        <Button variant="secondary" sx={{ mr: 2 }} onClick={skip.bind(null, commentId)}>
-          Skip
-        </Button>
+        {hasVoted && !editingVote ? (
+          <React.Fragment>
+            <Button variant="outline" sx={{ mr: 2 }} onClick={() => setEditingVote(true)}>
+              <TbEdit />
+              &nbsp;Update vote
+            </Button>
+            <Text
+              sx={{
+                display: "inline",
+                fontFamily: "monospace",
+                color: "lightGray",
+                ml: 3,
+                my: 2,
+              }}
+            >
+              You voted X
+            </Text>
+          </React.Fragment>
+        ) : (
+          <React.Fragment>
+            <Button
+              variant={editingVote ? "outline" : "primary"}
+              sx={{ mr: 2 }}
+              onClick={agree.bind(null, commentId)}
+            >
+              <TbCheck />
+              &nbsp;Agree
+            </Button>
+            <Button
+              variant={editingVote ? "outline" : "primary"}
+              sx={{ mr: 2 }}
+              onClick={disagree.bind(null, commentId)}
+            >
+              <TbX />
+              &nbsp;Disagree
+            </Button>
+            <Button
+              variant={editingVote ? "outlineSecondary" : "secondary"}
+              sx={{ mr: 2 }}
+              onClick={skip.bind(null, commentId)}
+            >
+              Skip
+            </Button>
+            {editingVote && (
+              <Text
+                sx={{
+                  display: "inline",
+                  fontFamily: "monospace",
+                  color: "lightGray",
+                  "&:hover": {
+                    color: "primary",
+                    borderBottom: "1.5px solid",
+                    borderBottomColor: "primary",
+                  },
+                  cursor: "pointer",
+                  ml: 3,
+                  my: 2,
+                }}
+                onClick={() => setEditingVote(false)}
+              >
+                Cancel edits
+              </Text>
+            )}
+          </React.Fragment>
+        )}
       </Box>
     </Box>
   )

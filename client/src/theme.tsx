@@ -114,6 +114,30 @@ export default {
       fontFamily: "monospace",
       cursor: "pointer",
     },
+    outline: {
+      color: "primary",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "primary",
+      "&:hover": {
+        color: "primaryActive",
+        borderColor: "primaryActive",
+      },
+    },
+    outlineSecondary: {
+      color: "lightGray",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "lightGray",
+      "&:hover": {
+        color: "lightGrayActive",
+        borderColor: "lightGrayActive",
+      },
+    },
   },
   cards: {
     primary: {

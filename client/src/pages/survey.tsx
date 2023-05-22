@@ -110,14 +110,14 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
             borderRadius: 2,
             padding: [2],
             border: "1px solid",
-            borderColor: "mediumGray",
+            borderColor: "lightGray",
             mb: [3],
           }}
           ref={inputRef}
           placeholder="Write a new card here..."
         />
         <Flex>
-          <Box sx={{ flex: 1 }}>
+          <Box>
             <Button
               onClick={() => {
                 submitComment(inputRef.current.value).then(() => (inputRef.current.value = ""))
@@ -127,7 +127,7 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
             </Button>
           </Box>
           <Box sx={{ mt: 2 }}>
-            <label>
+            <label sx={{ fontFamily: "monospace" }}>
               <input
                 type="checkbox"
                 data-test-id="new-comment-agree"
@@ -136,13 +136,13 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
                   setIsAgree(true)
                   setIsDisagree(false)
                 }}
-                sx={{ ml: 3, mr: 2 }}
+                sx={{ ml: 4, mr: 2 }}
               />
-              Agree
+              I agree
             </label>
           </Box>
           <Box sx={{ mt: 2 }}>
-            <label>
+            <label sx={{ fontFamily: "monospace" }}>
               <input
                 type="checkbox"
                 data-test-id="new-comment-disagree"
@@ -151,9 +151,9 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
                   setIsAgree(false)
                   setIsDisagree(true)
                 }}
-                sx={{ ml: 3, mr: 2 }}
+                sx={{ ml: 4, mr: 2 }}
               />
-              Disagree
+              I disagree
             </label>
           </Box>
         </Flex>
@@ -167,8 +167,8 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
     <Box>
       <Flex>
         <Text sx={{ color: "lightGray", margin: "20px auto" }}>
-          You’ve voted on {votedComments.length}/{votedComments.length + unvotedComments.length}{" "}
-          comments
+          You’ve voted on {votedComments.length} of {votedComments.length + unvotedComments.length}{" "}
+          cards
         </Text>
       </Flex>
       <Box sx={{ pb: "180px" }}>
@@ -194,7 +194,7 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
               width: "100%",
               height: "180px",
               px: "40px",
-              py: "36px",
+              py: "40px",
               textAlign: "center",
               mb: "-120px",
             }}
@@ -205,7 +205,7 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
         )}
       </Box>
       <Flex>
-        <Text sx={{ color: "lightGray", margin: "20px auto" }}>Already voted</Text>
+        <Text sx={{ color: "lightGray", margin: "20px auto" }}>Review cards you've voted on</Text>
       </Flex>
       <Box sx={{ pb: "180px" }}>
         {votedComments.map((comment, i) => (
