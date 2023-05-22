@@ -147,7 +147,7 @@ function isPolisDev(uid?: any) {
 
 const polisFromAddress = Config.polisFromAddress;
 
-const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:6000
+const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:8040
 
 let akismet = akismetLib.client({
   blog: serverUrl,
@@ -1121,7 +1121,7 @@ function initializePolisHelpers() {
     ...Config.whitelistItems,
     "localhost:8080",
     "localhost:8081",
-    "localhost:6000",
+    "localhost:8040",
     "localhost:5000",
     "localhost:5001",
     "facebook.com",
@@ -13713,7 +13713,7 @@ Thanks for using Polis!
   let fetchIndexForAdminPage = makeFileFetcher(
     hostname,
     staticFilesPort,
-    "/index_admin.html",
+    "/index.html",
     {
       "Content-Type": "text/html",
     }

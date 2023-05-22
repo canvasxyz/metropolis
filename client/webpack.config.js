@@ -39,7 +39,7 @@ module.exports = (env, options) => {
       historyApiFallback: true,
       proxy: {
         "/api": {
-          target: "http://localhost:6000",
+          target: "http://localhost:8040",
           secure: false,
         },
       },
@@ -50,7 +50,7 @@ module.exports = (env, options) => {
       }),
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, "public/index.ejs"),
-        filename: isDevBuild || isDevServer ? "index.html" : "index_admin.html",
+        filename: "index.html",
         inject: "body",
         templateParameters: {
           enableTwitterWidgets: enableTwitterWidgets,
