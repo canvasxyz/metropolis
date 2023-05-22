@@ -7,8 +7,6 @@ import { populateUserStore } from "./actions"
 import type { User } from "./util/types"
 import { RootState } from "./util/types"
 
-import _ from "lodash"
-
 import { Switch, Route, Link, Redirect } from "react-router-dom"
 import { Flex, Box, jsx } from "theme-ui"
 
@@ -111,8 +109,7 @@ class App extends React.Component<
 
   isLoading() {
     const { isLoggedIn } = this.props
-
-    return _.isUndefined(isLoggedIn) /* if isLoggedIn is undefined, the app is loading */
+    return isLoggedIn === undefined
   }
 
   onSetSidebarOpen(open) {
