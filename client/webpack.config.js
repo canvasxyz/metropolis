@@ -3,7 +3,6 @@
 var path = require("path")
 var webpack = require("webpack")
 var CompressionPlugin = require("compression-webpack-plugin")
-var LodashModuleReplacementPlugin = require("lodash-webpack-plugin")
 var HtmlWebPackPlugin = require("html-webpack-plugin")
 var EventHooksPlugin = require("event-hooks-webpack-plugin")
 var CopyPlugin = require("copy-webpack-plugin")
@@ -25,6 +24,7 @@ module.exports = (env, options) => {
   var isDevServer = process.env.WEBPACK_SERVE
   var chunkHashFragment = isDevBuild || isDevServer ? "" : ".[chunkhash:8]"
   return {
+    stats: { errorDetails: true },
     entry: ["./src/index"],
     output: {
       publicPath: "/",
@@ -57,13 +57,6 @@ module.exports = (env, options) => {
           fbAppId: fbAppId,
         },
       }),
-      new LodashModuleReplacementPlugin({
-        currying: true,
-        flattening: true,
-        paths: true,
-        placeholders: true,
-        shorthands: true,
-      }),
       new webpack.DefinePlugin({
         "process.env.FB_APP_ID": JSON.stringify(fbAppId),
       }),
@@ -73,13 +66,6 @@ module.exports = (env, options) => {
       ...(isDevBuild || isDevServer || cliArgs.analyze
         ? []
         : [
-            new CompressionPlugin({
-              test: /\.js$/,
-              // Leave unmodified without gz ext.
-              // See: https://webpack.js.org/plugins/compression-webpack-plugin/#options
-              filename: "[path][base]",
-              deleteOriginalAssets: true,
-            }),
             new EventHooksPlugin({
               afterEmit: () => {
                 console.log("Writing *.headersJson files...")
@@ -132,6 +118,16 @@ module.exports = (env, options) => {
           test: /\.tsx?$/,
           exclude: [/node_modules/, path.resolve(__dirname, "build")],
           use: "ts-loader",
+        },
+        {
+          test: /\.m?js$/,
+          exclude: [/node_modules/, path.resolve(__dirname, "build")],
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env", "@babel/preset-react"],
+            },
+          },
         },
         {
           test: /\.(png|jpg|gif|svg)$/,
