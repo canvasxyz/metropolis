@@ -68,6 +68,12 @@ $ docker run -p 1080:1080 -p 1025:1025 maildev/maildev
 - [🔏 Set up SSL/HTTPS](docs/ssl.md), to keep the site secure
 - [📈 Scale](docs/scaling.md) for large or many concurrent conversations
 
+
+Analyzing bundle size:
+- `cd client`
+- `npx webpack --profile --json > stats.json`
+- `npx webpack-bundle-analyzer ./stats.json`
+
 ### Facebook App Integration
 
 Optionally, you can [register with Facebook](https://developers.facebook.com/docs/development) and get a Facebook App ID

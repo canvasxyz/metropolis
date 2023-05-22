@@ -1540,8 +1540,8 @@ helpersInitialized.then(
     app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
     app.get(
-      /^\/dist\/admin_bundle.js$/,
-      makeFileFetcher(hostname, staticFilesPort, "/dist/admin_bundle.js", {
+      /^\/dist\/client_bundle.js$/,
+      makeFileFetcher(hostname, staticFilesPort, "/dist/client_bundle.js", {
         "Content-Type": "application/javascript",
       })
     );

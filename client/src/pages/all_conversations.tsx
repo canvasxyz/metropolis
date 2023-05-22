@@ -21,7 +21,7 @@ function ConversationRow({ c, i, dispatch }) {
     <Box>
       <Flex
         sx={{
-          "overflow-wrap": "break-word",
+          overflowWrap: "break-word",
           py: [3],
           bb: [1],
           width: "100%",

@@ -28,7 +28,7 @@ module.exports = (env, options) => {
     entry: ["./src/index"],
     output: {
       publicPath: "/",
-      filename: `static/js/admin_bundle${chunkHashFragment}.js`,
+      filename: `static/js/client_bundle${chunkHashFragment}.js`,
       path: path.resolve(__dirname, "build"),
       clean: true,
     },
@@ -68,8 +68,6 @@ module.exports = (env, options) => {
         : [
             new EventHooksPlugin({
               afterEmit: () => {
-                console.log("Writing *.headersJson files...")
-
                 function writeHeadersJson(matchGlob, headersData = {}) {
                   const files = glob.sync(path.resolve(__dirname, "build", matchGlob))
                   files.forEach((f, i) => {
