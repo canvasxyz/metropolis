@@ -130,18 +130,8 @@ module.exports = (env, options) => {
       rules: [
         {
           test: /\.tsx?$/,
-          exclude: /node_modules/,
+          exclude: [/node_modules/, path.resolve(__dirname, "build")],
           use: "ts-loader",
-        },
-        {
-          test: /\.m?js$/,
-          exclude: /node_modules/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env", "@babel/preset-react"],
-            },
-          },
         },
         {
           test: /\.(png|jpg|gif|svg)$/,
