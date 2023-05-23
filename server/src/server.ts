@@ -113,7 +113,6 @@ const resolveWith = (x: { body?: { user_id: string } }) => {
   return Promise.resolve(x);
 };
 
-
 //var SegfaultHandler = require('segfault-handler');
 
 //SegfaultHandler.registerHandler("segfault.log");
@@ -129,17 +128,13 @@ if (devMode) {
 
 // Bluebird uncaught error handler.
 Promise.onPossiblyUnhandledRejection(function (err: any) {
-  logger.error('onPossiblyUnhandledRejection', err);
+  logger.error("onPossiblyUnhandledRejection", err);
   // throw err; // not throwing since we're printing stack traces anyway
 });
 
-const adminEmails = Config.adminEmails
-  ? JSON.parse(Config.adminEmails)
-  : [];
+const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
 
-const polisDevs = Config.adminUIDs
-  ? JSON.parse(Config.adminUIDs)
-  : [];
+const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
 
 function isPolisDev(uid?: any) {
   return polisDevs.indexOf(uid) >= 0;
@@ -173,18 +168,18 @@ function isSpam(o: {
 }) {
   // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
   // @ts-ignore
-  return new MPromise(
-    "isSpam",
-    function (resolve: (arg0: any) => void, reject: (arg0: any) => void) {
-      akismet.checkSpam(o, function (err: any, spam: any) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(spam);
-        }
-      });
-    }
-  );
+  return new MPromise("isSpam", function (
+    resolve: (arg0: any) => void,
+    reject: (arg0: any) => void
+  ) {
+    akismet.checkSpam(o, function (err: any, spam: any) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(spam);
+      }
+    });
+  });
 }
 
 var INFO: {
@@ -610,7 +605,7 @@ function initializePolisHelpers() {
     conv?: { zid: any },
     tid?: any,
     voteType?: any,
-    weight?: number,
+    weight?: number
   ) {
     let zid = conv?.zid;
     weight = weight || 0;
@@ -649,7 +644,7 @@ function initializePolisHelpers() {
     zid?: any,
     tid?: any,
     voteType?: any,
-    weight?: number,
+    weight?: number
   ) {
     return (
       pgQueryP_readOnly("select * from conversations where zid = ($1);", [zid])
@@ -695,14 +690,7 @@ function initializePolisHelpers() {
           return conv;
         })
         .then(function (conv: any) {
-          return doVotesPost(
-            uid,
-            pid,
-            conv,
-            tid,
-            voteType,
-            weight,
-          );
+          return doVotesPost(uid, pid, conv, tid, voteType, weight);
         })
     );
   }
@@ -716,31 +704,31 @@ function initializePolisHelpers() {
   function votesGet(p: { zid?: any; pid?: any; tid?: any }) {
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "votesGet",
-      function (resolve: (arg0: any) => void, reject: (arg0: any) => void) {
-        let q = sql_votes_latest_unique
-          .select(sql_votes_latest_unique.star())
-          .where(sql_votes_latest_unique.zid.equals(p.zid));
+    return new MPromise("votesGet", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0: any) => void
+    ) {
+      let q = sql_votes_latest_unique
+        .select(sql_votes_latest_unique.star())
+        .where(sql_votes_latest_unique.zid.equals(p.zid));
 
-        if (!_.isUndefined(p.pid)) {
-          q = q.where(sql_votes_latest_unique.pid.equals(p.pid));
-        }
-        if (!_.isUndefined(p.tid)) {
-          q = q.where(sql_votes_latest_unique.tid.equals(p.tid));
-        }
-        pgQuery_readOnly(
-          q.toString(),
-          function (err: any, results: { rows: any }) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(results.rows);
-            }
-          }
-        );
+      if (!_.isUndefined(p.pid)) {
+        q = q.where(sql_votes_latest_unique.pid.equals(p.pid));
       }
-    );
+      if (!_.isUndefined(p.tid)) {
+        q = q.where(sql_votes_latest_unique.tid.equals(p.tid));
+      }
+      pgQuery_readOnly(
+        q.toString(),
+        function (err: any, results: { rows: any }) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(results.rows);
+          }
+        }
+      );
+    });
   } // End votesGet
 
   function writeDefaultHead(
@@ -1272,9 +1260,11 @@ function initializePolisHelpers() {
   function handle_GET_tryCookie(
     req: { headers?: { origin: string }; cookies: { [x: string]: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     if (!req.cookies[COOKIES.TRY_COOKIE]) {
@@ -1672,7 +1662,7 @@ function initializePolisHelpers() {
     });
   }
   function redirectIfHasZidButNoConversationId(
-    req: { body: { zid: any; conversation_id: any }, headers?: any },
+    req: { body: { zid: any; conversation_id: any }; headers?: any },
     res: {
       writeHead: (arg0: number, arg1: { Location: string }) => void;
       end: () => any;
@@ -1696,9 +1686,11 @@ function initializePolisHelpers() {
   function handle_GET_math_pca(
     req: any,
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
     }
   ) {
     // migrated off this path, old clients were causing timeout issues by polling repeatedly without waiting for a result for a previous poll.
@@ -1712,9 +1704,11 @@ function initializePolisHelpers() {
   function handle_GET_math_pca2(
     req: { p: { zid: any; math_tick: any; ifNoneMatch: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
       set: (arg0: {
         "Content-Type": string;
         "Content-Encoding": string;
@@ -1826,9 +1820,11 @@ function initializePolisHelpers() {
   function handle_POST_math_update(
     req: { p: { zid: any; uid?: any; math_update_type: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -1863,9 +1859,7 @@ function initializePolisHelpers() {
   function handle_GET_math_correlationMatrix(
     req: { p: { rid: any; math_tick: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { status: string }): void; new (): any };
@@ -2091,9 +2085,11 @@ function initializePolisHelpers() {
     req: { p: { zid: any; math_tick: any } },
     res: {
       json: (arg0: { bidToPid: any }) => void;
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -2114,31 +2110,33 @@ function initializePolisHelpers() {
   function getXids(zid: any) {
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getXids",
-      function (resolve: (arg0: any) => void, reject: (arg0: string) => void) {
-        pgQuery_readOnly(
-          "select pid, xid from xids inner join " +
-            "(select * from participants where zid = ($1)) as p on xids.uid = p.uid " +
-            " where owner in (select org_id from conversations where zid = ($1));",
-          [zid],
-          function (err: any, result: { rows: any }) {
-            if (err) {
-              reject("polis_err_fetching_xids");
-              return;
-            }
-            resolve(result.rows);
+    return new MPromise("getXids", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0: string) => void
+    ) {
+      pgQuery_readOnly(
+        "select pid, xid from xids inner join " +
+          "(select * from participants where zid = ($1)) as p on xids.uid = p.uid " +
+          " where owner in (select org_id from conversations where zid = ($1));",
+        [zid],
+        function (err: any, result: { rows: any }) {
+          if (err) {
+            reject("polis_err_fetching_xids");
+            return;
           }
-        );
-      }
-    );
+          resolve(result.rows);
+        }
+      );
+    });
   }
   function handle_GET_xids(
     req: { p: { uid?: any; zid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -2167,9 +2165,11 @@ function initializePolisHelpers() {
   function handle_POST_xidWhitelist(
     req: { p: { xid_whitelist: any; uid?: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     const xid_whitelist = req.p.xid_whitelist;
@@ -2246,9 +2246,11 @@ function initializePolisHelpers() {
     req: { p: { uid?: any; zid: any; math_tick: any } },
     res: {
       json: (arg0: { bid: any }) => void;
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -2267,7 +2269,7 @@ function initializePolisHelpers() {
           let b2p = items[0].bidToPid || []; // not sure yet if "|| []" is right here.
           let pid = items[1];
           let mathResults = items[2].asPOJO;
-          if (((pid as unknown) as number) < 0) {
+          if ((pid as unknown as number) < 0) {
             // NOTE: this API should not be called in /demo mode
             fail(res, 500, "polis_err_get_bid_bad_pid");
             return;
@@ -2307,9 +2309,7 @@ function initializePolisHelpers() {
   function handle_POST_auth_password(
     req: { p: { pwresettoken: any; newPassword: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: string): void; new (): any };
@@ -2360,7 +2360,8 @@ function initializePolisHelpers() {
             );
           }
         );
-      });
+      }
+    );
   }
 
   const getServerNameWithProtocol = Config.getServerNameWithProtocol;
@@ -2368,9 +2369,7 @@ function initializePolisHelpers() {
   function handle_POST_auth_pwresettoken(
     req: { p: { email: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: string): void; new (): any };
@@ -2399,7 +2398,12 @@ function initializePolisHelpers() {
             server,
             function (err: any) {
               if (err) {
-                fail(res, 500, "Error: Couldn't send password reset email.", err);
+                fail(
+                  res,
+                  500,
+                  "Error: Couldn't send password reset email.",
+                  err
+                );
                 return;
               }
               finish();
@@ -2462,7 +2466,7 @@ Feel free to reply to this email if you need help.`;
   ) {
     res?.clearCookie?.(cookieName, {
       path: "/",
-      domain: cookies.cookieDomain(req)
+      domain: cookies.cookieDomain(req),
     });
   }
 
@@ -2529,9 +2533,7 @@ Feel free to reply to this email if you need help.`;
   function handle_POST_auth_deregister(
     req: { p: { showPage?: any }; cookies: { [x: string]: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         end: { (): void; new (): any };
@@ -2594,9 +2596,11 @@ Feel free to reply to this email if you need help.`;
       };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): any; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): any; new (): any };
+      };
       json: (arg0: {}) => void;
     }
   ) {
@@ -2658,9 +2662,7 @@ Feel free to reply to this email if you need help.`;
     res: {
       writeHead: (arg0: number) => void;
       json: (arg0: { status: number }) => void;
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { codes: any }): void; new (): any };
@@ -2749,9 +2751,7 @@ Feel free to reply to this email if you need help.`;
   function handle_POST_zinvites(
     req: { p: { short_url: any; zid: any; uid?: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { zinvite: any }): void; new (): any };
@@ -2871,33 +2871,31 @@ Feel free to reply to this email if you need help.`;
 
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getZinvites",
-      function (resolve: (arg0: {}) => void, reject: (arg0: any) => void) {
-        if (uncachedZids.length === 0) {
-          resolve(makeZidToConversationIdMap([zidsWithCachedConversationIds]));
-          return;
-        }
-        pgQuery_readOnly(
-          "select * from zinvites where zid in (" +
-            uncachedZids.join(",") +
-            ");",
-          [],
-          function (err: any, result: { rows: any }) {
-            if (err) {
-              reject(err);
-            } else {
-              resolve(
-                makeZidToConversationIdMap([
-                  result.rows,
-                  zidsWithCachedConversationIds,
-                ])
-              );
-            }
-          }
-        );
+    return new MPromise("getZinvites", function (
+      resolve: (arg0: {}) => void,
+      reject: (arg0: any) => void
+    ) {
+      if (uncachedZids.length === 0) {
+        resolve(makeZidToConversationIdMap([zidsWithCachedConversationIds]));
+        return;
       }
-    );
+      pgQuery_readOnly(
+        "select * from zinvites where zid in (" + uncachedZids.join(",") + ");",
+        [],
+        function (err: any, result: { rows: any }) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(
+              makeZidToConversationIdMap([
+                result.rows,
+                zidsWithCachedConversationIds,
+              ])
+            );
+          }
+        }
+      );
+    });
   }
 
   function addConversationId(
@@ -2941,9 +2939,11 @@ Feel free to reply to this email if you need help.`;
 
   function finishOne(
     res: {
-      status: (
-        arg0: any
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: any) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     },
     o: { url?: string; zid?: any; currentPid?: any },
     dontUseCache?: boolean | undefined,
@@ -2970,9 +2970,11 @@ Feel free to reply to this email if you need help.`;
 
   function finishArray(
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     },
     a: any
   ) {
@@ -3577,24 +3579,24 @@ Feel free to reply to this email if you need help.`;
   function getParticipant(zid: any, uid?: any) {
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getParticipant",
-      function (resolve: (arg0: any) => void, reject: (arg0: Error) => any) {
-        pgQuery_readOnly(
-          "SELECT * FROM participants WHERE zid = ($1) AND uid = ($2);",
-          [zid, uid],
-          function (err: any, results: { rows: any[] }) {
-            if (err) {
-              return reject(err);
-            }
-            if (!results || !results.rows) {
-              return reject(new Error("polis_err_getParticipant_failed"));
-            }
-            resolve(results.rows[0]);
+    return new MPromise("getParticipant", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0: Error) => any
+    ) {
+      pgQuery_readOnly(
+        "SELECT * FROM participants WHERE zid = ($1) AND uid = ($2);",
+        [zid, uid],
+        function (err: any, results: { rows: any[] }) {
+          if (err) {
+            return reject(err);
           }
-        );
-      }
-    );
+          if (!results || !results.rows) {
+            return reject(new Error("polis_err_getParticipant_failed"));
+          }
+          resolve(results.rows[0]);
+        }
+      );
+    });
   }
   function getAnswersForConversation(
     zid: any,
@@ -3711,12 +3713,14 @@ ${serverName}/pwreset/${pwresettoken}
           userInfo.email,
           "Polis Password Reset",
           body
-        ).then(function () {
-          callback?.();
-        }).catch(function (err: any) {
-          logger.error("polis_err_failed_to_email_password_reset_code", err);
-          callback?.(err);
-        });
+        )
+          .then(function () {
+            callback?.();
+          })
+          .catch(function (err: any) {
+            logger.error("polis_err_failed_to_email_password_reset_code", err);
+            callback?.(err);
+          });
       }
     );
   }
@@ -3939,9 +3943,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_participants(
     req: { p: { uid?: any; zid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     // let pid = req.p.pid;
@@ -4000,9 +4006,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_dummyButton(
     req: { p: { button: string; uid: string } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
     }
   ) {
     let message = req.p.button + " " + req.p.uid;
@@ -4091,9 +4099,11 @@ Email verified! You can close this tab or hit the back button.
       cookies: { [x: string]: any };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -4614,9 +4624,7 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_convSubscriptions(
     req: { p: { zid: any; uid?: any; type: any; email: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { subscribed: any }): void; new (): any };
@@ -4733,9 +4741,10 @@ Email verified! You can close this tab or hit the back button.
                   // lti_user_image: any; lti_context_id: any; tool_consumer_instance_guid?: any; afterJoinRedirectUrl: any; }; }' but required in type
                   // '{ cookies: { [x: string]: any; }; }'.ts(2345)
                   // @ts-ignore
-                  addCookies(req, res, token, uid).then(function () {
-                    res.json(response_data);
-                  })
+                  addCookies(req, res, token, uid)
+                    .then(function () {
+                      res.json(response_data);
+                    })
                     .catch(function (err: any) {
                       fail(res, 500, "polis_err_adding_cookies", err);
                     });
@@ -4761,9 +4770,7 @@ Email verified! You can close this tab or hit the back button.
       };
     },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { pid: any; uid?: any }): void; new (): any };
@@ -5263,7 +5270,11 @@ Email verified! You can close this tab or hit the back button.
       //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
       // @ts-ignore
     ).then(function (rows: string | any[]) {
-      logger.debug("isParentDomainWhitelisted", { domain, zid, isWithinIframe });
+      logger.debug("isParentDomainWhitelisted", {
+        domain,
+        zid,
+        isWithinIframe,
+      });
       if (!rows || !rows.length || !rows[0].domain_whitelist.length) {
         // there is no whitelist, so any domain is ok.
         logger.debug("isParentDomainWhitelisted : no whitelist");
@@ -5458,9 +5469,7 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_conversationStats(
     req: { p: { zid: any; uid?: any; until: any; rid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: {
@@ -5649,9 +5658,7 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_snapshot(
     req: { p: { uid?: any; zid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: {
@@ -5919,9 +5926,7 @@ Email verified! You can close this tab or hit the back button.
     },
     res: {
       json: (arg0: { uid?: any; hname: any; email: any }) => void;
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: {
@@ -6314,9 +6319,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_tutorial(
     req: { p: { uid?: any; step: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -6333,9 +6340,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_users(
     req: { p: { uid?: any; errIfNoAuth: any; xid: any; owner_uid?: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -6364,13 +6373,14 @@ Email verified! You can close this tab or hit the back button.
   const _getCommentsList = Comment._getCommentsList;
   const getNumberOfCommentsRemaining = Comment.getNumberOfCommentsRemaining;
 
-
   function handle_GET_participation(
     req: { p: { zid: any; uid?: any; strict: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -6626,9 +6636,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_comments_translations(
     req: { p: { zid: any; tid: any; lang: string } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     const zid = req.p.zid;
@@ -6766,9 +6778,11 @@ Email verified! You can close this tab or hit the back button.
 
   function failWithRetryRequest(res: {
     setHeader: (arg0: string, arg1: number) => void;
-    writeHead: (
-      arg0: number
-    ) => { (): any; new (): any; send: { (arg0: number): void; new (): any } };
+    writeHead: (arg0: number) => {
+      (): any;
+      new (): any;
+      send: { (arg0: number): void; new (): any };
+    };
   }) {
     res.setHeader("Retry-After", 0);
     logger.warn("failWithRetryRequest");
@@ -6778,28 +6792,28 @@ Email verified! You can close this tab or hit the back button.
   function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getNumberOfCommentsWithModerationStatus",
-      function (resolve: (arg0: any) => void, reject: (arg0: any) => void) {
-        pgQuery_readOnly(
-          "select count(*) from comments where zid = ($1) and mod = ($2);",
-          [zid, mod],
-          function (err: any, result: { rows: { count: any }[] }) {
-            if (err) {
-              reject(err);
-            } else {
-              let count =
-                result && result.rows && result.rows[0] && result.rows[0].count;
-              count = Number(count);
-              if (isNaN(count)) {
-                count = void 0;
-              }
-              resolve(count);
+    return new MPromise("getNumberOfCommentsWithModerationStatus", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0: any) => void
+    ) {
+      pgQuery_readOnly(
+        "select count(*) from comments where zid = ($1) and mod = ($2);",
+        [zid, mod],
+        function (err: any, result: { rows: { count: any }[] }) {
+          if (err) {
+            reject(err);
+          } else {
+            let count =
+              result && result.rows && result.rows[0] && result.rows[0].count;
+            count = Number(count);
+            if (isNaN(count)) {
+              count = void 0;
             }
+            resolve(count);
           }
-        );
-      }
-    );
+        }
+      );
+    });
   }
 
   function sendCommentModerationEmail(
@@ -7110,7 +7124,7 @@ Email verified! You can close this tab or hit the back button.
             logger.debug("Post comments quote_txt", { txt, quote_txt });
             txt = quote_txt;
           } else {
-            logger.debug("Post comments txt", {zid, pid, txt});
+            logger.debug("Post comments txt", { zid, pid, txt });
           }
 
           let ip =
@@ -7147,26 +7161,28 @@ Email verified! You can close this tab or hit the back button.
               !_.isUndefined(xid) && !_.isNull(xid)
                 ? getXidStuff(xid, zid)
                 : Promise.resolve();
-            pidPromise = xidUserPromise.then((xidUser: UserType | "noXidRecord") => {
-              shouldCreateXidRecord = xidUser === "noXidRecord";
-              if (typeof xidUser === 'object') {
-                uid = xidUser.uid;
-                pid = xidUser.pid;
-                return pid;
-              } else {
-                return doGetPid().then((pid: any) => {
-                  if (shouldCreateXidRecord) {
-                    // Expected 6 arguments, but got 3.ts(2554)
-                    // conversation.ts(34, 3): An argument for 'x_profile_image_url' was not provided.
-                    // @ts-ignore
-                    return createXidRecordByZid(zid, uid, xid).then(() => {
-                      return pid;
-                    });
-                  }
+            pidPromise = xidUserPromise.then(
+              (xidUser: UserType | "noXidRecord") => {
+                shouldCreateXidRecord = xidUser === "noXidRecord";
+                if (typeof xidUser === "object") {
+                  uid = xidUser.uid;
+                  pid = xidUser.pid;
                   return pid;
-                });
+                } else {
+                  return doGetPid().then((pid: any) => {
+                    if (shouldCreateXidRecord) {
+                      // Expected 6 arguments, but got 3.ts(2554)
+                      // conversation.ts(34, 3): An argument for 'x_profile_image_url' was not provided.
+                      // @ts-ignore
+                      return createXidRecordByZid(zid, uid, xid).then(() => {
+                        return pid;
+                      });
+                    }
+                    return pid;
+                  });
+                }
               }
-            });
+            );
           }
 
           let commentExistsPromise = commentExists(zid, txt);
@@ -7227,16 +7243,22 @@ Email verified! You can close this tab or hit the back button.
                   if (bad && conv.profanity_filter) {
                     active = false;
                     classifications.push("bad");
-                    logger.info("active=false because (bad && conv.profanity_filter)");
+                    logger.info(
+                      "active=false because (bad && conv.profanity_filter)"
+                    );
                   }
                   if (spammy && conv.spam_filter) {
                     active = false;
                     classifications.push("spammy");
-                    logger.info("active=false because (spammy && conv.spam_filter)");
+                    logger.info(
+                      "active=false because (spammy && conv.spam_filter)"
+                    );
                   }
                   if (conv.strict_moderation) {
                     active = false;
-                    logger.info("active=false because (conv.strict_moderation)");
+                    logger.info(
+                      "active=false because (conv.strict_moderation)"
+                    );
                   }
 
                   let mod = 0; // hasn't yet been moderated.
@@ -7365,7 +7387,12 @@ Email verified! You can close this tab or hit the back button.
                       function (err: { code: string | number }) {
                         if (err.code === "23505" || err.code === 23505) {
                           // duplicate comment
-                          fail(res, 409, "polis_err_post_comment_duplicate", err);
+                          fail(
+                            res,
+                            409,
+                            "polis_err_post_comment_duplicate",
+                            err
+                          );
                         } else {
                           fail(res, 500, "polis_err_post_comment", err);
                         }
@@ -7493,8 +7520,11 @@ Email verified! You can close this tab or hit the back button.
       let comments = results[0];
       let math = results[1];
       let numberOfCommentsRemainingRows = results[2];
-      logger.debug("getNextPrioritizedComment intermediate results:",
-                   {zid, pid, numberOfCommentsRemainingRows});
+      logger.debug("getNextPrioritizedComment intermediate results:", {
+        zid,
+        pid,
+        numberOfCommentsRemainingRows,
+      });
       if (!comments || !comments.length) {
         return null;
       } else if (
@@ -7589,9 +7619,11 @@ Email verified! You can close this tab or hit the back button.
       };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     if (req.timedout) {
@@ -7658,9 +7690,7 @@ Email verified! You can close this tab or hit the back button.
       cookies: { [x: string]: any };
     },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: {
@@ -7948,7 +7978,7 @@ Email verified! You can close this tab or hit the back button.
               zid,
               req.p.tid,
               req.p.vote,
-              req.p.weight,
+              req.p.weight
             );
           })
           .then(function (o: { vote: any }) {
@@ -7972,7 +8002,11 @@ Email verified! You can close this tab or hit the back button.
             return getNextComment(zid, pid, [], true, lang);
           })
           .then(function (nextComment: any) {
-            logger.debug("handle_POST_votes nextComment:", {zid, pid, nextComment});
+            logger.debug("handle_POST_votes nextComment:", {
+              zid,
+              pid,
+              nextComment,
+            });
             let result: PidReadyResult = {};
             if (nextComment) {
               result.nextComment = nextComment;
@@ -8127,9 +8161,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_upvotes(
     req: { p: { uid?: any; zid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -8197,9 +8233,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_stars(
     req: { p: { zid: any; tid: any; pid: any; starred: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     addStar(req.p.zid, req.p.tid, req.p.pid, req.p.starred)
@@ -8228,9 +8266,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_trashes(
     req: { p: { pid: any; zid: any; tid: any; trashed: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let query =
@@ -8321,9 +8361,11 @@ Email verified! You can close this tab or hit the back button.
       p: { uid?: any; zid: any; tid: any; active: any; mod: any; is_meta: any };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -8421,9 +8463,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_conversation_close(
     req: { p: { zid: any; uid?: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     var q = "select * from conversations where zid = ($1)";
@@ -8463,9 +8507,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_conversation_reopen(
     req: { p: { zid: any; uid?: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     var q = "select * from conversations where zid = ($1)";
@@ -8652,8 +8698,8 @@ Email verified! You can close this tab or hit the back button.
         ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields);
 
         if (!_.isUndefined(req.p.owner_sees_participation_stats)) {
-          fields.owner_sees_participation_stats = !!req.p
-            .owner_sees_participation_stats;
+          fields.owner_sees_participation_stats =
+            !!req.p.owner_sees_participation_stats;
         }
         if (!_.isUndefined(req.p.link_url)) {
           fields.link_url = req.p.link_url;
@@ -9153,9 +9199,7 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_metadata(
     req: { p: { zid: any; zinvite: any; suzinvite: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: {
@@ -9392,9 +9436,11 @@ Email verified! You can close this tab or hit the back button.
       p: ConversationType;
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -9597,10 +9643,8 @@ Email verified! You can close this tab or hit the back button.
                           conv.conversation_id +
                           "'>moderate</a>";
 
-                        conv.inbox_item_admin_html_escaped = conv.inbox_item_admin_html.replace(
-                          /'/g,
-                          "\\'"
-                        );
+                        conv.inbox_item_admin_html_escaped =
+                          conv.inbox_item_admin_html.replace(/'/g, "\\'");
                       }
                       if (want_inbox_item_participant_html) {
                         conv.inbox_item_participant_html =
@@ -9611,10 +9655,8 @@ Email verified! You can close this tab or hit the back button.
                           "'>" +
                           (conv.topic || conv.created) +
                           "</a>";
-                        conv.inbox_item_participant_html_escaped = conv.inbox_item_admin_html.replace(
-                          /'/g,
-                          "\\'"
-                        );
+                        conv.inbox_item_participant_html_escaped =
+                          conv.inbox_item_admin_html.replace(/'/g, "\\'");
                       }
 
                       if (suurlData) {
@@ -9903,9 +9945,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_GET_contexts(
     req: any,
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     pgQueryP_readOnly(
@@ -9928,9 +9972,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_contexts(
     req: { p: { uid?: any; name: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -10080,8 +10126,8 @@ Email verified! You can close this tab or hit the back button.
                 spam_filter: req.p.spam_filter,
                 strict_moderation: req.p.strict_moderation,
                 context: req.p.context || null,
-                owner_sees_participation_stats: !!req.p
-                  .owner_sees_participation_stats,
+                owner_sees_participation_stats:
+                  !!req.p.owner_sees_participation_stats,
                 // Set defaults for fields that aren't set at postgres level.
                 auth_needed_to_vote:
                   req.p.auth_needed_to_vote || DEFAULTS.auth_needed_to_vote,
@@ -10154,9 +10200,7 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_query_participants_by_metadata(
     req: { p: { uid?: any; zid: any; pmaids: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: never[]): void; new (): any };
@@ -10203,9 +10247,11 @@ Email verified! You can close this tab or hit the back button.
   function handle_POST_sendCreatedLinkToEmail(
     req: { p: { uid?: any; zid: string } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     pgQuery_readOnly(
@@ -10268,9 +10314,11 @@ Email verified! You can close this tab or hit the back button.
       };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     if (
@@ -10301,9 +10349,11 @@ Email verified! You can close this tab or hit the back button.
       };
     },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     if (
@@ -10479,45 +10529,42 @@ Thanks for using Polis!
 
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getTwitterUserInfo",
-      function (
-        resolve: (arg0: any) => void,
-        reject: (arg0?: undefined) => void
-      ) {
-        let cachedCopy = twitterUserInfoCache.get(identifier);
-        if (useCache && cachedCopy) {
-          return resolve(cachedCopy);
-        }
-        if (
-          suspendedOrPotentiallyProblematicTwitterIds.indexOf(identifier) >= 0
-        ) {
-          return reject();
-        }
-        oauth.post(
-          "https://api.twitter.com/1.1/users/lookup.json",
-          // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
-          // @ts-ignore
-          void 0, //'your user token for this app', //test user token
-          void 0, //'your user secret for this app', //test user secret
-          params,
-          "multipart/form-data",
-          function (err: any, data: any, res: any) {
-            if (err) {
-              logger.error(
-                "get twitter token failed for identifier: " + identifier,
-                err
-              );
-              suspendedOrPotentiallyProblematicTwitterIds.push(identifier);
-              reject(err);
-            } else {
-              twitterUserInfoCache.set(identifier, data);
-              resolve(data);
-            }
-          }
-        );
+    return new MPromise("getTwitterUserInfo", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0?: undefined) => void
+    ) {
+      let cachedCopy = twitterUserInfoCache.get(identifier);
+      if (useCache && cachedCopy) {
+        return resolve(cachedCopy);
       }
-    );
+      if (
+        suspendedOrPotentiallyProblematicTwitterIds.indexOf(identifier) >= 0
+      ) {
+        return reject();
+      }
+      oauth.post(
+        "https://api.twitter.com/1.1/users/lookup.json",
+        // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
+        // @ts-ignore
+        void 0, //'your user token for this app', //test user token
+        void 0, //'your user secret for this app', //test user secret
+        params,
+        "multipart/form-data",
+        function (err: any, data: any, res: any) {
+          if (err) {
+            logger.error(
+              "get twitter token failed for identifier: " + identifier,
+              err
+            );
+            suspendedOrPotentiallyProblematicTwitterIds.push(identifier);
+            reject(err);
+          } else {
+            twitterUserInfoCache.set(identifier, data);
+            resolve(data);
+          }
+        }
+      );
+    });
   }
 
   function getTwitterTweetById(twitter_tweet_id: string) {
@@ -10536,28 +10583,27 @@ Thanks for using Polis!
 
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise(
-      "getTwitterTweet",
-      function (resolve: (arg0: any) => void, reject: (arg0: any) => void) {
-        oauth.get(
-          "https://api.twitter.com/1.1/statuses/show.json?id=" +
-            twitter_tweet_id,
-          // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
-          // @ts-ignore
-          void 0, //'your user token for this app', //test user token
-          void 0, //'your user secret for this app', //test user secret
-          function (err: any, data: string, res: any) {
-            if (err) {
-              logger.error("get twitter tweet failed", err);
-              reject(err);
-            } else {
-              data = JSON.parse(data);
-              resolve(data);
-            }
+    return new MPromise("getTwitterTweet", function (
+      resolve: (arg0: any) => void,
+      reject: (arg0: any) => void
+    ) {
+      oauth.get(
+        "https://api.twitter.com/1.1/statuses/show.json?id=" + twitter_tweet_id,
+        // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
+        // @ts-ignore
+        void 0, //'your user token for this app', //test user token
+        void 0, //'your user secret for this app', //test user secret
+        function (err: any, data: string, res: any) {
+          if (err) {
+            logger.error("get twitter tweet failed", err);
+            reject(err);
+          } else {
+            data = JSON.parse(data);
+            resolve(data);
           }
-        );
-      }
-    );
+        }
+      );
+    });
   }
 
   // function getTwitterUserTimeline(screen_name) {
@@ -12017,9 +12063,11 @@ Thanks for using Polis!
   function handle_GET_locations(
     req: { p: { zid: any; gid: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -12119,9 +12167,11 @@ Thanks for using Polis!
   function handle_PUT_ptptois(
     req: { p: { zid: any; uid?: any; pid: any; mod: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -12148,9 +12198,11 @@ Thanks for using Polis!
   function handle_GET_ptptois(
     req: { p: { zid: any; mod: any; uid?: any; conversation_id: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let zid = req.p.zid;
@@ -12190,9 +12242,11 @@ Thanks for using Polis!
   function handle_GET_votes_famous(
     req: { p: any },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     doFamousQuery(req.p, req)
@@ -12461,9 +12515,11 @@ Thanks for using Polis!
   function handle_GET_twitter_users(
     req: { p: { uid?: any; twitter_user_id: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let uid = req.p.uid;
@@ -12504,13 +12560,14 @@ Thanks for using Polis!
     });
   }
 
-
   function handle_POST_einvites(
     req: { p: { email: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: {}): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: {}): void; new (): any };
+      };
     }
   ) {
     let email = req.p.email;
@@ -12541,9 +12598,11 @@ Thanks for using Polis!
   function handle_GET_einvites(
     req: { p: { einvite: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     let einvite = req.p.einvite;
@@ -12710,9 +12769,7 @@ Thanks for using Polis!
   function handle_GET_testConnection(
     req: any,
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { status: string }): void; new (): any };
@@ -12727,9 +12784,7 @@ Thanks for using Polis!
   function handle_GET_testDatabase(
     req: any,
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { status: string }): void; new (): any };
@@ -12788,9 +12843,7 @@ Thanks for using Polis!
   function handle_POST_users_invite(
     req: { p: { uid?: any; emails: any; zid: any; conversation_id: any } },
     res: {
-      status: (
-        arg0: number
-      ) => {
+      status: (arg0: number) => {
         (): any;
         new (): any;
         json: { (arg0: { status: string }): void; new (): any };
@@ -13094,9 +13147,11 @@ Thanks for using Polis!
   function handle_GET_conversationPreloadInfo(
     req: { p: { conversation_id: any } },
     res: {
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; json: { (arg0: any): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        json: { (arg0: any): void; new (): any };
+      };
     }
   ) {
     return doGetConversationPreloadInfo(req.p.conversation_id).then(
@@ -13107,218 +13162,6 @@ Thanks for using Polis!
         fail(res, 500, "polis_err_get_conversation_preload_info", err);
       }
     );
-  }
-
-  // NOTE: this isn't optimal
-  // rather than code for a new URL scheme for implicit conversations,
-  // the idea is to redirect implicitly created conversations
-  // to their zinvite based URL after creating the conversation.
-  // To improve conversation load time, this should be changed so that it
-  // does not redirect, and instead serves up the index.
-  // The routers on client and server will need to be updated for that
-  // as will checks like isParticipationView on the client.
-  function handle_GET_implicit_conversation_generation(
-    req: {
-      path: string;
-      p: {
-        demo: any;
-        ucv: any;
-        ucw: any;
-        ucsh: any;
-        ucst: any;
-        ucsd: any;
-        ucsv: any;
-        ucsf: any;
-        ui_lang: any;
-        subscribe_type: any;
-        xid: any;
-        x_name: any;
-        x_profile_image_url: any;
-        x_email: any;
-        parent_url: any;
-        dwok: any;
-        build: any;
-        show_vis: any;
-        bg_white: any;
-        show_share: any;
-        referrer: any;
-      };
-      headers?: { origin: string };
-    },
-    res: { redirect: (arg0: string) => void }
-  ) {
-    let site_id = /polis_site_id[^\/]*/.exec(req.path) || null;
-    let page_id = /\S\/([^\/]*)/.exec(req.path) || null;
-    if (!site_id?.length || (page_id && page_id?.length < 2)) {
-      fail(res, 404, "polis_err_parsing_site_id_or_page_id");
-    }
-    // TODO fix this after refactoring server.ts
-    // TODO into smaller files with one function per file
-    // TODO manually tracing scope is too difficult right now
-    //
-    // Type 'string | undefined' is not assignable to type 'RegExpExecArray | null'.
-    //   Type 'undefined' is not assignable to type 'RegExpExecArray | null'.ts(2322)
-    // @ts-ignore
-    site_id = site_id?.[0];
-    // Type 'string | undefined' is not assignable to type 'RegExpExecArray | null'.ts(2322)
-    // @ts-ignore
-    page_id = page_id?.[1];
-
-    let demo = req.p.demo;
-    let ucv = req.p.ucv;
-    let ucw = req.p.ucw;
-    let ucsh = req.p.ucsh;
-    let ucst = req.p.ucst;
-    let ucsd = req.p.ucsd;
-    let ucsv = req.p.ucsv;
-    let ucsf = req.p.ucsf;
-    let ui_lang = req.p.ui_lang;
-    let subscribe_type = req.p.subscribe_type;
-    let xid = req.p.xid;
-    let x_name = req.p.x_name;
-    let x_profile_image_url = req.p.x_profile_image_url;
-    let x_email = req.p.x_email;
-    let parent_url = req.p.parent_url;
-    let dwok = req.p.dwok;
-    let build = req.p.build;
-    let o: ConversationType = {};
-    ifDefinedSet("parent_url", req.p, o);
-    ifDefinedSet("auth_needed_to_vote", req.p, o);
-    ifDefinedSet("auth_needed_to_write", req.p, o);
-    ifDefinedSet("auth_opt_fb", req.p, o);
-    ifDefinedSet("auth_opt_tw", req.p, o);
-    ifDefinedSet("auth_opt_allow_3rdparty", req.p, o);
-    ifDefinedSet("topic", req.p, o);
-    if (!_.isUndefined(req.p.show_vis)) {
-      o.vis_type = req.p.show_vis ? 1 : 0;
-    }
-    if (!_.isUndefined(req.p.bg_white)) {
-      o.bgcolor = req.p.bg_white ? "#fff" : null;
-    }
-    o.socialbtn_type = req.p.show_share ? 1 : 0;
-    // Set stuff in cookies to be retrieved when POST participants is called.
-    if (req.p.referrer) {
-      setParentReferrerCookie(req, res, req.p.referrer);
-    }
-    if (req.p.parent_url) {
-      setParentUrlCookie(req, res, req.p.parent_url);
-    }
-
-    function appendParams(url: string) {
-      // These are needed to disambiguate postMessages from multiple polis conversations embedded on one page.
-      url += "?site_id=" + site_id + "&page_id=" + page_id;
-      if (!_.isUndefined(ucv)) {
-        url += "&ucv=" + ucv;
-      }
-      if (!_.isUndefined(ucw)) {
-        url += "&ucw=" + ucw;
-      }
-      if (!_.isUndefined(ucst)) {
-        url += "&ucst=" + ucst;
-      }
-      if (!_.isUndefined(ucsd)) {
-        url += "&ucsd=" + ucsd;
-      }
-      if (!_.isUndefined(ucsv)) {
-        url += "&ucsv=" + ucsv;
-      }
-      if (!_.isUndefined(ucsf)) {
-        url += "&ucsf=" + ucsf;
-      }
-      if (!_.isUndefined(ui_lang)) {
-        url += "&ui_lang=" + ui_lang;
-      }
-      if (!_.isUndefined(ucsh)) {
-        url += "&ucsh=" + ucsh;
-      }
-      if (!_.isUndefined(subscribe_type)) {
-        url += "&subscribe_type=" + subscribe_type;
-      }
-      if (!_.isUndefined(xid)) {
-        url += "&xid=" + xid;
-      }
-      if (!_.isUndefined(x_name)) {
-        url += "&x_name=" + encodeURIComponent(x_name);
-      }
-      if (!_.isUndefined(x_profile_image_url)) {
-        url +=
-          "&x_profile_image_url=" + encodeURIComponent(x_profile_image_url);
-      }
-      if (!_.isUndefined(x_email)) {
-        url += "&x_email=" + encodeURIComponent(x_email);
-      }
-      if (!_.isUndefined(parent_url)) {
-        url += "&parent_url=" + encodeURIComponent(parent_url);
-      }
-      if (!_.isUndefined(dwok)) {
-        url += "&dwok=" + dwok;
-      }
-      if (!_.isUndefined(build)) {
-        url += "&build=" + build;
-      }
-      return url;
-    }
-
-    // also parse out the page_id after the '/', and look that up, along with site_id in the page_ids table
-    pgQueryP_readOnly(
-      "select * from page_ids where site_id = ($1) and page_id = ($2);",
-      [site_id, page_id]
-    )
-      //     Argument of type '(rows: string | any[]) => void' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
-      // Types of parameters 'rows' and 'value' are incompatible.
-      //   Type 'unknown' is not assignable to type 'string | any[]'.
-      //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-      // @ts-ignore
-      .then(function (rows: string | any[]) {
-        if (!rows || !rows.length) {
-          // conv not initialized yet
-          initializeImplicitConversation(site_id, page_id, o)
-            //           Argument of type '(conv: { zinvite: any; }) => void' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
-            // Types of parameters 'conv' and 'value' are incompatible.
-            //           Type 'unknown' is not assignable to type '{ zinvite: any; }'.ts(2345)
-            // @ts-ignore
-            .then(function (conv: { zinvite: any }) {
-              let url = _.isUndefined(demo)
-                ? buildConversationUrl(req, conv.zinvite)
-                : buildConversationDemoUrl(req, conv.zinvite);
-              let modUrl = buildModerationUrl(req, conv.zinvite);
-              let seedUrl = buildSeedUrl(req, conv.zinvite);
-              sendImplicitConversationCreatedEmails(
-                site_id,
-                page_id,
-                url,
-                modUrl,
-                seedUrl
-              )
-                .then(function () {
-                  logger.info("email sent");
-                })
-                .catch(function (err: any) {
-                  logger.error("email fail", err);
-                });
-
-              url = appendParams(url);
-              res.redirect(url);
-            })
-            .catch(function (err: any) {
-              fail(res, 500, "polis_err_creating_conv", err);
-            });
-        } else {
-          // conv was initialized, nothing to set up
-          getZinvite(rows[0].zid)
-            .then(function (conversation_id: any) {
-              let url = buildConversationUrl(req, conversation_id);
-              url = appendParams(url);
-              res.redirect(url);
-            })
-            .catch(function (err: any) {
-              fail(res, 500, "polis_err_finding_conversation_id", err);
-            });
-        }
-      })
-      .catch(function (err: any) {
-        fail(res, 500, "polis_err_redirecting_to_conv", err);
-      });
   }
 
   // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
@@ -13382,9 +13225,7 @@ Thanks for using Polis!
       if (!whitelistedBuckets[origin || ""]) {
         if (hasWhitelistMatches(origin || "")) {
           // Use the prod bucket for non pol.is domains
-          return (
-            whitelistedBuckets["pol.is"] + "." + Config.staticFilesHost
-          );
+          return whitelistedBuckets["pol.is"] + "." + Config.staticFilesHost;
         } else {
           logger.error(
             "got request with host that's not whitelisted: (" +
@@ -13694,13 +13535,7 @@ Thanks for using Polis!
           conversation: x,
           // Nothing user-specific can go here, since we want to cache these per-conv index files on the CDN.
         };
-        fetchIndex(
-          req,
-          res,
-          preloadData,
-          staticFilesPort,
-          buildNumber
-        );
+        fetchIndex(req, res, preloadData, staticFilesPort, buildNumber);
       })
       .catch(function (err: any) {
         logger.error("polis_err_fetching_conversation_info", err);
@@ -13784,9 +13619,11 @@ Thanks for using Polis!
       setHeader: (arg0: string, arg1: string) => void;
       writeHead: (arg0: number) => void;
       end: (arg0: string) => void;
-      status: (
-        arg0: number
-      ) => { (): any; new (): any; end: { (): void; new (): any } };
+      status: (arg0: number) => {
+        (): any;
+        new (): any;
+        end: { (): void; new (): any };
+      };
     }
   ) {
     getTwitterUserInfo(
@@ -14026,7 +13863,6 @@ Thanks for using Polis!
     handle_GET_groupDemographics,
     handle_GET_iim_conversation,
     handle_GET_iip_conversation,
-    handle_GET_implicit_conversation_generation,
     handle_GET_launchPrep,
     handle_GET_localFile_dev_only,
     handle_GET_locations,

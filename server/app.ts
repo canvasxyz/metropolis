@@ -113,7 +113,6 @@ helpersInitialized.then(
       handle_GET_groupDemographics,
       handle_GET_iim_conversation,
       handle_GET_iip_conversation,
-      handle_GET_implicit_conversation_generation,
       handle_GET_launchPrep,
       handle_GET_localFile_dev_only,
       handle_GET_locations,
@@ -1394,38 +1393,6 @@ helpersInitialized.then(
       // need('single_use_tokens', getBool, assignToP),
       need("emails", getArrayOfStringNonEmpty, assignToP),
       handle_POST_users_invite
-    );
-
-    app.get(
-      /^\/polis_site_id.*/,
-      moveToBody,
-      need("parent_url", getStringLimitLength(1, 10000), assignToP),
-      want("referrer", getStringLimitLength(1, 10000), assignToP),
-      want("auth_needed_to_vote", getBool, assignToP),
-      want("auth_needed_to_write", getBool, assignToP),
-      want("auth_opt_fb", getBool, assignToP),
-      want("auth_opt_tw", getBool, assignToP),
-      want("auth_opt_allow_3rdparty", getBool, assignToP),
-      want("show_vis", getBool, assignToP),
-      want("show_share", getBool, assignToP),
-      want("bg_white", getBool, assignToP),
-      want("topic", getStringLimitLength(1, 1000), assignToP),
-      want("ucv", getBool, assignToP), // not persisted
-      want("ucw", getBool, assignToP), // not persisted
-      want("ucsh", getBool, assignToP), // not persisted
-      want("ucst", getBool, assignToP), // not persisted
-      want("ucsd", getBool, assignToP), // not persisted
-      want("ucsv", getBool, assignToP), // not persisted
-      want("ucsf", getBool, assignToP), // not persisted
-      want("ui_lang", getStringLimitLength(1, 10), assignToP), // not persisted
-      want("dwok", getStringLimitLength(1, 1000), assignToP), // not persisted
-      want("xid", getStringLimitLength(1, 999), assignToP), // not persisted
-      want("subscribe_type", getStringLimitLength(1, 9), assignToP), // not persisted
-      want("x_name", getStringLimitLength(1, 746), assignToP), // not persisted here, but later on POST vote/comment
-      want("x_profile_image_url", getStringLimitLength(1, 3000), assignToP), // not persisted here, but later on POST vote/comment
-      want("x_email", getStringLimitLength(256), assignToP), // not persisted here, but later on POST vote/comment
-      want("build", getStringLimitLength(300), assignToP),
-      handle_GET_implicit_conversation_generation
     );
 
     app.get(
