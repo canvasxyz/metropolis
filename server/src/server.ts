@@ -5230,10 +5230,6 @@ Email verified! You can close this tab or hit the back button.
     }
   }
 
-  function handle_GET_perfStats(req: any, res: { json: (arg0: any) => void }) {
-    res.json(METRICS_IN_RAM);
-  }
-
   function getFirstForPid(votes: string | any[]) {
     let seen = {};
     let len = votes.length;
@@ -13613,64 +13609,6 @@ Thanks for using Polis!
       });
   }
 
-  function handle_GET_twitter_image(
-    req: { p: { id: any } },
-    res: {
-      setHeader: (arg0: string, arg1: string) => void;
-      writeHead: (arg0: number) => void;
-      end: (arg0: string) => void;
-      status: (arg0: number) => {
-        (): any;
-        new (): any;
-        end: { (): void; new (): any };
-      };
-    }
-  ) {
-    getTwitterUserInfo(
-      {
-        twitter_user_id: req.p.id,
-      },
-      true
-    )
-      .then(function (data: string) {
-        let parsedData = JSON.parse(data);
-        if (!parsedData || !parsedData.length) {
-          fail(res, 500, "polis_err_finding_twitter_user_info");
-          return;
-        }
-        const url = parsedData[0].profile_image_url; // not https to save a round-trip
-        let finished = false;
-        http
-          .get(url, function (twitterResponse: { pipe: (arg0: any) => void }) {
-            if (!finished) {
-              clearTimeout(timeoutHandle);
-              finished = true;
-              res.setHeader(
-                "Cache-Control",
-                "no-transform,public,max-age=18000,s-maxage=18000"
-              );
-              twitterResponse.pipe(res);
-            }
-          })
-          .on("error", function (err: any) {
-            finished = true;
-            fail(res, 500, "polis_err_finding_file " + url, err);
-          });
-
-        let timeoutHandle = setTimeout(function () {
-          if (!finished) {
-            finished = true;
-            res.writeHead(504);
-            res.end("request timed out");
-            logger.debug("twitter_image timeout");
-          }
-        }, 9999);
-      })
-      .catch(function (err: any) {
-        logger.error("polis_err_missing_twitter_image", err);
-        res.status(500).end();
-      });
-  }
   let handle_GET_conditionalIndexFetcher = (function () {
     return function (req: any, res: { redirect: (arg0: string) => void }) {
       if (hasAuthToken(req)) {
@@ -13879,21 +13817,18 @@ Thanks for using Polis!
     handle_GET_participants,
     handle_GET_participation,
     handle_GET_participationInit,
-    handle_GET_perfStats,
     handle_GET_ptptois,
     handle_GET_reports,
     handle_GET_snapshot,
     handle_GET_testConnection,
     handle_GET_testDatabase,
     handle_GET_tryCookie,
-    handle_GET_twitter_image,
     handle_GET_twitter_oauth_callback,
     handle_GET_twitter_users,
     handle_GET_twitterBtn,
     handle_GET_users,
     handle_GET_verification,
     handle_GET_votes,
-    handle_GET_votes_famous,
     handle_GET_votes_me,
     handle_GET_xids,
     handle_GET_zinvites,

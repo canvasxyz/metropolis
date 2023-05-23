@@ -137,14 +137,12 @@ helpersInitialized.then(
       handle_GET_testConnection,
       handle_GET_testDatabase,
       handle_GET_tryCookie,
-      handle_GET_twitter_image,
       handle_GET_twitter_oauth_callback,
       handle_GET_twitter_users,
       handle_GET_twitterBtn,
       handle_GET_users,
       handle_GET_verification,
       handle_GET_votes,
-      handle_GET_votes_famous,
       handle_GET_votes_me,
       handle_GET_xids,
       handle_GET_zinvites,
@@ -518,8 +516,6 @@ helpersInitialized.then(
       handle_POST_joinWithInvite
     );
 
-    app.get("/perfStats_9182738127", moveToBody, handle_GET_perfStats);
-
     app.post(
       "/api/v3/sendEmailExportReady",
       need("webserver_username", getStringLimitLength(1, 999), assignToP),
@@ -787,10 +783,6 @@ helpersInitialized.then(
     app.get("/api/v3/testConnection", moveToBody, handle_GET_testConnection);
 
     app.get("/api/v3/testDatabase", moveToBody, handle_GET_testDatabase);
-
-    app.get("/robots.txt", function (req, res) {
-      res.send("User-agent: *\n" + "Disallow: /api/");
-    });
 
     app.get(
       "/api/v3/participationInit",
@@ -1346,20 +1338,6 @@ helpersInitialized.then(
     );
 
     app.get(
-      "/api/v3/votes/famous",
-      moveToBody,
-      authOptional(assignToP),
-      need(
-        "conversation_id",
-        getConversationIdFetchZid,
-        assignToPCustom("zid")
-      ),
-      want("math_tick", getInt, assignToP, -1),
-      want("ptptoiLimit", getIntInRange(0, 99), assignToP),
-      handle_GET_votes_famous
-    );
-
-    app.get(
       "/api/v3/twitter_users",
       moveToBody,
       authOptional(assignToP),
@@ -1393,39 +1371,6 @@ helpersInitialized.then(
       // need('single_use_tokens', getBool, assignToP),
       need("emails", getArrayOfStringNonEmpty, assignToP),
       handle_POST_users_invite
-    );
-
-    app.get(
-      "/iip/:conversation_id",
-      moveToBody,
-      need(
-        "conversation_id",
-        getConversationIdFetchZid,
-        assignToPCustom("zid")
-      ),
-      handle_GET_iip_conversation
-    );
-
-    app.get(
-      "/iim/:conversation_id",
-      moveToBody,
-      need(
-        "conversation_id",
-        getConversationIdFetchZid,
-        assignToPCustom("zid")
-      ),
-      handle_GET_iim_conversation
-    );
-
-    // proxy for fetching twitter profile images
-    // Needed because Twitter doesn't provide profile pics in response to a request - you have to fetch the user info, then parse that to get the URL, requiring two round trips.
-    // There is a bulk user data API, but it's too slow to block on in our /famous route.
-    // So references to this route are injected into the twitter part of the /famous response.
-    app.get(
-      "/twitter_image",
-      moveToBody,
-      need("id", getStringLimitLength(999), assignToP),
-      handle_GET_twitter_image
     );
 
     // TODO this should probably be exempt from the CORS restrictions
@@ -1466,6 +1411,42 @@ helpersInitialized.then(
       handle_POST_metrics
     );
 
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    //
+    // BEGIN USER ROUTES
+    //
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+    ////////////////////////////////////////////
+
+    // inbox item participant
+    app.get(
+      "/iip/:conversation_id",
+      moveToBody,
+      need(
+        "conversation_id",
+        getConversationIdFetchZid,
+        assignToPCustom("zid")
+      ),
+      handle_GET_iip_conversation
+    );
+
+    // inbox item admin
+    app.get(
+      "/iim/:conversation_id",
+      moveToBody,
+      need(
+        "conversation_id",
+        getConversationIdFetchZid,
+        assignToPCustom("zid")
+      ),
+      handle_GET_iim_conversation
+    );
+
     function makeFetchIndexWithoutPreloadData() {
       let port = staticFilesPort;
       return function (req, res) {
@@ -1473,11 +1454,11 @@ helpersInitialized.then(
       };
     }
 
-    // Conversation aliases
-    app.get(/^\/football$/, makeRedirectorTo("/2arcefpshi"));
-    app.get(/^\/pdf$/, makeRedirectorTo("/23mymwyhkn")); // pdf 2017
-    app.get(/^\/nabi$/, makeRedirectorTo("/8ufpzc6fkm")); //
+    app.get("/robots.txt", function (req, res) {
+      res.send("User-agent: *\n" + "Disallow: /api/");
+    });
 
+    // Conversation aliases
     app.get(/^\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // conversation view
     app.get(/^\/explore\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // power view
     app.get(/^\/share\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // share view
