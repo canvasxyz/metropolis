@@ -1,11 +1,7 @@
 // @ts-nocheck
-// TODO ^^ enable typechecking after refactoring to use
-// TODO modern import syntax for helpers
-
-// Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 "use strict";
 
-import * as dotenv from 'dotenv';
+import * as dotenv from "dotenv";
 dotenv.config();
 
 import Promise from "bluebird";
@@ -16,17 +12,44 @@ import Config from "./src/config";
 import server from "./src/server";
 import logger from "./src/utils/logger";
 
+import {
+  assignToP,
+  assignToPCustom,
+  getArrayOfInt,
+  getArrayOfStringNonEmpty,
+  getArrayOfStringNonEmptyLimitLength,
+  getBool,
+  getConversationIdFetchZid,
+  getEmail,
+  getInt,
+  getIntInRange,
+  getNumberInRange,
+  getOptionalStringLimitLength,
+  getPassword,
+  getPasswordWithCreatePasswordRules,
+  getReportIdFetchRid,
+  getStringLimitLength,
+  getUrlLimitLength,
+  moveToBody,
+  need,
+  needCookie,
+  needHeader,
+  resolve_pidThing,
+  want,
+  wantCookie,
+  wantHeader,
+} from "./src/utils/parameter";
+
 const app = express();
 
 // 'dev' format is
 // :method :url :status :response-time ms - :res[content-length]
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 
 // Trust the X-Forwarded-Proto and X-Forwarded-Host, but only on private subnets.
 // See: https://github.com/pol-is/polis/issues/546
 // See: https://expressjs.com/en/guide/behind-proxies.html
 app.set("trust proxy", "uniquelocal");
-
 
 var helpersInitialized = new Promise(function (resolve, reject) {
   resolve(server.initializePolisHelpers());
@@ -171,34 +194,6 @@ helpersInitialized.then(
       handle_PUT_reports,
       handle_PUT_users,
     } = o;
-
-    const {
-      assignToP,
-      assignToPCustom,
-      getArrayOfInt,
-      getArrayOfStringNonEmpty,
-      getArrayOfStringNonEmptyLimitLength,
-      getBool,
-      getConversationIdFetchZid,
-      getEmail,
-      getInt,
-      getIntInRange,
-      getNumberInRange,
-      getOptionalStringLimitLength,
-      getPassword,
-      getPasswordWithCreatePasswordRules,
-      getReportIdFetchRid,
-      getStringLimitLength,
-      getUrlLimitLength,
-      moveToBody,
-      need,
-      needCookie,
-      needHeader,
-      resolve_pidThing,
-      want,
-      wantCookie,
-      wantHeader,
-    } = require("./src/utils/parameter");
 
     app.disable("x-powered-by");
     // app.disable('etag'); // seems to be eating CPU, and we're not using etags yet. https://www.dropbox.com/s/hgfd5dm0e29728w/Screenshot%202015-06-01%2023.42.47.png?dl=0
@@ -1621,14 +1616,9 @@ helpersInitialized.then(
     );
     app.get(
       /^\/twitterAuthReturn(\/.*)?$/,
-      makeFileFetcher(
-        hostname,
-        staticFilesPort,
-        "/twitterAuthReturn.html",
-        {
-          "Content-Type": "text/html",
-        }
-      )
+      makeFileFetcher(hostname, staticFilesPort, "/twitterAuthReturn.html", {
+        "Content-Type": "text/html",
+      })
     );
 
     app.get(/^\/localFile\/.*/, handle_GET_localFile_dev_only);
@@ -1679,7 +1669,6 @@ helpersInitialized.then(
 
     app.listen(Config.serverPort);
     logger.info("started on port " + Config.serverPort);
-
   },
 
   function (err) {
