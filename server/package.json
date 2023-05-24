@@ -7,6 +7,7 @@
     "build:dev": "tsc --watch --preserveWatchOutput",
     "start": "tsc && node --gc_interval=100 dist/app.js",
     "start:dev": "nodemon --inspect=0.0.0.0:9229 dist/app.js",
+    "serve:prod": "node --gc_interval=100 dist/app.js",
     "format": "prettier --config ./prettier.config.js --no-editorconfig 'src/**/*.{js,ts}' --write",
     "format:check": "prettier --config ./prettier.config.js --no-editorconfig 'src/**/*.{js,ts}' --check",
     "lint": "eslint .",

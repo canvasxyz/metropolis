@@ -4,7 +4,7 @@
     "dev": "concurrently -n cli,srv,tsc -c cyan,red,red 'npm run dev --workspace=polis-client' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server'",
     "start": "npm run build && npm run serve:prod",
     "build": "rimraf server/build && npm run build:prod --workspace=polis-client && copyfiles -E -u 2 \"client/build/**/*\" server/build && npm run build --workspace=polis-server",
-    "serve:prod": "npm run start --workspace=polis-server"
+    "serve:prod": "npm run serve:prod --workspace=polis-server"
   },
   "workspaces": [
     "client",
@@ -13,6 +13,7 @@
   ],
   "devDependencies": {
     "concurrently": "^8.0.1",
-    "copyfiles": "^2.4.1"
+    "copyfiles": "^2.4.1",
+    "rimraf": "^5.0.1"
   }
 }
