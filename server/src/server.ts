@@ -1112,6 +1112,7 @@ function initializePolisHelpers() {
     "localhost:8040",
     "localhost:5000",
     "localhost:5001",
+    "plusplus.herokuapp.com",
     "facebook.com",
     "api.twitter.com",
     "", // for API
