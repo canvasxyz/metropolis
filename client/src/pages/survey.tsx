@@ -260,7 +260,10 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   }, [])
 
   const onVoted = (commentId: string) => {
+    const comment = unvotedComments.find((c) => c.tid === commentId)
     setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
+    if (!comment) return
+    setVotedComments([...votedComments, comment])
   }
 
   return (
