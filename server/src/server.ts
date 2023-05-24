@@ -13161,10 +13161,6 @@ Thanks for using Polis!
     );
   }
 
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  let routingProxy = new httpProxy.createProxyServer();
-
   function addStaticFileHeaders(res: {
     setHeader: (arg0: string, arg1: string | number) => void;
   }) {
@@ -13202,13 +13198,6 @@ Thanks for using Polis!
     let port = Config.staticFilesPort;
     // set the host header too, since S3 will look at that (or the routing proxy will patch up the request.. not sure which)
     if (req && req.headers && req.headers.host) req.headers.host = hostname;
-    routingProxy.web(req, res, {
-      target: {
-        host: hostname,
-        port: port,
-      },
-    });
-    // }
   }
 
   function buildStaticHostname(req: { headers?: { host: string } }, res: any) {
