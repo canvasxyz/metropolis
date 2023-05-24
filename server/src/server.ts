@@ -107,7 +107,6 @@ import logger from "./utils/logger";
 // # notifications
 import emailSenders from "./email/senders";
 const sendTextEmail = emailSenders.sendTextEmail;
-const sendTextEmailWithBackupOnly = emailSenders.sendTextEmailWithBackupOnly;
 
 const resolveWith = (x: { body?: { user_id: string } }) => {
   return Promise.resolve(x);
@@ -3759,24 +3758,6 @@ ${serverName}/pwreset/${pwresettoken}
     );
   }
 
-  function trySendingBackupEmailTest() {
-    if (devMode) {
-      return;
-    }
-    let d = new Date();
-    if (d.getDay() === 1) {
-      // send the monday backup email system test
-      // If the sending fails, we should get an error ping.
-      sendTextEmailWithBackupOnly(
-        polisFromAddress,
-        Config.adminEmailEmailTest,
-        "monday backup email system test",
-        "seems to be working"
-      );
-    }
-  }
-  setInterval(trySendingBackupEmailTest, 1000 * 60 * 60 * 23); // try every 23 hours (so it should only try roughly once a day)
-  trySendingBackupEmailTest();
   function sendEinviteEmail(req: any, email: any, einvite: any) {
     let serverName = getServerNameWithProtocol(req);
     const body = `Welcome to pol.is!

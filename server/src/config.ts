@@ -62,13 +62,13 @@ export default {
   backfillCommentLangDetection: isTrue(process.env.BACKFILL_COMMENT_LANG_DETECTION) as boolean,
   cacheMathResults: isTrueOrBlank(process.env.CACHE_MATH_RESULTS) as boolean,
   databaseURL: process.env.DATABASE_URL as string,
-  emailTransportTypes: process.env.EMAIL_TRANSPORT_TYPES || null as string | null,
   encryptionPassword: process.env.ENCRYPTION_PASSWORD_00001 as string,
   fbAppId: process.env.FB_APP_ID || null as string | null,
   logLevel: process.env.SERVER_LOG_LEVEL as string,
   logToFile: isTrue(process.env.SERVER_LOG_TO_FILE) as boolean,
-  mailgunApiKey: process.env.MAILGUN_API_KEY || (null as string | null),
-  mailgunDomain: process.env.MAILGUN_DOMAIN || (null as string | null),
+
+  sendgridApiKey: process.env.SENDGRID_API_KEY || (null as string | null),
+
   mathEnv: process.env.MATH_ENV as string,
   maxmindLicenseKey: process.env.MAXMIND_LICENSE_KEY as string,
   maxmindUserID: process.env.MAXMIND_USER_ID as string,
