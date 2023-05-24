@@ -62,12 +62,17 @@ $ docker pull maildev/maildev:1.1.1
 $ docker run -p 1080:1080 -p 1025:1025 maildev/maildev
 ```
 
+Setting up for production:
+
+```
+heroku addons:create heroku-postgresql:mini
+```
+
 [️Production configuration](docs/configuration.md):
 - Set up the domain name you'll be serving from
 - Enable and add API keys for 3rd party services (e.g. automatic comment translation, spam filtering, etc)
 - [🔏 Set up SSL/HTTPS](docs/ssl.md), to keep the site secure
 - [📈 Scale](docs/scaling.md) for large or many concurrent conversations
-
 
 Analyzing bundle size:
 - `cd client`
