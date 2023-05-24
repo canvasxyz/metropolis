@@ -67,6 +67,19 @@ Setting up for production:
 ```
 heroku addons:create heroku-postgresql:mini
 heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
+git push heroku main
+```
+
+To run all migrations:
+
+```
+cat server/postgres/migrations/* | heroku run "psql \$DATABASE_URL"
+```
+
+To run one migration:
+
+```
+cat server/postgres/migrations/000000_initial.sql | heroku run "psql \$DATABASE_URL"
 ```
 
 [️Production configuration](docs/configuration.md):
