@@ -61,6 +61,10 @@ Setting up for production:
 heroku addons:create heroku-postgresql:mini
 heroku addons:create sendgrid:starter
 heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
+heroku config:set SENDGRID_API_KEY=[your sendgrid api key]
+heroku config:set POLIS_FROM_ADDRESS="Admin <name@email.com>"
+heroku config:set DOMAIN_OVERRIDE=[your domain]
+heroku config:set ENCRYPTION_PASSWORD_00001=[a new password]
 git push heroku main
 ```
 
