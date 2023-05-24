@@ -66,7 +66,8 @@ class ModerateCommentsSeed extends React.Component<{
             sx={{
               fontFamily: "body",
               fontSize: [2],
-              width: "35em",
+              width: "100%",
+              maxWidth: "35em",
               height: "7em",
               resize: "none",
               padding: [2],

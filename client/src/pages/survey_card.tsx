@@ -91,9 +91,10 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         py: "36px",
         // mb: [3, null, 4],
         mb: stacked ? "-177px" : undefined,
+        overflow: "scroll",
       }}
     >
-      <Text sx={{ mb: 4 }}>{txt}</Text>
+      <Text sx={{ mb: 4, wordBreak: "break-word" }}>{txt}</Text>
       <Box sx={{ position: "absolute", bottom: "36px" }}>
         {hasVoted && !editingVote ? (
           <React.Fragment>

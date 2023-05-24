@@ -24,7 +24,7 @@ const Header: React.FC<{ user? }> = ({ user }) => {
             Polis
           </Link>
         </Box>
-        <Box sx={{ mt: [1], mr: [-4] }}>
+        <Box sx={{ mt: [1] }}>
           {user ? (
             <React.Fragment>
               <Link sx={{ variant: "links.nav" }} to={`/account`}>

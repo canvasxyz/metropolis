@@ -32,7 +32,8 @@ class PasswordResetInit extends React.Component<{ dispatch: Function }, {}> {
             sx={{
               fontFamily: "body",
               fontSize: [2],
-              width: "35em",
+              width: "100%",
+              maxWidth: "35em",
               borderRadius: 2,
               padding: [2],
               border: "1px solid",

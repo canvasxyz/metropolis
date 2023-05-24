@@ -79,7 +79,8 @@ class CreateUser extends React.Component<{
               sx={{
                 fontFamily: "body",
                 fontSize: [2],
-                width: "35em",
+                width: "100%",
+                maxWidth: "35em",
                 borderRadius: 2,
                 padding: [2],
                 border: "1px solid",
@@ -97,7 +98,8 @@ class CreateUser extends React.Component<{
               sx={{
                 fontFamily: "body",
                 fontSize: [2],
-                width: "35em",
+                width: "100%",
+                maxWidth: "35em",
                 borderRadius: 2,
                 padding: [2],
                 border: "1px solid",
@@ -115,7 +117,8 @@ class CreateUser extends React.Component<{
               sx={{
                 fontFamily: "body",
                 fontSize: [2],
-                width: "35em",
+                width: "100%",
+                maxWidth: "35em",
                 borderRadius: 2,
                 padding: [2],
                 border: "1px solid",
@@ -133,7 +136,8 @@ class CreateUser extends React.Component<{
               sx={{
                 fontFamily: "body",
                 fontSize: [2],
-                width: "35em",
+                width: "100%",
+                maxWidth: "35em",
                 borderRadius: 2,
                 padding: [2],
                 border: "1px solid",
