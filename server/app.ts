@@ -5,14 +5,12 @@ import path from "path";
 dotenv.config();
 
 import Promise from "bluebird";
-import * as expressUntyped from "express";
+import express from "express";
 import morgan from "morgan";
 
 import Config from "./src/config";
 import server from "./src/server";
 import logger from "./src/utils/logger";
-
-const express = expressUntyped as any;
 
 import {
   assignToP,
@@ -204,19 +202,21 @@ helpersInitialized.then(
     ////////////////////////////////////////////
     ////////////////////////////////////////////
 
+    const expressUntyped = express as any;
+
     app.use(middleware_responseTime_start);
 
     app.use(redirectIfNotHttps);
-    app.use(express.cookieParser());
-    app.use(express.bodyParser());
+    app.use(expressUntyped.cookieParser());
+    app.use(expressUntyped.bodyParser());
     app.use(writeDefaultHead);
 
     if (devMode) {
-      app.use(express.compress());
+      app.use(expressUntyped.compress());
     } else {
       // Cloudflare would apply gzip if we didn't
       // but it's about 2x faster if we do the gzip (for the inbox query on mike's account)
-      app.use(express.compress());
+      app.use(expressUntyped.compress());
     }
     app.use(middleware_log_request_body);
     app.use(middleware_log_middleware_errors);
@@ -1439,7 +1439,7 @@ helpersInitialized.then(
       handle_GET_iim_conversation
     );
 
-    app.get("/robots.txt", function (req: expressUntyped.Request, res: expressUntyped.Response) {
+    app.get("/robots.txt", function (req: express.Request, res: express.Response) {
       res.send("User-agent: *\n" + "Disallow: /api/");
     });
 
