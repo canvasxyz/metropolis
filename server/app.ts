@@ -1447,91 +1447,40 @@ helpersInitialized.then(
       handle_GET_iim_conversation
     );
 
-    function makeFetchIndexWithoutPreloadData() {
-      let port = staticFilesPort;
-      return function (req, res) {
-        return fetchIndexWithoutPreloadData(req, res, port);
-      };
-    }
+    app.get(/^\/[^(api\/)]?.*/, proxy);
 
     app.get("/robots.txt", function (req, res) {
       res.send("User-agent: *\n" + "Disallow: /api/");
     });
 
-    // Conversation aliases
-    app.get(/^\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // conversation view
-    app.get(/^\/explore\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // power view
-    app.get(/^\/share\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // share view
-    app.get(/^\/summary\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // summary view
-    app.get(/^\/ot\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // conversation view, one-time url
-    // TODO consider putting static files on /static, and then using a catch-all to serve the index.
-    app.get(/^\/conversation\/create(\/.*)?/, fetchIndexWithoutPreloadData);
-    app.get(/^\/user\/create(\/.*)?$/, fetchIndexWithoutPreloadData);
-    app.get(/^\/user\/login(\/.*)?$/, fetchIndexWithoutPreloadData);
+    // Client routes
+    // These should be maintained to match the client router, for now.
 
-    app.get(/^\/settings(\/.*)?$/, makeFetchIndexWithoutPreloadData());
-
-    app.get(/^\/user\/logout(\/.*)?$/, fetchIndexWithoutPreloadData);
-
-    // admin dash routes
-    app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/integrate(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/other-conversations(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/bot(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/conversations(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
+    // app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/pwreset.*/, fetchIndexForAdminPage);
+    app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage);
+    app.get(/^\/tos$/, fetchIndexForAdminPage);
+    app.get(/^\/privacy$/, fetchIndexForAdminPage);
+
+    app.get(/^\/conversations(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
+
     app.get(
       /^\/dist\/client_bundle.js$/,
       makeFileFetcher(hostname, staticFilesPort, "/dist/client_bundle.js", {
         "Content-Type": "application/javascript",
       })
     );
-    app.get(
-      /^\/__webpack_hmr$/,
-      makeFileFetcher(hostname, staticFilesPort, "/__webpack_hmr", {
-        "Content-Type": "eventsource",
-      })
-    );
-    app.get(/^\/privacy$/, fetchIndexForAdminPage);
-    app.get(/^\/tos$/, fetchIndexForAdminPage);
-
-    // admin dash-based landers
-    app.get(/^\/gov(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/contrib(\/.*)?/, fetchIndexForAdminPage);
-
-    app.get(/^\/bot\/install(\/.*)?/, fetchIndexForAdminPage);
-    app.get(/^\/bot\/support(\/.*)?/, fetchIndexForAdminPage);
-
-    app.get(/^\/inbox(\/.*)?$/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/r/, fetchIndexWithoutPreloadData);
-    app.get(/^\/hk/, fetchIndexWithoutPreloadData);
-    app.get(/^\/s\//, fetchIndexWithoutPreloadData);
-    app.get(/^\/s$/, fetchIndexWithoutPreloadData);
-    app.get(/^\/hk\/new/, fetchIndexWithoutPreloadData);
-    app.get(/^\/inboxApiTest/, fetchIndexWithoutPreloadData);
-    app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage);
-    app.get(/^\/demo\/[0-9][0-9A-Za-z]+/, fetchIndexForConversation);
-    app.get(/^\/demo$/, fetchIndexForAdminPage);
-    app.get(/^\/pwreset.*/, fetchIndexForAdminPage);
-    app.get(/^\/company$/, fetchIndexForAdminPage);
-
-    app.get(/^\/report\/r?[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForReportPage);
-
-    app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
-    app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);
+    app.get("/", handle_GET_conditionalIndexFetcher);
 
     app.get(
       /^\/embed$/,
       makeFileFetcher(hostname, staticFilesPort, "/embed.html", {
-        "Content-Type": "text/html",
-      })
-    );
-    app.get(
-      /^\/embedPreprod$/,
-      makeFileFetcher(hostname, staticFilesPort, "/embedPreprod.html", {
         "Content-Type": "text/html",
       })
     );
@@ -1541,42 +1490,6 @@ helpersInitialized.then(
         "Content-Type": "text/html",
       })
     );
-    app.get(
-      /^\/embedReportPreprod$/,
-      makeFileFetcher(hostname, staticFilesPort, "/embedReportPreprod.html", {
-        "Content-Type": "text/html",
-      })
-    );
-    app.get(
-      /^\/styleguide$/,
-      makeFileFetcher(hostname, staticFilesPort, "/styleguide.html", {
-        "Content-Type": "text/html",
-      })
-    );
-    // Duplicate url for content at root. Needed so we have something for "About" to link to.
-    app.get(/^\/about$/, makeRedirectorTo("/"));
-    app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
-    app.get(
-      /^\/s\/CTE\/?$/,
-      makeFileFetcher(hostname, staticFilesPort, "/football.html", {
-        "Content-Type": "text/html",
-      })
-    );
-    app.get(
-      /^\/twitterAuthReturn(\/.*)?$/,
-      makeFileFetcher(hostname, staticFilesPort, "/twitterAuthReturn.html", {
-        "Content-Type": "text/html",
-      })
-    );
-
-    app.get(/^\/localFile\/.*/, handle_GET_localFile_dev_only);
-
-    app.get("/", handle_GET_conditionalIndexFetcher);
-
-    // proxy static files
-    app.get(/^\/cached\/.*/, proxy);
-    app.get(/^\/font\/.*/, proxy);
-    app.get(/^\/.*embed.*js\/.*/, proxy);
 
     // ends in slash? redirect to non-slash version
     app.get(/.*\//, function (req, res) {
@@ -1601,19 +1514,39 @@ helpersInitialized.then(
       }
     });
 
-    var missingFilesGet404 = false;
-    if (missingFilesGet404) {
-      // 404 everything else
-      app.get(
-        /^\/[^(api\/)]?.*/,
-        makeFileFetcher(hostname, staticFilesPort, "/404.html", {
-          "Content-Type": "text/html",
-        })
-      );
-    } else {
-      // proxy everything else
-      app.get(/^\/[^(api\/)]?.*/, proxy);
-    }
+    // app.get(/^\/integrate(\/.*)?/, fetchIndexForAdminPage);
+    // app.get(/^\/other-conversations(\/.*)?/, fetchIndexForAdminPage);
+    // app.get(/^\/bot(\/.*)?/, fetchIndexForAdminPage);
+    // app.get(/^\/bot\/install(\/.*)?/, fetchIndexForAdminPage);
+    // app.get(/^\/bot\/support(\/.*)?/, fetchIndexForAdminPage);
+
+    // app.get(/^\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // conversation view
+    // app.get(/^\/explore\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // power view
+    // app.get(/^\/share\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // share view
+    // app.get(/^\/summary\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // summary view
+
+    // app.get(/^\/inbox(\/.*)?$/, fetchIndexWithoutPreloadData);
+    // app.get(/^\/r/, fetchIndexWithoutPreloadData);
+    // app.get(/^\/hk/, fetchIndexWithoutPreloadData);
+    // app.get(/^\/s\//, fetchIndexWithoutPreloadData);
+    // app.get(/^\/s$/, fetchIndexWithoutPreloadData);
+    // app.get(/^\/hk\/new/, fetchIndexWithoutPreloadData);
+    // app.get(/^\/inboxApiTest/, fetchIndexWithoutPreloadData);
+
+    // app.get(/^\/demo\/[0-9][0-9A-Za-z]+/, fetchIndexForConversation);
+    // app.get(/^\/demo$/, fetchIndexForAdminPage);
+    // app.get(/^\/company$/, fetchIndexForAdminPage);
+    // app.get(/^\/report\/r?[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForReportPage);
+
+    // app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
+    // app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);
+
+    // app.get(
+    //   /^\/twitterAuthReturn(\/.*)?$/,
+    //   makeFileFetcher(hostname, staticFilesPort, "/twitterAuthReturn.html", {
+    //     "Content-Type": "text/html",
+    //   })
+    // );
 
     app.listen(Config.serverPort);
     logger.info("started on port " + Config.serverPort);
