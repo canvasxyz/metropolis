@@ -89,6 +89,7 @@ class CreateUser extends React.Component<{
               ref={(c) => (this.hname = c)}
               placeholder="name"
               type="text"
+              autoComplete="name"
             />
           </Box>
           <Box sx={{ my: [2] }}>
@@ -106,6 +107,7 @@ class CreateUser extends React.Component<{
               ref={(c) => (this.email = c)}
               placeholder="email"
               type="email"
+              autoComplete="username"
             />
           </Box>
           <Box sx={{ my: [2] }}>
@@ -141,6 +143,7 @@ class CreateUser extends React.Component<{
               ref={(c) => (this.password2 = c)}
               placeholder="repeat password"
               type="password"
+              autoComplete="new-password"
             />
           </Box>
           {this.maybeErrorMessage()}
@@ -161,7 +164,7 @@ class CreateUser extends React.Component<{
             id="createUserButton"
             onClick={this.handleLoginClicked.bind(this)}
           >
-            {this.props.pending ? "Creating Account..." : "Create Account"}
+            {this.props.pending ? "Creating account..." : "Create account"}
           </Button>
         </form>
         <Box sx={{ mb: [4] }}>

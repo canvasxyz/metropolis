@@ -120,6 +120,7 @@ class SignIn extends React.Component<{
               ref={(c) => (this.password = c)}
               placeholder="password"
               type="password"
+              autoComplete="password"
             />
           </Box>
           {this.maybeErrorMessage()}
@@ -128,7 +129,7 @@ class SignIn extends React.Component<{
             id="signinButton"
             onClick={this.handleLoginClicked.bind(this)}
           >
-            {this.props.pending ? "Signing in..." : "Sign In"}
+            {this.props.pending ? "Signing in..." : "Sign in"}
           </Button>
           <Text sx={{ mt: 4 }}>
             {"Forgot your password? "}

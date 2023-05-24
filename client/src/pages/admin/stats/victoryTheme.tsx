@@ -12,7 +12,7 @@ const blueGrey700 = "#455A64"
 const grey900 = "#212121"
 
 // Typography
-const sansSerif = "'Space Mono', monospace"
+const sansSerif = "'Space Grotesk', monospace"
 const letterSpacing = "normal"
 const fontSize = 12
 

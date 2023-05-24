@@ -3,7 +3,7 @@ export default {
   fonts: {
     heading: "Space Grotesk, monospace",
     body: "Inter, sans-serif",
-    monospace: "Space Mono, monospace",
+    monospace: "Space Grotesk, monospace",
   },
   fontSizes: [12, 14, 16, 20, 24, 36, 48, 64, 96],
   fontWeights: {
@@ -66,7 +66,7 @@ export default {
       },
       "&:hover": {
         color: "primary",
-        borderBottom: "2px solid",
+        borderBottom: "1.5px solid",
         borderBottomColor: "primary",
       },
       textDecoration: "none",

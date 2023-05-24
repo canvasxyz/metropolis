@@ -1107,6 +1107,7 @@ function initializePolisHelpers() {
   let whitelistedDomains = [
     Config.getServerHostname(),
     ...Config.whitelistItems,
+    "localhost:8080",
     "localhost:8040",
     "localhost:5000",
     "plusplus.herokuapp.com",
