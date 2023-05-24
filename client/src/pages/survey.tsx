@@ -85,7 +85,7 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
           lang: null,
           pid: currentPid,
         }
-        setVotedComments([comment, ...votedComments])
+        setVotedComments([...votedComments, comment])
       })
   }
 
