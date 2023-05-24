@@ -47,7 +47,7 @@ function want(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal: any
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -73,7 +73,7 @@ function wantCookie(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal: any
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -105,7 +105,7 @@ function wantHeader(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal: any
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -490,7 +490,7 @@ function assignToPCustom(name: any) {
 function resolve_pidThing(
   pidThingStringName: any,
   assigner: (arg0: any, arg1: any, arg2: number) => void,
-  loggingString: string
+  loggingString?: string
 ) {
   if (_.isUndefined(loggingString)) {
     loggingString = "";

@@ -1,16 +1,18 @@
-// @ts-nocheck
 "use strict";
 
 import * as dotenv from "dotenv";
+import path from "path";
 dotenv.config();
 
 import Promise from "bluebird";
-import express from "express";
+import * as expressUntyped from "express";
 import morgan from "morgan";
 
 import Config from "./src/config";
 import server from "./src/server";
 import logger from "./src/utils/logger";
+
+const express = expressUntyped as any;
 
 import {
   assignToP,
@@ -40,6 +42,7 @@ import {
   wantHeader,
 } from "./src/utils/parameter";
 
+// no typedefs for express 3
 const app = express();
 
 // 'dev' format is
@@ -67,19 +70,11 @@ helpersInitialized.then(
       enableAgid,
       fetchThirdPartyCookieTestPt1,
       fetchThirdPartyCookieTestPt2,
-      fetchIndexForAdminPage,
-      fetchIndexForConversation,
-      fetchIndexForReportPage,
-      fetchIndexWithoutPreloadData,
       getPidForParticipant,
       haltOnTimeout,
       HMAC_SIGNATURE_PARAM_NAME,
-      hostname,
-      makeFileFetcher,
       makeRedirectorTo,
       pidCache,
-      staticFilesPort,
-      proxy,
       redirectIfHasZidButNoConversationId,
       redirectIfNotHttps,
       timeout,
@@ -96,7 +91,6 @@ helpersInitialized.then(
       handle_GET_bidToPid,
       handle_GET_comments,
       handle_GET_comments_translations,
-      handle_GET_conditionalIndexFetcher,
       handle_GET_contexts,
       handle_GET_conversationPreloadInfo,
       handle_GET_conversations,
@@ -114,7 +108,6 @@ helpersInitialized.then(
       handle_GET_iim_conversation,
       handle_GET_iip_conversation,
       handle_GET_launchPrep,
-      handle_GET_localFile_dev_only,
       handle_GET_locations,
       handle_GET_logMaxmindResponse,
       handle_GET_math_pca,
@@ -190,7 +183,7 @@ helpersInitialized.then(
       handle_PUT_ptptois,
       handle_PUT_reports,
       handle_PUT_users,
-    } = o;
+    } = o as any;
 
     app.disable("x-powered-by");
     // app.disable('etag'); // seems to be eating CPU, and we're not using etags yet. https://www.dropbox.com/s/hgfd5dm0e29728w/Screenshot%202015-06-01%2023.42.47.png?dl=0
@@ -549,7 +542,6 @@ helpersInitialized.then(
         "domain_whitelist",
         getOptionalStringLimitLength(999),
         assignToP,
-        ""
       ),
       handle_POST_domainWhitelist
     );
@@ -1260,7 +1252,7 @@ helpersInitialized.then(
         getConversationIdFetchZid,
         assignToPCustom("zid")
       ),
-      need("pmaids", getArrayOfInt, assignToP, []),
+      need("pmaids", getArrayOfInt, assignToP),
       handle_POST_query_participants_by_metadata
     );
 
@@ -1447,16 +1439,17 @@ helpersInitialized.then(
       handle_GET_iim_conversation
     );
 
-    app.get(/^\/[^(api\/)]?.*/, proxy);
-
-    app.get("/robots.txt", function (req, res) {
+    app.get("/robots.txt", function (req: expressUntyped.Request, res: expressUntyped.Response) {
       res.send("User-agent: *\n" + "Disallow: /api/");
     });
+
+    const fetchIndexForAdminPage = express.static(path.join(__dirname, "build", "index.html"))
 
     // Client routes
     // These should be maintained to match the client router, for now.
 
     // app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
+    app.get("/", fetchIndexForAdminPage);
     app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage);
@@ -1470,49 +1463,49 @@ helpersInitialized.then(
     app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
 
-    app.get(
-      /^\/dist\/client_bundle.js$/,
-      makeFileFetcher(hostname, staticFilesPort, "/dist/client_bundle.js", {
-        "Content-Type": "application/javascript",
-      })
-    );
-    app.get("/", handle_GET_conditionalIndexFetcher);
+    // app.get(
+    //   /^\/dist\/client_bundle.js$/, express.static(path.join(__dirname, "build", "index.html"))
+    //   makeFileFetcher(hostname, staticFilesPort, "/dist/client_bundle.js", {
+    //     "Content-Type": "application/javascript",
+    //   })
+    // );
+    // app.get("/", handle_GET_conditionalIndexFetcher);
 
-    app.get(
-      /^\/embed$/,
-      makeFileFetcher(hostname, staticFilesPort, "/embed.html", {
-        "Content-Type": "text/html",
-      })
-    );
-    app.get(
-      /^\/embedReport$/,
-      makeFileFetcher(hostname, staticFilesPort, "/embedReport.html", {
-        "Content-Type": "text/html",
-      })
-    );
+    // app.get(
+    //   /^\/embed$/,
+    //   makeFileFetcher(hostname, staticFilesPort, "/embed.html", {
+    //     "Content-Type": "text/html",
+    //   })
+    // );
+    // app.get(
+    //   /^\/embedReport$/,
+    //   makeFileFetcher(hostname, staticFilesPort, "/embedReport.html", {
+    //     "Content-Type": "text/html",
+    //   })
+    // );
 
     // ends in slash? redirect to non-slash version
-    app.get(/.*\//, function (req, res) {
-      let pathAndQuery = req.originalUrl;
+    // app.get(/.*\//, function (req, res) {
+    //   let pathAndQuery = req.originalUrl;
 
-      // remove slash at end
-      if (pathAndQuery.endsWith("/")) {
-        pathAndQuery = pathAndQuery.slice(0, pathAndQuery.length - 1);
-      }
+    //   // remove slash at end
+    //   if (pathAndQuery.endsWith("/")) {
+    //     pathAndQuery = pathAndQuery.slice(0, pathAndQuery.length - 1);
+    //   }
 
-      // remove slashes before "?"
-      if (pathAndQuery.indexOf("?") >= 1) {
-        pathAndQuery = pathAndQuery.replace("/?", "?");
-      }
+    //   // remove slashes before "?"
+    //   if (pathAndQuery.indexOf("?") >= 1) {
+    //     pathAndQuery = pathAndQuery.replace("/?", "?");
+    //   }
 
-      let fullUrl = req.protocol + "://" + req.get("host") + pathAndQuery;
+    //   let fullUrl = req.protocol + "://" + req.get("host") + pathAndQuery;
 
-      if (pathAndQuery !== req.originalUrl) {
-        res.redirect(fullUrl);
-      } else {
-        proxy(req, res);
-      }
-    });
+    //   if (pathAndQuery !== req.originalUrl) {
+    //     res.redirect(fullUrl);
+    //   } else {
+    //     proxy(req, res);
+    //   }
+    // });
 
     // app.get(/^\/integrate(\/.*)?/, fetchIndexForAdminPage);
     // app.get(/^\/other-conversations(\/.*)?/, fetchIndexForAdminPage);

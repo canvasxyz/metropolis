@@ -77,8 +77,6 @@ export default {
   readOnlyDatabaseURL: process.env.READ_ONLY_DATABASE_URL || process.env.DATABASE_URL as string,
   runPeriodicExportTests: isTrue(process.env.RUN_PERIODIC_EXPORT_TESTS) as boolean,
   shouldUseTranslationAPI: setGoogleApplicationCredentials() as boolean,
-  staticFilesPort: parseInt(process.env.STATIC_FILES_PORT || '8080', 10) as number,
-  staticFilesHost: process.env.STATIC_FILES_HOST as string,
   twitterConsumerKey: process.env.TWITTER_CONSUMER_KEY || null as string | null,
   twitterConsumerSecret: process.env.TWITTER_CONSUMER_SECRET || null as string | null,
   webserverPass: process.env.WEBSERVER_PASS as string,

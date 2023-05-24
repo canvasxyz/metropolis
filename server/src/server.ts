@@ -1107,11 +1107,8 @@ function initializePolisHelpers() {
   let whitelistedDomains = [
     Config.getServerHostname(),
     ...Config.whitelistItems,
-    "localhost:8080",
-    "localhost:8081",
     "localhost:8040",
     "localhost:5000",
-    "localhost:5001",
     "plusplus.herokuapp.com",
     "facebook.com",
     "api.twitter.com",
@@ -13169,66 +13166,6 @@ Thanks for using Polis!
     res.setHeader("Expires", 0);
   }
 
-  function proxy(req: { headers?: { host: string }; path: any }, res: any) {
-    let hostname = buildStaticHostname(req, res);
-    if (!hostname) {
-      let host = req?.headers?.host || "";
-      let re = new RegExp(Config.getServerHostname() + "$");
-      if (host.match(re)) {
-        // don't alert for this, it's probably DNS related
-        // TODO_SEO what should we return?
-        fail(res, 500, "polis_err_proxy_serving_to_domain", new Error(host));
-      } else {
-        fail(res, 500, "polis_err_proxy_serving_to_domain", new Error(host));
-      }
-      return;
-    }
-
-    if (devMode) {
-      addStaticFileHeaders(res);
-    }
-    // if (/MSIE [^1]/.exec(req?.headers?.['user-agent'])) { // older than 10
-    //     // http.get(Config.staticFilesHost + "/unsupportedBrowser.html", function(page) {
-    //     //     res.status(200).end(page);
-    //     // }).on('error', function(e) {
-    //     //     res.status(200).end("Apollogies, this browser is not supported. We recommend Chrome, Firefox, or Safari.");
-    //     // });
-    //     getStaticFile("./unsupportedBrowser.html", res);
-    // } else {
-    let port = Config.staticFilesPort;
-    // set the host header too, since S3 will look at that (or the routing proxy will patch up the request.. not sure which)
-    if (req && req.headers && req.headers.host) req.headers.host = hostname;
-  }
-
-  function buildStaticHostname(req: { headers?: { host: string } }, res: any) {
-    if (devMode || domainOverride) {
-      return Config.staticFilesHost;
-    } else {
-      let origin = req?.headers?.host;
-      // Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "pol.is": string; "embed.pol.is": string; "survey.pol.is": string; "preprod.pol.is": string; }'.
-      // No index signature with a parameter of type 'string' was found on type '{ "pol.is": string; "embed.pol.is": string; "survey.pol.is": string; "preprod.pol.is": string; }'.ts(7053)
-      // @ts-ignore
-      if (!whitelistedBuckets[origin || ""]) {
-        if (hasWhitelistMatches(origin || "")) {
-          // Use the prod bucket for non pol.is domains
-          return whitelistedBuckets["pol.is"] + "." + Config.staticFilesHost;
-        } else {
-          logger.error(
-            "got request with host that's not whitelisted: (" +
-              req?.headers?.host +
-              ")"
-          );
-          return;
-        }
-      }
-      // Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ "pol.is": string; "embed.pol.is": string; "survey.pol.is": string; "preprod.pol.is": string; }'.
-      // No index signature with a parameter of type 'string' was found on type '{ "pol.is": string; "embed.pol.is": string; "survey.pol.is": string; "preprod.pol.is": string; }'.ts(7053)
-      // @ts-ignore
-      origin = whitelistedBuckets[origin || ""];
-      return origin + "." + Config.staticFilesHost;
-    }
-  }
-
   function makeRedirectorTo(path: string) {
     return function (
       req: { headers?: { host: string } },
@@ -13293,260 +13230,9 @@ Thanks for using Polis!
     );
   }
 
-  function makeFileFetcher(
-    hostname?: string,
-    port?: string | number,
-    path?: string,
-    headers?: { "Content-Type": string },
-    preloadData?: { conversation?: ConversationType }
-  ) {
-    return function (
-      req: { headers?: { host: any }; path: any; pipe: (arg0: any) => void },
-      res: { set: (arg0: any) => void }
-    ) {
-      let hostname = buildStaticHostname(req, res);
-      if (!hostname) {
-        fail(res, 500, "polis_err_file_fetcher_serving_to_domain");
-        return;
-      }
-      // pol.is.s3-website-us-east-1.amazonaws.com
-      // preprod.pol.is.s3-website-us-east-1.amazonaws.com
-
-      // TODO https - buckets would need to be renamed to have dashes instead of dots.
-      // http://stackoverflow.com/questions/3048236/amazon-s3-https-ssl-is-it-possible
-      let url = "http://" + hostname + ":" + port + path;
-      logger.info("fetch file from " + url);
-      let x = request(url);
-      req.pipe(x);
-      if (!_.isUndefined(preloadData)) {
-        x = x.pipe(
-          replaceStream(
-            '"REPLACE_THIS_WITH_PRELOAD_DATA"',
-            JSON.stringify(preloadData)
-          )
-        );
-      }
-      // let title = "foo";
-      // let description = "bar";
-      // let site_name = "baz";
-
-      let fbMetaTagsString =
-        '<meta property="og:image" content="https://s3.amazonaws.com/pol.is/polis_logo.png" />\n';
-      if (preloadData && preloadData.conversation) {
-        fbMetaTagsString +=
-          '    <meta property="og:title" content="' +
-          preloadData.conversation.topic +
-          '" />\n';
-        fbMetaTagsString +=
-          '    <meta property="og:description" content="' +
-          preloadData.conversation.description +
-          '" />\n';
-        // fbMetaTagsString += "    <meta property=\"og:site_name\" content=\"" + site_name + "\" />\n";
-      }
-      x = x.pipe(
-        replaceStream(
-          "<!-- REPLACE_THIS_WITH_FB_META_TAGS -->",
-          fbMetaTagsString
-        )
-      );
-
-      res.set(headers);
-
-      // Argument of type '{ set: (arg0: any) => void; }' is not assignable to parameter of type 'WritableStream'.
-      //   Type '{ set: (arg0: any) => void; }' is missing the following properties from type 'WritableStream': writable, write, end, addListener, and 14 more.ts(2345)
-      // @ts-ignore
-      x.pipe(res);
-      x.on("error", function (err: any) {
-        fail(res, 500, "polis_err_finding_file " + path, err);
-      });
-      // http.get(url, function(proxyResponse) {
-      //     if (devMode) {
-      //         addStaticFileHeaders(res);
-      //     }
-      //     res.setHeader('Content-Type', contentType);
-      //     proxyResponse.on('data', function (chunk) {
-      //         res.write(chunk);
-      //     });
-      //     proxyResponse.on('end', function () {
-      //         res.end();
-      //     });
-      // }).on("error", function(e) {
-      //     fail(res, 500, "polis_err_serving_file", new Error("polis_err_serving_file"));
-      // });
-    };
-  }
-
-  // function isIE(req) {
-  //   let h = req?.headers?.['user-agent'];
-  //   return /MSIE [0-9]/.test(h) || /Trident/.test(h);
-  // }
-
-  function isUnsupportedBrowser(req: { headers?: { [x: string]: string } }) {
-    return /MSIE [234567]/.test(req?.headers?.["user-agent"] || "");
-  }
-
-  function browserSupportsPushState(req: {
-    headers?: { [x: string]: string };
-  }) {
-    return !/MSIE [23456789]/.test(req?.headers?.["user-agent"] || "");
-  }
-
-  // serve up index.html in response to anything starting with a number
-  let hostname: string = Config.staticFilesHost;
-  let staticFilesPort: number = Config.staticFilesPort;
-  let fetchUnsupportedBrowserPage = makeFileFetcher(
-    hostname,
-    staticFilesPort,
-    "/unsupportedBrowser.html",
-    {
-      "Content-Type": "text/html",
-    }
-  );
-
-  function fetchIndex(
-    req: { path: string; headers?: { host: string } },
-    res: {
-      writeHead: (arg0: number, arg1: { Location: string }) => void;
-      end: () => any;
-    },
-    preloadData: { conversation?: ConversationType },
-    port: string | number | undefined,
-    buildNumber?: string | null | undefined
-  ) {
-    let headers = {
-      "Content-Type": "text/html",
-    };
-    if (!devMode) {
-      Object.assign(headers, {
-        // 'Cache-Control': 'no-transform,public,max-age=60,s-maxage=60', // Cloudflare will probably cache it for one or two hours
-        "Cache-Control": "no-cache", // Cloudflare will probably cache it for one or two hours
-      });
-    }
-
-    // Argument of type '{ path: string; headers?: { host: string; } | undefined; }' is not assignable to parameter of type 'Req'.
-    //  Property 'cookies' is missing in type '{ path: string; headers?: { host: string; } | undefined; }' but required in type 'Req'.ts(2345)
-    // @ts-ignore
-    setCookieTestCookie(req, res);
-
-    if (devMode) {
-      buildNumber = null;
-    }
-
-    let indexPath =
-      (buildNumber ? "/cached/" + buildNumber : "") + "/index.html";
-
-    let doFetch = makeFileFetcher(
-      hostname,
-      port,
-      indexPath,
-      headers,
-      preloadData
-    );
-    if (isUnsupportedBrowser(req)) {
-      // Argument of type '{ path: string; headers?: { host: string; } | undefined; }' is not assignable to parameter of type '{ headers?: { host: any; } | undefined; path: any; pipe: (arg0: any) => void; }'.
-      //   Property 'pipe' is missing in type '{ path: string; headers?: { host: string; } | undefined; }' but required in type '{ headers?: { host: any; } | undefined; path: any; pipe: (arg0: any) => void; }'.ts(2345)
-      // @ts-ignore
-      return fetchUnsupportedBrowserPage(req, res);
-    } else if (
-      !browserSupportsPushState(req) &&
-      req.path.length > 1 &&
-      !/^\/api/.exec(req.path) // TODO probably better to create a list of client-side route regexes (whitelist), rather than trying to blacklist things like API calls.
-    ) {
-      // Redirect to the same URL with the path behind the fragment "#"
-      res.writeHead(302, {
-        Location: "https://" + req?.headers?.host + "/#" + req.path,
-      });
-
-      return res.end();
-    } else {
-      // Argument of type '{ path: string; headers?: { host: string; } | undefined; }'
-      // is not assignable to parameter of type '{ headers?: { host: any; } | undefined;
-      // path: any; pipe: (arg0: any) => void; } '.ts(2345)
-      // @ts-ignore
-      return doFetch(req, res);
-    }
-  }
-
-  function fetchIndexWithoutPreloadData(req: any, res: any, port: any) {
-    return fetchIndex(req, res, {}, port);
-  }
   function ifDefinedFirstElseSecond(first: any, second: boolean) {
     return _.isUndefined(first) ? second : first;
   }
-  let fetch404Page = makeFileFetcher(hostname, staticFilesPort, "/404.html", {
-    "Content-Type": "text/html",
-  });
-
-  function fetchIndexForConversation(
-    req: { path: string; query?: { build: any } },
-    res: any
-  ) {
-    logger.debug("fetchIndexForConversation", req.path);
-    let match = req.path.match(/[0-9][0-9A-Za-z]+/);
-    let conversation_id: any;
-    if (match && match.length) {
-      conversation_id = match[0];
-    }
-    let buildNumber: null = null;
-    if (req?.query?.build) {
-      buildNumber = req.query.build;
-      logger.debug("loading_build", buildNumber);
-    }
-
-    setTimeout(function () {
-      // Kick off requests to twitter and FB to get the share counts.
-      // This will be nice because we cache them so it will be fast when
-      // client requests these later.
-      // TODO actually store these values in a cache that is shared between
-      // the servers, probably just in the db.
-      if (Config.twitterConsumerKey) {
-        getTwitterShareCountForConversation(conversation_id).catch(function (
-          err: string
-        ) {
-          logger.error("polis_err_fetching_twitter_share_count", err);
-        });
-      }
-      if (Config.fbAppId) {
-        getFacebookShareCountForConversation(conversation_id).catch(function (
-          err: string
-        ) {
-          logger.error("polis_err_fetching_facebook_share_count", err);
-        });
-      }
-    }, 100);
-
-    doGetConversationPreloadInfo(conversation_id)
-      .then(function (x: any) {
-        let preloadData = {
-          conversation: x,
-          // Nothing user-specific can go here, since we want to cache these per-conv index files on the CDN.
-        };
-        fetchIndex(req, res, preloadData, staticFilesPort, buildNumber);
-      })
-      .catch(function (err: any) {
-        logger.error("polis_err_fetching_conversation_info", err);
-        // Argument of type '{ path: string; query?: { build: any; } | undefined; }' is not assignable to parameter of type '{ headers?: { host: any; } | undefined; path: any; pipe: (arg0: any) => void; }'.
-        //   Property 'pipe' is missing in type '{ path: string; query?: { build: any; } | undefined; }' but required in type '{ headers?: { host: any; } | undefined; path: any; pipe: (arg0: any) => void; }'.ts(2345)
-        // @ts-ignore
-        fetch404Page(req, res);
-      });
-  }
-  let fetchIndexForAdminPage = makeFileFetcher(
-    hostname,
-    staticFilesPort,
-    "/index.html",
-    {
-      "Content-Type": "text/html",
-    }
-  );
-  let fetchIndexForReportPage = makeFileFetcher(
-    hostname,
-    staticFilesPort,
-    "/index_report.html",
-    {
-      "Content-Type": "text/html",
-    }
-  );
 
   function handle_GET_iip_conversation(
     req: { params: { conversation_id: any } },
@@ -13597,67 +13283,6 @@ Thanks for using Polis!
       .catch(function (err: any) {
         fail(res, 500, "polis_err_fetching_conversation_info", err);
       });
-  }
-
-  let handle_GET_conditionalIndexFetcher = (function () {
-    return function (req: any, res: { redirect: (arg0: string) => void }) {
-      if (hasAuthToken(req)) {
-        // user is signed in, serve the app
-        // Argument of type '{ redirect: (arg0: string) => void; }'
-        // is not assignable to parameter of type '{ set: (arg0: any) => void; }'.
-        //
-        // Property 'set' is missing in type '{ redirect: (arg0: string) => void; }'
-        // but required in type '{ set: (arg0: any) => void; }'.ts(2345)
-        // @ts-ignore
-        return fetchIndexForAdminPage(req, res);
-      } else if (!browserSupportsPushState(req)) {
-        // TEMPORARY: Don't show the landing page.
-        // The problem is that /user/create redirects to #/user/create,
-        // which ends up here, and since there's no auth token yet,
-        // we would show the lander. One fix would be to serve up the auth page
-        // as a separate html file, and not rely on JS for the routing.
-        //
-        // Argument of type '{ redirect: (arg0: string) => void; }'
-        // is not assignable to parameter of type '{ set: (arg0: any) => void; }'.ts(2345)
-        // @ts-ignore
-        return fetchIndexForAdminPage(req, res);
-      } else {
-        // user not signed in, redirect to landing page
-        let url = getServerNameWithProtocol(req) + "/home";
-        res.redirect(url);
-      }
-    };
-  })();
-
-  function handle_GET_localFile_dev_only(
-    req: { path: any },
-    res: {
-      writeHead: (
-        arg0: number,
-        arg1?: { "Content-Type": string } | undefined
-      ) => void;
-      end: (arg0?: undefined, arg1?: string) => void;
-    }
-  ) {
-    const filenameParts = String(req.path).split("/");
-    filenameParts.shift();
-    filenameParts.shift();
-    const filename = filenameParts.join("/");
-    if (!devMode) {
-      // pretend this route doesn't exist.
-      return proxy(req, res);
-    }
-    fs.readFile(filename, function (error: any, content: any) {
-      if (error) {
-        res.writeHead(500);
-        res.end();
-      } else {
-        res.writeHead(200, {
-          "Content-Type": "text/html",
-        });
-        res.end(content, "utf-8");
-      }
-    });
   }
 
   function middleware_log_request_body(
@@ -13745,19 +13370,11 @@ Thanks for using Polis!
     fail,
     fetchThirdPartyCookieTestPt1,
     fetchThirdPartyCookieTestPt2,
-    fetchIndexForAdminPage,
-    fetchIndexForConversation,
-    fetchIndexForReportPage,
-    fetchIndexWithoutPreloadData,
     getPidForParticipant,
     haltOnTimeout,
     HMAC_SIGNATURE_PARAM_NAME,
-    hostname,
-    makeFileFetcher,
     makeRedirectorTo,
     pidCache,
-    staticFilesPort,
-    proxy,
     redirectIfHasZidButNoConversationId,
     redirectIfNotHttps,
     sendTextEmail,
@@ -13774,7 +13391,6 @@ Thanks for using Polis!
     handle_GET_bidToPid,
     handle_GET_comments,
     handle_GET_comments_translations,
-    handle_GET_conditionalIndexFetcher,
     handle_GET_contexts,
     handle_GET_conversationPreloadInfo,
     handle_GET_conversations,
@@ -13792,7 +13408,6 @@ Thanks for using Polis!
     handle_GET_iim_conversation,
     handle_GET_iip_conversation,
     handle_GET_launchPrep,
-    handle_GET_localFile_dev_only,
     handle_GET_locations,
     handle_GET_logMaxmindResponse,
     handle_GET_math_pca,
