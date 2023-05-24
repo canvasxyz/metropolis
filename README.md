@@ -55,22 +55,20 @@ npm run dev
 
 6. Create user: http://localhost:8080/createuser
 
-7. Set up maildev. Runs on port 1080, with SMTP on port 1025:
-
-```
-$ docker pull maildev/maildev:1.1.1
-$ docker run -p 1080:1080 -p 1025:1025 maildev/maildev
-```
-
 Setting up for production:
 
 ```
 heroku addons:create heroku-postgresql:mini
+heroku addons:create sendgrid:starter
 heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
 git push heroku main
 ```
 
-To run all migrations:
+To send password reset emails, configure Sendgrid with a single sender identity
+from within the Sendgrid control panel. Then, set that email address and the
+Sendgrid API key in `server/.env`.
+
+Run all migrations before starting:
 
 ```
 cat server/postgres/migrations/* | heroku run "psql \$DATABASE_URL"
