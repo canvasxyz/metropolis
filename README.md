@@ -66,6 +66,7 @@ Setting up for production:
 
 ```
 heroku addons:create heroku-postgresql:mini
+heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
 ```
 
 [️Production configuration](docs/configuration.md):
