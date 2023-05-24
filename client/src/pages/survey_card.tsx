@@ -33,8 +33,11 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         tid: commentId,
         // starred: boolean
       })
-      .then(() => onVoted(commentId))
-      .finally(() => setVoting(false))
+      .then(() => {
+        onVoted(commentId)
+        setEditingVote(false)
+      })
+      .always(() => setVoting(false))
   }
   const disagree = (commentId: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
@@ -48,8 +51,11 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         tid: commentId,
         // starred: boolean
       })
-      .then(() => onVoted(commentId))
-      .finally(() => setVoting(false))
+      .then(() => {
+        onVoted(commentId)
+        setEditingVote(false)
+      })
+      .always(() => setVoting(false))
   }
   const skip = (tid: string, starred: boolean = undefined, weight = 0) => {
     setVoting(true)
@@ -63,8 +69,11 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         tid: tid,
         // starred: boolean
       })
-      .then(() => onVoted(commentId))
-      .finally(() => setVoting(false))
+      .then(() => {
+        onVoted(commentId)
+        setEditingVote(false)
+      })
+      .always(() => setVoting(false))
   }
 
   return (
@@ -101,7 +110,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
                 my: 2,
               }}
             >
-              You voted X
+              You voted agree
             </Text>
           </React.Fragment>
         ) : (

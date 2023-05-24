@@ -2,7 +2,6 @@
   "private": true,
   "scripts": {
     "dev": "concurrently -n cli,srv,tsc -c cyan,red,red 'npm run dev --workspace=polis-client' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server'",
-    "start": "concurrently -n cli,srv -c cyan,red 'npm run start --workspace=polis-client' 'npm run start --workspace=polis-server'",
     "build": "rimraf server/build && npm run build:prod --workspace=polis-client && copyfiles -E -u 2 \"client/build/**/*\" server/build && npm run build --workspace=polis-server",
     "serve:prod": "npm run start --workspace=polis-server"
   },
