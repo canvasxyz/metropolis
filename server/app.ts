@@ -538,11 +538,7 @@ helpersInitialized.then(
     app.post(
       "/api/v3/domainWhitelist",
       auth(assignToP),
-      need(
-        "domain_whitelist",
-        getOptionalStringLimitLength(999),
-        assignToP,
-      ),
+      need("domain_whitelist", getOptionalStringLimitLength(999), assignToP),
       handle_POST_domainWhitelist
     );
 
@@ -1439,17 +1435,26 @@ helpersInitialized.then(
       handle_GET_iim_conversation
     );
 
-    app.get("/robots.txt", function (req: express.Request, res: express.Response) {
+    app.get("/robots.txt", (req: express.Request, res: express.Response) => {
       res.send("User-agent: *\n" + "Disallow: /api/");
     });
 
-    const fetchIndexForAdminPage = express.static(path.join(__dirname, "build", "index.html"))
+    // const fetchIndexForAdminPage = express.static(
+    //   path.join(__dirname, "build", "index.html")
+    // );
 
-    // Client routes
-    // These should be maintained to match the client router, for now.
+    express.static.mime.define({ "text/html": ["html"] });
 
-    // app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
-    app.get("/", fetchIndexForAdminPage);
+    const fetchIndexForAdminPage = (
+      req: express.Request,
+      res: express.Response
+    ) => {
+      res.setHeader("Content-Type", "text/html");
+      res.sendfile(__dirname + "/client/index.html");
+    };
+
+    app.get("^/$", fetchIndexForAdminPage);
+    app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage);
@@ -1463,13 +1468,7 @@ helpersInitialized.then(
     app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
 
-    // app.get(
-    //   /^\/dist\/client_bundle.js$/, express.static(path.join(__dirname, "build", "index.html"))
-    //   makeFileFetcher(hostname, staticFilesPort, "/dist/client_bundle.js", {
-    //     "Content-Type": "application/javascript",
-    //   })
-    // );
-    // app.get("/", handle_GET_conditionalIndexFetcher);
+    app.use(express.static(path.join(__dirname, "client")));
 
     // app.get(
     //   /^\/embed$/,
@@ -1483,29 +1482,6 @@ helpersInitialized.then(
     //     "Content-Type": "text/html",
     //   })
     // );
-
-    // ends in slash? redirect to non-slash version
-    // app.get(/.*\//, function (req, res) {
-    //   let pathAndQuery = req.originalUrl;
-
-    //   // remove slash at end
-    //   if (pathAndQuery.endsWith("/")) {
-    //     pathAndQuery = pathAndQuery.slice(0, pathAndQuery.length - 1);
-    //   }
-
-    //   // remove slashes before "?"
-    //   if (pathAndQuery.indexOf("?") >= 1) {
-    //     pathAndQuery = pathAndQuery.replace("/?", "?");
-    //   }
-
-    //   let fullUrl = req.protocol + "://" + req.get("host") + pathAndQuery;
-
-    //   if (pathAndQuery !== req.originalUrl) {
-    //     res.redirect(fullUrl);
-    //   } else {
-    //     proxy(req, res);
-    //   }
-    // });
 
     // app.get(/^\/integrate(\/.*)?/, fetchIndexForAdminPage);
     // app.get(/^\/other-conversations(\/.*)?/, fetchIndexForAdminPage);
