@@ -1,1 +1,1 @@
-web: npm run start --workspace=polis-server
+web: npm run serve:prod
