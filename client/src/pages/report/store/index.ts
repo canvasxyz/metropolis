@@ -3,7 +3,7 @@
 import { createStore, applyMiddleware, compose } from "redux";
 import thunk from "redux-thunk";
 
-import rootReducer from "../reducers";
+import rootReducer from "../../../reducers";
 
 const middleware = [thunk];
 
@@ -14,7 +14,7 @@ if (process.env.NODE_ENV === "production") {
 } else {
   finalCreateStore = compose(
     applyMiddleware(...middleware),
-    window.devToolsExtension ? window.devToolsExtension() : (f) => f
+    // window["devToolsExtension"] ? window["devToolsExtension"]() : (f) => f
   )(createStore);
 }
 

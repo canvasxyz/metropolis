@@ -1,12 +1,29 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
-import _ from "lodash";
+import React from "react"
+import _ from "lodash"
 // import textWrap from "svg-text-wrap";
 
-class Comments extends React.Component {
+class Comments extends React.Component<
+  {
+    points: any
+    comments: any[]
+    xScaleup
+    yScaleup
+    xCenter
+    yCenter
+    xx
+    yy
+    handleClick: Function
+    formatTid: Function
+    parentGraph: string
+  },
+  {
+    //
+  }
+> {
   createComments() {
-    console.log("in create comments, comments graph", this.props.points[0]);
+    console.log("in create comments, comments graph", this.props.points[0])
 
     // const _points = this.props.points.slice(0);
     //
@@ -25,15 +42,15 @@ class Comments extends React.Component {
     return this.props.points.map((comment, i) => {
       /* find the original comment */
       const _comment = _.find(this.props.comments, (c) => {
-        return c.tid === comment.tid;
-      });
+        return c.tid === comment.tid
+      })
 
       /* see if it's meta or consensus */
       if (
         _comment.is_meta
         // this.props.math.pca["comment-extremity"][comment.tid] < globals.maxCommentExtremityToShow
       ) {
-        return;
+        return
       }
 
       /* break the text up into pieces */
@@ -62,13 +79,13 @@ class Comments extends React.Component {
               )
             })*/}
         </text>
-      );
-    });
+      )
+    })
   }
 
   render() {
-    return <g>{this.createComments()}</g>;
+    return <g>{this.createComments()}</g>
   }
 }
 
-export default Comments;
+export default Comments

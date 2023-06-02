@@ -1,40 +1,40 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
-import _ from "lodash";
-import * as globals from "../globals";
+import React from "react"
+import _ from "lodash"
+import * as globals from "../globals"
 
-const BarChartCompact = ({ comment, voteCounts, nMembers, voteColors }) => {
-  if (!comment) return null;
+const BarChartCompact = ({ comment, voteCounts, nMembers, voteColors, index }) => {
+  if (!comment) return null
 
-  let w = 100;
-  let agrees = 0;
-  let disagrees = 0;
-  let sawTheComment = 0;
-  let missingCounts = false;
+  let w = 100
+  let agrees = 0
+  let disagrees = 0
+  let sawTheComment = 0
+  let missingCounts = false
 
   if (typeof voteCounts != "undefined") {
-    agrees = voteCounts.A;
-    disagrees = voteCounts.D;
-    sawTheComment = voteCounts.S;
+    agrees = voteCounts.A
+    disagrees = voteCounts.D
+    sawTheComment = voteCounts.S
   } else {
-    missingCounts = true;
+    missingCounts = true
   }
-  let passes = sawTheComment - (agrees + disagrees);
+  let passes = sawTheComment - (agrees + disagrees)
   // let totalVotes = agrees + disagrees + passes;
 
-  const agree = (agrees / nMembers) * w;
-  const disagree = (disagrees / nMembers) * w;
-  const pass = (passes / nMembers) * w;
+  const agree = (agrees / nMembers) * w
+  const disagree = (disagrees / nMembers) * w
+  const pass = (passes / nMembers) * w
   // const blank = nMembers - (sawTheComment / nMembers) * w;
 
-  const agreeSaw = (agrees / sawTheComment) * w;
-  const disagreeSaw = (disagrees / sawTheComment) * w;
-  const passSaw = (passes / sawTheComment) * w;
+  const agreeSaw = (agrees / sawTheComment) * w
+  const disagreeSaw = (disagrees / sawTheComment) * w
+  const passSaw = (passes / sawTheComment) * w
 
-  const agreeString = (agreeSaw << 0) + "%";
-  const disagreeString = (disagreeSaw << 0) + "%";
-  const passString = (passSaw << 0) + "%";
+  const agreeString = (agreeSaw << 0) + "%"
+  const disagreeString = (disagreeSaw << 0) + "%"
+  const passString = (passSaw << 0) + "%"
 
   return (
     <div
@@ -74,24 +74,24 @@ const BarChartCompact = ({ comment, voteCounts, nMembers, voteColors }) => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-const CommentRow = ({ comment, groups, voteColors }) => {
+const CommentRow = ({ comment, groups, voteColors, index }) => {
   if (!comment) {
-    console.error("WHY IS THERE NO COMMENT 3452354235", comment);
-    return null;
+    console.error("WHY IS THERE NO COMMENT 3452354235", comment)
+    return null
   }
   // const percentAgreed = Math.floor(groupVotesForThisGroup.votes[comment.tid].A / groupVotesForThisGroup.votes[comment.tid].S * 100);
 
-  let BarCharts = [];
-  let totalMembers = 0;
+  let BarCharts = []
+  let totalMembers = 0
 
   // groups
   _.forEach(groups, (g, i) => {
-    let nMembers = g["n-members"];
-    totalMembers += nMembers;
-    let gVotes = g.votes[comment.tid];
+    let nMembers = g["n-members"]
+    totalMembers += nMembers
+    let gVotes = g.votes[comment.tid]
 
     BarCharts.push(
       <BarChartCompact
@@ -102,8 +102,8 @@ const CommentRow = ({ comment, groups, voteColors }) => {
         nMembers={nMembers}
         voteColors={voteColors}
       />
-    );
-  });
+    )
+  })
 
   // totals column
   // let globalCounts = {
@@ -124,7 +124,7 @@ const CommentRow = ({ comment, groups, voteColors }) => {
       nMembers={totalMembers}
       voteColors={voteColors}
     />
-  );
+  )
 
   return (
     <div
@@ -156,10 +156,23 @@ const CommentRow = ({ comment, groups, voteColors }) => {
       </span>
       {BarCharts}
     </div>
-  );
-};
+  )
+}
 
-class CommentList extends React.Component {
+class CommentList extends React.Component<
+  {
+    math
+    conversation
+    comments
+    tidsToRender
+    voteColors
+    ptptCount
+    formatTid
+  },
+  {
+    //
+  }
+> {
   getGroupLabels() {
     function makeLabel(key, label, numMembers) {
       return (
@@ -183,22 +196,22 @@ class CommentList extends React.Component {
             {numMembers}
           </span>
         </span>
-      );
+      )
     }
-    let labels = [];
+    let labels = []
 
     // totals
-    labels.push(makeLabel(99, "Overall", this.props.ptptCount));
+    labels.push(makeLabel(99, "Overall", this.props.ptptCount))
 
     _.each(this.props.math["group-votes"], (g, i) => {
-      labels.push(makeLabel(i, globals.groupLabels[i], g["n-members"]));
-    });
+      labels.push(makeLabel(i, globals.groupLabels[i], g["n-members"]))
+    })
 
-    return labels;
+    return labels
   }
 
   render() {
-    const comments = _.keyBy(this.props.comments, "tid");
+    const comments = _.keyBy(this.props.comments, "tid")
 
     return (
       <div>
@@ -234,11 +247,11 @@ class CommentList extends React.Component {
               comment={comments[tid]}
               voteColors={this.props.voteColors}
             />
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 }
 
-export default CommentList;
+export default CommentList

@@ -1,33 +1,32 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
-import _ from "lodash";
-import * as globals from "../globals";
-import graphUtil from "../../util/graphUtil";
-import Axes from "../graphAxes";
-import * as d3contour from "d3-contour";
-import * as d3chromatic from "d3-scale-chromatic";
+import React from "react"
+import _ from "lodash"
+import * as globals from "../globals"
+import graphUtil from "../../util/graphUtil"
+import Axes from "../graphAxes"
+import d3 from "d3"
+import * as d3contour from "d3-contour"
+import * as d3chromatic from "d3-scale-chromatic"
 // import GroupLabels from "./groupLabels";
-import Comments from "../commentsGraph/comments";
-import Hull from "./hull";
-import CommentList from "../lists/commentList";
+import Comments from "../commentsGraph/comments"
+import Hull from "./hull"
+import CommentList from "../lists/commentList"
 
-const pointsPerSquarePixelMax = 0.0017; /* choose dynamically ? */
-const contourBandwidth = 20;
-const colorScaleDownFactor = 0.5; /* The colors are too dark. This helps. */
+const pointsPerSquarePixelMax = 0.0017 /* choose dynamically ? */
+const contourBandwidth = 20
+const colorScaleDownFactor = 0.5 /* The colors are too dark. This helps. */
 
-const color = d3
-  .scaleSequential(d3chromatic.interpolateYlGnBu)
-  .domain([0, pointsPerSquarePixelMax]);
-const geoPath = d3.geoPath();
+const color = d3.scaleSequential(d3chromatic.interpolateYlGnBu).domain([0, pointsPerSquarePixelMax])
+const geoPath = d3.geoPath()
 
 const Contour = ({ contour }) => (
   <path fill={color(contour.value * colorScaleDownFactor)} d={geoPath(contour)} />
-);
+)
 
 const Participants = ({ points, math }) => {
   if (!points) {
-    return null;
+    return null
   }
 
   return (
@@ -47,7 +46,7 @@ const Participants = ({ points, math }) => {
               {globals.groupSymbols[pt.gid]}
             </text>
           </g>
-        );
+        )
         // return (<text
         //     key={i}
         //     transform={
@@ -65,13 +64,38 @@ const Participants = ({ points, math }) => {
         //   </text>)
       })}
     </g>
-  );
-};
+  )
+}
 
-class ParticipantsGraph extends React.Component {
+class ParticipantsGraph extends React.Component<
+  {
+    math: any
+    height?: any
+    formatTid: any
+    comments: any
+    badTids: any
+    colorBlindMode: any
+    showOnlyGroup?: any
+    voteColors: any
+    consensusDivisionColorScale?: any
+    conversation?: any
+    ptptCount?: any
+    report: any
+  },
+  {
+    selectedComment: any
+    showContour: any
+    showGroupLabels: any
+    showParticipants: any
+    showGroupOutline: any
+    showComments: any
+    showAxes: any
+    showRadialAxes: any
+    consensusDivisionColorScale?: any
+  }
+> {
   constructor(props) {
-    super(props);
-    this.Viewer = null;
+    super(props)
     this.state = {
       selectedComment: null,
       showContour: false,
@@ -81,28 +105,28 @@ class ParticipantsGraph extends React.Component {
       showComments: true,
       showAxes: true,
       showRadialAxes: true,
-    };
+    }
   }
 
   handleCommentClick(selectedComment) {
     return () => {
-      this.setState({ selectedComment });
-    };
+      this.setState({ selectedComment })
+    }
   }
 
   getInnerRadialAxisColor() {
-    let color = globals.brandColors.lightgrey;
+    let color = globals.brandColors.lightgrey
     if (this.props.consensusDivisionColorScale && this.props.colorBlindMode) {
-      color = globals.brandColors.blue;
+      color = globals.brandColors.blue
     } else if (this.props.consensusDivisionColorScale && !this.props.colorBlindMode) {
-      color = this.props.voteColors.agree;
+      color = this.props.voteColors.agree
     }
-    return color;
+    return color
   }
 
   render() {
     if (!this.props.math) {
-      return null;
+      return null
     }
 
     const {
@@ -115,19 +139,19 @@ class ParticipantsGraph extends React.Component {
       commentScaleupFactorX,
       commentScaleupFactorY,
       hulls,
-    } = graphUtil(this.props.comments, this.props.math, this.props.badTids);
+    } = graphUtil(this.props.comments, this.props.math, this.props.badTids)
 
     const contours = d3contour
       .contourDensity()
       .x(function (d) {
-        return d.x;
+        return d.x
       })
       .y(function (d) {
-        return d.y;
+        return d.y
       })
       .size([globals.side, globals.side])
       // .bandwidth(10)(baseClustersScaled)
-      .bandwidth(contourBandwidth)(baseClustersScaled);
+      .bandwidth(contourBandwidth)(baseClustersScaled)
 
     return (
       <div style={{ position: "relative" }}>
@@ -174,7 +198,7 @@ class ParticipantsGraph extends React.Component {
               marginRight: 20,
             }}
             onClick={() => {
-              this.setState({ showAxes: !this.state.showAxes });
+              this.setState({ showAxes: !this.state.showAxes })
             }}
           >
             Axes
@@ -192,7 +216,7 @@ class ParticipantsGraph extends React.Component {
             onClick={() => {
               this.setState({
                 showRadialAxes: !this.state.showRadialAxes,
-              });
+              })
             }}
           >
             Radial axes
@@ -224,7 +248,7 @@ class ParticipantsGraph extends React.Component {
               marginRight: 20,
             }}
             onClick={() => {
-              this.setState({ showComments: !this.state.showComments });
+              this.setState({ showComments: !this.state.showComments })
             }}
           >
             Statements
@@ -240,7 +264,7 @@ class ParticipantsGraph extends React.Component {
               marginRight: 20,
             }}
             onClick={() => {
-              this.setState({ showParticipants: !this.state.showParticipants });
+              this.setState({ showParticipants: !this.state.showParticipants })
             }}
           >
             Participants (bucketized)
@@ -256,7 +280,7 @@ class ParticipantsGraph extends React.Component {
               marginRight: 20,
             }}
             onClick={() => {
-              this.setState({ showGroupOutline: !this.state.showGroupOutline });
+              this.setState({ showGroupOutline: !this.state.showGroupOutline })
             }}
           >
             Group outline
@@ -272,7 +296,7 @@ class ParticipantsGraph extends React.Component {
               marginRight: 20,
             }}
             onClick={() => {
-              this.setState({ showGroupLabels: !this.state.showGroupLabels });
+              this.setState({ showGroupLabels: !this.state.showGroupLabels })
             }}
           >
             Group labels
@@ -311,7 +335,7 @@ class ParticipantsGraph extends React.Component {
                     {`${globals.groupLabels[i]}`}{" "}
                   </span>
                 </span>
-              );
+              )
             })}
           </p>
         ) : null}
@@ -377,13 +401,13 @@ class ParticipantsGraph extends React.Component {
           ) : null}
           {this.state.showGroupOutline
             ? hulls.map((hull) => {
-                let gid = hull.group[0].gid;
+                let gid = hull.group[0].gid
                 if (_.isNumber(this.props.showOnlyGroup)) {
                   if (gid !== this.props.showOnlyGroup) {
-                    return "";
+                    return ""
                   }
                 }
-                return <Hull key={gid} hull={hull} />;
+                return <Hull key={gid} hull={hull} />
               })
             : null}
           {this.state.showParticipants ? (
@@ -422,7 +446,7 @@ class ParticipantsGraph extends React.Component {
                   >
                     {globals.groupLabels[g.id]}
                   </text>
-                );
+                )
               })
             : null}
           {this.state.consensusDivisionColorScale ? (
@@ -444,8 +468,8 @@ class ParticipantsGraph extends React.Component {
           ) : null}
         </svg>
       </div>
-    );
+    )
   }
 }
 
-export default ParticipantsGraph;
+export default ParticipantsGraph

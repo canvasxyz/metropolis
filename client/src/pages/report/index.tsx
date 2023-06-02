@@ -26,9 +26,7 @@ import ParticipantsGraph from "./components/participantsGraph/participantsGraph"
 import Beeswarm from "./components/beeswarm/beeswarm"
 import Controls from "./components/controls/controls"
 
-import net from "../components/util/net"
-
-import $ from "jquery"
+import net from "./util/net"
 
 var pathname = window.location.pathname // "/report/2arcefpshi"
 var report_id = pathname.split("/")[2]
@@ -39,7 +37,39 @@ function assertExists(obj, key) {
   }
 }
 
-class App extends React.Component {
+class App extends React.Component<{
+}, {
+  loading
+  consensus
+  comments
+  participants
+  conversation
+  groupDemographics
+  colorBlindMode
+  dimensions
+  shouldPoll
+  voteColors
+  groupNames?
+  math?
+  report?
+  ptptCount?
+  extremity?
+  errorText?
+  error?
+  uncertainty?
+  demographics?,
+  ptptCountTotal?
+  filteredCorrelationMatrix?
+  filteredCorrelationTids?
+  badTids?
+  repfulAgreeTidsByGroup?
+  repfulDisageeTidsByGroup?
+  formatTid?
+  computedStats?
+  nothingToShow?
+}> {
+  corMatRetries: any
+
   constructor(props) {
     super(props)
     this.state = {
@@ -281,7 +311,7 @@ class App extends React.Component {
         }
         var tidWidth = ("" + maxTid).length
 
-        function pad(n, width, z) {
+        function pad(n, width, z?) {
           z = z || "0"
           n = n + ""
           return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n
@@ -362,7 +392,7 @@ class App extends React.Component {
           loading: false,
           math: mathResult,
           consensus: mathResult.consensus,
-          extremity: extremity,
+          extremity,
           uncertainty: uncertainty.map((c) => {
             return c.tid
           }),
@@ -485,7 +515,7 @@ class App extends React.Component {
             colorBlindMode={this.state.colorBlindMode}
             onAutoRefreshDisabled={this.onAutoRefreshDisabled.bind(this)}
             autoRefreshEnabled={this.state.shouldPoll}
-            voteColors={this.state.voteColors}
+            /*voteColors={this.state.voteColors}*/
           />
 
           {/* This may eventually need to go back in below */}
@@ -493,12 +523,12 @@ class App extends React.Component {
           <Overview
             computedStats={this.state.computedStats}
             math={this.state.math}
-            comments={this.state.comments}
+            /*comments={this.state.comments}*/
             ptptCount={this.state.ptptCount}
             ptptCountTotal={this.state.ptptCountTotal}
-            demographics={this.state.demographics}
+            /*demographics={this.state.demographics}*/
             conversation={this.state.conversation}
-            voteColors={this.state.voteColors}
+            /*voteColors={this.state.voteColors}*/
           />
           <Beeswarm
             conversation={this.state.conversation}
@@ -564,13 +594,12 @@ class App extends React.Component {
             voteColors={this.state.voteColors}/> : ""} */}
           <ParticipantsGraph
             comments={this.state.comments}
-            groupNames={this.state.groupNames}
+            /*groupNames={this.state.groupNames}*/
             badTids={this.state.badTids}
             colorBlindMode={this.state.colorBlindMode}
             formatTid={this.state.formatTid}
-            repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup}
+            /*repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup}*/
             math={this.state.math}
-            renderHeading={true}
             report={this.state.report}
             voteColors={this.state.voteColors}
           />
@@ -592,5 +621,3 @@ class App extends React.Component {
 }
 
 export default App
-
-window.$ = $

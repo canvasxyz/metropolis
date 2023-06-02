@@ -11,7 +11,7 @@ const Footer = (/*{conversation}*/) => {
        marginTop: 40,
        marginBottom: 60,
      }}>
-     <LargeLogo/>
+     <LargeLogo />
    </div>
  )
 };

@@ -35,7 +35,7 @@ const getDomainPrefix = () => {
 
   if (serviceUrl) return `${serviceUrl}/`;
 
-  return `${document.origin}/`;
+  return `${document.location.origin}/`;
 };
 
 const urlPrefix = getDomainPrefix();

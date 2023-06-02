@@ -1,46 +1,64 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import React from "react";
-import Radium from "radium";
-import Color from "color";
-import settings from "../../settings";
+import React from "react"
+import Radium from "radium"
+import Color from "color"
+import settings from "../../settings"
 
 @Radium
-export default class Checkbox extends React.Component {
+export default class Checkbox extends React.Component<
+  {
+    checked: boolean
+    disabled?: boolean
+    labelPosition: string
+    clickHandler: Function
+    labelWrapperColor: string
+    color: string
+    helpText?: string
+    label: string
+  },
+  {
+    active: boolean
+    checked: boolean
+  }
+> {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       checked: this.props.checked,
-      active: false
-    };
+      active: false,
+    }
   }
 
   static defaultProps = {
-      checked: true,
-      clickHandler: (x) => { return x },
-      color: settings.darkGray,
-
+    checked: true,
+    clickHandler: (x) => {
+      return x
+    },
+    color: settings.darkGray,
   }
 
-  activeHandler () {
-    this.setState({ active: !this.state.active });
+  activeHandler() {
+    this.setState({ active: !this.state.active })
   }
 
-  clickHandler () {
-    var newState = !this.state.checked;
-    this.setState({ checked: newState });
-    if (this.props.clickHandler) { this.props.clickHandler(newState); }
+  clickHandler() {
+    var newState = !this.state.checked
+    this.setState({ checked: newState })
+    if (this.props.clickHandler) {
+      this.props.clickHandler(newState)
+    }
   }
 
-  getWrapperStyles () {
+  getWrapperStyles(): any {
     return {
       display: "block",
       marginBottom: 10,
-      position: "relative"
-    };
+      position: "relative",
+    }
   }
 
-  getLabelWrapperStyles () {
+  getLabelWrapperStyles() {
     return {
       color: this.props.labelWrapperColor,
       cursor: "pointer",
@@ -51,11 +69,11 @@ export default class Checkbox extends React.Component {
       lineHeight: "20px",
       paddingLeft: 22,
       // "-webkit-user-select": "none"
-    };
+    }
   }
 
-  getCheckboxStyles () {
-    const activeColor = Color(this.props.color).lighten(0.2).hex();
+  getCheckboxStyles() {
+    const activeColor = Color(this.props.color).lighten(0.2).hex()
 
     return {
       base: {
@@ -67,27 +85,27 @@ export default class Checkbox extends React.Component {
         position: "relative",
         top: 1,
         transition: "background-color ease .3s",
-        width: 12
+        width: 12,
       },
       checked: {
-        backgroundColor: this.props.color
+        backgroundColor: this.props.color,
       },
       active: {
-        backgroundColor: activeColor
-      }
-    };
+        backgroundColor: activeColor,
+      },
+    }
   }
 
-  getLabelStyles () {
+  getLabelStyles(): any {
     return {
       display: "inline",
       left: -12,
       marginRight: 4,
-      position: "relative"
-    };
+      position: "relative",
+    }
   }
 
-  getHelpTextStyles () {
+  getHelpTextStyles() {
     return {
       color: "#ccc",
       cursor: "pointer",
@@ -96,12 +114,12 @@ export default class Checkbox extends React.Component {
       fontSize: 12,
       fontWeight: 200,
       lineHeight: "20px",
-      marginLeft: 5
-    };
+      marginLeft: 5,
+    }
   }
 
-  render () {
-    const checkboxStyles = this.getCheckboxStyles();
+  render() {
+    const checkboxStyles = this.getCheckboxStyles()
 
     return (
       <div style={this.getWrapperStyles()}>
@@ -109,23 +127,23 @@ export default class Checkbox extends React.Component {
           style={this.getLabelWrapperStyles()}
           onClick={this.clickHandler.bind(this)}
           onMouseDown={this.activeHandler.bind(this)}
-          onMouseUp={this.activeHandler.bind(this)}>
-          <span style={[
-            checkboxStyles.base,
-            this.state.checked && checkboxStyles.checked,
-            this.state.active && checkboxStyles.active
-          ]}>
-          </span>
+          onMouseUp={this.activeHandler.bind(this)}
+        >
+          <span
+            style={[
+              checkboxStyles.base,
+              this.state.checked && checkboxStyles.checked,
+              this.state.active && checkboxStyles.active,
+            ] as any}
+          ></span>
           <span style={this.getLabelStyles()}>
             {this.props.label}
             {this.props.helpText ? (
-              <span style={this.getHelpTextStyles()}>
-                ({this.props.helpText})
-              </span>
-            ) : null }
+              <span style={this.getHelpTextStyles()}>({this.props.helpText})</span>
+            ) : null}
           </span>
         </span>
       </div>
-    );
+    )
   }
 }
