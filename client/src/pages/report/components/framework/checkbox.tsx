@@ -1,11 +1,9 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react"
-import Radium from "radium"
 import Color from "color"
 import settings from "../../settings"
 
-//@Radium
 export default class Checkbox extends React.Component<
   {
     checked: boolean
@@ -130,11 +128,13 @@ export default class Checkbox extends React.Component<
           onMouseUp={this.activeHandler.bind(this)}
         >
           <span
-            style={[
-              checkboxStyles.base,
-              this.state.checked && checkboxStyles.checked,
-              this.state.active && checkboxStyles.active,
-            ] as any}
+            style={
+              [
+                checkboxStyles.base,
+                this.state.checked && checkboxStyles.checked,
+                this.state.active && checkboxStyles.active,
+              ] as any
+            }
           ></span>
           <span style={this.getLabelStyles()}>
             {this.props.label}

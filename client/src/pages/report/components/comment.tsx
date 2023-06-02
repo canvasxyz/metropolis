@@ -1,14 +1,12 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react"
-import Radium from "radium"
 import PropTypes from "prop-types"
 import Flex from "./framework/flex"
 // import ParticipantHeader from "./participant-header";
 import * as globals from "./globals"
 import BarChart from "./barChart"
 
-@Radium
 class Comment extends React.Component<{
   formatTid
   comment: any // Comment
@@ -74,7 +72,9 @@ class Comment extends React.Component<{
           <span style={{ fontWeight: 700, fontStyle: "auto" }}>
             {this.props.comment.is_meta ? "Metadata: " : ""}
           </span>
-          <span style={[globals.paragraph, { fontStyle: "italic" }] as any}>{this.props.comment.txt}</span>
+          <span style={[globals.paragraph, { fontStyle: "italic" }] as any}>
+            {this.props.comment.txt}
+          </span>
         </Flex>
         <svg width={globals.barChartWidth} height={70}>
           <line x1="120" y1="0" x2="120" y2="65" strokeWidth="2" stroke="rgb(245,245,245)" />

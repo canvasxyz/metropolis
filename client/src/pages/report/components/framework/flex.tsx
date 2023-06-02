@@ -2,7 +2,6 @@
 
 import PropTypes from "prop-types"
 import React, { CSSProperties } from "react"
-import Radium from "radium"
 
 /**
 
@@ -101,4 +100,4 @@ class Flex extends React.Component<{
   }
 }
 
-export default Radium(Flex)
+export default Flex

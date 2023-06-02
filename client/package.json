@@ -68,7 +68,6 @@
     "lodash": "~4.17.21",
     "object-assign": "^4.1.1",
     "prop-types": "~15.7.2",
-    "radium": "~0.26.2",
     "react": "~16.14.0",
     "react-dom": "~16.14.0",
     "react-easy-emoji": "~1.4.0",
