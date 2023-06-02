@@ -6,6 +6,8 @@ import * as globals from "../globals"
 import graphUtil from "../../util/graphUtil"
 import Axes from "../graphAxes"
 import d3 from "d3"
+import { geoPath as d3geoPath } from "d3-geo"
+import { scaleSequential } from "d3-scale"
 import * as d3contour from "d3-contour"
 import * as d3chromatic from "d3-scale-chromatic"
 // import GroupLabels from "./groupLabels";
@@ -17,8 +19,8 @@ const pointsPerSquarePixelMax = 0.0017 /* choose dynamically ? */
 const contourBandwidth = 20
 const colorScaleDownFactor = 0.5 /* The colors are too dark. This helps. */
 
-const color = d3.scaleSequential(d3chromatic.interpolateYlGnBu).domain([0, pointsPerSquarePixelMax])
-const geoPath = d3.geoPath()
+const color = scaleSequential(d3chromatic.interpolateYlGnBu).domain([0, pointsPerSquarePixelMax])
+const geoPath = d3geoPath()
 
 const Contour = ({ contour }) => (
   <path fill={color(contour.value * colorScaleDownFactor)} d={geoPath(contour)} />

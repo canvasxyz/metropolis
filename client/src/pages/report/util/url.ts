@@ -19,25 +19,25 @@
 
 // NOTE: SERVICE_URL is currently not present in the production build via gulp.
 // It is only present in the dev build via webpack-dev-server.
-const serviceUrl = process.env.SERVICE_URL;
-const domain = document.domain;
-const port = document.location.port;
+const serviceUrl = document.location.origin
+const domain = document.domain
+const port = document.location.port
 
 const getDomainPrefix = () => {
   if (domain === "localhost") {
-    if (port === "" || port === "80") return "http://localhost/";
-    if (port === "5010") return "http://localhost:5000/";
-    return "http://localhost:5000/";
+    if (port === "" || port === "80") return "http://localhost/"
+    if (port === "5010") return "http://localhost:5000/"
+    return "http://localhost:5000/"
   }
 
-  if (domain.includes("pol.is")) return `https://${domain}/`;
-  if (domain.includes("polis.io")) return `https://${domain}/`;
+  if (domain.includes("pol.is")) return `https://${domain}/`
+  if (domain.includes("polis.io")) return `https://${domain}/`
 
-  if (serviceUrl) return `${serviceUrl}/`;
+  if (serviceUrl) return `${serviceUrl}/`
 
-  return `${document.location.origin}/`;
-};
+  return `${document.location.origin}/`
+}
 
-const urlPrefix = getDomainPrefix();
+const urlPrefix = getDomainPrefix()
 
-export default { urlPrefix };
+export default { urlPrefix }

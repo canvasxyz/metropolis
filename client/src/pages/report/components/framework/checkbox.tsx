@@ -5,7 +5,7 @@ import Radium from "radium"
 import Color from "color"
 import settings from "../../settings"
 
-@Radium
+//@Radium
 export default class Checkbox extends React.Component<
   {
     checked: boolean
