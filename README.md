@@ -18,7 +18,13 @@ npm install
 
 Setting up locally:
 
-1. Install Postgres, through Postgres.app (Mac) or your package manager.
+1. Install Postgres, through Postgres.app (Mac) or your package manager. Also install Java and Clojure for the math worker.
+
+```
+brew install --cask temurin
+brew install clojure/tools/clojure
+```
+
 2. From a `psql` console run:
 
 ```
