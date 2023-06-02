@@ -33,6 +33,9 @@ import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import Survey from "./pages/survey"
 
+/* report */
+import Report from "./pages/report"
+
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
     return null
@@ -194,6 +197,7 @@ class App extends React.Component<
                         component={Account}
                       />
                       <Route path="/c/:conversation_id" component={Survey} />
+                      <Route path="/r/:conversation_id" component={Report} />
                     </Box>
                   )
                 }}
