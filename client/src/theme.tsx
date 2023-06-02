@@ -60,6 +60,7 @@ export default {
       cursor: "pointer",
     },
     nav: {
+      fontFamily: "monospace",
       color: "inherit",
       "&.active": {
         color: "primary",
