@@ -8,7 +8,6 @@
   },
   "workspaces": [
     "client",
-    "client-report",
     "server"
   ],
   "devDependencies": {

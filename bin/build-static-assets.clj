@@ -98,7 +98,7 @@
   ;; once that has completed,
 
 (def processes
-  (for [client-dir ["client"]];; "client-report"]] ; leaving client-report off for now
+  (for [client-dir ["client"]]
     (async/thread
       (build-and-cp-client client-dir)
       (println "Finished building:" client-dir))))

@@ -14,12 +14,10 @@ First things first, it helps to understand a bit how the system is set up.
 | [`server`][dir-server] | Node.js | The main server. Handles client web requests (page loads, vote activity, etc.) |
 | [`math`][dir-math] | Clojure/JVM | The math engine.  |
 | [`client`][dir-client] | Javascript | The client code. |
-| [`client-report`][dir-report] | Node.js | The code for detailed analytics reports. |
 
    [dir-server]: /server
    [dir-math]: /math
    [dir-client]: /client
-   [dir-report]: /client-report
 
 While this document will try to outline some of the more important configuration steps and options, you'll need to see
 the individual READMEs for more detailed descriptions of how to configure these components.
@@ -105,7 +103,6 @@ If you are deploying to a custom domain (not pol.is) then you need to update bot
 - **`DOMAIN_OVERRIDE`** the hostname of your site. Should match **`API_PROD_HOSTNAME`**.
 - **`DOMAIN_WHITELIST_ITEM_01`** - **`08`** up to 8 possible additional whitelisted domains for client applications to make API requests from. Typical setups that use the same URL for the API service as for the public-facing web sites do not need to configure these.
 - **`EMBED_SERVICE_HOSTNAME`** should match **`API_DEV_HOSTNAME`** in production, or **`API_DEV_HOSTNAME`** in development. Embedded conversations make API requests to this host.
-- **`SERVICE_URL`** used by client-report to make API calls. Only necessary if client-report is hosted separately from the API service. Can be left blank.
 - **`STATIC_FILES_HOST`** Used by the API service to fetch static assets (the compiled client applications) from a static file server. Within a docker compose network this is "file-server", but could be an external hostname, such as a CDN.
 
 ### Third Party API Credentials
