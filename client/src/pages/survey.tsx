@@ -61,6 +61,10 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
   const [isAgree, setIsAgree] = useState<boolean>(true)
   const [isDisagree, setIsDisagree] = useState<boolean>()
 
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const submitComment = (txt: string) => {
     const params = {
       pid: "mypid",

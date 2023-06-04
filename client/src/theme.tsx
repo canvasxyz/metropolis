@@ -75,10 +75,11 @@ export default {
       fontSize: [2],
       fontWeight: "bold",
       cursor: "pointer",
-      borderBottom: "2px solid",
+      borderBottom: "1.5px solid",
       borderBottomColor: "background",
     },
     activeNav: {
+      fontFamily: "monospace",
       color: "inherit",
       "&.active": {
         color: "primary",
@@ -92,7 +93,7 @@ export default {
       fontSize: [2],
       fontWeight: "bold",
       cursor: "pointer",
-      borderBottom: "2px solid",
+      borderBottom: "1.5px solid",
       borderBottomColor: "mediumGray",
     },
   },
