@@ -5,6 +5,7 @@ import CommentList from "./lists/commentList"
 import * as globals from "./globals"
 import _ from "lodash"
 import * as d3 from "d3"
+import { voronoi as d3voronoi } from "d3-voronoi"
 
 // import Flex from "../framework/flex"
 
@@ -191,19 +192,18 @@ class Beeswarm extends React.Component<
 
     for (var i = 0; i < 120; ++i) simulation.tick()
 
-    // const voronoi = d3
-    //   .voronoi()
-    //   .extent([
-    //     [-this.margin.left, -this.margin.top],
-    //     [this.widthMinusMargins + this.margin.right, this.heightMinusMargins + this.margin.top],
-    //   ])
-    //   .x(function (d) {
-    //     return d.x
-    //   })
-    //   .y(function (d) {
-    //     return d.y
-    //   })
-    //   .polygons(commentsWithExtremity)
+    const voronoi = d3voronoi()
+      .extent([
+        [-this.margin.left, -this.margin.top],
+        [this.widthMinusMargins + this.margin.right, this.heightMinusMargins + this.margin.top],
+      ])
+      .x(function (d) {
+        return d.x
+      })
+      .y(function (d) {
+        return d.y
+      })
+      .polygons(commentsWithExtremity)
 
     // if (!this.state.axesRendered) {
     //   d3.select("#beeswarmAxisAttachPointD3").append("g")
@@ -214,7 +214,7 @@ class Beeswarm extends React.Component<
 
     this.setState({
       x,
-      voronoi: [], // TODO
+      voronoi,
       commentsWithExtremity,
       axesRendered: true,
     })

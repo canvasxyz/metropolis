@@ -132,7 +132,7 @@ class App extends React.Component<
           <Box
             sx={{
               margin: `0 auto`,
-              maxWidth: "45em",
+              maxWidth: document.location.pathname?.startsWith("/r/") ? "62em" : "45em",
               padding: `0 1.0875rem 1.45rem`,
             }}
           >

@@ -187,11 +187,8 @@ class Report extends React.Component<
     console.log(conversation_id, report_id)
 
     const reportPromise = this.getReport(report_id)
-    // debug initial report data fetch
-    reportPromise.then((report) => console.log("report recieved:", report))
-    const mathPromise = reportPromise.then((report) => {
-      return this.getMath(report.conversation_id)
-    })
+
+    const mathPromise = reportPromise.then((report) => this.getMath(report.conversation_id))
     const commentsPromise = reportPromise.then((report) => {
       return conversationPromise.then((conv) => {
         return this.getComments(report.conversation_id, report_id, conv.strict_moderation)
