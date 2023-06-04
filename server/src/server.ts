@@ -1815,45 +1815,6 @@ function initializePolisHelpers() {
     );
   }
 
-  function handle_POST_math_update(
-    req: { p: { zid: any; uid?: any; math_update_type: any } },
-    res: {
-      status: (arg0: number) => {
-        (): any;
-        new (): any;
-        json: { (arg0: {}): void; new (): any };
-      };
-    }
-  ) {
-    let zid = req.p.zid;
-    let uid = req.p.uid;
-    let math_env = Config.mathEnv;
-    let math_update_type = req.p.math_update_type;
-
-    isModerator(zid, uid).then((hasPermission: any) => {
-      if (!hasPermission) {
-        return fail(res, 500, "handle_POST_math_update_permission");
-      }
-      return pgQueryP(
-        "insert into worker_tasks (task_type, task_data, task_bucket, math_env) values ('update_math', $1, $2, $3);",
-        [
-          JSON.stringify({
-            zid: zid,
-            math_update_type: math_update_type,
-          }),
-          zid,
-          math_env,
-        ]
-      )
-        .then(() => {
-          res.status(200).json({});
-        })
-        .catch((err: any) => {
-          return fail(res, 500, "polis_err_POST_math_update", err);
-        });
-    });
-  }
-
   function handle_GET_math_correlationMatrix(
     req: { p: { rid: any; math_tick: any } },
     res: {
@@ -13435,7 +13396,6 @@ Thanks for using Polis!
     handle_POST_domainWhitelist,
     handle_POST_einvites,
     handle_POST_joinWithInvite,
-    handle_POST_math_update,
     handle_POST_metadata_answers,
     handle_POST_metadata_questions,
     handle_POST_metrics,

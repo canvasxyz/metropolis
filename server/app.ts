@@ -154,7 +154,6 @@ helpersInitialized.then(
       handle_POST_domainWhitelist,
       handle_POST_einvites,
       handle_POST_joinWithInvite,
-      handle_POST_math_update,
       handle_POST_metadata_answers,
       handle_POST_metadata_questions,
       handle_POST_metrics,
@@ -1145,19 +1144,6 @@ helpersInitialized.then(
       ),
       want("report_id", getReportIdFetchRid, assignToPCustom("rid")), // Knowing the report_id grants the user permission to view the report
       handle_GET_reports
-    );
-
-    app.post(
-      "/api/v3/mathUpdate",
-      moveToBody,
-      auth(assignToP),
-      need(
-        "conversation_id",
-        getConversationIdFetchZid,
-        assignToPCustom("zid")
-      ),
-      need("math_update_type", getStringLimitLength(1, 32), assignToP), // expecting "recompute" or "update"
-      handle_POST_math_update
     );
 
     app.post(
