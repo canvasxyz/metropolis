@@ -15,7 +15,6 @@ import AllCommentsModeratedIn from "./components/lists/allCommentsModeratedIn"
 import ParticipantGroups from "./components/lists/participantGroups"
 import ParticipantsGraph from "./components/participantsGraph/participantsGraph"
 import Beeswarm from "./components/beeswarm"
-import Controls from "./components/controls"
 
 import net from "./util/net"
 
@@ -34,9 +33,7 @@ class Report extends React.Component<
     participants
     conversation
     groupDemographics
-    colorBlindMode
     dimensions
-    shouldPoll
     voteColors
     groupNames?
     math?
@@ -70,12 +67,10 @@ class Report extends React.Component<
       participants: null,
       conversation: null,
       groupDemographics: null,
-      colorBlindMode: false,
       dimensions: {
         width: window.innerWidth,
         height: window.innerHeight,
       },
-      shouldPoll: false,
       voteColors: {
         agree: globals.brandColors.agree,
         disagree: globals.brandColors.disagree,
@@ -418,12 +413,6 @@ class Report extends React.Component<
   UNSAFE_componentWillMount() {
     this.getData()
 
-    setInterval(() => {
-      if (this.state.shouldPoll) {
-        this.getData()
-      }
-    }, 20 * 1000)
-
     window.addEventListener(
       "resize",
       _.throttle(() => {
@@ -437,71 +426,32 @@ class Report extends React.Component<
     )
   }
 
-  onAutoRefreshEnabled() {
-    this.setState({
-      shouldPoll: true,
-    })
-  }
-
-  onAutoRefreshDisabled() {
-    this.setState({
-      shouldPoll: false,
-    })
-  }
-
-  handleColorblindModeClick() {
-    var colorBlind = !this.state.colorBlindMode
-    if (colorBlind) {
-      this.setState({
-        colorBlindMode: colorBlind,
-        voteColors: Object.assign(this.state.voteColors, {
-          agree: globals.brandColors.agreeColorblind,
-        }),
-      })
-    } else {
-      this.setState({
-        colorBlindMode: colorBlind,
-        voteColors: Object.assign(this.state.voteColors, {
-          agree: globals.brandColors.agree,
-        }),
-      })
-    }
-  }
-
   render() {
     if (this.state.error) {
       return (
         <div>
-          <div> Error Loading </div>
-          <div> {this.state.errorText} </div>
+          <div>Error Loading</div>
+          <div>{this.state.errorText}</div>
         </div>
       )
     }
     if (this.state.nothingToShow) {
       return (
         <div>
-          <div> Nothing to show yet </div>
+          <div>Nothing to show yet</div>
         </div>
       )
     }
     if (this.state.loading) {
       return (
         <div>
-          <div> Loading ... </div>
+          <div>Loading...</div>
         </div>
       )
     }
     return (
       <div className="survey-report">
         <div>
-          <Controls
-            onAutoRefreshEnabled={this.onAutoRefreshEnabled.bind(this)}
-            handleColorblindModeClick={this.handleColorblindModeClick.bind(this)}
-            colorBlindMode={this.state.colorBlindMode}
-            onAutoRefreshDisabled={this.onAutoRefreshDisabled.bind(this)}
-            autoRefreshEnabled={this.state.shouldPoll}
-            /*voteColors={this.state.voteColors}*/
-          />
           <Overview
             computedStats={this.state.computedStats}
             math={this.state.math}
@@ -562,7 +512,6 @@ class Report extends React.Component<
             comments={this.state.comments}
             /*groupNames={this.state.groupNames}*/
             badTids={this.state.badTids}
-            colorBlindMode={this.state.colorBlindMode}
             formatTid={this.state.formatTid}
             /*repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup}*/
             math={this.state.math}

@@ -75,7 +75,6 @@ class ParticipantsGraph extends React.Component<
     formatTid: any
     comments: any
     badTids: any
-    colorBlindMode: any
     showOnlyGroup?: any
     voteColors: any
     consensusDivisionColorScale?: any
@@ -117,9 +116,7 @@ class ParticipantsGraph extends React.Component<
 
   getInnerRadialAxisColor() {
     let color = globals.brandColors.lightgrey
-    if (this.props.consensusDivisionColorScale && this.props.colorBlindMode) {
-      color = globals.brandColors.blue
-    } else if (this.props.consensusDivisionColorScale && !this.props.colorBlindMode) {
+    if (this.props.consensusDivisionColorScale) {
       color = this.props.voteColors.agree
     }
     return color

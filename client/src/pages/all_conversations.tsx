@@ -62,10 +62,10 @@ function ConversationRow({ c, i, dispatch }) {
         {!c.is_archived ? (
           <React.Fragment>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
-              <Text>{c.is_active ? "Voting Open" : "Voting Closed"}</Text>
               <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}/reports`}>
                 Reports
               </Link>
+              <Text>{c.is_active ? "Voting Open" : "Voting Closed"}</Text>
             </Box>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
               <Text>
