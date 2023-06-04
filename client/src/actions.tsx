@@ -1734,3 +1734,14 @@ export const startDataExport = (conversation_id, format, unixTimestamp, untilEna
     )
   }
 }
+
+// // poll for new comments, since others might be creating comments?
+// function getNextComment(conversationId, currentCommentTid) {
+//   return api.get("api/v3/nextComment", {
+//     not_voted_by_pid: "mypid",
+//     limit: 1,
+//     include_social: true,
+//     conversation_id: conversationId,
+//     without: currentCommentTid ? [currentCommentTid] : []
+//   });
+// }

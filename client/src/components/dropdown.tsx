@@ -4,13 +4,72 @@ import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import { TbChevronDown } from "react-icons/tb"
 
+type DropdownMenuOptions = Array<{
+  name: string
+  onClick: Function
+}>
+
+const DropdownMenu = ({
+  sx,
+  rightAlign,
+  options,
+}: {
+  sx?
+  rightAlign?: boolean
+  options: DropdownMenuOptions
+}) => {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <Box sx={{ ...sx, position: "relative" }}>
+      <Button
+        variant="outlineSecondary"
+        sx={{ px: 2, py: 1 }}
+        onClick={() => setOpen(!open)}
+        onBlur={() => setTimeout(() => setOpen(false), 10)}
+      >
+        <Box sx={{ position: "relative", top: "2px" }}>
+          <TbChevronDown />
+        </Box>
+      </Button>
+      <Box
+        sx={{
+          mt: "1px",
+          borderRadius: "3px",
+          bg: "primary",
+          position: "absolute",
+          right: rightAlign ? "0" : undefined,
+          whiteSpace: "nowrap",
+          display: open ? "block" : "none",
+        }}
+      >
+        {options.map((option, index) => {
+          return (
+            <Button variant="outlineGray" key={index} onClick={option.onClick}>
+              {option.name}
+            </Button>
+          )
+        })}
+      </Box>
+    </Box>
+  )
+}
+
 type DropdownButtonOptions = Array<{
   name: string
   onClick: Function
   default?: boolean
 }>
 
-const DropdownButton = ({ sx, options }: { sx?; options: DropdownButtonOptions }) => {
+const DropdownButton = ({
+  sx,
+  rightAlign,
+  options,
+}: {
+  sx?
+  rightAlign?: boolean
+  options: DropdownButtonOptions
+}) => {
   const [open, setOpen] = useState(false)
 
   const defaultOption = options.find((o) => o.default)
@@ -42,6 +101,7 @@ const DropdownButton = ({ sx, options }: { sx?; options: DropdownButtonOptions }
           borderRadius: "3px",
           bg: "primary",
           position: "absolute",
+          right: rightAlign ? "0" : undefined,
           whiteSpace: "nowrap",
           display: open ? "block" : "none",
         }}
@@ -58,4 +118,4 @@ const DropdownButton = ({ sx, options }: { sx?; options: DropdownButtonOptions }
   )
 }
 
-export default DropdownButton
+export { DropdownMenu, DropdownButton }

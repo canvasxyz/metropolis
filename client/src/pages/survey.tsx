@@ -8,7 +8,7 @@ import api from "../util/api"
 import SurveyCard from "./survey_card"
 import type { RootState, Comment, Conversation } from "../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../actions"
-import DropdownButton from "../components/dropdown"
+import { DropdownButton } from "../components/dropdown"
 
 // TODO: enforce comment too long on backend
 
@@ -110,14 +110,14 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
             fontFamily: "body",
             fontSize: [2],
             width: "100%",
-            borderRadius: 2,
+            borderRadius: "3px",
             padding: [2],
             border: "1px solid",
             borderColor: "lightGray",
             mb: [3],
           }}
           ref={inputRef}
-          placeholder="Write a new card here..."
+          placeholder="Write a new comment..."
         />
         <Flex>
           <Box>
@@ -187,12 +187,14 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
             }}
           >
             <p>It looks like you've voted on everything.</p>
-            <p>Maybe try writing some cards of your own?</p>
+            <p>Have you tried writing a comment yet?</p>
           </Box>
         )}
       </Box>
       <Flex>
-        <Text sx={{ color: "lightGray", margin: "20px auto" }}>Review cards you've voted on</Text>
+        <Text sx={{ color: "lightGray", margin: "20px auto" }}>
+          Review comments you've voted on
+        </Text>
       </Flex>
       <Box sx={{ pb: "180px" }}>
         {votedComments.map((comment, i) => (
