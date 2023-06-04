@@ -50,7 +50,7 @@
       (storm/spout
         (nextTuple []
           (try
-            (log/info "Polling" message-type ">" @last-timestamp)
+            (log/trace "Polling" message-type ">" @last-timestamp)
             (let [poll-function (get {:votes postgres/poll :moderation postgres/mod-poll} message-type)
                   results (poll-function postgres @last-timestamp)
                   grouped-batches (group-by :zid results)]
@@ -138,5 +138,3 @@
     [config-overrides]
     (merge (system/base-system config-overrides)
            {:storm-cluster (component/using (create-storm-cluster) [:config :conversation-manager])})))
-
-

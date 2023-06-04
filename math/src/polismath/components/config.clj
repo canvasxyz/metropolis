@@ -45,9 +45,9 @@
                 :private-url-base "http://localhost:8080"}
                 ;; Shit... should be able to specify dependency on preprod as well!
    :database   {:pool-size 3}
-   :poller     {:votes {:polling-interval 1000}
-                :moderation {:polling-interval 1000}
-                :tasks {:polling-interval 1000}
+   :poller     {:votes {:polling-interval 3000}
+                :moderation {:polling-interval 3000}
+                :tasks {:polling-interval 3000}
                 :poll-from-days-ago 10}
    :math       {:matrix-implementation :vectorz}
    :logging    {:file "log/dev.log"
@@ -195,4 +195,3 @@
 ;                     (get-config profile overrides))
 ;          :stop (do (log/info "<< Stopping config component")
 ;                    (reset! overrides nil)))
-

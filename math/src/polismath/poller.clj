@@ -21,7 +21,7 @@
              message-type)]
     (go-loop [last-timestamp start-polling-from]
       (when-not (async/poll! kill-chan)
-        (log/info "Polling" message-type ">" last-timestamp)
+        (log/trace "Polling" message-type ">" last-timestamp)
         (let [results (poll-function postgres last-timestamp)
               grouped-batches (group-by :zid results)
               last-timestamp (apply max 0 last-timestamp (map timestamp-key results))]
@@ -56,5 +56,3 @@
    (create-poller message-type {}))
   ([message-type options]
    (map->Poller (merge options {:message-type message-type}))))
-
-

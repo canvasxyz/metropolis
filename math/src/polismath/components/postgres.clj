@@ -72,7 +72,7 @@
 (defn poll
   "Query for all data since last-vote-timestamp, given a db-spec"
   [component last-vote-timestamp]
-  (log/info "poll" last-vote-timestamp)
+  (log/trace "poll" last-vote-timestamp)
   (try
     (query component
            {:select [:*]
@@ -89,7 +89,7 @@
   "Moderation query: basically look for when things were last modified, since this is the only time they will
   have been moderated."
   [component last-mod-timestamp]
-  (log/info "modpoll" last-mod-timestamp)
+  (log/trace "modpoll" last-mod-timestamp)
   (try
     (query component
            {:select [:*]
@@ -103,7 +103,7 @@
 
 (defn get-zid-from-zinvite
   [component zinvite]
-  (log/debug "get-zid-from-zinvite for zinvite" zinvite)
+  (log/trace "get-zid-from-zinvite for zinvite" zinvite)
   (->
     (query component
            {:select [:zid :zinvite]
@@ -125,7 +125,7 @@
 
 (defn get-zinvite-from-zid
   [component zid]
-  (log/debug "get-zinvite-from-zid for zid" zid)
+  (log/trace "get-zinvite-from-zid for zid" zid)
   (->
     (query component
            {:select [:zid :zinvite]
@@ -415,5 +415,3 @@
   :endcomment)
 
 :ok
-
-
