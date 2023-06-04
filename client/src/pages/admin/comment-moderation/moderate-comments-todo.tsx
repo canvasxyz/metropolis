@@ -54,7 +54,6 @@ class ModerateCommentsTodo extends React.Component<
     return (
       <div>
         <div>
-          <p> Displays maximum {max} comments </p>
           {this.props.unmoderated_comments !== null
             ? this.createCommentMarkup(max)
             : "Loading unmoderated comments..."}

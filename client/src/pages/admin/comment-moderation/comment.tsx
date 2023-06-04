@@ -60,13 +60,6 @@ class Comment extends React.Component<
               ) : null}
             </Box>
             <Flex sx={{ alignItems: "center" }}>
-              <Link
-                title="Identifying information that should not be considered in the survey"
-                sx={{ mr: [2], variant: "styles.a" }}
-                href="#"
-              >
-                {this.props.isMetaCheckbox ? "metadata" : null}
-              </Link>
               {this.props.isMetaCheckbox ? (
                 <label>
                   <input
@@ -75,7 +68,7 @@ class Comment extends React.Component<
                     checked={this.props.comment.is_meta}
                     onChange={this.onIsMetaClicked.bind(this)}
                   />
-                  metadata
+                  Mark as metadata
                 </label>
               ) : null}
             </Flex>
