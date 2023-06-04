@@ -79,13 +79,6 @@ class ShareAndEmbed extends React.Component<
               {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
             </pre>
           </div>
-          <p>
-            This embed code can only be used to embed a single conversation.{" "}
-            <Link to="/integrate">
-              I want to integrate the survey system across multiple pages on my site.
-            </Link>
-          </p>
-          <div>{this.props.zid_metadata.parent_url ? this.constructEmbeddedOnMarkup() : ""}</div>
         </div>
       </div>
     )

@@ -1453,6 +1453,7 @@ helpersInitialized.then(
     app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
+    app.get(/^\/r\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
 
     app.use(express.static(path.join(__dirname, "client")));
 
@@ -1468,30 +1469,6 @@ helpersInitialized.then(
     //     "Content-Type": "text/html",
     //   })
     // );
-
-    // app.get(/^\/integrate(\/.*)?/, fetchIndexForAdminPage);
-    // app.get(/^\/other-conversations(\/.*)?/, fetchIndexForAdminPage);
-    // app.get(/^\/bot(\/.*)?/, fetchIndexForAdminPage);
-    // app.get(/^\/bot\/install(\/.*)?/, fetchIndexForAdminPage);
-    // app.get(/^\/bot\/support(\/.*)?/, fetchIndexForAdminPage);
-
-    // app.get(/^\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // conversation view
-    // app.get(/^\/explore\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // power view
-    // app.get(/^\/share\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // share view
-    // app.get(/^\/summary\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForConversation); // summary view
-
-    // app.get(/^\/inbox(\/.*)?$/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/r/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/hk/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/s\//, fetchIndexWithoutPreloadData);
-    // app.get(/^\/s$/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/hk\/new/, fetchIndexWithoutPreloadData);
-    // app.get(/^\/inboxApiTest/, fetchIndexWithoutPreloadData);
-
-    // app.get(/^\/demo\/[0-9][0-9A-Za-z]+/, fetchIndexForConversation);
-    // app.get(/^\/demo$/, fetchIndexForAdminPage);
-    // app.get(/^\/company$/, fetchIndexForAdminPage);
-    // app.get(/^\/report\/r?[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForReportPage);
 
     // app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
     // app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);
