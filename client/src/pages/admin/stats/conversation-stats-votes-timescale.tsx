@@ -22,10 +22,12 @@ class VotesTimescale extends React.Component<{
       <VictoryChart
         width={this.props.chartWidth}
         height={this.props.chartHeight}
-        scale={{
-          x: scaleTime(this.props.data.voteTimes),
-          y: scaleLinear(),
-        }}
+        scale={
+          {
+            x: scaleTime(this.props.data.voteTimes),
+            y: scaleLinear(),
+          } as any
+        }
       >
         <VictoryLine
           style={{

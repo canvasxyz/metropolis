@@ -21,10 +21,12 @@ class CommentsTimescale extends React.Component<
       <VictoryChart
         width={this.props.chartWidth}
         height={this.props.chartHeight}
-        scale={{
-          x: scaleTime(this.props.data.commentTimes),
-          y: scaleLinear(),
-        }}
+        scale={
+          {
+            x: scaleTime(this.props.data.commentTimes),
+            y: scaleLinear(),
+          } as any
+        }
       >
         <VictoryLine
           style={{

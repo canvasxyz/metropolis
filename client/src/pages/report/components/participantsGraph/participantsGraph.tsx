@@ -10,7 +10,7 @@ import { scaleSequential } from "d3-scale"
 import * as d3contour from "d3-contour"
 import * as d3chromatic from "d3-scale-chromatic"
 // import GroupLabels from "./groupLabels";
-import Comments from "../commentsGraph/comments"
+import Comments from "./comments"
 import Hull from "./hull"
 import CommentList from "../lists/commentList"
 

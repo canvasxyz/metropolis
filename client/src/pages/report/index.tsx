@@ -1,30 +1,19 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// import { connect } from "react-redux";
-// import probabilities from "../sampleData/probabilities";
-// import covariance from "../sampleData/covariance";
-// import correlation from "../sampleData/correlation";
-// import correlationHClust from "../sampleData/correlationHClust"
-// import Matrix from "./correlationMatrix/matrix";
-// import CommentsGraph from "./commentsGraph/commentsGraph";
-// import BoxPlot from "./boxPlot/boxPlot";
-
 import React from "react"
 import _ from "lodash"
 
 import DataUtils from "./util/dataUtils"
 
 import * as globals from "./components/globals"
-import Heading from "./components/framework/heading"
-import Footer from "./components/framework/Footer"
 import Overview from "./components/overview"
 import MajorityStrict from "./components/lists/majorityStrict"
 import Uncertainty from "./components/lists/uncertainty"
 import AllCommentsModeratedIn from "./components/lists/allCommentsModeratedIn"
 import ParticipantGroups from "./components/lists/participantGroups"
 import ParticipantsGraph from "./components/participantsGraph/participantsGraph"
-import Beeswarm from "./components/beeswarm/beeswarm"
-import Controls from "./components/controls/controls"
+import Beeswarm from "./components/beeswarm"
+import Controls from "./components/controls"
 
 import net from "./util/net"
 
@@ -504,14 +493,8 @@ class Report extends React.Component<
       )
     }
     return (
-      <div style={{ margin: "0px 10px" }}>
-        <Heading conversation={this.state.conversation} />
-        <div
-          style={{
-            marginLeft: 20,
-            marginTop: 40,
-          }}
-        >
+      <div>
+        <div>
           <Controls
             onAutoRefreshEnabled={this.onAutoRefreshEnabled.bind(this)}
             handleColorblindModeClick={this.handleColorblindModeClick.bind(this)}
@@ -520,9 +503,6 @@ class Report extends React.Component<
             autoRefreshEnabled={this.state.shouldPoll}
             /*voteColors={this.state.voteColors}*/
           />
-
-          {/* This may eventually need to go back in below */}
-          {/* stats={this.state.conversationStats} */}
           <Overview
             computedStats={this.state.computedStats}
             math={this.state.math}
@@ -532,6 +512,7 @@ class Report extends React.Component<
             /*demographics={this.state.demographics}*/
             conversation={this.state.conversation}
             /*voteColors={this.state.voteColors}*/
+            /*stats={this.state.conversationStats}*/
           />
           <Beeswarm
             conversation={this.state.conversation}
@@ -578,23 +559,6 @@ class Report extends React.Component<
             formatTid={this.state.formatTid}
             voteColors={this.state.voteColors}
           />
-          {/* {false ? <CommentsGraph
-            comments={this.state.comments}
-            groupNames={this.state.groupNames}
-            badTids={this.state.badTids}
-            formatTid={this.state.formatTid}
-            repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup}
-            math={this.state.math}
-            renderHeading={true}
-            report={this.state.report}
-            voteColors={this.state.voteColors}/> : null}
-          {globals.enableMatrix && false ? <Matrix
-            probabilities={this.state.filteredCorrelationMatrix}
-            comments={this.state.comments}
-            tids={this.state.filteredCorrelationTids}
-            formatTid={this.state.formatTid}
-            ptptCount={this.state.ptptCount}
-            voteColors={this.state.voteColors}/> : ""} */}
           <ParticipantsGraph
             comments={this.state.comments}
             /*groupNames={this.state.groupNames}*/
@@ -606,8 +570,6 @@ class Report extends React.Component<
             report={this.state.report}
             voteColors={this.state.voteColors}
           />
-          {/* <BoxPlot
-            groupVotes={this.state.math["group-votes"]}/>*/}
           <AllCommentsModeratedIn
             math={this.state.math}
             comments={this.state.comments}
@@ -616,7 +578,6 @@ class Report extends React.Component<
             formatTid={this.state.formatTid}
             voteColors={this.state.voteColors}
           />
-          <Footer />
         </div>
       </div>
     )
