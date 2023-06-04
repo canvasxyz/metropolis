@@ -113,6 +113,10 @@ module.exports = (env, options) => {
     module: {
       rules: [
         {
+          test: /\.css$/i,
+          use: ["style-loader", "css-loader"],
+        },
+        {
           test: /\.tsx?$/,
           exclude: [/node_modules/, path.resolve(__dirname, "build")],
           use: "ts-loader",

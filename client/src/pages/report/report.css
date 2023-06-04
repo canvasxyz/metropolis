@@ -1,0 +1,39 @@
+/*begin http://bl.ocks.org/jensgrubert/7789216 */
+.survey-report .box {
+  font: 10px sans-serif;
+}
+
+.survey-report .box line,
+.survey-report .box rect,
+.survey-report .box circle {
+  fill: steelblue;
+  stroke: #000;
+  stroke-width: 1px;
+}
+
+.survey-report .box .center {
+  stroke-dasharray: 3,3;
+}
+
+.survey-report .box .outlier {
+  fill: none;
+  stroke: #000;
+}
+
+.survey-report .axis {
+  font: 12px sans-serif;
+}
+
+.survey-report .axis path,
+.survey-report .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.survey-report .x.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+/*end  http://bl.ocks.org/jensgrubert/7789216 */
