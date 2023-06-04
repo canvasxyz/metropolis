@@ -5,7 +5,6 @@ import _ from "lodash"
 import * as globals from "../globals"
 import graphUtil from "../../util/graphUtil"
 import Axes from "../graphAxes"
-import d3 from "d3"
 import { geoPath as d3geoPath } from "d3-geo"
 import { scaleSequential } from "d3-scale"
 import * as d3contour from "d3-contour"
@@ -145,15 +144,15 @@ class ParticipantsGraph extends React.Component<
 
     const contours = d3contour
       .contourDensity()
-      .x(function (d) {
+      .x(function (d: any) {
         return d.x
       })
-      .y(function (d) {
+      .y(function (d: any) {
         return d.y
       })
       .size([globals.side, globals.side])
       // .bandwidth(10)(baseClustersScaled)
-      .bandwidth(contourBandwidth)(baseClustersScaled)
+      .bandwidth(contourBandwidth)(baseClustersScaled as any)
 
     return (
       <div style={{ position: "relative" }}>

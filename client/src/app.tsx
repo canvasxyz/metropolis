@@ -197,7 +197,7 @@ class App extends React.Component<
                         component={Account}
                       />
                       <Route path="/c/:conversation_id" component={Survey} />
-                      <Route path="/r/:conversation_id" component={Report} />
+                      <Route path="/r/:conversation_id/:report_id" component={Report} />
                     </Box>
                   )
                 }}

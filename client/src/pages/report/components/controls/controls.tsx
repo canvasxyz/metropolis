@@ -34,6 +34,7 @@ class Controls extends React.Component<{
   render() {
     return (
       <div>
+        {/*
         <Checkbox
           label={"auto-refresh"}
           disabled={false}
@@ -53,7 +54,7 @@ class Controls extends React.Component<{
           labelPosition={"left"}
           labelWrapperColor={settings.darkerGray}
           color={settings.polisBlue}
-        />
+          />*/}
       </div>
     )
   }

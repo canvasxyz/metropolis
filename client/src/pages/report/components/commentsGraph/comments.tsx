@@ -23,8 +23,6 @@ class Comments extends React.Component<
   }
 > {
   createComments() {
-    console.log("in create comments, comments graph", this.props.points[0])
-
     // const _points = this.props.points.slice(0);
     //
     // var simulation = d3.forceSimulation(_points)

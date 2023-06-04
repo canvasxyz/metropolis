@@ -13,7 +13,7 @@ import ConversationStats from "./stats"
 
 import ModerateComments from "./comment-moderation/"
 
-// import DataExport from "./data-export";
+import DataExport from "./data-export"
 import ShareAndEmbed from "./share-and-embed"
 
 import Reports from "./report/reports"
@@ -100,15 +100,27 @@ class ConversationAdminContainer extends React.Component<
               Report
             </Link>
           </Box>
+          <Box sx={{ mb: [3] }}>
+            <Link
+              sx={{
+                variant: url === "export" ? "links.activeNav" : "links.nav",
+              }}
+              to={`${match.url}/export`}
+            >
+              Export
+            </Link>
+          </Box>
         </Box>
         <Box sx={{ p: [4], flex: "0 0 auto", maxWidth: "35em", mx: [4] }}>
           <Switch>
-            <Route exact path={`${match.path}/`} component={ConversationConfig} />
+            <Route exact path={`${match.path}/`} component={ConversationConfig} /> {/* configure */}
             <Route exact path={`${match.path}/share`} component={ShareAndEmbed} />
-            <Route exact path={`${match.path}/reports`} component={Reports} />
-            <Route path={`${match.path}/comments`} component={ModerateComments} />
+            {/* distribute */}
+            <Route path={`${match.path}/comments`} component={ModerateComments} /> {/* moderate */}
             <Route exact path={`${match.path}/stats`} component={ConversationStats} />
-            {/* <Route exact path={`${match.path}/export`} component={DataExport} /> */}
+            {/* monitor */}
+            <Route exact path={`${match.path}/reports`} component={Reports} /> {/* report */}
+            <Route exact path={`${match.path}/export`} component={DataExport} /> {/* export */}
           </Switch>
         </Box>
       </Flex>

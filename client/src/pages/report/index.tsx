@@ -28,50 +28,50 @@ import Controls from "./components/controls/controls"
 
 import net from "./util/net"
 
-var pathname = window.location.pathname // "/report/2arcefpshi"
-var report_id = pathname.split("/")[2]
-
 function assertExists(obj, key) {
   if (typeof obj[key] === "undefined") {
     console.error("assertExists failed. Missing: ", key)
   }
 }
 
-class App extends React.Component<{
-}, {
-  loading
-  consensus
-  comments
-  participants
-  conversation
-  groupDemographics
-  colorBlindMode
-  dimensions
-  shouldPoll
-  voteColors
-  groupNames?
-  math?
-  report?
-  ptptCount?
-  extremity?
-  errorText?
-  error?
-  uncertainty?
-  demographics?,
-  ptptCountTotal?
-  filteredCorrelationMatrix?
-  filteredCorrelationTids?
-  badTids?
-  repfulAgreeTidsByGroup?
-  repfulDisageeTidsByGroup?
-  formatTid?
-  computedStats?
-  nothingToShow?
-}> {
+class Report extends React.Component<
+  { match: { params: { report_id; conversation_id } } },
+  {
+    loading
+    consensus
+    comments
+    participants
+    conversation
+    groupDemographics
+    colorBlindMode
+    dimensions
+    shouldPoll
+    voteColors
+    groupNames?
+    math?
+    report?
+    ptptCount?
+    extremity?
+    errorText?
+    error?
+    uncertainty?
+    demographics?
+    ptptCountTotal?
+    filteredCorrelationMatrix?
+    filteredCorrelationTids?
+    badTids?
+    repfulAgreeTidsByGroup?
+    repfulDisageeTidsByGroup?
+    formatTid?
+    computedStats?
+    nothingToShow?
+  }
+> {
   corMatRetries: any
 
   constructor(props) {
     super(props)
+
     this.state = {
       loading: true,
       consensus: null,
@@ -107,7 +107,7 @@ class App extends React.Component<{
       })
   }
 
-  getComments(conversation_id, isStrictMod) {
+  getComments(conversation_id, report_id, isStrictMod) {
     return net.polisGet("/api/v3/comments", {
       conversation_id: conversation_id,
       report_id: report_id,
@@ -141,21 +141,21 @@ class App extends React.Component<{
         return null
       })
   }
-  getGroupDemographics(conversation_id) {
+  getGroupDemographics(conversation_id, report_id) {
     return net.polisGet("/api/v3/group_demographics", {
       conversation_id: conversation_id,
       report_id: report_id,
     })
   }
 
-  getConversationStats(conversation_id) {
+  getConversationStats(conversation_id, report_id) {
     return net.polisGet("/api/v3/conversationStats", {
       conversation_id: conversation_id,
       report_id: report_id,
     })
   }
 
-  getCorrelationMatrix(math_tick) {
+  getCorrelationMatrix(math_tick, report_id) {
     const attemptResponse = net.polisGet("/api/v3/math/correlationMatrix", {
       math_tick: math_tick,
       report_id: report_id,
@@ -168,7 +168,7 @@ class App extends React.Component<{
             this.corMatRetries = _.isNumber(this.corMatRetries) ? this.corMatRetries + 1 : 1
             setTimeout(
               () => {
-                this.getCorrelationMatrix(math_tick).then(resolve, reject)
+                this.getCorrelationMatrix(math_tick, report_id).then(resolve, reject)
               },
               this.corMatRetries < 10 ? 200 : 3000
             ) // try to get a quick response, but don't keep polling at that rate for more than 10 seconds.
@@ -193,6 +193,10 @@ class App extends React.Component<{
   }
 
   getData() {
+    const { conversation_id, report_id } = this.props.match.params
+
+    console.log(conversation_id, report_id)
+
     const reportPromise = this.getReport(report_id)
     // debug initial report data fetch
     reportPromise.then((report) => console.log("report recieved:", report))
@@ -201,14 +205,14 @@ class App extends React.Component<{
     })
     const commentsPromise = reportPromise.then((report) => {
       return conversationPromise.then((conv) => {
-        return this.getComments(report.conversation_id, conv.strict_moderation)
+        return this.getComments(report.conversation_id, report_id, conv.strict_moderation)
       })
     })
     const groupDemographicsPromise = reportPromise.then((report) => {
-      return this.getGroupDemographics(report.conversation_id)
+      return this.getGroupDemographics(report.conversation_id, report_id)
     })
     //const conversationStatsPromise = reportPromise.then((report) => {
-    //return this.getConversationStats(report.conversation_id)
+    //return this.getConversationStats(report.conversation_id, report_id)
     //});
     const participantsOfInterestPromise = reportPromise.then((report) => {
       return this.getParticipantsOfInterest(report.conversation_id)
@@ -216,7 +220,7 @@ class App extends React.Component<{
     const matrixPromise = globals.enableMatrix
       ? mathPromise.then((math) => {
           const math_tick = math.math_tick
-          return this.getCorrelationMatrix(math_tick)
+          return this.getCorrelationMatrix(math_tick, report_id)
         })
       : Promise.resolve()
     const conversationPromise = reportPromise.then((report) => {
@@ -499,7 +503,6 @@ class App extends React.Component<{
         </div>
       )
     }
-    console.log("top level app state and props", this.state, this.props)
     return (
       <div style={{ margin: "0px 10px" }}>
         <Heading conversation={this.state.conversation} />
@@ -620,4 +623,4 @@ class App extends React.Component<{
   }
 }
 
-export default App
+export default Report

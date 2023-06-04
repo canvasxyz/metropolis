@@ -5,13 +5,14 @@ import Url from "../../../util/url"
 import { RootState } from "../../../util/types"
 import { connect } from "react-redux"
 import { Heading, Box, Button } from "theme-ui"
+import { Link } from "react-router-dom"
 import ComponentHelpers from "../../../util/component-helpers"
 import NoPermission from "../no-permission"
 
 class ReportsList extends React.Component<
   {
     match: { params: { conversation_id: string } }
-    zid_metadata: { is_mod: boolean }
+    zid_metadata: { is_mod: boolean; conversation_id: string }
   },
   {
     loading: boolean
@@ -71,6 +72,9 @@ class ReportsList extends React.Component<
     if (this.state.loading) {
       return <div>Loading Reports...</div>
     }
+
+    const conversation_id = this.props.zid_metadata.conversation_id
+
     return (
       <Box>
         <Heading
@@ -86,19 +90,13 @@ class ReportsList extends React.Component<
         <Box sx={{ mb: [3, null, 4] }}>
           <Button onClick={this.createReportClicked.bind(this)}>Create report url</Button>
         </Box>
-        {this.state.reports.map((report) => {
-          return (
-            <Box sx={{ mb: [2] }} key={report.report_id}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href={Url.urlPrefix + "report/" + report.report_id}
-              >
-                {Url.urlPrefix}report/{report.report_id}
-              </a>
-            </Box>
-          )
-        })}
+        {this.state.reports.map((report) => (
+          <Box sx={{ mb: [2] }} key={report.report_id}>
+            <Link sx={{ variant: "links.text" }} to={`/r/${conversation_id}/${report.report_id}`}>
+              {document.location.host}/r/{conversation_id}/{report.report_id}
+            </Link>
+          </Box>
+        ))}
       </Box>
     )
   }

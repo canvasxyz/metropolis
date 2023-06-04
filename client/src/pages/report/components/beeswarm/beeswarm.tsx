@@ -4,7 +4,7 @@ import React from "react"
 import CommentList from "../lists/commentList"
 import * as globals from "../globals"
 import _ from "lodash"
-import d3 from "d3"
+import * as d3 from "d3"
 
 // import Flex from "../framework/flex"
 
@@ -102,23 +102,26 @@ class VoronoiCells extends React.Component<{
   }
 }
 
-class Beeswarm extends React.Component<{
-  comments
-  extremity
-  probabilities
-  probabilitiesTids
-  ptptCount?: number
-  math
-  conversation
-  formatTid?: Function
-  voteColors
-}, {
-  x?
-  voronoi?
-  currentBeeswarmComment
-  commentsWithExtremity
-  axesRendered
-}> {
+class Beeswarm extends React.Component<
+  {
+    comments
+    extremity
+    probabilities
+    probabilitiesTids
+    ptptCount?: number
+    math
+    conversation
+    formatTid?: Function
+    voteColors
+  },
+  {
+    x?
+    voronoi?
+    currentBeeswarmComment
+    commentsWithExtremity
+    axesRendered
+  }
+> {
   svgWidth: number
   svgHeight: number
   margin: any
@@ -177,7 +180,7 @@ class Beeswarm extends React.Component<{
       .force(
         "x",
         d3
-          .forceX(function (d) {
+          .forceX(function (d: any) {
             return x(d.extremity)
           })
           .strength(1)
@@ -188,19 +191,19 @@ class Beeswarm extends React.Component<{
 
     for (var i = 0; i < 120; ++i) simulation.tick()
 
-    const voronoi = d3
-      .voronoi()
-      .extent([
-        [-this.margin.left, -this.margin.top],
-        [this.widthMinusMargins + this.margin.right, this.heightMinusMargins + this.margin.top],
-      ])
-      .x(function (d) {
-        return d.x
-      })
-      .y(function (d) {
-        return d.y
-      })
-      .polygons(commentsWithExtremity)
+    // const voronoi = d3
+    //   .voronoi()
+    //   .extent([
+    //     [-this.margin.left, -this.margin.top],
+    //     [this.widthMinusMargins + this.margin.right, this.heightMinusMargins + this.margin.top],
+    //   ])
+    //   .x(function (d) {
+    //     return d.x
+    //   })
+    //   .y(function (d) {
+    //     return d.y
+    //   })
+    //   .polygons(commentsWithExtremity)
 
     // if (!this.state.axesRendered) {
     //   d3.select("#beeswarmAxisAttachPointD3").append("g")
@@ -211,7 +214,7 @@ class Beeswarm extends React.Component<{
 
     this.setState({
       x,
-      voronoi,
+      voronoi: [], // TODO
       commentsWithExtremity,
       axesRendered: true,
     })

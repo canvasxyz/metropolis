@@ -63,8 +63,8 @@ function ConversationRow({ c, i, dispatch }) {
           <React.Fragment>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
               <Text>{c.is_active ? "Voting Open" : "Voting Closed"}</Text>
-              <Link sx={{ variant: "links.text" }} to={`/r/${c.conversation_id}`}>
-                Report
+              <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}/reports`}>
+                Reports
               </Link>
             </Box>
             <Box sx={{ ml: [4], color: "mediumGray" }}>
