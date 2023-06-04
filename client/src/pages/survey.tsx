@@ -8,6 +8,7 @@ import api from "../util/api"
 import SurveyCard from "./survey_card"
 import type { RootState, Comment, Conversation } from "../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../actions"
+import DropdownButton from "../components/dropdown"
 
 // TODO: enforce comment too long on backend
 
@@ -58,18 +59,16 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
   setVotedComments,
 }) => {
   const inputRef = useRef<HTMLInputElement>()
-  const [isAgree, setIsAgree] = useState<boolean>(true)
-  const [isDisagree, setIsDisagree] = useState<boolean>()
 
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
-  const submitComment = (txt: string) => {
+  const submitComment = (txt: string, vote: number) => {
     const params = {
       pid: "mypid",
       conversation_id: zid_metadata.conversation_id,
-      vote: 0,
+      vote,
       txt: txt.replace(/\n/g, " "), // replace newlines with whitespace
       agid: 1,
     }
@@ -122,43 +121,27 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
         />
         <Flex>
           <Box>
-            <Button
-              onClick={() => {
-                submitComment(inputRef.current.value).then(() => (inputRef.current.value = ""))
-              }}
-            >
-              Add new comment
-            </Button>
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <label sx={{ fontFamily: "monospace" }}>
-              <input
-                type="checkbox"
-                data-test-id="new-comment-agree"
-                checked={isAgree}
-                onChange={() => {
-                  setIsAgree(true)
-                  setIsDisagree(false)
-                }}
-                sx={{ ml: 4, mr: 2 }}
-              />
-              I agree
-            </label>
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <label sx={{ fontFamily: "monospace" }}>
-              <input
-                type="checkbox"
-                data-test-id="new-comment-disagree"
-                checked={isDisagree}
-                onChange={() => {
-                  setIsAgree(false)
-                  setIsDisagree(true)
-                }}
-                sx={{ ml: 4, mr: 2 }}
-              />
-              I disagree
-            </label>
+            <DropdownButton
+              options={[
+                {
+                  name: "Add new comment",
+                  onClick: () => {
+                    submitComment(inputRef.current.value, 1).then(
+                      () => (inputRef.current.value = "")
+                    )
+                  },
+                  default: true,
+                },
+                {
+                  name: "Add new comment (disagree)",
+                  onClick: () => {
+                    submitComment(inputRef.current.value, -1).then(
+                      () => (inputRef.current.value = "")
+                    )
+                  },
+                },
+              ]}
+            />
           </Box>
         </Flex>
       </form>
