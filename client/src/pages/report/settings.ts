@@ -16,8 +16,8 @@ const settings = {
   borderRadiusBase: 4,
   borderStyleBase: "solid",
   borderWidthBase: 1,
-  fontFamilyMonospace: "\"Courier New\", monospace",
-  fontFamilySansSerif: "\"Helvetica Neue\", Helvetica, Arial, sans-serif",
+  fontFamilyMonospace: '"Courier New", monospace',
+  fontFamilySansSerif: '"Helvetica Neue", Helvetica, Arial, sans-serif',
   fontSizeBase: 14,
   lineHeightBase: 1.428571429,
   lineHeightSmall: 1.3,
@@ -32,6 +32,6 @@ const settings = {
   darkGray: "#6C7277",
   darkerGray: "#34383C",
   darkestGray: "#1E2226",
-};
+}
 
-export default settings;
+export default settings

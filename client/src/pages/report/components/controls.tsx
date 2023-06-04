@@ -28,9 +28,6 @@ class Controls extends React.Component<{
     }
   }
 
-  // UNSAFE_componentWillMount() {
-  // }
-
   render() {
     return (
       <div>
@@ -59,6 +56,5 @@ class Controls extends React.Component<{
     )
   }
 }
-// <Checkbox value="pineapple"/>
 
 export default Controls
