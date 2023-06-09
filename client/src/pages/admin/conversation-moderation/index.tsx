@@ -5,7 +5,6 @@ import ComponentHelpers from "../../../util/component-helpers"
 import NoPermission from "../no-permission"
 import React from "react"
 import { connect } from "react-redux"
-import { populateAllCommentStores } from "../../../actions"
 import { Heading, Flex, Box, jsx } from "theme-ui"
 import { RootState } from "../../../util/types"
 
@@ -16,8 +15,6 @@ import ModerateCommentsRejected from "./moderate-comments-rejected"
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
 
-const pollFrequency = 60000
-
 class CommentModeration extends React.Component<{
   dispatch: Function
   match: { params: { conversation_id: string }; url: string; path: string }
@@ -27,26 +24,6 @@ class CommentModeration extends React.Component<{
   rejected: { rejected_comments: object[] }
   seed: object[]
 }> {
-  getCommentsRepeatedly: ReturnType<typeof setInterval>
-  loadComments() {
-    const { match } = this.props
-    this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
-  }
-
-  UNSAFE_componentWillMount() {
-    this.getCommentsRepeatedly = setInterval(() => {
-      this.loadComments()
-    }, pollFrequency)
-  }
-
-  componentDidMount() {
-    this.loadComments()
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.getCommentsRepeatedly)
-  }
-
   render() {
     if (ComponentHelpers.shouldShowPermissionsError(this.props)) {
       return <NoPermission />

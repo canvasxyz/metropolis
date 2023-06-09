@@ -7,6 +7,7 @@ import { Flex, Box, jsx } from "theme-ui"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
 import { RootState } from "../../util/types"
+import { populateAllCommentStores } from "../../actions"
 
 import ConversationConfig from "./conversation-config"
 import ConversationModeration from "./conversation-moderation"
@@ -23,6 +24,25 @@ class ConversationAdminContainer extends React.Component<
   },
   {}
 > {
+  getCommentsRepeatedly: ReturnType<typeof setInterval>
+  loadComments() {
+    const { match } = this.props
+    this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
+  }
+
+  UNSAFE_componentWillMount() {
+    const pollFrequency = 60000
+
+    this.loadZidMetadata()
+    this.getCommentsRepeatedly = setInterval(() => {
+      this.loadComments()
+    }, pollFrequency)
+  }
+
+  componentDidMount() {
+    this.loadComments()
+  }
+
   loadZidMetadata() {
     this.props.dispatch(populateZidMetadataStore(this.props.match.params.conversation_id))
   }
@@ -31,12 +51,9 @@ class ConversationAdminContainer extends React.Component<
     this.props.dispatch(resetMetadataStore())
   }
 
-  UNSAFE_componentWillMount() {
-    this.loadZidMetadata()
-  }
-
   componentWillUnmount() {
     this.resetMetadata()
+    clearInterval(this.getCommentsRepeatedly)
   }
 
   componentDidUpdate() {
