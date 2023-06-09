@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from "react"
 import { connect } from "react-redux"
 import { Box, Heading, Button, Text, Input } from "theme-ui"
 
-import api from "../util/api"
-import type { Comment } from "../util/types"
-import { DropdownMenu } from "../components/dropdown"
+import api from "../../util/api"
+import type { Comment } from "../../util/types"
+import { DropdownMenu } from "../../components/dropdown"
 import { TbCheck, TbEdit, TbX } from "react-icons/tb"
 
 type SurveyCardProps = {
