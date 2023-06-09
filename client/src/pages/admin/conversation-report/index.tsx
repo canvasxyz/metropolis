@@ -4,7 +4,6 @@ import React from "react"
 import { connect } from "react-redux"
 import { UrlObject } from "url"
 import { Heading, Box, jsx } from "theme-ui"
-import { Switch, Route } from "react-router-dom"
 
 import dateSetupUtil from "../../../util/data-export-date-setup"
 import ComponentHelpers from "../../../util/component-helpers"
@@ -120,11 +119,8 @@ class ConversationStats extends React.Component<
           Report
         </Heading>
         <NumberCards data={conversation_stats} />
-        <Switch>
-          <Route exact component={ReportsList} />
-        </Switch>
+        <ReportsList conversation_id={this.props.match.params.conversation_id} />
         {/* activity charts */}
-        <hr sx={{ my: [5] }} />
         <Voters firstVoteTimes={conversation_stats.firstVoteTimes} size={this.chartSize} />
         <Commenters
           firstCommentTimes={conversation_stats.firstCommentTimes}

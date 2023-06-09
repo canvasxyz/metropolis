@@ -11,18 +11,14 @@ import NoPermission from "../no-permission"
 
 class ReportsList extends React.Component<
   {
-    match: { params: { conversation_id: string } }
-    zid_metadata: { is_mod: boolean; conversation_id: string }
+    conversation_id: string
   },
   {
     loading: boolean
     reports: Array<{ report_id: string }>
   }
 > {
-  static propTypes: {
-    match: object
-    zid_metadata: object
-  }
+  static propTypes: {}
 
   constructor(props) {
     super(props)
@@ -33,9 +29,8 @@ class ReportsList extends React.Component<
   }
 
   getData() {
-    const { match } = this.props
     const reportsPromise = api.get("/api/v3/reports", {
-      conversation_id: match.params.conversation_id,
+      conversation_id: this.props.conversation_id,
     })
     reportsPromise.then((reports) => {
       this.setState({
@@ -46,18 +41,13 @@ class ReportsList extends React.Component<
   }
 
   componentDidMount() {
-    const { zid_metadata } = this.props
-
-    if (zid_metadata.is_mod) {
-      this.getData()
-    }
+    this.getData()
   }
 
   createReportClicked() {
-    const { match } = this.props
     api
       .post("/api/v3/reports", {
-        conversation_id: match.params.conversation_id,
+        conversation_id: this.props.conversation_id,
       })
       .then(() => {
         this.getData()
@@ -73,11 +63,11 @@ class ReportsList extends React.Component<
       return <div>Loading Reports...</div>
     }
 
-    const conversation_id = this.props.zid_metadata.conversation_id
+    const conversation_id = this.props.conversation_id
 
     return (
       <Box>
-        <Box sx={{ mb: [3, null, 4] }}>
+        <Box sx={{ my: [3] }}>
           {this.state.reports.length === 0 ? (
             <Button onClick={this.createReportClicked.bind(this)}>Create report url</Button>
           ) : (
@@ -96,14 +86,7 @@ class ReportsList extends React.Component<
 }
 
 ReportsList.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      conversation_id: PropTypes.string,
-    }),
-  }),
-  zid_metadata: PropTypes.shape({
-    is_mod: PropTypes.bool,
-  }),
+  conversation_id: PropTypes.string,
 }
 
-export default connect((state: RootState) => state.zid_metadata)(ReportsList)
+export default ReportsList
