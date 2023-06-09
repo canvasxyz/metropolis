@@ -4,17 +4,19 @@ import { RouteComponentProps, Link } from "react-router-dom"
 import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
+import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
+import { TbExternalLink, TbUser } from "react-icons/tb"
+
 import {
   populateConversationsStore,
   handleCreateConversationSubmit,
   handleCloseConversation,
   handleReopenConversation,
 } from "../actions"
+import { DropdownMenu } from "../components/dropdown"
 
 import Url from "../util/url"
 import { RootState, Conversation } from "../util/types"
-import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser } from "react-icons/tb"
 
 function ConversationRow({ c, i, dispatch }) {
   return (
@@ -54,55 +56,57 @@ function ConversationRow({ c, i, dispatch }) {
               {c.topic}
             </Link>
           )}
-          <Text data-test-id="embed-page">
-            {c.parent_url ? `Embedded on ${c.parent_url}` : null}
+          <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>
+            {!c.is_archived && (c.is_active ? "Voting Open" : "Voting Closed")}
           </Text>
           <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
         </Box>
-        {!c.is_archived ? (
-          <React.Fragment>
-            <Box sx={{ ml: [4], color: "mediumGray" }}>
+        <Box sx={{ ml: [4], color: "lightGray" }}>
+          <Text>{c.participant_count} participants</Text>
+          {!c.is_archived && (
+            <Box sx={{ color: "mediumGray" }}>
               <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}/report`}>
-                Reports
-              </Link>
-              <Text>{c.is_active ? "Voting Open" : "Voting Closed"}</Text>
-            </Box>
-            <Box sx={{ ml: [4], color: "mediumGray" }}>
-              <Text>
-                {c.participant_count}
-                <TbUser />
-              </Text>
-            </Box>
-            <Box sx={{ ml: [3] }}>
-              <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}`}>
-                Edit
+                Go to report
               </Link>
             </Box>
-            <Box sx={{ ml: [3], mr: [3] }}>
-              <Text
-                sx={{ variant: "links.text" }}
-                onClick={() => {
-                  if (confirm("Archive this conversation?")) {
+          )}
+        </Box>
+        {!c.is_archived ? (
+          <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
+            <DropdownMenu
+              rightAlign
+              options={[
+                {
+                  name: "Configure",
+                  onClick: () => {
+                    document.location = `/m/${c.conversation_id}`
+                  },
+                },
+                {
+                  name: "Move to trash",
+                  onClick: () => {
+                    if (!confirm("Move this conversation to the trash?")) return
                     dispatch(handleCloseConversation(c.conversation_id))
-                  }
-                }}
-              >
-                Close
-              </Text>
-            </Box>
-          </React.Fragment>
+                  },
+                },
+              ]}
+            />
+          </Box>
         ) : (
-          <Box sx={{ ml: [3], mr: [3] }}>
-            <Text
-              sx={{ variant: "links.text", fontWeight: "400", color: "lightGray" }}
-              onClick={() => {
-                if (confirm("Reopen this archived conversation?")) {
-                  dispatch(handleReopenConversation(c.conversation_id))
-                }
-              }}
-            >
-              Reopen
-            </Text>
+          <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
+            <DropdownMenu
+              rightAlign
+              options={[
+                {
+                  name: "Recover from trash",
+                  onClick: () => {
+                    if (confirm("Reopen this archived conversation?")) {
+                      dispatch(handleReopenConversation(c.conversation_id))
+                    }
+                  },
+                },
+              ]}
+            />
           </Box>
         )}
       </Flex>

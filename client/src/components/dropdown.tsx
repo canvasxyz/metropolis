@@ -9,6 +9,8 @@ type DropdownMenuOptions = Array<{
   onClick: Function
 }>
 
+let isFocused
+
 const DropdownMenu = ({
   sx,
   rightAlign,
@@ -26,7 +28,14 @@ const DropdownMenu = ({
         variant="outlineSecondary"
         sx={{ px: 2, py: 1 }}
         onClick={() => setOpen(!open)}
-        onBlur={() => setTimeout(() => setOpen(false), 10)}
+        onFocus={() => {
+          isFocused = -1
+        }}
+        onBlur={() =>
+          setTimeout(() => {
+            if (isFocused === -1) setOpen(false)
+          }, 10)
+        }
       >
         <Box sx={{ position: "relative", top: "2px" }}>
           <TbChevronDown />
@@ -36,16 +45,44 @@ const DropdownMenu = ({
         sx={{
           mt: "1px",
           borderRadius: "3px",
-          bg: "primary",
+          bg: "white",
           position: "absolute",
           right: rightAlign ? "0" : undefined,
           whiteSpace: "nowrap",
           display: open ? "block" : "none",
+          zIndex: 999,
         }}
       >
         {options.map((option, index) => {
           return (
-            <Button variant="outlineGray" key={index} onClick={option.onClick}>
+            <Button
+              onFocus={() => {
+                isFocused = index
+              }}
+              onBlur={() =>
+                setTimeout(() => {
+                  if (isFocused === index) setOpen(false)
+                }, 10)
+              }
+              variant="outlineGray"
+              sx={{
+                display: "block",
+                width: "100%",
+                outline: "none",
+                boxShadow: "none",
+                borderBottom: index === options.length - 1 ? undefined : "none",
+                borderRadius:
+                  options.length === 1
+                    ? "8px"
+                    : index === 0
+                    ? "8px 8px 0 0"
+                    : index === options.length - 1
+                    ? "0 0 8px 8px"
+                    : "0",
+              }}
+              key={index}
+              onClick={option.onClick}
+            >
               {option.name}
             </Button>
           )

@@ -22,7 +22,14 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
   const [editingVote, setEditingVote] = useState(false)
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
-  const agree = (commentId: string, starred: boolean = undefined, weight = 0) => {
+  const agree = (
+    commentId: string,
+    event: MouseEvent,
+    starred: boolean = undefined,
+    weight = 0,
+    f
+  ) => {
+    ;(event.currentTarget as any).blur()
     setVoting(true)
     api
       .post("api/v3/votes", {
@@ -40,7 +47,13 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .always(() => setVoting(false))
   }
-  const disagree = (commentId: string, starred: boolean = undefined, weight = 0) => {
+  const disagree = (
+    commentId: string,
+    event: MouseEvent,
+    starred: boolean = undefined,
+    weight = 0
+  ) => {
+    ;(event.currentTarget as any).blur()
     setVoting(true)
     api
       .post("api/v3/votes", {
@@ -58,7 +71,8 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .always(() => setVoting(false))
   }
-  const skip = (tid: string, starred: boolean = undefined, weight = 0) => {
+  const skip = (commentId: string, event: MouseEvent, starred: boolean = undefined, weight = 0) => {
+    ;(event.currentTarget as any).blur()
     setVoting(true)
     api
       .post("api/v3/votes", {
@@ -67,7 +81,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         agid: 1,
         weight,
         vote: 0,
-        tid: tid,
+        tid: commentId,
         // starred: boolean
       })
       .then(() => {
@@ -96,58 +110,24 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       }}
     >
       <Text sx={{ mb: 4, wordBreak: "break-word" }}>{txt}</Text>
-      {hasVoted && !editingVote ? (
+      {hasVoted && (
         <Box sx={{ position: "absolute", top: [3], right: [3] }}>
           <DropdownMenu
             rightAlign
-            options={[{ name: "Edit your vote", onClick: () => setEditingVote(true) }]}
+            options={
+              editingVote
+                ? [
+                    { name: "Agree", onClick: agree.bind(null, commentId) },
+                    { name: "Disagree", onClick: disagree.bind(null, commentId) },
+                    { name: "Skip", onClick: skip.bind(null, commentId) },
+                    {
+                      name: "Cancel",
+                      onClick: () => setEditingVote(false),
+                    },
+                  ]
+                : [{ name: "Edit your vote", onClick: () => setEditingVote(true) }]
+            }
           />
-        </Box>
-      ) : (
-        <Box sx={{ position: "absolute", bottom: "36px" }}>
-          <Button
-            variant={editingVote ? "outline" : "primary"}
-            sx={{ mr: 2 }}
-            onClick={agree.bind(null, commentId)}
-          >
-            <TbCheck />
-            &nbsp;Agree
-          </Button>
-          <Button
-            variant={editingVote ? "outline" : "primary"}
-            sx={{ mr: 2 }}
-            onClick={disagree.bind(null, commentId)}
-          >
-            <TbX />
-            &nbsp;Disagree
-          </Button>
-          <Button
-            variant={editingVote ? "outline" : "primary"}
-            sx={{ mr: 2 }}
-            onClick={skip.bind(null, commentId)}
-          >
-            Skip
-          </Button>
-          {editingVote && (
-            <Text
-              sx={{
-                display: "inline",
-                fontFamily: "monospace",
-                color: "lightGray",
-                "&:hover": {
-                  color: "primary",
-                  borderBottom: "1.5px solid",
-                  borderBottomColor: "primary",
-                },
-                cursor: "pointer",
-                ml: 3,
-                my: 2,
-              }}
-              onClick={() => setEditingVote(false)}
-            >
-              Cancel
-            </Text>
-          )}
         </Box>
       )}
     </Box>
