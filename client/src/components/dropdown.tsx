@@ -7,16 +7,19 @@ import { TbChevronDown } from "react-icons/tb"
 type DropdownMenuOptions = Array<{
   name: string
   onClick: Function
+  sx?
 }>
 
 let isFocused
 
 const DropdownMenu = ({
   sx,
+  buttonSx,
   rightAlign,
   options,
 }: {
   sx?
+  buttonSx?
   rightAlign?: boolean
   options: DropdownMenuOptions
 }) => {
@@ -25,7 +28,7 @@ const DropdownMenu = ({
   return (
     <Box sx={{ ...sx, position: "relative" }}>
       <Button
-        variant="outlineSecondary"
+        variant="outlineGray"
         sx={{ px: 2, py: 1 }}
         onClick={() => setOpen(!open)}
         onFocus={() => {
@@ -79,6 +82,8 @@ const DropdownMenu = ({
                     : index === options.length - 1
                     ? "0 0 8px 8px"
                     : "0",
+                ...buttonSx,
+                ...option.sx,
               }}
               key={index}
               onClick={option.onClick}
@@ -118,13 +123,13 @@ const DropdownButton = ({
   return (
     <Box sx={{ ...sx, position: "relative" }}>
       <Button
-        sx={{ borderRadius: "3px 0 0 3px", borderRight: "1px solid #88bffc" }}
+        sx={{ borderRadius: "3px 0 0 3px", borderRight: "1px solid lightGray" }}
         onClick={defaultOption.onClick}
       >
         {defaultOption.name}
       </Button>
       <Button
-        sx={{ borderRadius: "0 3px 3px 0", pr: "6px", pl: "6px" }}
+        sx={{ borderRadius: "0 3px 3px 0", pr: "6px", pl: "6px", borderColor: "lightGray" }}
         onClick={() => setOpen(!open)}
         onBlur={() => setTimeout(() => setOpen(false), 10)}
       >

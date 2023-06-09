@@ -28,6 +28,8 @@ export default {
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#63676e",
     lightGrayActive: "#9f9f9f",
+    mediumRed: "#e26666",
+    mediumRedActive: "#d32d28",
   },
   links: {
     text: {
@@ -139,6 +141,18 @@ export default {
       "&:hover": {
         color: "lightGrayActive",
         borderColor: "lightGrayActive",
+      },
+    },
+    outlineRed: {
+      color: "mediumRed",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "mediumGray",
+      "&:hover": {
+        color: "mediumRedActive",
+        borderColor: "mediumRedActive",
       },
     },
     outlineGray: {

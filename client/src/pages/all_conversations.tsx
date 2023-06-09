@@ -63,18 +63,12 @@ function ConversationRow({ c, i, dispatch }) {
         </Box>
         <Box sx={{ ml: [4], color: "lightGray" }}>
           <Text>{c.participant_count} participants</Text>
-          {!c.is_archived && (
-            <Box sx={{ color: "mediumGray" }}>
-              <Link sx={{ variant: "links.text" }} to={`/m/${c.conversation_id}/report`}>
-                Go to report
-              </Link>
-            </Box>
-          )}
         </Box>
         {!c.is_archived ? (
           <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
             <DropdownMenu
               rightAlign
+              buttonSx={{ textAlign: "left" }}
               options={[
                 {
                   name: "Configure",
@@ -83,11 +77,24 @@ function ConversationRow({ c, i, dispatch }) {
                   },
                 },
                 {
+                  name: "Moderate",
+                  onClick: () => {
+                    document.location = `/m/${c.conversation_id}/comments`
+                  },
+                },
+                {
+                  name: "See results",
+                  onClick: () => {
+                    document.location = `/m/${c.conversation_id}/report`
+                  },
+                },
+                {
                   name: "Move to trash",
                   onClick: () => {
                     if (!confirm("Move this conversation to the trash?")) return
                     dispatch(handleCloseConversation(c.conversation_id))
                   },
+                  sx: { variant: "buttons.outlineRed" },
                 },
               ]}
             />
