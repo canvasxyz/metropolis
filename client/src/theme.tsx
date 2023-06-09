@@ -30,6 +30,8 @@ export default {
     lightGrayActive: "#9f9f9f",
     mediumRed: "#e26666",
     mediumRedActive: "#d32d28",
+    mediumGreen: "#5fa240",
+    mediumGreenActive: "#448b24",
   },
   links: {
     text: {
@@ -153,6 +155,30 @@ export default {
       "&:hover": {
         color: "mediumRedActive",
         borderColor: "mediumRedActive",
+      },
+    },
+    outlineGreen: {
+      color: "mediumGreen",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "mediumGray",
+      "&:hover": {
+        color: "mediumGreenActive",
+        borderColor: "mediumGreenActive",
+      },
+    },
+    outlineLightGray: {
+      color: "lightGray",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "lightGray",
+      "&:hover": {
+        color: "lightGrayActive",
+        borderColor: "lightGrayActive",
       },
     },
     outlineGray: {

@@ -61,13 +61,14 @@ function ConversationRow({ c, i, dispatch }) {
           </Text>
           <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
         </Box>
-        <Box sx={{ ml: [4], color: "lightGray" }}>
+        <Box sx={{ ml: [4], color: c.is_archived ? "lightGray" : "mediumGray" }}>
           <Text>{c.participant_count} participants</Text>
         </Box>
         {!c.is_archived ? (
           <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
             <DropdownMenu
               rightAlign
+              variant="outlineGray"
               buttonSx={{ textAlign: "left" }}
               options={[
                 {
@@ -86,6 +87,16 @@ function ConversationRow({ c, i, dispatch }) {
                   name: "See results",
                   onClick: () => {
                     document.location = `/m/${c.conversation_id}/report`
+                  },
+                },
+                {
+                  name: (
+                    <React.Fragment>
+                      Open survey <TbExternalLink />
+                    </React.Fragment>
+                  ),
+                  onClick: () => {
+                    window.open(`/c/${c.conversation_id}`)
                   },
                 },
                 {

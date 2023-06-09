@@ -5,7 +5,7 @@ import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { TbChevronDown } from "react-icons/tb"
 
 type DropdownMenuOptions = Array<{
-  name: string
+  name: string | React.ReactNode
   onClick: Function
   sx?
 }>
@@ -15,20 +15,22 @@ let isFocused
 const DropdownMenu = ({
   sx,
   buttonSx,
+  variant,
   rightAlign,
   options,
 }: {
   sx?
   buttonSx?
+  variant?: string
   rightAlign?: boolean
   options: DropdownMenuOptions
 }) => {
   const [open, setOpen] = useState(false)
 
   return (
-    <Box sx={{ ...sx, position: "relative" }}>
+    <Box sx={{ position: "relative" }}>
       <Button
-        variant="outlineGray"
+        variant={variant || "outlineLightGray"}
         sx={{ px: 2, py: 1 }}
         onClick={() => setOpen(!open)}
         onFocus={() => {
@@ -98,7 +100,7 @@ const DropdownMenu = ({
 }
 
 type DropdownButtonOptions = Array<{
-  name: string
+  name: string | React.ReactNode
   onClick: Function
   default?: boolean
 }>
