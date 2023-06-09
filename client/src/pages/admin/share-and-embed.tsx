@@ -23,16 +23,6 @@ class ShareAndEmbed extends React.Component<
   {}
 > {
   static propTypes: {}
-  constructEmbeddedOnMarkup() {
-    return (
-      <p data-test-id="embed-page">
-        {"Embedded on: "}
-        <a style={{ color: "black" }} target="blank" href={this.props.zid_metadata.parent_url}>
-          {this.props.zid_metadata.parent_url}
-        </a>
-      </p>
-    )
-  }
 
   render() {
     if (ComponentHelpers.shouldShowPermissionsError(this.props)) {
@@ -61,15 +51,15 @@ class ShareAndEmbed extends React.Component<
           accepted_comments={[]}
         />
         <div>
-          <p> Share </p>
+          <p>Share</p>
           <p>
-            <a target="blank" href={Url.urlPrefix + match.params.conversation_id}>
-              {Url.urlPrefix + match.params.conversation_id}
+            <a target="blank" href={Url.urlPrefix + "c/" + match.params.conversation_id}>
+              {Url.urlPrefix + "c/" + match.params.conversation_id}
             </a>
           </p>
         </div>
         <div>
-          <p> Embed</p>
+          <p>Embed</p>
           <div>
             <pre>
               {"<div"}

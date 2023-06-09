@@ -10,7 +10,8 @@ const s = {
   polis_err_reg_user_with_that_email_exists:
     "Email address already in use. Try logging in instead.",
   polis_err_reg_need_name: "Please include your name.",
-  polis_err_post_comment_duplicate: "Error posting: This comment already exists!",
+  polis_err_post_comment_duplicate: "Error: This comment already exists!",
+  polis_err_param_missing_txt: "Error: This isn't a valid comment!",
   polis_err_fetching_tweet: "Error fetching tweet. Expected a URL to a twitter tweet.",
   share_but_no_comments_warning:
     "This conversation has no comments. We recommend you add a few comments before inviting participants. This will help participants get started. Go to 'Configure' and then 'Seed Comments'.",

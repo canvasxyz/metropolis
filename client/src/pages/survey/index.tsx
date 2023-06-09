@@ -10,7 +10,9 @@ import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 
 import SurveyHeading from "./survey_heading"
 import SurveyCompose from "./survey_compose"
+import SurveyInstructions from "./survey_instructions"
 import SurveyCards from "./survey_cards"
+import SurveyLogin from "./survey_login"
 
 // TODO: enforce comment too long on backend
 
@@ -75,6 +77,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   return (
     <Box>
       <SurveyHeading zid_metadata={zid_metadata} />
+      <SurveyInstructions />
+      <SurveyLogin />
       <Divider />
       <SurveyCards
         votedComments={votedComments}

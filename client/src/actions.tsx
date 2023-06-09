@@ -787,49 +787,6 @@ export const optimisticZidMetadataUpdateOnTyping = (zm, field, value) => {
 
 /* seed comments submit */
 
-export const seedCommentChanged = (text) => {
-  return {
-    type: SEED_COMMENT_LOCAL_UPDATE,
-    text: text,
-  }
-}
-
-const submitSeedCommentStart = () => {
-  return {
-    type: SUBMIT_SEED_COMMENT,
-  }
-}
-
-const submitSeedCommentPostSuccess = () => {
-  console.log("seed comment post success")
-  return {
-    type: SUBMIT_SEED_COMMENT_SUCCESS,
-  }
-}
-
-const submitSeedCommentPostError = (err) => {
-  return {
-    type: SUBMIT_SEED_COMMENT_ERROR,
-    data: err,
-  }
-}
-
-const postSeedComment = (comment) => {
-  return api.post("/api/v3/comments", comment)
-}
-
-export const handleSeedCommentSubmit = (comment) => {
-  return (dispatch) => {
-    dispatch(submitSeedCommentStart())
-    return postSeedComment(comment)
-      .then(
-        (res) => dispatch(submitSeedCommentPostSuccess()),
-        (err) => dispatch(submitSeedCommentPostError(err))
-      )
-      .then(dispatch(populateAllCommentStores(comment.conversation_id)))
-  }
-}
-
 // FIXME
 // eslint-disable-next-line no-unused-vars
 const makeStandardStart = (type) => {
