@@ -1,36 +1,26 @@
 import React, { useState, useEffect } from "react"
+import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
+
 import SurveyCard from "./survey_card"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { surveyHeading } from "./index"
 
-const SurveyInstructions = () => {
-  const [visible, setVisible] = useState(true)
-
-  useEffect(() => {
-    const stg = localStorage.getItem("polis-instructions-visible")
-    if (stg === "false") {
-      setVisible(false)
-    }
-  }, [])
-
-  // TODO: let user set limit
-  const limit = null
+const SurveyInstructions = ({
+  onNext,
+  onPrev,
+  limit,
+}: {
+  onNext: Function
+  onPrev: Function
+  limit: number
+}) => {
   const cardsText = limit ? `a batch of ${limit} comments` : "comments written by other people"
 
-  if (visible === false) return <></>
-
   return (
-    <Box
-      sx={{
-        mb: [3, null, 4],
-        margin: "0 auto",
-        border: "1px solid",
-        borderColor: "lighterGray",
-        px: "40px",
-        py: "36px",
-        borderRadius: "8px",
-      }}
-    >
-      <Text sx={{ my: [2] }}>
+    <Box>
+      <Heading as="h3" sx={surveyHeading}>
+        About this survey
+      </Heading>
+      <Text sx={{ mt: [4], mb: [2] }}>
         This is a collaborative survey, where you can contribute comments that everyone votes on.
       </Text>
       <Text sx={{ my: [2] }}>
@@ -47,16 +37,22 @@ const SurveyInstructions = () => {
           <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
         </ul>
       </Text>
-      <Box sx={{ mt: [4] }}>
-        <Button
-          variant="primary"
-          onClick={() => {
-            setVisible(false)
-            localStorage.setItem("polis-instructions-visible", "false")
-          }}
-        >
+      <Box sx={{ mt: [5] }}>
+        <Button variant="primary" onClick={onNext}>
           Continue
         </Button>
+        <Link
+          onClick={onPrev}
+          sx={{
+            display: "inline",
+            my: [2],
+            mx: "22px",
+            fontFamily: "monospace",
+            color: "mediumGray",
+          }}
+        >
+          Back
+        </Link>
       </Box>
     </Box>
   )

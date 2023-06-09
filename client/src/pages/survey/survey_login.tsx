@@ -1,22 +1,33 @@
 import React from "react"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 
-const SurveyLogin = () => {
-  return <></>
+import { surveyHeading } from "./index"
 
+const SurveyLogin = ({ onNext, onPrev }) => {
   return (
-    <Box
-      sx={{
-        mb: [3, null, 4],
-        margin: "0 auto",
-        border: "1px solid",
-        borderColor: "lighterGray",
-        px: "40px",
-        py: "36px",
-        borderRadius: "8px",
-      }}
-    >
-      b
+    <Box>
+      <Heading as="h3" sx={surveyHeading}>
+        Before we begin...
+      </Heading>
+      <Text>This survey requires you to be logged in with an email or identity provider.</Text>
+      <Text>Your identity won’t be publicly associated with your answers.</Text>
+      <Box sx={{ mt: [5] }}>
+        <Button variant="primary" onClick={onNext}>
+          Continue
+        </Button>
+        <Link
+          onClick={onPrev}
+          sx={{
+            display: "inline",
+            my: [2],
+            mx: "22px",
+            fontFamily: "monospace",
+            color: "mediumGray",
+          }}
+        >
+          Back
+        </Link>
+      </Box>
     </Box>
   )
 }

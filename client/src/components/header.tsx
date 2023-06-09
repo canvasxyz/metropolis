@@ -7,41 +7,42 @@ import Logomark from "./logomark"
 
 const Header: React.FC<{ user? }> = ({ user }) => {
   return (
-    <Box>
-      <Flex
-        sx={{
-          margin: `0 auto`,
-          width: "100%",
-          pt: [5],
-          pb: [6],
-          justifyContent: "space-between",
-          fontFamily: "monospace",
-        }}
-      >
-        <Box sx={{ zIndex: 1000 }}>
-          <Logomark style={{ marginRight: 10, position: "relative", top: 6 }} fill={"#62a6ef"} />
-          <Link sx={{ variant: "links.nav" }} to={user ? "/conversations" : "/"}>
-            Polis
-          </Link>
-        </Box>
-        <Box sx={{ mt: [1] }}>
-          {user ? (
-            <React.Fragment>
-              <Link sx={{ variant: "links.nav" }} to={`/account`}>
-                Account
-              </Link>
-              <Link sx={{ variant: "links.nav" }} to="/signout">
-                Sign out
-              </Link>
-            </React.Fragment>
-          ) : (
-            <Link sx={{ variant: "links.nav" }} to="/signin">
-              Sign in
+    <Flex
+      sx={{
+        margin: `0 auto`,
+        width: "100%",
+        pt: [3, 5],
+        pb: [3, 5],
+        px: [4],
+        mb: [5, 0],
+        justifyContent: "space-between",
+        fontFamily: "monospace",
+        borderBottom: ["1px solid lightGray", "none"],
+      }}
+    >
+      <Box sx={{ position: "relative", top: "-1px" }}>
+        <Logomark style={{ marginRight: 10, position: "relative", top: 6 }} fill={"#62a6ef"} />
+        <Link sx={{ variant: "links.nav" }} to={user ? "/conversations" : "/"}>
+          Polis
+        </Link>
+      </Box>
+      <Box sx={{ mt: [1] }}>
+        {user ? (
+          <React.Fragment>
+            <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>
+              Account
             </Link>
-          )}
-        </Box>
-      </Flex>
-    </Box>
+            <Link sx={{ variant: "links.nav", ml: [4] }} to="/signout">
+              Sign out
+            </Link>
+          </React.Fragment>
+        ) : (
+          <Link sx={{ variant: "links.nav" }} to="/signin">
+            Sign in
+          </Link>
+        )}
+      </Box>
+    </Flex>
   )
 }
 

@@ -133,7 +133,7 @@ class App extends React.Component<
             sx={{
               margin: `0 auto`,
               maxWidth: document.location.pathname?.startsWith("/r/") ? "62em" : "45em",
-              padding: `0 1.0875rem 1.45rem`,
+              pb: [4],
             }}
           >
             <Header user={this.props.user} />
@@ -141,7 +141,8 @@ class App extends React.Component<
               sx={{
                 pt: "1px", // prevent margins from spilling over
                 pb: "3em",
-                minHeight: "calc(100vh - 10.2em)",
+                px: [4],
+                minHeight: "calc(100vh - 9em)",
               }}
             >
               <Route exact path="/" render={() => <Home user={this.props.user} />} />

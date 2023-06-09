@@ -5,7 +5,7 @@ import { Box, Link, Heading, jsx } from "theme-ui"
 class Header extends Component {
   render() {
     return (
-      <Box sx={{ fontFamily: "monospace" }}>
+      <Box sx={{ fontFamily: "monospace", px: [4] }}>
         (c) {new Date().getFullYear()} Authors
         <Link sx={{ ml: 4 }} href="/tos">
           Terms
