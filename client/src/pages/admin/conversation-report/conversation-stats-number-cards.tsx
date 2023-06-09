@@ -1,6 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import NumberCard from "./conversation-stats-number-card"
+import { Box } from "theme-ui"
 
 class NumberCards extends React.Component<
   {
@@ -19,16 +20,19 @@ class NumberCards extends React.Component<
     const data = this.props.data
     const averageVotes = data.voteTimes.length / data.firstVoteTimes.length
     return (
-      <div>
-        <NumberCard datum={data.firstVoteTimes.length} subheading="participants voted" />
-        <NumberCard datum={data.voteTimes.length} subheading="votes were cast" />
-        <NumberCard
-          datum={isNaN(averageVotes) ? 0 : averageVotes.toFixed(2)}
-          subheading="votes per participant on average"
-        />
-        <NumberCard datum={data.firstCommentTimes.length} subheading="commented" />
-        <NumberCard datum={data.commentTimes.length} subheading="comments submitted" />
-      </div>
+      <Box sx={{ display: "flex" }}>
+        <Box sx={{ flex: 1 }}>
+          <NumberCard datum={data.firstVoteTimes.length} subheading="participants voted" />
+          <NumberCard datum={data.voteTimes.length} subheading="votes were cast" />
+        </Box>
+        <Box sx={{ flex: 1 }}>
+          <NumberCard
+            datum={data.firstCommentTimes.length}
+            subheading="participants wrote comments"
+          />
+          <NumberCard datum={data.commentTimes.length} subheading="comments submitted" />
+        </Box>
+      </Box>
     )
   }
 }

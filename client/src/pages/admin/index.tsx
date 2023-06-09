@@ -9,19 +9,16 @@ import { Switch, Route, Link } from "react-router-dom"
 import { RootState } from "../../util/types"
 
 import ConversationConfig from "./conversation-config"
-import ConversationStats from "./stats"
+import ConversationModeration from "./conversation-moderation"
+import ConversationReport from "./conversation-report"
 
-import ModerateComments from "./comment-moderation/"
-
-import ShareAndEmbed from "./share-and-embed"
-
-import Reports from "./report/reports"
 import { UrlObject } from "url"
 
 class ConversationAdminContainer extends React.Component<
   {
     dispatch: Function
     match: { url: string; path: string; params: { conversation_id: string } }
+    zid_metadata: { is_mod: boolean }
     location: UrlObject
   },
   {}
@@ -62,16 +59,6 @@ class ConversationAdminContainer extends React.Component<
           <Box sx={{ mb: [3] }}>
             <Link
               sx={{
-                variant: url === "share" ? "links.activeNav" : "links.nav",
-              }}
-              to={`${match.url}/share`}
-            >
-              Distribute
-            </Link>
-          </Box>
-          <Box sx={{ mb: [3] }}>
-            <Link
-              sx={{
                 variant: url === "comments" ? "links.activeNav" : "links.nav",
               }}
               to={`${match.url}/comments`}
@@ -82,33 +69,23 @@ class ConversationAdminContainer extends React.Component<
           <Box sx={{ mb: [3] }}>
             <Link
               sx={{
-                variant: url === "stats" ? "links.activeNav" : "links.nav",
+                variant: url === "report" ? "links.activeNav" : "links.nav",
               }}
-              to={`${match.url}/stats`}
-            >
-              Monitor
-            </Link>
-          </Box>
-          <Box sx={{ mb: [3] }}>
-            <Link
-              sx={{
-                variant: url === "reports" ? "links.activeNav" : "links.nav",
-              }}
-              to={`${match.url}/reports`}
+              to={`${match.url}/report`}
             >
               Report
             </Link>
           </Box>
         </Box>
-        <Box sx={{ p: [4], flex: "0 0 auto", maxWidth: "35em", mx: [4] }}>
-          <Switch>
-            <Route exact path={`${match.path}/`} component={ConversationConfig} />
-            <Route exact path={`${match.path}/share`} component={ShareAndEmbed} />
-            <Route path={`${match.path}/comments`} component={ModerateComments} />
-            <Route exact path={`${match.path}/stats`} component={ConversationStats} />
-            <Route exact path={`${match.path}/reports`} component={Reports} />
-          </Switch>
-        </Box>
+        {this.props.zid_metadata?.is_mod && (
+          <Box sx={{ p: [4], flex: "0 0 auto", maxWidth: "35em", mx: [4] }}>
+            <Switch>
+              <Route exact path={`${match.path}/`} component={ConversationConfig} />
+              <Route path={`${match.path}/comments`} component={ConversationModeration} />
+              <Route exact path={`${match.path}/report`} component={ConversationReport} />
+            </Switch>
+          </Box>
+        )}
       </Flex>
     )
   }

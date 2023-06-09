@@ -4,16 +4,18 @@
 
 import React from "react"
 import { connect } from "react-redux"
-import { handleZidMetadataUpdate, optimisticZidMetadataUpdateOnTyping } from "../../actions"
-import ComponentHelpers from "../../util/component-helpers"
-import NoPermission from "./no-permission"
 import { Heading, Box, Text, jsx } from "theme-ui"
 import emoji from "react-easy-emoji"
-import { RootState } from "../../util/types"
 
+import { handleZidMetadataUpdate, optimisticZidMetadataUpdateOnTyping } from "../../actions"
+import NoPermission from "./no-permission"
 import { CheckboxField } from "./CheckboxField"
 import SeedComment from "./seed-comment"
 // import SeedTweet from "./seed-tweet";
+
+import Url from "../../util/url"
+import ComponentHelpers from "../../util/component-helpers"
+import { RootState } from "../../util/types"
 
 class ConversationConfig extends React.Component<
   {
@@ -65,12 +67,16 @@ class ConversationConfig extends React.Component<
           Configure
         </Heading>
         <Box sx={{ mb: [4] }}>
-          {this.props.loading ? <Text>Saving...</Text> : <Text>⚡ Up to date</Text>}
+          {this.props.loading ? (
+            <Text>Saving...</Text>
+          ) : (
+            <Text>⚡ Changes automatically saved</Text>
+          )}
           {this.props.error ? <Text>Error Saving</Text> : null}
         </Box>
 
         <CheckboxField field="is_active" label="Conversation is open">
-          Unchecking disables voting and commenting
+          Uncheck to disable voting and commenting
         </CheckboxField>
 
         <Box sx={{ mb: [3] }}>
@@ -117,14 +123,7 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
-        <Heading
-          as="h6"
-          sx={{
-            fontSize: [1, null, 2],
-            lineHeight: "body",
-            my: [3, null, 4],
-          }}
-        >
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           Seed Comments
         </Heading>
         <SeedComment
@@ -133,14 +132,7 @@ class ConversationConfig extends React.Component<
         />
         {/* <SeedTweet params={{ conversation_id: this.props.zid_metadata.conversation_id }} /> */}
 
-        <Heading
-          as="h6"
-          sx={{
-            fontSize: [1, null, 2],
-            lineHeight: "body",
-            my: [3, null, 4],
-          }}
-        >
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           Customize the user interface
         </Heading>
 
@@ -174,14 +166,7 @@ class ConversationConfig extends React.Component<
           Show Twitter login prompt
         </CheckboxField>
 
-        <Heading
-          as="h6"
-          sx={{
-            fontSize: [1, null, 2],
-            lineHeight: "body",
-            my: [3, null, 4],
-          }}
-        >
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           Schemes
         </Heading>
 
@@ -196,6 +181,29 @@ class ConversationConfig extends React.Component<
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
           Participants cannot vote without first connecting either Facebook or Twitter
         </CheckboxField>
+
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+          Embed
+        </Heading>
+        <Box>
+          <Text>Copy this HTML into your page to embed this survey.</Text>
+          <Box
+            sx={{ my: [2], px: [3], py: [1], border: "1px solid lightGray", borderRadius: "6px" }}
+          >
+            <pre>
+              {"<div"}
+              {" class='polis'"}
+              {" data-conversation_id='" + this.props.zid_metadata.conversation_id + "'>"}
+              {"</div>\n"}
+              {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
+            </pre>
+          </Box>
+          <Text>
+            <a target="blank" href={Url.urlPrefix + "c/" + this.props.zid_metadata.conversation_id}>
+              Open conversation
+            </a>
+          </Text>
+        </Box>
       </Box>
     )
   }
@@ -204,55 +212,3 @@ class ConversationConfig extends React.Component<
 export default connect((state: RootState) => state.user)(
   connect((state: RootState) => state.zid_metadata)(ConversationConfig)
 )
-
-// checked={this.props.zid_metadata.is_data_open}
-// Comments, votes, and group data can be exported by any user
-
-/* <InputField
-            ref={"style_btn"}
-
-            style={{ width: 360 }}
-            onBlur={this.handleStringValueChange("style_btn").bind(this)}
-            hintText="ie., #e63082"
-            onChange={this.handleConfigInputTyping("style_btn")}
-            value={this.props.zid_metadata.style_btn}
-            floatingLabelText={
-              "Customize submit button color" + (canCustomizeColors ? "" : lockedIcon)
-            }
-            multiLine={true}
-          /> */
-
-/* <InputField
-            ref={"help_bgcolor"}
-
-            style={{ width: 360 }}
-            onBlur={this.handleStringValueChange("help_bgcolor").bind(this)}
-            onChange={this.handleConfigInputTyping("help_bgcolor")}
-            value={this.props.zid_metadata.help_bgcolor}
-            hintText="ie., #e63082"
-            floatingLabelText={
-              "Customize help text background" + (canCustomizeColors ? "" : lockedIcon)
-            }
-            multiLine={true}
-          /> */
-
-/* <InputField
-            ref={"help_color"}
-
-            style={{ width: 360 }}
-            onBlur={this.handleStringValueChange("help_color").bind(this)}
-            onChange={this.handleConfigInputTyping("help_color")}
-            value={this.props.zid_metadata.help_color}
-            hintText="ie., #e63082"
-            floatingLabelText={"Customize help text color" + (canCustomizeColors ? "" : lockedIcon)}
-            multiLine={true}
-          /> */
-
-/* <Checkbox
-            label="Social sharing buttons"
-            ref={"socialbtn_type"}
-            checked={this.props.zid_metadata.socialbtn_type === 1 ? true : false}
-            onCheck={this.handleIntegerBoolValueChange("socialbtn_type").bind(this)}
-
-
-          /> */

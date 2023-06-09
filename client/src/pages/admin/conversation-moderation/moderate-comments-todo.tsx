@@ -8,6 +8,7 @@ import {
 } from "../../../actions"
 import Comment from "./comment"
 import { RootState, Comment as CommentType } from "../../../util/types"
+import { Text } from "theme-ui"
 
 class ModerateCommentsTodo extends React.Component<
   {
@@ -30,34 +31,32 @@ class ModerateCommentsTodo extends React.Component<
     this.props.dispatch(changeCommentCommentIsMeta(comment, is_meta))
   }
 
-  createCommentMarkup(max) {
-    return this.props.unmoderated_comments.slice(0, max).map((comment, i) => {
-      return (
-        <Comment
-          key={i}
-          acceptButton
-          rejectButton
-          acceptClickHandler={this.onCommentAccepted.bind(this)}
-          rejectClickHandler={this.onCommentRejected.bind(this)}
-          acceptButtonText="accept"
-          rejectButtonText="reject"
-          isMetaCheckbox
-          toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
-          comment={comment}
-        />
-      )
-    })
-  }
-
   render() {
     const max = 100
     return (
       <div>
-        <div>
-          {this.props.unmoderated_comments !== null
-            ? this.createCommentMarkup(max)
-            : "Loading unmoderated comments..."}
-        </div>
+        {this.props.unmoderated_comments === null ? (
+          <Text sx={{ color: "mediumGray" }}>Loading unmoderated comments...</Text>
+        ) : this.props.unmoderated_comments.length === 0 ? (
+          <Text sx={{ color: "mediumGray" }}>No comments left to moderate</Text>
+        ) : (
+          this.props.unmoderated_comments.slice(0, max).map((comment, i) => {
+            return (
+              <Comment
+                key={i}
+                acceptButton
+                rejectButton
+                acceptClickHandler={this.onCommentAccepted.bind(this)}
+                rejectClickHandler={this.onCommentRejected.bind(this)}
+                acceptButtonText="accept"
+                rejectButtonText="reject"
+                isMetaCheckbox
+                toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
+                comment={comment}
+              />
+            )
+          })
+        )}
       </div>
     )
   }

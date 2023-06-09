@@ -1,17 +1,21 @@
 /** @jsx jsx */
 
-import dateSetupUtil from "../../../util/data-export-date-setup"
 import React from "react"
 import { connect } from "react-redux"
+import { UrlObject } from "url"
+import { Heading, Box, jsx } from "theme-ui"
+import { Switch, Route } from "react-router-dom"
+
+import dateSetupUtil from "../../../util/data-export-date-setup"
+import ComponentHelpers from "../../../util/component-helpers"
+import { RootState } from "../../../util/types"
 import { populateConversationStatsStore } from "../../../actions"
+
 import NumberCards from "./conversation-stats-number-cards"
 import Voters from "./voters"
 import Commenters from "./commenters"
-import { Heading, Box, jsx } from "theme-ui"
-import ComponentHelpers from "../../../util/component-helpers"
 import NoPermission from "../no-permission"
-import { RootState } from "../../../util/types"
-import { UrlObject } from "url"
+import ReportsList from "./reports-list"
 
 class ConversationStats extends React.Component<
   {
@@ -110,12 +114,17 @@ class ConversationStats extends React.Component<
           sx={{
             fontSize: [3, null, 4],
             lineHeight: "body",
-            mb: [3, null, 4],
+            mb: [3, null, 2],
           }}
         >
-          Monitor
+          Report
         </Heading>
         <NumberCards data={conversation_stats} />
+        <Switch>
+          <Route exact component={ReportsList} />
+        </Switch>
+        {/* activity charts */}
+        <hr sx={{ my: [5] }} />
         <Voters firstVoteTimes={conversation_stats.firstVoteTimes} size={this.chartSize} />
         <Commenters
           firstCommentTimes={conversation_stats.firstCommentTimes}

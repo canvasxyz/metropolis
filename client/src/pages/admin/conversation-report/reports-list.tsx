@@ -77,26 +77,19 @@ class ReportsList extends React.Component<
 
     return (
       <Box>
-        <Heading
-          as="h3"
-          sx={{
-            fontSize: [3, null, 4],
-            lineHeight: "body",
-            mb: [3, null, 4],
-          }}
-        >
-          Report
-        </Heading>
         <Box sx={{ mb: [3, null, 4] }}>
-          <Button onClick={this.createReportClicked.bind(this)}>Create report url</Button>
+          {this.state.reports.length === 0 ? (
+            <Button onClick={this.createReportClicked.bind(this)}>Create report url</Button>
+          ) : (
+            <Button
+              onClick={() => {
+                document.location = `/r/${conversation_id}/${this.state.reports[0].report_id}`
+              }}
+            >
+              Go to full report
+            </Button>
+          )}
         </Box>
-        {this.state.reports.map((report) => (
-          <Box sx={{ mb: [2] }} key={report.report_id}>
-            <Link sx={{ variant: "links.text" }} to={`/r/${conversation_id}/${report.report_id}`}>
-              {document.location.host}/r/{conversation_id}/{report.report_id}
-            </Link>
-          </Box>
-        ))}
       </Box>
     )
   }

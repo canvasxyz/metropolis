@@ -4,6 +4,7 @@ import { connect } from "react-redux"
 import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../../../actions"
 import Comment from "./comment"
 import { RootState } from "../../../util/types"
+import { Text } from "theme-ui"
 
 class ModerateCommentsAccepted extends React.Component<
   {
@@ -22,29 +23,28 @@ class ModerateCommentsAccepted extends React.Component<
     this.props.dispatch(changeCommentCommentIsMeta(comment, is_meta))
   }
 
-  createCommentMarkup() {
-    const comments = this.props.accepted_comments.map((comment, i) => {
-      return (
-        <Comment
-          key={i}
-          rejectButton
-          rejectClickHandler={this.onCommentRejected.bind(this)}
-          rejectButtonText="reject"
-          isMetaCheckbox
-          toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
-          comment={comment}
-        />
-      )
-    })
-    return comments
-  }
-
   render() {
     return (
       <div>
-        {this.props.accepted_comments !== null
-          ? this.createCommentMarkup()
-          : "Loading accepted comments..."}
+        {this.props.accepted_comments === null ? (
+          <Text sx={{ color: "mediumGray" }}>Loading accepted comments...</Text>
+        ) : this.props.accepted_comments.length === 0 ? (
+          <Text sx={{ color: "mediumGray" }}>No accepted comments yet</Text>
+        ) : (
+          this.props.accepted_comments.map((comment, i) => {
+            return (
+              <Comment
+                key={i}
+                rejectButton
+                rejectClickHandler={this.onCommentRejected.bind(this)}
+                rejectButtonText="reject"
+                isMetaCheckbox
+                toggleIsMetaHandler={this.toggleIsMetaHandler.bind(this)}
+                comment={comment}
+              />
+            )
+          })
+        )}
       </div>
     )
   }
