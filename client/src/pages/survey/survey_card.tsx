@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react"
 import { connect } from "react-redux"
+import { toast } from "react-hot-toast"
 import { Box, Heading, Button, Text, Input } from "theme-ui"
 
 import api from "../../util/api"
@@ -42,6 +43,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
+        toast.success("Vote submitted")
         onVoted(commentId)
         setEditingVote(false)
       })
@@ -67,6 +69,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
+        toast.success("Vote submitted")
         onVoted(commentId)
         setEditingVote(false)
       })
@@ -87,6 +90,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
+        toast.success("Vote submitted")
         onVoted(commentId)
         setEditingVote(false)
       })

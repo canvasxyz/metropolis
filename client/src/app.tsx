@@ -7,6 +7,7 @@ import { populateUserStore } from "./actions"
 import type { User } from "./util/types"
 import { RootState } from "./util/types"
 
+import { Toaster } from "react-hot-toast"
 import { Switch, Route, Link, Redirect } from "react-router-dom"
 import { Flex, Box, jsx } from "theme-ui"
 
@@ -127,6 +128,15 @@ class App extends React.Component<
     const { location } = this.props
     return (
       <React.Fragment>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 5000,
+            style: {
+              fontFamily: "Space Grotesk, monospace",
+            },
+          }}
+        />
         <Switch>
           <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
           <Box
