@@ -5,7 +5,7 @@ import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser } from "react-icons/tb"
+import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
 import {
   populateConversationsStore,
@@ -41,29 +41,47 @@ function ConversationRow({ c, i, dispatch }) {
             }}
           />
         </Box>
-        <Box sx={{ flex: "1 1 auto", ml: [3], maxWidth: "50%" }}>
-          {c.is_archived ? (
-            <Text sx={{ color: "lightGray" }}>{c.topic}</Text>
-          ) : (
-            <Link
-              sx={{
-                variant: "links.text",
-                cursor: "pointer",
-                fontWeight: 600,
-              }}
-              to={`/c/${c.conversation_id}`}
-            >
-              {c.topic}
-            </Link>
-          )}
-          <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>
-            {!c.is_archived && (c.is_active ? "Voting Open" : "Voting Closed")}
-          </Text>
-          <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
+        <Box sx={{ lineHeight: 1.35, flex: "1 1 auto", ml: [3], maxWidth: "50%" }}>
+          <Box sx={{ my: [1] }}>
+            {c.is_archived ? (
+              <Text sx={{ color: "lightGray" }}>{c.topic}</Text>
+            ) : (
+              <Link
+                sx={{
+                  variant: "links.text",
+                  cursor: "pointer",
+                  fontWeight: 600,
+                }}
+                to={`/c/${c.conversation_id}`}
+              >
+                {c.topic}
+              </Link>
+            )}
+          </Box>
+          <Box sx={{ my: [2] }}>
+            <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>
+              {!c.is_archived && (c.is_active ? "Voting Open" : "Voting Closed")}
+            </Text>
+          </Box>
+          <Box sx={{ my: [2] }}>
+            <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
+          </Box>
         </Box>
         <Box sx={{ ml: [4], color: c.is_archived ? "lightGray" : "mediumGray" }}>
-          <Text>{c.participant_count} participants</Text>
+          {c.participant_count}
+          <Text sx={{ display: ["inline", "none"] }}>
+            <TbUser />
+          </Text>{" "}
+          <Text sx={{ display: ["none", "inline"] }}>participants</Text>
         </Box>
+        {/*
+        <Box sx={{ ml: [4], color: c.is_archived ? "lightGray" : "mediumGray" }}>
+          {c.vote_count}
+          <Text sx={{ display: ["inline", "none"] }}>
+            <TbCheckbox />
+          </Text>{" "}
+          <Text sx={{ display: ["none", "inline"] }}>votes</Text>
+          </Box>*/}
         {!c.is_archived ? (
           <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
             <DropdownMenu

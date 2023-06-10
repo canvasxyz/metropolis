@@ -169,7 +169,7 @@ export default {
       fontFamily: "monospace",
       cursor: "pointer",
       border: "1px solid",
-      borderColor: "mediumGray",
+      borderColor: "lightGray",
       "&:hover": {
         color: "mediumRedActive",
         borderColor: "mediumRedActive",
@@ -181,14 +181,14 @@ export default {
       fontFamily: "monospace",
       cursor: "pointer",
       border: "1px solid",
-      borderColor: "mediumGray",
+      borderColor: "lightGray",
       "&:hover": {
         color: "mediumGreenActive",
         borderColor: "mediumGreenActive",
       },
     },
     outlineLightGray: {
-      color: "lightGray",
+      color: "mediumGray",
       bg: "background",
       fontFamily: "monospace",
       cursor: "pointer",

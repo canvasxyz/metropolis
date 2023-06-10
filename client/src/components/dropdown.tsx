@@ -69,7 +69,7 @@ const DropdownMenu = ({
                   if (isFocused === index) setOpen(false)
                 }, 10)
               }
-              variant="outlineGray"
+              variant="outlineLightGray"
               sx={{
                 display: "block",
                 width: "100%",
@@ -152,7 +152,7 @@ const DropdownButton = ({
       >
         {dropdownOptions.map((option, index) => {
           return (
-            <Button variant="outlineGray" key={index} onClick={option.onClick}>
+            <Button variant="outlineLightGray" key={index} onClick={option.onClick}>
               {option.name}
             </Button>
           )
