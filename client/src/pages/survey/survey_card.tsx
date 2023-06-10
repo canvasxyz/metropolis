@@ -1,7 +1,9 @@
+/** @jsx jsx */
+
 import React, { useEffect, useState, useRef } from "react"
 import { connect } from "react-redux"
 import { toast } from "react-hot-toast"
-import { Box, Heading, Button, Text, Input } from "theme-ui"
+import { Box, Heading, Button, Text, Input, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -107,17 +109,15 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         bg: "background",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
-        height: "350px",
+        height: [null, "350px"],
         mb: "20px",
-        px: "40px",
-        pt: "36px",
+        px: [4, "40px"],
+        pt: [4, "36px"],
         pb: "16px",
-        // mb: [3, null, 4],
-        // mb: stacked ? "-177px" : undefined,
         overflow: "scroll",
       }}
     >
-      <Text sx={{ mb: 4, minHeight: "170px", wordBreak: "break-word" }}>{txt}</Text>
+      <Text sx={{ mb: 4, minHeight: [null, "170px"], wordBreak: "break-word" }}>{txt}</Text>
       {hasVoted && (
         <Box sx={{ position: "absolute", top: [3], right: [3] }}>
           <DropdownMenu
@@ -143,7 +143,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         sx={{ mr: 2, color: "mediumGray" }}
         onClick={agree.bind(null, commentId)}
       >
-        <TbCheck />
+        <TbCheck style={{ position: "relative", top: "2px" }} />
         &nbsp;Agree
       </Button>
       <Button
@@ -151,7 +151,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         sx={{ mr: 2, color: "mediumGray" }}
         onClick={disagree.bind(null, commentId)}
       >
-        <TbX />
+        <TbX style={{ position: "relative", top: "2px" }} />
         &nbsp;Disagree
       </Button>
       <Button

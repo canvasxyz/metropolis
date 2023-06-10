@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { Flex, Box, Text, Button, Card, Link } from "theme-ui"
+import { Flex, Box, Text, Button, Card } from "theme-ui"
 import { RootState } from "../../../util/types"
 
 class Comment extends React.Component<

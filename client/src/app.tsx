@@ -126,6 +126,9 @@ class App extends React.Component<
 
   render() {
     const { location } = this.props
+    const inReport = document.location.pathname?.startsWith("/r/")
+    const inSurvey = document.location.pathname?.startsWith("/c/")
+
     return (
       <React.Fragment>
         <Toaster
@@ -142,11 +145,11 @@ class App extends React.Component<
           <Box
             sx={{
               margin: `0 auto`,
-              maxWidth: document.location.pathname?.startsWith("/r/") ? "62em" : "45em",
+              maxWidth: inReport ? "62em" : "45em",
               pb: [4],
             }}
           >
-            <Header user={this.props.user} />
+            <Header user={this.props.user} inSurvey={inSurvey} />
             <Box
               sx={{
                 pt: "1px", // prevent margins from spilling over
@@ -220,7 +223,7 @@ class App extends React.Component<
                 component={ConversationAdmin}
               />
             </Box>
-            <Footer />
+            <Footer inSurvey={inSurvey} />
           </Box>
         </Switch>
       </React.Fragment>

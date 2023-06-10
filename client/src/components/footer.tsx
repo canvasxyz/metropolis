@@ -1,21 +1,40 @@
 /** @jsx jsx */
-import { Component } from "react"
-import { Box, Link, Heading, jsx } from "theme-ui"
+import React from "react"
+import { Link } from "react-router-dom"
+import { Box, Heading, Text, jsx } from "theme-ui"
 
-class Header extends Component {
-  render() {
-    return (
-      <Box sx={{ fontFamily: "monospace", px: [4] }}>
-        (c) {new Date().getFullYear()} Authors
-        <Link sx={{ ml: 4 }} href="/tos">
-          Terms
-        </Link>{" "}
-        <Link sx={{ ml: 3 }} href="/privacy">
-          Privacy
+const Header: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
+  return (
+    <Box
+      sx={{
+        textAlign: inSurvey ? "center" : "",
+        fontFamily: "monospace",
+        px: [4],
+      }}
+    >
+      {!inSurvey && <Text as="span">(c) {new Date().getFullYear()} Authors</Text>}
+      <Link sx={{ variant: "styles.a", ml: 3 }} to="/tos">
+        Terms
+      </Link>{" "}
+      <Link sx={{ variant: "styles.a", ml: 3, pr: "1px" }} to="/privacy">
+        Privacy
+      </Link>
+      {inSurvey && (
+        <Link sx={{ variant: "styles.a", ml: 3 }} to="/">
+          About
         </Link>
-      </Box>
-    )
-  }
+      )}
+      {!inSurvey && (
+        <a
+          sx={{ variant: "styles.a", ml: 3 }}
+          href="https://github.com/raykyri/polis"
+          target="_blank"
+        >
+          Code
+        </a>
+      )}
+    </Box>
+  )
 }
 
 export default Header

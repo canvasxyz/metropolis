@@ -1,7 +1,8 @@
 /** @jsx jsx */
 
 import React from "react"
-import { Heading, Box, Text, Link, Button, jsx } from "theme-ui"
+import { Link } from "react-router-dom"
+import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 const Index: React.FC<{ user? }> = ({ user }) => {
   return (
@@ -11,7 +12,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         sx={{
           fontSize: [5],
           lineHeight: 1.2,
-          my: [5],
+          mt: [2, 5],
+          mb: [5],
           maxWidth: "20em",
         }}
       >
@@ -19,11 +21,11 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       </Heading>
       <Box sx={{ mb: [4, null, 5] }}>
         <Text sx={{ my: 3 }}>
-          Polis+ is a tool for collaborative intelligence, that allows groups to quickly and
-          effectively explore their knowledge and opinion space around a domain.
+          Polis+ is a tool for collaborative intelligence, that allows groups to explore their
+          knowledge and opinion space around a domain, in realtime.
         </Text>
         <Text sx={{ my: 3 }}>
-          Starting from a prompt, members write comments and vote on each others' comments.
+          Starting from a prompt, participants write comments and vote on each others’ comments.
           Statistical methods are used to identify the most important comments, and points of
           agreement and disagreement within the group.
         </Text>
@@ -34,17 +36,17 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </Text>
         {user ? (
           <Box sx={{ mt: [6] }}>
-            <Link variant="links.button" href="/conversations">
+            <Link sx={{ variant: "links.button" }} to="/conversations">
               Go to conversations
             </Link>
           </Box>
         ) : (
           <Box sx={{ mt: [6] }}>
-            <Link variant="links.button" href="/createuser">
+            <Link sx={{ variant: "links.button" }} to="/createuser">
               Sign up
             </Link>
             <Text sx={{ display: "inline", my: [2], mx: [1], fontFamily: "monospace" }}> or </Text>
-            <Link variant="links.button" href="/signin">
+            <Link sx={{ variant: "links.button" }} to="/signin">
               Sign in
             </Link>
           </Box>

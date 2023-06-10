@@ -36,7 +36,7 @@ function ConversationRow({ c, i, dispatch }) {
             src="/polldoc.png"
             sx={{
               width: 16,
-              mt: "3px",
+              mt: "6px",
               filter: c.is_archived ? "grayscale(1) opacity(0.4)" : undefined,
             }}
           />

@@ -19,7 +19,7 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
           />
         ))}
         {unvotedComments.length === 0 && (
-          <Box sx={{ ...surveyBox }}>
+          <Box sx={{ ...surveyBox, pt: [5] }}>
             <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
               You’re done for now!
             </Heading>
@@ -27,8 +27,8 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
               You’ve voted on all {votedComments.length} comments in the survey so far.
             </Text>
             <Text sx={{ mb: [2] }}>
-              Come back to this page to see comments as they’re submitted by others. Or, try
-              contributing a few of your own!
+              Come back to this page to see comments as they’re submitted by others. Or, you can
+              also contribute a few of your own!
             </Text>
           </Box>
         )}

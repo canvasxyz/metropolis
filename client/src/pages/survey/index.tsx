@@ -28,7 +28,7 @@ export const surveyHeading = {
 export const surveyHeadingMini = {
   fontSize: [3],
   lineHeight: "1.35",
-  mt: [0, 3],
+  mt: [0],
   mb: [4],
 }
 
@@ -50,31 +50,30 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
 
   return (
     <React.Fragment>
-      {showIntro ? (
-        <Box sx={{ ...surveyBox }}>
-          <Text sx={{ mb: [4] }}>{zid_metadata.description}</Text>
-          <Button variant="outlineGray" onClick={() => setShowIntro(false)}>
-            Hide intro
-            <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
-          </Button>
-        </Box>
-      ) : (
-        <Box>
-          {zid_metadata?.description && (
-            <Button variant="outlineGray" onClick={() => setShowIntro(true)}>
-              Show intro
+      <Box>
+        {zid_metadata?.description && (
+          <Button variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
+            {showIntro ? "Hide intro" : "Show intro"}
+            {showIntro ? (
+              <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
+            ) : (
               <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
-            </Button>
-          )}
-          <Button
-            variant="primary"
-            sx={{ ml: [2] }}
-            onClick={() => {
-              setIsOpen(true)
-            }}
-          >
-            Add new comment
+            )}
           </Button>
+        )}
+        <Button
+          variant="primary"
+          sx={{ ml: [2] }}
+          onClick={() => {
+            setIsOpen(true)
+          }}
+        >
+          Add new comment
+        </Button>
+      </Box>
+      {showIntro && (
+        <Box sx={{ ...surveyBox }}>
+          <Text>{zid_metadata.description}</Text>
         </Box>
       )}
       <Modal
@@ -198,7 +197,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         maxWidth: "29em",
         letterSpacing: "-0.06px",
         fontSize: ["1em", "1.05em"],
-        lineHeight: ["1.4", "1.55"],
+        lineHeight: ["1.4", "1.5"],
       }}
     >
       {state === "intro" && (
