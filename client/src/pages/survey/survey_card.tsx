@@ -47,6 +47,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .always(() => setVoting(false))
   }
+
   const disagree = (
     commentId: string,
     event: MouseEvent,
@@ -71,6 +72,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .always(() => setVoting(false))
   }
+
   const skip = (commentId: string, event: MouseEvent, starred: boolean = undefined, weight = 0) => {
     ;(event.currentTarget as any).blur()
     setVoting(true)
@@ -101,15 +103,17 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         bg: "background",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
-        height: "180px",
+        height: "350px",
+        mb: "20px",
         px: "40px",
-        py: "36px",
+        pt: "36px",
+        pb: "16px",
         // mb: [3, null, 4],
-        mb: stacked ? "-177px" : undefined,
+        // mb: stacked ? "-177px" : undefined,
         overflow: "scroll",
       }}
     >
-      <Text sx={{ mb: 4, wordBreak: "break-word" }}>{txt}</Text>
+      <Text sx={{ mb: 4, minHeight: "170px", wordBreak: "break-word" }}>{txt}</Text>
       {hasVoted && (
         <Box sx={{ position: "absolute", top: [3], right: [3] }}>
           <DropdownMenu
@@ -130,6 +134,35 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
           />
         </Box>
       )}
+      <Button
+        variant="outlineGreen"
+        sx={{ mr: 2, color: "mediumGray" }}
+        onClick={agree.bind(null, commentId)}
+      >
+        <TbCheck />
+        &nbsp;Agree
+      </Button>
+      <Button
+        variant="outlineRed"
+        sx={{ mr: 2, color: "mediumGray" }}
+        onClick={disagree.bind(null, commentId)}
+      >
+        <TbX />
+        &nbsp;Disagree
+      </Button>
+      <Button
+        variant="outlineGray"
+        sx={{ mr: 2, color: "mediumGray" }}
+        onClick={skip.bind(null, commentId)}
+      >
+        Skip
+      </Button>
+      <Box sx={{ mt: "12px", fontSize: "0.94em", color: "mediumGray", fontFamily: "monospace" }}>
+        <label>
+          <input type="checkbox" onChange={() => false} />
+          &nbsp;This option is important to me
+        </label>
+      </Box>
     </Box>
   )
 }

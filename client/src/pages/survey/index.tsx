@@ -2,12 +2,13 @@
 
 import React, { useEffect, useState, useRef } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
+import Modal from "react-modal"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { RootState, Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
-import { TbChevronsDown } from "react-icons/tb"
+import { TbChevronsDown, TbChevronsUp } from "react-icons/tb"
 
 import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
@@ -34,45 +35,69 @@ export const surveyBox = {
   mb: [3, null, 4],
 }
 
-const Divider = () => {
-  return (
-    <Box sx={{ width: "100%", py: [5] }}>
-      <hr
-        sx={{
-          maxWidth: "100px",
-          border: "none",
-          borderBottom: "1px solid",
-          borderBottomColor: "secondary",
-        }}
-      />
-    </Box>
-  )
-}
+Modal.setAppElement("#root")
 
-const CollapsibleIntro = ({ zid_metadata }) => {
+const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => {
   const [showIntro, setShowIntro] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <React.Fragment>
-      <a
-        href="#"
-        sx={{
-          color: "lightGray",
-          textDecoration: "none",
-          "&:hover": { textDecoration: "underline" },
-        }}
-        onClick={(e) => {
-          e.preventDefault()
-          setShowIntro(!showIntro)
-        }}
-      >
-        <TbChevronsDown style={{ marginRight: "6px" }} />
-        {showIntro ? "Hide" : "Show"} introduction
-      </a>
-      {showIntro && (
+      {showIntro ? (
         <Box sx={{ ...surveyBox }}>
-          <Text>{zid_metadata.description}</Text>
+          <Text sx={{ mb: [4] }}>{zid_metadata.description}</Text>
+          <Button variant="outlineGray" onClick={() => setShowIntro(false)}>
+            Hide intro
+            <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
+          </Button>
+        </Box>
+      ) : (
+        <Box>
+          {zid_metadata?.description && (
+            <Button variant="outlineGray" onClick={() => setShowIntro(true)}>
+              Show intro
+              <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
+            </Button>
+          )}
+          <Button
+            variant="primary"
+            sx={{ ml: [2] }}
+            onClick={() => {
+              setIsOpen(true)
+            }}
+          >
+            Add new comment
+          </Button>
         </Box>
       )}
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(255, 255, 255, 0.15)",
+          },
+          content: {
+            borderRadius: "8px",
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            minHeight: "200px",
+            width: "540px",
+            overflow: "visible",
+          },
+        }}
+        contentLabel="Add new comment"
+      >
+        <SurveyCompose
+          zid_metadata={zid_metadata}
+          votedComments={votedComments}
+          setVotedComments={setVotedComments}
+        />
+      </Modal>
     </React.Fragment>
   )
 }
@@ -179,22 +204,20 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       )}
       {state === "voting" && (
         <React.Fragment>
-          <Heading as="h3" sx={surveyHeading}>
+          <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
             {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
           </Heading>
-          {zid_metadata?.description && <CollapsibleIntro zid_metadata={zid_metadata} />}
-          <Box>
+          <CollapsibleIntro
+            zid_metadata={zid_metadata}
+            votedComments={votedComments}
+            setVotedComments={setVotedComments}
+          />
+          <Box sx={{ mt: [5] }}>
             <SurveyCards
               votedComments={votedComments}
               unvotedComments={unvotedComments}
               onVoted={onVoted}
               conversation_id={conversation_id}
-            />
-            <Divider />
-            <SurveyCompose
-              zid_metadata={zid_metadata}
-              votedComments={votedComments}
-              setVotedComments={setVotedComments}
             />
           </Box>
         </React.Fragment>

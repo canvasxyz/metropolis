@@ -1,19 +1,13 @@
 import React from "react"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
-import { surveyBox } from "./index"
+import { surveyBox, surveyHeading } from "./index"
 import SurveyCard from "./survey_card"
 
 const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted }) => {
   return (
     <Box>
-      <Flex>
-        <Text sx={{ color: "lightGray", margin: "20px auto" }}>
-          You’ve voted on {votedComments.length} of {votedComments.length + unvotedComments.length}{" "}
-          comments
-        </Text>
-      </Flex>
-      <Box sx={{ pb: "180px" }}>
+      <Box>
         {unvotedComments.map((comment, i) => (
           <SurveyCard
             key={comment.tid}
@@ -25,37 +19,19 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
           />
         ))}
         {unvotedComments.length === 0 && (
-          <Box
-            sx={{
-              ...surveyBox,
-              // boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
-              // width: "100%",
-              height: "180px",
-              // textAlign: "center",
-              mb: "-120px",
-            }}
-          >
-            <p>It looks like you've voted on everything.</p>
-            <p>Have you tried writing a comment yet?</p>
+          <Box sx={{ ...surveyBox }}>
+            <Heading as="h3" sx={{ ...surveyHeading, mt: [3], fontSize: "22px" }}>
+              You’re done for now!
+            </Heading>
+            <Text sx={{ mb: [3] }}>
+              You’ve voted on all {votedComments.length} comments in the survey so far.
+            </Text>
+            <Text sx={{ mb: [3] }}>
+              Come back to this page any time for more comments as they’re submitted by others. Or,
+              try adding a few of your own!
+            </Text>
           </Box>
         )}
-      </Box>
-      <Flex>
-        <Text sx={{ color: "lightGray", margin: "20px auto" }}>
-          Review comments you've voted on
-        </Text>
-      </Flex>
-      <Box sx={{ pb: "180px" }}>
-        {votedComments.map((comment, i) => (
-          <SurveyCard
-            key={comment.tid}
-            comment={comment}
-            conversationId={conversation_id}
-            onVoted={onVoted}
-            hasVoted={true}
-            stacked={true}
-          />
-        ))}
       </Box>
     </Box>
   )

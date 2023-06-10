@@ -46,59 +46,47 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
   }
 
   return (
-    <Box
-      sx={{
-        mb: [3, null, 4],
-        margin: "0 auto",
-        border: "1px solid",
-        borderColor: "lighterGray",
-        px: "40px",
-        py: "36px",
-        borderRadius: "8px",
-      }}
-    >
-      <form onSubmit={(e) => e.preventDefault()}>
-        <Textarea
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            borderRadius: "3px",
-            padding: [2],
-            border: "1px solid",
-            borderColor: "lightGray",
-            mb: [3],
-          }}
-          ref={inputRef}
-          placeholder="Write a new comment..."
-        />
-        <Flex>
-          <Box>
-            <DropdownButton
-              options={[
-                {
-                  name: "Add new comment",
-                  onClick: () => {
-                    submitComment(inputRef.current.value, 1).then(
-                      () => (inputRef.current.value = "")
-                    )
-                  },
-                  default: true,
+    <form onSubmit={(e) => e.preventDefault()}>
+      <Textarea
+        sx={{
+          fontFamily: "body",
+          fontSize: [2],
+          width: "100%",
+          borderRadius: "3px",
+          padding: [2],
+          border: "1px solid",
+          borderColor: "lightGray",
+          mb: [3],
+        }}
+        rows={4}
+        ref={inputRef}
+        placeholder="Write a new comment..."
+        autoFocus
+      />
+      <Flex>
+        <Box>
+          <DropdownButton
+            options={[
+              {
+                name: "Add new comment (agree)",
+                onClick: () => {
+                  submitComment(inputRef.current.value, 1).then(() => (inputRef.current.value = ""))
                 },
-                {
-                  name: "Add new comment (disagree)",
-                  onClick: () => {
-                    submitComment(inputRef.current.value, -1).then(
-                      () => (inputRef.current.value = "")
-                    )
-                  },
+                default: true,
+              },
+              {
+                name: "Add new comment (disagree)",
+                onClick: () => {
+                  submitComment(inputRef.current.value, -1).then(
+                    () => (inputRef.current.value = "")
+                  )
                 },
-              ]}
-            />
-          </Box>
-        </Flex>
-      </form>
-    </Box>
+              },
+            ]}
+          />
+        </Box>
+      </Flex>
+    </form>
   )
 }
 
