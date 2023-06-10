@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
 import Modal from "react-modal"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { RootState, Comment, Conversation } from "../../util/types"
@@ -23,6 +23,13 @@ export const surveyHeading = {
   lineHeight: "1.35",
   mt: [1, 5],
   mb: [5],
+}
+
+export const surveyHeadingMini = {
+  fontSize: [3],
+  lineHeight: "1.35",
+  mt: [0, 3],
+  mb: [4],
 }
 
 export const surveyBox = {
@@ -75,7 +82,7 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
         onRequestClose={() => setIsOpen(false)}
         style={{
           overlay: {
-            backgroundColor: "rgba(255, 255, 255, 0.15)",
+            backgroundColor: "rgba(40, 40, 40, 0.3)",
           },
           content: {
             borderRadius: "8px",
@@ -86,12 +93,17 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
             marginRight: "-50%",
             transform: "translate(-50%, -50%)",
             minHeight: "200px",
-            width: "540px",
+            width: "96vw", // for mobile
+            maxWidth: "540px",
             overflow: "visible",
+            padding: "32px 28px 28px",
           },
         }}
         contentLabel="Add new comment"
       >
+        <Heading as="h4" sx={surveyHeadingMini}>
+          Add new comment
+        </Heading>
         <SurveyCompose
           zid_metadata={zid_metadata}
           votedComments={votedComments}
@@ -186,7 +198,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         maxWidth: "29em",
         letterSpacing: "-0.06px",
         fontSize: ["1em", "1.05em"],
-        lineHeight: ["1.5", "1.55"],
+        lineHeight: ["1.4", "1.55"],
       }}
     >
       {state === "intro" && (
@@ -219,6 +231,19 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               onVoted={onVoted}
               conversation_id={conversation_id}
             />
+          </Box>
+          <Box sx={{ mt: [4], textAlign: "right" }}>
+            <Link
+              sx={{
+                fontFamily: "monospace",
+                color: "mediumGray",
+                "&:hover": { color: "mediumGrayActive", borderColor: "mediumGrayActive" },
+              }}
+              as="a"
+              onClick={() => goTo("intro")}
+            >
+              Back to intro
+            </Link>
           </Box>
         </React.Fragment>
       )}

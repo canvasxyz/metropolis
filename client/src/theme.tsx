@@ -53,6 +53,22 @@ export default {
       textDecoration: "none",
       cursor: "pointer",
     },
+    textGray: {
+      fontWeight: "600",
+      color: "mediumGray",
+      "&:visited": {
+        color: "mediumGray",
+      },
+      "&:active": {
+        color: "mediumGrayActive",
+      },
+      "&:hover": {
+        color: "mediumGrayActive",
+        textDecoration: "underline",
+      },
+      textDecoration: "none",
+      cursor: "pointer",
+    },
     button: {
       px: [3],
       py: [2],

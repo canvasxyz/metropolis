@@ -13,7 +13,7 @@ const SurveyInstructions = ({
   onPrev: Function
   limit: number
 }) => {
-  const cardsText = limit ? `a batch of ${limit} comments` : "comments written by other people"
+  const cardsText = limit ? `a batch of ${limit} comments` : "comments by other people"
 
   return (
     <Box>
@@ -21,7 +21,7 @@ const SurveyInstructions = ({
         About this survey
       </Heading>
       <Text sx={{ mt: [4], mb: [2] }}>
-        This is a collaborative survey, where you can contribute comments that everyone votes on.
+        This is a collaborative survey, where you can contribute comments for everyone to vote on.
       </Text>
       <Text sx={{ my: [2] }}>
         You’ll be shown {cardsText}, and asked to <strong>Agree</strong>, <strong>Disagree</strong>,
@@ -37,10 +37,12 @@ const SurveyInstructions = ({
           <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
         </ul>
       </Text>
-      <Box sx={{ mt: [5] }}>
-        <Button variant="primary" onClick={onNext}>
-          Continue
-        </Button>
+      <Flex sx={{ mt: [5] }}>
+        <Box sx={{ flex: 1 }}>
+          <Button variant="primary" onClick={onNext}>
+            Continue
+          </Button>
+        </Box>
         <Link
           onClick={onPrev}
           sx={{
@@ -53,7 +55,7 @@ const SurveyInstructions = ({
         >
           Back
         </Link>
-      </Box>
+      </Flex>
     </Box>
   )
 }

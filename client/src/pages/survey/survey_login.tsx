@@ -9,12 +9,16 @@ const SurveyLogin = ({ onNext, onPrev }) => {
       <Heading as="h3" sx={surveyHeading}>
         Before we begin...
       </Heading>
-      <Text>This survey requires you to be logged in with an email or identity provider.</Text>
-      <Text>Your identity won’t be publicly associated with your answers.</Text>
-      <Box sx={{ mt: [5] }}>
-        <Button variant="primary" onClick={onNext}>
-          Continue
-        </Button>
+      <Text sx={{ mb: [3] }}>
+        This survey requires you to be logged in with an email or identity provider.
+      </Text>
+      <Text sx={{ mb: [3] }}>Your identity won’t be publicly associated with your answers.</Text>
+      <Flex sx={{ mt: [5] }}>
+        <Box sx={{ flex: 1 }}>
+          <Button variant="primary" onClick={onNext}>
+            Continue
+          </Button>
+        </Box>
         <Link
           onClick={onPrev}
           sx={{
@@ -27,7 +31,7 @@ const SurveyLogin = ({ onNext, onPrev }) => {
         >
           Back
         </Link>
-      </Box>
+      </Flex>
     </Box>
   )
 }
