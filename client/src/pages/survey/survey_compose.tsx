@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from "react"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { toast } from "react-hot-toast"
 
 import type { Comment } from "../../util/types"
 import { DropdownButton } from "../../components/dropdown"
@@ -13,7 +14,6 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
 }) => {
   const inputRef = useRef<HTMLInputElement>()
   const importantRef = useRef<HTMLInputElement>()
-  const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
   const submitComment = (txt: string, vote: number) => {
@@ -50,6 +50,7 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
           pid: currentPid,
         }
         setVotedComments([...votedComments, comment])
+        toast.success("Comment added")
       })
   }
 
@@ -76,27 +77,23 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
           sx={{ display: "inline-block" }}
           options={[
             {
-              name: "Add new comment (agree)",
+              name: "Add & vote agree",
               onClick: () => {
                 submitComment(inputRef.current.value, 1).then(() => {
                   inputRef.current.value = ""
                   importantRef.current.checked = false
                   setError("")
-                  setSuccess(true)
-                  setTimeout(() => setSuccess(false), 1500)
                 })
               },
               default: true,
             },
             {
-              name: "Add new comment (disagree)",
+              name: "Add & vote disagree",
               onClick: () => {
                 submitComment(inputRef.current.value, -1).then(() => {
                   inputRef.current.value = ""
                   importantRef.current.checked = false
                   setError("")
-                  setSuccess(true)
-                  setTimeout(() => setSuccess(false), 1500)
                 })
               },
             },
@@ -104,14 +101,10 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
         />
       </Box>
       <Box sx={{ fontFamily: "monospace" }}>
-        {success ? (
-          <Text sx={{ mt: [2], color: "mediumGreen" }}>Comment added!</Text>
-        ) : (
-          <label>
-            <input type="checkbox" ref={importantRef} onChange={() => false} />
-            &nbsp;This option is important to me
-          </label>
-        )}
+        <label>
+          <input type="checkbox" ref={importantRef} onChange={() => false} />
+          &nbsp;This option is important to me
+        </label>
         {error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}
       </Box>
     </form>

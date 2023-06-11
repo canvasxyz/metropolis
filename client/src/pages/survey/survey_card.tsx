@@ -45,7 +45,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
-        toast.success("Vote submitted")
+        toast.success("Vote recorded")
         onVoted(commentId)
         setEditingVote(false)
       })
@@ -71,7 +71,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
-        toast.success("Vote submitted")
+        toast.success("Vote recorded")
         onVoted(commentId)
         setEditingVote(false)
       })
@@ -92,7 +92,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         // starred: boolean
       })
       .then(() => {
-        toast.success("Vote submitted")
+        toast.success("Skip recorded")
         onVoted(commentId)
         setEditingVote(false)
       })

@@ -38,8 +38,7 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
               You’ve voted on all {votedComments.length} comments in the survey so far.
             </Text>
             <Text sx={{ mb: [2] }}>
-              Come back to this page to see comments as they’re submitted by others. Or, you can
-              also contribute a few of your own!
+              Come back to this page to see comments as they’re submitted by others.
             </Text>
           </Box>
         )}

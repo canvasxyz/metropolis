@@ -51,7 +51,7 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
   return (
     <React.Fragment>
       <Box>
-        {zid_metadata?.description && (
+        {/* zid_metadata?.description && (
           <Button sx={{ mr: [2] }} variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
             {showIntro ? "Hide intro" : "Show intro"}
             {showIntro ? (
@@ -60,7 +60,7 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
               <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
             )}
           </Button>
-        )}
+        ) */}
         <Button
           variant="primary"
           onClick={() => {
