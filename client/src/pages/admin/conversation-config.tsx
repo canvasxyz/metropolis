@@ -59,12 +59,16 @@ class ConversationConfig extends React.Component<
 
   handleIntegerValueChange(field) {
     return () => {
-      const val = parseInt(this[field].value, 10)
-      if (isNaN(val) || val.toString() !== this[field].value) {
-        toast.error("Invalid value")
-        return
+      if (this[field].value === "") {
+        this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, 0))
+      } else {
+        const val = parseInt(this[field].value, 10)
+        if (isNaN(val) || val.toString() !== this[field].value) {
+          toast.error("Invalid value")
+          return
+        }
+        this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
       }
-      this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
     }
   }
   handleIntegerInputTyping(field) {
@@ -163,7 +167,6 @@ class ConversationConfig extends React.Component<
           </Text>
           <input
             ref={(c) => (this.postsurvey_limit = c)}
-            placeholder="Recommended: 20-40"
             sx={{
               fontFamily: "body",
               fontSize: [2],
@@ -176,7 +179,7 @@ class ConversationConfig extends React.Component<
             }}
             onBlur={this.handleIntegerValueChange("postsurvey_limit").bind(this)}
             onChange={this.handleIntegerInputTyping("postsurvey_limit").bind(this)}
-            defaultValue={this.props.zid_metadata.postsurvey_limit}
+            defaultValue={this.props.zid_metadata.postsurvey_limit || ""}
           />
         </Box>
 
@@ -207,16 +210,20 @@ class ConversationConfig extends React.Component<
           Customize the user interface
         </Heading>
 
-        <CheckboxField field="write_type" label="Commenting" isIntegerBool>
-          Participants can submit comments
+        <CheckboxField field="write_type" label="Enable comments" isIntegerBool>
+          Participants can write their own cards
         </CheckboxField>
 
-        <CheckboxField field="strict_moderation" label="Strict mode (moderator approval required)">
-          Require moderator approval before comments can be voted on
+        <CheckboxField field="auth_needed_to_write" label="Email required to comment">
+          Email registration required to write cards
         </CheckboxField>
 
-        <CheckboxField field="help_type" label="Help text" isIntegerBool>
-          Show explanatory text when voting or writing comments
+        <CheckboxField field="strict_moderation" label="Moderator approval for comments">
+          Require moderator approval before new comments can be voted on
+        </CheckboxField>
+
+        <CheckboxField field="help_type" label="Show help text" isIntegerBool>
+          Show explanatory text when writing comments
         </CheckboxField>
 
         {/*
@@ -234,10 +241,6 @@ class ConversationConfig extends React.Component<
 
         <CheckboxField field="auth_opt_tw" label="Twitter login prompt">
           Show Twitter login prompt
-        </CheckboxField>
-
-        <CheckboxField field="auth_needed_to_write" label="Require Auth to Comment">
-          Participants cannot submit comments without first connecting either Facebook or Twitter
         </CheckboxField>
 
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">

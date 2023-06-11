@@ -14,7 +14,6 @@ import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
-import SurveyCompose from "./survey_compose"
 
 // TODO: enforce comment too long on backend
 
@@ -144,7 +143,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             sx={{ position: "fixed", top: [3], right: [3], px: [2], pt: "4px", pb: "3px" }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
-            <TbSettings /> Configure
+            <TbSettings /> Admin Panel
           </Button>
         )}
       </Box>
@@ -170,20 +169,13 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             <SurveyCards
               votedComments={votedComments}
               unvotedComments={unvotedComments}
+              setVotedComments={setVotedComments}
+              user={user}
               onVoted={onVoted}
               conversation_id={conversation_id}
+              zid_metadata={zid_metadata}
             />
           </Box>
-          {zid_metadata.auth_needed_to_write && !user.isLoggedIn ? (
-            <Box>{/* TODO: log in to comment */}</Box>
-          ) : (
-            <SurveyCompose
-              zid_metadata={zid_metadata}
-              votedComments={votedComments}
-              unvotedComments={unvotedComments}
-              setVotedComments={setVotedComments}
-            />
-          )}
         </React.Fragment>
       )}
     </Box>

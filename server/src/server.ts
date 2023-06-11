@@ -10065,7 +10065,7 @@ Email verified! You can close this tab or hit the back button.
                 topic: req.p.topic,
                 description: req.p.description,
                 postsurvey: req.p.postsurvey,
-                postsurvey_limit: req.p.postsurvey_limit,
+                // postsurvey_limit: req.p.postsurvey_limit,
                 is_active: req.p.is_active,
                 is_data_open: req.p.is_data_open,
                 is_draft: req.p.is_draft,
