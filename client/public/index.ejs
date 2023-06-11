@@ -27,6 +27,15 @@
     .ReactModal__Overlay--before-close{
         opacity: 0;
     }
+
+    @keyframes slideout {
+        0% {transform: translate3d(0,-200%,0) scale(.6); opacity:.5;}
+        100% {transform: translate3d(0,0,0) scale(1); opacity:1;}
+    }
+    .animation-exit {
+        animation: slideout 400ms ease-in-out;
+        animation-direction: reverse;
+    }
   </style>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>

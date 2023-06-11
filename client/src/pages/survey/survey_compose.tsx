@@ -15,8 +15,10 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
   const inputRef = useRef<HTMLInputElement>()
   const importantRef = useRef<HTMLInputElement>()
   const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
 
   const submitComment = (txt: string, vote: number) => {
+    setLoading(true)
     const finalTxt = txt.replace(/\n/g, " ").trim() // replace newlines with whitespace
     const params = {
       pid: "mypid",
@@ -66,10 +68,27 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
           border: "1px solid",
           borderColor: "lightGray",
           mb: [3],
+          background: loading ? "#eee" : undefined,
         }}
+        disabled={!!loading}
         rows={4}
         ref={inputRef}
         placeholder="Write a new comment..."
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && e.metaKey) {
+            e.preventDefault()
+            submitComment(inputRef.current.value, 1)
+              .then(() => {
+                inputRef.current.value = ""
+                importantRef.current.checked = false
+                setError("")
+              })
+              .done(() => {
+                setLoading(false)
+                inputRef.current.focus()
+              })
+          }
+        }}
         autoFocus
       />
       <Box sx={{ mb: [3] }}>
@@ -79,22 +98,31 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
             {
               name: "Add comment",
               onClick: () => {
-                submitComment(inputRef.current.value, 1).then(() => {
-                  inputRef.current.value = ""
-                  importantRef.current.checked = false
-                  setError("")
-                })
+                submitComment(inputRef.current.value, 1)
+                  .then(() => {
+                    inputRef.current.value = ""
+                    importantRef.current.checked = false
+                    setError("")
+                  })
+                  .done(() => {
+                    setLoading(false)
+                    inputRef.current.focus()
+                  })
               },
               default: true,
             },
             {
               name: "Add & vote disagree",
               onClick: () => {
-                submitComment(inputRef.current.value, -1).then(() => {
-                  inputRef.current.value = ""
-                  importantRef.current.checked = false
-                  setError("")
-                })
+                submitComment(inputRef.current.value, -1)
+                  .then(() => {
+                    inputRef.current.value = ""
+                    importantRef.current.checked = false
+                    setError("")
+                  })
+                  .done(() => {
+                    setLoading(false)
+                  })
               },
             },
           ]}

@@ -23,78 +23,80 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
 
   const [voting, setVoting] = useState(false)
   const [editingVote, setEditingVote] = useState(false)
+  const [important, setImportant] = useState<boolean>()
+
+  const animateOut = (el) =>
+    new Promise<void>((resolve, reject) => {
+      el.parentElement.classList.add("animation-exit")
+      setTimeout(() => resolve(), 400)
+    })
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
-  const agree = (
-    commentId: string,
-    event: MouseEvent,
-    starred: boolean = undefined,
-    weight = 0,
-    f
-  ) => {
-    ;(event.currentTarget as any).blur()
+  const agree = (commentId: string, event: MouseEvent, important: boolean) => {
+    // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
         conversation_id: conversationId,
         agid: 1,
-        weight,
+        weight: important ? 1 : 0,
         vote: -1,
         tid: commentId,
         // starred: boolean
       })
       .then(() => {
         toast.success("Vote recorded")
-        onVoted(commentId)
-        setEditingVote(false)
+        animateOut(event).then(() => {
+          onVoted(commentId)
+          setEditingVote(false)
+        })
       })
       .always(() => setVoting(false))
   }
 
-  const disagree = (
-    commentId: string,
-    event: MouseEvent,
-    starred: boolean = undefined,
-    weight = 0
-  ) => {
-    ;(event.currentTarget as any).blur()
+  const disagree = (commentId: string, event: MouseEvent, important: boolean) => {
+    // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
         conversation_id: conversationId,
         agid: 1,
-        weight,
+        weight: important ? 1 : 0,
         vote: 1,
         tid: commentId,
         // starred: boolean
       })
       .then(() => {
         toast.success("Vote recorded")
-        onVoted(commentId)
-        setEditingVote(false)
+        animateOut(event).then(() => {
+          onVoted(commentId)
+          setEditingVote(false)
+        })
       })
       .always(() => setVoting(false))
   }
 
-  const skip = (commentId: string, event: MouseEvent, starred: boolean = undefined, weight = 0) => {
-    ;(event.currentTarget as any).blur()
+  const skip = (commentId: string, event: MouseEvent, important: boolean) => {
+    // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
         conversation_id: conversationId,
         agid: 1,
-        weight,
+        weight: important ? 1 : 0,
         vote: 0,
         tid: commentId,
         // starred: boolean
       })
       .then(() => {
         toast.success("Skip recorded")
-        onVoted(commentId)
-        setEditingVote(false)
+        animateOut(event).then(() => {
+          onVoted(commentId)
+          setEditingVote(false)
+        })
       })
       .always(() => setVoting(false))
   }
@@ -109,7 +111,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         bg: "background",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
-        // height: [null, "350px"],
         mb: "20px",
         px: ["24px", "40px"],
         pt: ["20px", "30px"],
@@ -120,7 +121,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       <Text
         sx={{
           mb: 4,
-          // minHeight: [null, "170px"],
           wordBreak: "break-word",
         }}
       >
@@ -133,9 +133,9 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
             options={
               editingVote
                 ? [
-                    { name: "Agree", onClick: agree.bind(null, commentId) },
-                    { name: "Disagree", onClick: disagree.bind(null, commentId) },
-                    { name: "Skip", onClick: skip.bind(null, commentId) },
+                    { name: "Agree", onClick: (e) => agree(commentId, e.target, important) },
+                    { name: "Disagree", onClick: (e) => disagree(commentId, e.target, important) },
+                    { name: "Skip", onClick: (e) => skip(commentId, e.target, important) },
                     {
                       name: "Cancel",
                       onClick: () => setEditingVote(false),
@@ -149,7 +149,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       <Button
         variant="outlineGreen"
         sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
-        onClick={agree.bind(null, commentId)}
+        onClick={(e) => agree(commentId, e.target, important)}
       >
         <TbCheck style={{ position: "relative", top: "2px" }} />
         &nbsp;Agree
@@ -157,7 +157,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       <Button
         variant="outlineRed"
         sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
-        onClick={disagree.bind(null, commentId)}
+        onClick={(e) => disagree(commentId, e.target, important)}
       >
         <TbX style={{ position: "relative", top: "2px" }} />
         &nbsp;Disagree
@@ -165,13 +165,13 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       <Button
         variant="outlineGray"
         sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
-        onClick={skip.bind(null, commentId)}
+        onClick={(e) => skip(commentId, e.target, important)}
       >
         Skip
       </Button>
       <Box sx={{ mt: "12px", fontSize: "0.94em", color: "mediumGray", fontFamily: "monospace" }}>
         <label>
-          <input type="checkbox" onChange={() => false} />
+          <input type="checkbox" onChange={(e) => setImportant(e.target.checked)} />
           &nbsp;This option is important to me
         </label>
       </Box>
