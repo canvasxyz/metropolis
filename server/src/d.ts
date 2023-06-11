@@ -132,6 +132,8 @@ export type ConversationType = {
   strict_moderation?: any;
   topic?: any;
   description?: any;
+  postsurvey?: any;
+  postsurvey_limit?: number;
   vis_type?: any;
   help_type?: any;
   socialbtn_type?: any;

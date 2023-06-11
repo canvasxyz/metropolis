@@ -36,5 +36,7 @@ export type Conversation = {
   is_archived: boolean
   topic: string
   description: string
+  postsurvey: string
+  postsurvey_limit: string
   // TODO ...
 }

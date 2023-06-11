@@ -1,13 +1,17 @@
 import React, { useRef, useEffect, useState } from "react"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
+import Modal from "react-modal"
 
 import type { Comment } from "../../util/types"
 import { DropdownButton } from "../../components/dropdown"
 import SurveyCard from "./survey_card"
 import api from "../../util/api"
+import { surveyBox, surveyHeadingMini } from "./index"
 
-const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }> = ({
+Modal.setAppElement("#root")
+
+const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments }> = ({
   zid_metadata,
   votedComments,
   setVotedComments,
@@ -136,6 +140,75 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
         {error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}
       </Box>
     </form>
+  )
+}
+
+const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedComments }) => {
+  const [showIntro, setShowIntro] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <React.Fragment>
+      <Box>
+        {/* zid_metadata?.description && (
+          <Button sx={{ mr: [2] }} variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
+            {showIntro ? "Hide intro" : "Show intro"}
+            {showIntro ? (
+              <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
+            ) : (
+              <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
+            )}
+          </Button>
+        ) */}
+        <Button
+          variant={unvotedComments.length === 0 ? "primary" : "outline"}
+          sx={{ width: "100%", mt: [2] }}
+          onClick={() => {
+            setIsOpen(true)
+          }}
+        >
+          Add your own comment
+        </Button>
+      </Box>
+      {showIntro && (
+        <Box sx={{ ...surveyBox }}>
+          <Text>{zid_metadata.description}</Text>
+        </Box>
+      )}
+      <Modal
+        isOpen={isOpen}
+        onRequestClose={() => setIsOpen(false)}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(40, 40, 40, 0.3)",
+          },
+          content: {
+            borderRadius: "8px",
+            top: "50%",
+            left: "50%",
+            right: "auto",
+            bottom: "auto",
+            marginRight: "-50%",
+            transform: "translate(-50%, -50%)",
+            minHeight: "200px",
+            width: "96vw", // for mobile
+            maxWidth: "540px",
+            overflow: "visible",
+            padding: "32px 28px 28px",
+          },
+        }}
+        contentLabel="Add new comment"
+      >
+        <Heading as="h4" sx={surveyHeadingMini}>
+          Add new comment
+        </Heading>
+        <SurveyComposeBox
+          zid_metadata={zid_metadata}
+          votedComments={votedComments}
+          setVotedComments={setVotedComments}
+        />
+      </Modal>
+    </React.Fragment>
   )
 }
 

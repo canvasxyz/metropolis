@@ -58,7 +58,6 @@ class ModerateCommentsSeed extends React.Component<
   render() {
     return (
       <Box sx={{ mb: [4] }}>
-        <Text sx={{ mb: [2] }}>Add starter comments for participants to vote on:</Text>
         <Box sx={{ mb: [2] }}>
           <textarea
             sx={{

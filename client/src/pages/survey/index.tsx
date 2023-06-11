@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
-import Modal from "react-modal"
 import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
 
@@ -18,6 +17,8 @@ import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 
 // TODO: enforce comment too long on backend
+
+type SurveyState = "loading" | "intro" | "instructions" | "login" | "voting" | "redirect"
 
 export const surveyHeading = {
   fontSize: [4],
@@ -43,77 +44,6 @@ export const surveyBox = {
   mb: [3, null, 4],
 }
 
-Modal.setAppElement("#root")
-
-const CollapsibleIntro = ({ zid_metadata, votedComments, unvotedComments, setVotedComments }) => {
-  const [showIntro, setShowIntro] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <React.Fragment>
-      <Box>
-        {/* zid_metadata?.description && (
-          <Button sx={{ mr: [2] }} variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
-            {showIntro ? "Hide intro" : "Show intro"}
-            {showIntro ? (
-              <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
-            ) : (
-              <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
-            )}
-          </Button>
-        ) */}
-        <Button
-          variant={unvotedComments.length === 0 ? "primary" : "outline"}
-          sx={{ width: "100%", mt: [2] }}
-          onClick={() => {
-            setIsOpen(true)
-          }}
-        >
-          Add your own comment
-        </Button>
-      </Box>
-      {showIntro && (
-        <Box sx={{ ...surveyBox }}>
-          <Text>{zid_metadata.description}</Text>
-        </Box>
-      )}
-      <Modal
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        style={{
-          overlay: {
-            backgroundColor: "rgba(40, 40, 40, 0.3)",
-          },
-          content: {
-            borderRadius: "8px",
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            minHeight: "200px",
-            width: "96vw", // for mobile
-            maxWidth: "540px",
-            overflow: "visible",
-            padding: "32px 28px 28px",
-          },
-        }}
-        contentLabel="Add new comment"
-      >
-        <Heading as="h4" sx={surveyHeadingMini}>
-          Add new comment
-        </Heading>
-        <SurveyCompose
-          zid_metadata={zid_metadata}
-          votedComments={votedComments}
-          setVotedComments={setVotedComments}
-        />
-      </Modal>
-    </React.Fragment>
-  )
-}
-
 const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   match: {
     params: { conversation_id },
@@ -130,6 +60,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   const [conversation, setConversation] = useState<Conversation>()
 
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
+  const { user } = useSelector((state: RootState) => state.user)
 
   useEffect(() => {
     dispatch(populateZidMetadataStore(conversation_id))
@@ -163,7 +94,6 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     setVotedComments([...votedComments, comment])
   }
 
-  type SurveyState = "loading" | "intro" | "instructions" | "login" | "voting" | "redirect"
   const [state, setState] = useState<SurveyState>("loading")
   useEffect(() => {
     const hash = document.location.hash.slice(1)
@@ -223,7 +153,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       )}
       {state === "instructions" && (
         <SurveyInstructions
-          onNext={() => goTo("login")}
+          onNext={() => goTo("voting") /* goTo("login") */}
           onPrev={() => goTo("intro")}
           limit={null /* TODO */}
         />
@@ -244,16 +174,20 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               conversation_id={conversation_id}
             />
           </Box>
-          <CollapsibleIntro
-            zid_metadata={zid_metadata}
-            votedComments={votedComments}
-            unvotedComments={unvotedComments}
-            setVotedComments={setVotedComments}
-          />
+          {zid_metadata.auth_needed_to_write && !user.isLoggedIn ? (
+            <Box>{/* TODO: log in to comment */}</Box>
+          ) : (
+            <SurveyCompose
+              zid_metadata={zid_metadata}
+              votedComments={votedComments}
+              unvotedComments={unvotedComments}
+              setVotedComments={setVotedComments}
+            />
+          )}
         </React.Fragment>
       )}
     </Box>
   )
 }
 
-export default connect((state: RootState) => state.zid_metadata)(Survey)
+export default connect((state: RootState) => ({ z: state.zid_metadata, u: state.user }))(Survey)

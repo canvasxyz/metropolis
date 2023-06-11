@@ -4,14 +4,14 @@
 
 import React from "react"
 import { connect } from "react-redux"
+import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
-import emoji from "react-easy-emoji"
+import toast from "react-hot-toast"
 
 import { handleZidMetadataUpdate, optimisticZidMetadataUpdateOnTyping } from "../../actions"
 import NoPermission from "./no-permission"
 import { CheckboxField } from "./CheckboxField"
 import SeedComment from "./seed-comment"
-// import SeedTweet from "./seed-tweet";
 
 import Url from "../../util/url"
 import ComponentHelpers from "../../util/component-helpers"
@@ -20,14 +20,22 @@ import { RootState } from "../../util/types"
 class ConversationConfig extends React.Component<
   {
     dispatch: Function
-    zid_metadata: { conversation_id: string; topic: string; description: string }
+    zid_metadata: {
+      conversation_id: string
+      topic: string
+      description: string
+      postsurvey: string
+      postsurvey_limit: string
+    }
     error: string
     loading: boolean
   },
   {}
 > {
-  description: HTMLTextAreaElement
   topic: HTMLInputElement
+  description: HTMLTextAreaElement
+  postsurvey: HTMLTextAreaElement
+  postsurvey_limit: HTMLInputElement
 
   handleStringValueChange(field) {
     return () => {
@@ -46,6 +54,26 @@ class ConversationConfig extends React.Component<
       this.props.dispatch(
         optimisticZidMetadataUpdateOnTyping(this.props.zid_metadata, field, e.target.value)
       )
+    }
+  }
+
+  handleIntegerValueChange(field) {
+    return () => {
+      const val = parseInt(this[field].value, 10)
+      if (isNaN(val) || val.toString() !== this[field].value) {
+        toast.error("Invalid value")
+        return
+      }
+      this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
+    }
+  }
+  handleIntegerInputTyping(field) {
+    return (e) => {
+      const val = parseInt(e.target.value, 10)
+      if (isNaN(val) || val.toString() !== this[field].value) {
+        return
+      }
+      this.props.dispatch(optimisticZidMetadataUpdateOnTyping(this.props.zid_metadata, field, val))
     }
   }
 
@@ -80,7 +108,7 @@ class ConversationConfig extends React.Component<
         </CheckboxField>
 
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Topic</Text>
+          <Text sx={{ mb: [2] }}>Title</Text>
           <input
             ref={(c) => (this.topic = c)}
             sx={{
@@ -93,7 +121,6 @@ class ConversationConfig extends React.Component<
               border: "1px solid",
               borderColor: "mediumGray",
             }}
-            data-test-id="topic"
             onBlur={this.handleStringValueChange("topic").bind(this)}
             onChange={this.handleConfigInputTyping("topic").bind(this)}
             defaultValue={this.props.zid_metadata.topic}
@@ -101,7 +128,7 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Description</Text>
+          <Text sx={{ mb: [2] }}>Intro Text</Text>
           <textarea
             ref={(c) => (this.description = c)}
             sx={{
@@ -124,38 +151,81 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          Seed Comments
+          Post-Survey
         </Heading>
-        <SeedComment
-          params={{ conversation_id: this.props.zid_metadata.conversation_id }}
-          dispatch={this.props.dispatch}
-        />
-        {/* <SeedTweet params={{ conversation_id: this.props.zid_metadata.conversation_id }} /> */}
+
+        <Box sx={{ mb: [3] }}>
+          <Text sx={{ mb: [2] }}>
+            Votes Required
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
+              Number of votes before the post-survey prompt
+            </Text>
+          </Text>
+          <input
+            ref={(c) => (this.postsurvey_limit = c)}
+            placeholder="Recommended: 20-40"
+            sx={{
+              fontFamily: "body",
+              fontSize: [2],
+              width: "100%",
+              maxWidth: "35em",
+              borderRadius: 2,
+              padding: [2],
+              border: "1px solid",
+              borderColor: "mediumGray",
+            }}
+            onBlur={this.handleIntegerValueChange("postsurvey_limit").bind(this)}
+            onChange={this.handleIntegerInputTyping("postsurvey_limit").bind(this)}
+            defaultValue={this.props.zid_metadata.postsurvey_limit}
+          />
+        </Box>
+
+        <Box sx={{ mb: [3] }}>
+          <Text sx={{ mb: [2] }}>Post-Survey Text</Text>
+          <textarea
+            ref={(c) => (this.postsurvey = c)}
+            sx={{
+              fontFamily: "body",
+              fontSize: [2],
+              width: "100%",
+              maxWidth: "35em",
+              height: "7em",
+              resize: "none",
+              padding: [2],
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "mediumGray",
+            }}
+            data-test-id="postsurvey"
+            onBlur={this.handleStringValueChange("postsurvey").bind(this)}
+            onChange={this.handleConfigInputTyping("postsurvey").bind(this)}
+            defaultValue={this.props.zid_metadata.postsurvey}
+          />
+        </Box>
 
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           Customize the user interface
         </Heading>
 
-        <CheckboxField field="vis_type" label="Visualization" isIntegerBool>
-          Participants can see the visualization
-        </CheckboxField>
-
-        <CheckboxField field="write_type" label="Comment form" isIntegerBool>
+        <CheckboxField field="write_type" label="Commenting" isIntegerBool>
           Participants can submit comments
         </CheckboxField>
 
-        <CheckboxField field="help_type" label="Help text" isIntegerBool>
-          Show explanation text above voting and visualization
+        <CheckboxField field="strict_moderation" label="Strict mode (moderator approval required)">
+          Require moderator approval before comments can be voted on
         </CheckboxField>
 
+        <CheckboxField field="help_type" label="Help text" isIntegerBool>
+          Show explanatory text when voting or writing comments
+        </CheckboxField>
+
+        {/*
         <CheckboxField
           field="subscribe_type"
           label="Prompt participants to subscribe to updates"
           isIntegerBool
         >
-          Prompt participants to subscribe to updates. A prompt is shown to users once they finish
-          voting on all available comments. If enabled, participants may optionally provide their
-          email address to receive notifications when there are new comments to vote on.
+          Prompt participants after they have finished voting to provide their email address, to receive notifications when there are new comments to vote on.
         </CheckboxField>
 
         <CheckboxField field="auth_opt_fb" label="Facebook login prompt">
@@ -166,14 +236,6 @@ class ConversationConfig extends React.Component<
           Show Twitter login prompt
         </CheckboxField>
 
-        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          Schemes
-        </Heading>
-
-        <CheckboxField field="strict_moderation">
-          No comments shown without moderator approval
-        </CheckboxField>
-
         <CheckboxField field="auth_needed_to_write" label="Require Auth to Comment">
           Participants cannot submit comments without first connecting either Facebook or Twitter
         </CheckboxField>
@@ -181,6 +243,7 @@ class ConversationConfig extends React.Component<
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
           Participants cannot vote without first connecting either Facebook or Twitter
         </CheckboxField>
+         */}
 
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           Embed
@@ -198,11 +261,21 @@ class ConversationConfig extends React.Component<
               {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
             </pre>
           </Box>
-          <Text>
-            <a target="blank" href={Url.urlPrefix + "c/" + this.props.zid_metadata.conversation_id}>
-              Open conversation
-            </a>
-          </Text>
+        </Box>
+
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+          Add seed comments
+        </Heading>
+
+        <SeedComment
+          params={{ conversation_id: this.props.zid_metadata.conversation_id }}
+          dispatch={this.props.dispatch}
+        />
+
+        <Box sx={{ mt: [4] }}>
+          <Link sx={{ variant: "styles.a" }} to={"/c/" + this.props.zid_metadata.conversation_id}>
+            Go to survey
+          </Link>
         </Box>
       </Box>
     )

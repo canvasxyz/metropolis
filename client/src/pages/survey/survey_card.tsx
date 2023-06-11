@@ -148,7 +148,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       )}
       <Button
         variant="outlineGreen"
-        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
+        sx={{ mr: 2, borderColor: "mediumGreen", px: [2, 3], py: [1, 2] }}
         onClick={(e) => agree(commentId, e.target, important)}
       >
         <TbCheck style={{ position: "relative", top: "2px" }} />
@@ -156,7 +156,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       </Button>
       <Button
         variant="outlineRed"
-        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
+        sx={{ mr: 2, borderColor: "mediumRed", px: [2, 3], py: [1, 2] }}
         onClick={(e) => disagree(commentId, e.target, important)}
       >
         <TbX style={{ position: "relative", top: "2px" }} />
@@ -164,7 +164,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       </Button>
       <Button
         variant="outlineGray"
-        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
+        sx={{ mr: 2, px: [2, 3], py: [1, 2] }}
         onClick={(e) => skip(commentId, e.target, important)}
       >
         Skip

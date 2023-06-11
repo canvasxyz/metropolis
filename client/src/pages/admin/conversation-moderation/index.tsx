@@ -95,7 +95,7 @@ class CommentModeration extends React.Component<{
 }
 
 export default connect((state: RootState) => state.zid_metadata)(
-  connect((state: RootState, ownProps) => {
+  connect((state: RootState) => {
     return {
       unmoderated: state.mod_comments_unmoderated,
       accepted: state.mod_comments_accepted,

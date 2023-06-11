@@ -5621,8 +5621,8 @@ Email verified! You can close this tab or hit the back button.
     }
 
     pgQuery(
-      "insert into conversations (topic, description, link_url, owner, modified, created, participant_count) " +
-        "(select '(SNAPSHOT) ' || topic, description, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
+      "insert into conversations (topic, description, postsurvey, postsurvey_limit, link_url, owner, modified, created, participant_count) " +
+        "(select '(SNAPSHOT) ' || topic, description, postsurvey, postsurvey_limit, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
       [zid, uid],
       function (err: any, result: { rows: any[] }) {
         if (err) {
@@ -8529,6 +8529,8 @@ Email verified! You can close this tab or hit the back button.
         strict_moderation: any;
         topic: string;
         description: string;
+        postsurvey: string;
+        postsurvey_limit: number;
         vis_type: any;
         help_type: any;
         socialbtn_type: any;
@@ -8591,6 +8593,12 @@ Email verified! You can close this tab or hit the back button.
         }
         if (!_.isUndefined(req.p.description)) {
           fields.description = req.p.description;
+        }
+        if (!_.isUndefined(req.p.postsurvey)) {
+          fields.postsurvey = req.p.postsurvey;
+        }
+        if (!_.isUndefined(req.p.postsurvey_limit)) {
+          fields.postsurvey_limit = req.p.postsurvey_limit;
         }
         if (!_.isUndefined(req.p.vis_type)) {
           fields.vis_type = req.p.vis_type;
@@ -10003,6 +10011,8 @@ Email verified! You can close this tab or hit the back button.
         org_id: any;
         topic: any;
         description: any;
+        postsurvey: any;
+        postsurvey_limit: any;
         is_active: any;
         is_data_open: any;
         is_draft: any;
@@ -10054,6 +10064,8 @@ Email verified! You can close this tab or hit the back button.
                 org_id: req.p.org_id || req.p.uid, // assume the owner is the creator if there's no separate owner specified (
                 topic: req.p.topic,
                 description: req.p.description,
+                postsurvey: req.p.postsurvey,
+                postsurvey_limit: req.p.postsurvey_limit,
                 is_active: req.p.is_active,
                 is_data_open: req.p.is_data_open,
                 is_draft: req.p.is_draft,
@@ -13052,6 +13064,8 @@ Thanks for using Polis!
         conv = {
           topic: conv.topic,
           description: conv.description,
+          postsurvey: conv.postsurvey,
+          postsurvey_limit: conv.postsurvey_limit,
           created: conv.created,
           link_url: conv.link_url,
           parent_url: conv.parent_url,

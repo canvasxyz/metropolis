@@ -6,6 +6,8 @@ const sql_conversations: any = sql.define({
     "zid",
     "topic",
     "description",
+    "postsurvey",
+    "postsurvey_limit",
     "participant_count",
     "is_anon",
     "is_active",
@@ -133,7 +135,7 @@ const sql_reports = sql.define({
   ],
 });
 
-export {
+const SQL: any = {
   sql_conversations,
   sql_comments,
   sql_votes_latest_unique,
@@ -143,14 +145,4 @@ export {
   sql_users,
 };
 
-// 'default' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.ts(7022)
-// @ts-ignore
-export default {
-  sql_conversations,
-  sql_comments,
-  sql_votes_latest_unique,
-  sql_participant_metadata_answers,
-  sql_participants_extended,
-  sql_reports,
-  sql_users,
-};
+export default SQL;

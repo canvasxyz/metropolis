@@ -30,9 +30,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           knowledge and opinion space around a domain, in realtime.
         </Text>
         <Text sx={{ my: 3 }}>
-          Starting from a prompt, participants write comments and vote on each others’ comments.
-          Statistical methods are used to identify the most important comments, and points of
-          agreement and disagreement within the group.
+          Starting from a prompt, participants write and vote on each others’ comments. Statistical
+          methods are used to identify the most important points of agreement and disagreement.
         </Text>
         <Text sx={{ my: 3 }}>
           The tool is an extended version of{" "}
