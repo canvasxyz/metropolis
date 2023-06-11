@@ -16,10 +16,6 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
-
   const submitComment = (txt: string, vote: number) => {
     const finalTxt = txt.replace(/\n/g, " ").trim() // replace newlines with whitespace
     const params = {

@@ -5,7 +5,7 @@ import { Flex, Box, jsx } from "theme-ui"
 import { Link } from "react-router-dom"
 import Logomark from "./logomark"
 
-const Header: React.FC<{ user?; inSurvey? }> = ({ user, inSurvey }) => {
+const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, inSurvey }) => {
   return (
     <Flex
       sx={{
@@ -28,14 +28,14 @@ const Header: React.FC<{ user?; inSurvey? }> = ({ user, inSurvey }) => {
       >
         <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
         {!inSurvey && (
-          <Link sx={{ variant: "links.nav", ml: "10px" }} to={user ? "/conversations" : "/"}>
+          <Link sx={{ variant: "links.nav", ml: "10px" }} to={isLoggedIn ? "/conversations" : "/"}>
             Polis
           </Link>
         )}
       </Box>
       {!inSurvey && (
         <Box sx={{ mt: [1] }}>
-          {user ? (
+          {isLoggedIn ? (
             <React.Fragment>
               <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>
                 Account

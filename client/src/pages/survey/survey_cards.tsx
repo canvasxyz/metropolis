@@ -18,7 +18,18 @@ const SurveyCards = ({ conversation_id, votedComments, unvotedComments, onVoted 
             stacked={true}
           />
         ))}
-        {unvotedComments.length === 0 && (
+        {unvotedComments.length === 0 && votedComments.length === 0 && (
+          <Box sx={{ ...surveyBox, pt: [5] }}>
+            <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
+              No comments
+            </Heading>
+            <Text sx={{ mb: [3] }}>
+              Nobody has added any comments to this survey yet. If commenting is enabled, you could
+              be the first!
+            </Text>
+          </Box>
+        )}
+        {unvotedComments.length === 0 && votedComments.length !== 0 && (
           <Box sx={{ ...surveyBox, pt: [5] }}>
             <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
               You’re done for now!

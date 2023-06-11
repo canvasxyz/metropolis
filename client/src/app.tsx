@@ -149,7 +149,7 @@ class App extends React.Component<
               pb: [4],
             }}
           >
-            <Header user={this.props.user} inSurvey={inSurvey} />
+            <Header isLoggedIn={this.props.isLoggedIn} user={this.props.user} inSurvey={inSurvey} />
             <Box
               sx={{
                 pt: "1px", // prevent margins from spilling over

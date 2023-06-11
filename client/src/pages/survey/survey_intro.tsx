@@ -10,16 +10,21 @@ const SurveyIntro = ({ zid_metadata, onNext }) => {
       <Heading as="h3" sx={surveyHeading}>
         {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
       </Heading>
-      {zid_metadata?.description && (
-        <Box sx={{ ...surveyBox, border: "none", padding: "none", bg: "none" }}>
+      <Box>
+        {zid_metadata?.description ? (
           <Text>{zid_metadata.description}</Text>
-          <Box sx={{ mt: [5] }}>
-            <Button variant="primary" onClick={onNext}>
-              Continue
-            </Button>
-          </Box>
-        </Box>
-      )}
+        ) : (
+          <Text sx={{ color: "mediumGray" }}>
+            The creator of this survey hasn’t created a description yet. Press continue to get
+            started.
+          </Text>
+        )}
+      </Box>
+      <Box sx={{ mt: [5] }}>
+        <Button variant="primary" onClick={onNext}>
+          Continue
+        </Button>
+      </Box>
     </Box>
   )
 }

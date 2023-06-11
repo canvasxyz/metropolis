@@ -1,10 +1,14 @@
 /** @jsx jsx */
 
-import React from "react"
+import React, { useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 const Index: React.FC<{ user? }> = ({ user }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   return (
     <React.Fragment>
       <Heading

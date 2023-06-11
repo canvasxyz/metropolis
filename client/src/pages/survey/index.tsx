@@ -52,7 +52,7 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
     <React.Fragment>
       <Box>
         {zid_metadata?.description && (
-          <Button variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
+          <Button sx={{ mr: [2] }} variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
             {showIntro ? "Hide intro" : "Show intro"}
             {showIntro ? (
               <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
@@ -63,7 +63,6 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
         )}
         <Button
           variant="primary"
-          sx={{ ml: [2] }}
           onClick={() => {
             setIsOpen(true)
           }}
@@ -118,6 +117,10 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     params: { conversation_id },
   },
 }) => {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const dispatch = useDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
@@ -230,19 +233,6 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               onVoted={onVoted}
               conversation_id={conversation_id}
             />
-          </Box>
-          <Box sx={{ mt: [4], textAlign: "right" }}>
-            <Link
-              sx={{
-                fontFamily: "monospace",
-                color: "mediumGray",
-                "&:hover": { color: "mediumGrayActive", borderColor: "mediumGrayActive" },
-              }}
-              as="a"
-              onClick={() => goTo("intro")}
-            >
-              Back to intro
-            </Link>
           </Box>
         </React.Fragment>
       )}
