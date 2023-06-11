@@ -19,6 +19,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           mt: [2, 5],
           mb: [5],
           maxWidth: "20em",
+          width: ["90vw", null],
         }}
       >
         Tools for collective meaning
@@ -35,8 +36,17 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </Text>
         <Text sx={{ my: 3 }}>
           The tool is an extended version of{" "}
-          <a href="https://github.com/compdemocracy/polis">Polis</a>, created by the Computational
-          Democracy Project and used by governments, academics, and citizens around the world.
+          <a
+            sx={{ variant: "styles.a" }}
+            href="https://github.com/compdemocracy/polis"
+            target="_blank"
+            noreferrer="noreferrer"
+            noopener="noopener"
+          >
+            Polis
+          </a>
+          , created by the Computational Democracy Project and used by governments, academics, and
+          citizens around the world.
         </Text>
         {user ? (
           <Box sx={{ mt: [6] }}>

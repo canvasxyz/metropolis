@@ -11,5 +11,7 @@ declare namespace FB {
 declare module "react" {
   interface Attributes {
     sx?: ThemeUIStyleObject
+    noreferrer?: "noreferrer"
+    noopener?: "noopener"
   }
 }

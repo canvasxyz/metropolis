@@ -26,10 +26,23 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
           top: "-1px",
         }}
       >
-        <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
+        {inSurvey ? (
+          <Link
+            to={document.location.pathname}
+            onClick={(e) => {
+              e.preventDefault()
+              history.pushState({}, "", document.location.pathname + "#intro")
+              window.dispatchEvent(new Event("popstate"))
+            }}
+          >
+            <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
+          </Link>
+        ) : (
+          <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
+        )}
         {!inSurvey && (
           <Link sx={{ variant: "links.nav", ml: "10px" }} to={isLoggedIn ? "/conversations" : "/"}>
-            Polis
+            Polis+
           </Link>
         )}
       </Box>

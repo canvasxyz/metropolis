@@ -153,9 +153,9 @@ class App extends React.Component<
             <Box
               sx={{
                 pt: "1px", // prevent margins from spilling over
-                pb: "3em",
+                pb: "1em",
                 px: [4],
-                minHeight: "calc(100vh - 9em)",
+                minHeight: "calc(100vh - 8.6em)",
               }}
             >
               <Route exact path="/" render={() => <Home user={this.props.user} />} />

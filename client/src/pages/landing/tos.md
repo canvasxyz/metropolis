@@ -2,7 +2,7 @@
 
 Last Updated: May 23, 2023
 
-Welcome, and thank you for your interest in Polis (the "Company") and our Web site (the "Site"), as well as all related web sites, networks, embeddable widgets, downloadable software, mobile applications (including tablet applications), and other services provided by us and on which a link to these Terms of Use is displayed (collectively, together with the Site, our "Service").
+Welcome, and thank you for your interest in Polis+ (the "Company") and our Web site (the "Site"), as well as all related web sites, networks, embeddable widgets, downloadable software, mobile applications (including tablet applications), and other services provided by us and on which a link to these Terms of Use is displayed (collectively, together with the Site, our "Service").
 
 These Terms of Use are a legally binding contract between you and the Company regarding your use of the Service.
 
