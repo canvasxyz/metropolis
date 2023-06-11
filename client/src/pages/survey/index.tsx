@@ -4,11 +4,12 @@ import React, { useEffect, useState, useRef } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
 import Modal from "react-modal"
 import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
+import { useHistory } from "react-router-dom"
 
 import api from "../../util/api"
 import type { RootState, Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
-import { TbChevronsDown, TbChevronsUp } from "react-icons/tb"
+import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
@@ -122,12 +123,14 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     window.scrollTo(0, 0)
   }, [])
 
+  const hist = useHistory()
   const dispatch = useDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
   const [conversation, setConversation] = useState<Conversation>()
 
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
+
   useEffect(() => {
     dispatch(populateZidMetadataStore(conversation_id))
     return () => {
@@ -204,6 +207,17 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         lineHeight: ["1.4", "1.5"],
       }}
     >
+      <Box>
+        {(zid_metadata.is_mod || zid_metadata.is_owner) && (
+          <Button
+            variant="outlineDark"
+            sx={{ position: "fixed", top: [3], right: [3], px: [2], pt: "4px", pb: "3px" }}
+            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+          >
+            <TbSettings /> Configure
+          </Button>
+        )}
+      </Box>
       {state === "intro" && (
         <SurveyIntro zid_metadata={zid_metadata} onNext={() => goTo("instructions")} />
       )}

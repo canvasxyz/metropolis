@@ -163,6 +163,18 @@ export default {
         borderColor: "lightGrayActive",
       },
     },
+    outlineDark: {
+      color: "mediumGray",
+      bg: "background",
+      fontFamily: "monospace",
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "mediumGray",
+      "&:hover": {
+        color: "mediumGrayActive",
+        borderColor: "mediumGrayActive",
+      },
+    },
     outlineRed: {
       color: "mediumRed",
       bg: "background",
