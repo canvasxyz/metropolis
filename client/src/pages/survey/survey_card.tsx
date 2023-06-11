@@ -104,20 +104,28 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       sx={{
         position: "relative",
         border: "1px solid",
-        borderColor: "lighterGray",
+        borderColor: "#ddd",
         borderRadius: "8px",
         bg: "background",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
-        height: [null, "350px"],
+        // height: [null, "350px"],
         mb: "20px",
-        px: [4, "40px"],
-        pt: [4, "36px"],
-        pb: "16px",
+        px: ["24px", "40px"],
+        pt: ["20px", "30px"],
+        pb: ["18px", "28px"],
         overflow: "scroll",
       }}
     >
-      <Text sx={{ mb: 4, minHeight: [null, "170px"], wordBreak: "break-word" }}>{txt}</Text>
+      <Text
+        sx={{
+          mb: 4,
+          // minHeight: [null, "170px"],
+          wordBreak: "break-word",
+        }}
+      >
+        {txt}
+      </Text>
       {hasVoted && (
         <Box sx={{ position: "absolute", top: [3], right: [3] }}>
           <DropdownMenu
@@ -140,7 +148,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       )}
       <Button
         variant="outlineGreen"
-        sx={{ mr: 2, color: "mediumGray" }}
+        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
         onClick={agree.bind(null, commentId)}
       >
         <TbCheck style={{ position: "relative", top: "2px" }} />
@@ -148,7 +156,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       </Button>
       <Button
         variant="outlineRed"
-        sx={{ mr: 2, color: "mediumGray" }}
+        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
         onClick={disagree.bind(null, commentId)}
       >
         <TbX style={{ position: "relative", top: "2px" }} />
@@ -156,7 +164,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       </Button>
       <Button
         variant="outlineGray"
-        sx={{ mr: 2, color: "mediumGray" }}
+        sx={{ mr: 2, color: "mediumGray", px: [2, 3], py: [1, 2] }}
         onClick={skip.bind(null, commentId)}
       >
         Skip

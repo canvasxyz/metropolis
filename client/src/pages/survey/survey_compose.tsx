@@ -77,7 +77,7 @@ const SurveyCompose: React.FC<{ zid_metadata; votedComments; setVotedComments }>
           sx={{ display: "inline-block" }}
           options={[
             {
-              name: "Add & vote agree",
+              name: "Add comment",
               onClick: () => {
                 submitComment(inputRef.current.value, 1).then(() => {
                   inputRef.current.value = ""

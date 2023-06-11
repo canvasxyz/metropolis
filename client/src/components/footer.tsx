@@ -3,7 +3,7 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { Box, Heading, Text, jsx } from "theme-ui"
 
-const Header: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
+const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
   return (
     <Box
       sx={{
@@ -37,4 +37,4 @@ const Header: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
   )
 }
 
-export default Header
+export default Footer

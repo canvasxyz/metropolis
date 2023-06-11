@@ -44,7 +44,7 @@ export const surveyBox = {
 
 Modal.setAppElement("#root")
 
-const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => {
+const CollapsibleIntro = ({ zid_metadata, votedComments, unvotedComments, setVotedComments }) => {
   const [showIntro, setShowIntro] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
@@ -62,12 +62,13 @@ const CollapsibleIntro = ({ zid_metadata, votedComments, setVotedComments }) => 
           </Button>
         ) */}
         <Button
-          variant="primary"
+          variant={unvotedComments.length === 0 ? "primary" : "outline"}
+          sx={{ width: "100%", mt: [2] }}
           onClick={() => {
             setIsOpen(true)
           }}
         >
-          Add new comment
+          Add your own comment
         </Button>
       </Box>
       {showIntro && (
@@ -221,11 +222,6 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
             {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
           </Heading>
-          <CollapsibleIntro
-            zid_metadata={zid_metadata}
-            votedComments={votedComments}
-            setVotedComments={setVotedComments}
-          />
           <Box sx={{ mt: [5] }}>
             <SurveyCards
               votedComments={votedComments}
@@ -234,6 +230,12 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               conversation_id={conversation_id}
             />
           </Box>
+          <CollapsibleIntro
+            zid_metadata={zid_metadata}
+            votedComments={votedComments}
+            unvotedComments={unvotedComments}
+            setVotedComments={setVotedComments}
+          />
         </React.Fragment>
       )}
     </Box>

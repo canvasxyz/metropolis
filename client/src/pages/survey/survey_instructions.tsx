@@ -30,8 +30,8 @@ const SurveyInstructions = ({
       <Text>
         <ul>
           <li>
-            If you generally agree, select Agree. You can also check a box to indictate if you
-            identify strongly with the comment.
+            If you generally agree, select Agree. You can also check a box, to show if you identify
+            strongly with the comment.
           </li>
           <li>If you disagree or think the comment doesn’t make sense, select Disagree.</li>
           <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
