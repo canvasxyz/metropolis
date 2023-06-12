@@ -202,6 +202,20 @@ const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedC
         <Heading as="h4" sx={surveyHeadingMini}>
           Add new comment
         </Heading>
+
+        {zid_metadata.help_type !== 0 && (
+          <Text sx={{ mb: [4] }}>
+            <p>Add your perspectives, experiences, or ideas here. Good comments should:</p>
+            <ul>
+              <li>Raise new perspectives, experiences or issues</li>
+              <li>Be clear & concise</li>
+              <li>
+                Stand on their own (they are not direct replies to other participants’ statements)
+              </li>
+            </ul>
+          </Text>
+        )}
+
         <SurveyComposeBox
           zid_metadata={zid_metadata}
           votedComments={votedComments}
