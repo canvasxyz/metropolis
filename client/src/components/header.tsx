@@ -58,9 +58,16 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
               </Link>
             </React.Fragment>
           ) : (
-            <Link sx={{ variant: "links.nav" }} to="/signin">
-              Sign in
-            </Link>
+            <React.Fragment>
+              {/*
+              <Link sx={{ variant: "links.nav", ml: [4] }} to="/about">
+                About
+              </Link>
+               */}
+              <Link sx={{ variant: "links.nav", ml: [4] }} to="/signin">
+                Sign in
+              </Link>
+            </React.Fragment>
           )}
         </Box>
       )}

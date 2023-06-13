@@ -17,6 +17,7 @@ import Logomark from "./components/logomark"
 
 /* public home page */
 import Home from "./pages/home"
+import About from "./pages/about"
 
 /* landing pages */
 import TOS from "./pages/landing/tos"
@@ -159,6 +160,7 @@ class App extends React.Component<
               }}
             >
               <Route exact path="/" render={() => <Home user={this.props.user} />} />
+              <Route exact path="/about" render={() => <About />} />
               <Route
                 exact
                 path="/signin"

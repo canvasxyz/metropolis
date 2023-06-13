@@ -25,13 +25,9 @@ const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
         </Link>
       )}
       {!inSurvey && (
-        <a
-          sx={{ variant: "styles.a", ml: 3 }}
-          href="https://github.com/raykyri/polis"
-          target="_blank"
-        >
-          Code
-        </a>
+        <Link sx={{ variant: "styles.a", ml: 3 }} to="/about">
+          About
+        </Link>
       )}
     </Box>
   )
