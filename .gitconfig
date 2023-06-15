@@ -1,3 +1,0 @@
-[log]
-  # Display full log history even with file moves.
-  follow = true
