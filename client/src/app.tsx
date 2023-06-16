@@ -13,7 +13,6 @@ import { Flex, Box, jsx } from "theme-ui"
 
 import Header from "./components/header"
 import Footer from "./components/footer"
-import Logomark from "./components/logomark"
 
 /* public home page */
 import Home from "./pages/home"

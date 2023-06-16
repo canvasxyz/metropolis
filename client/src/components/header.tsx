@@ -12,7 +12,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         margin: `0 auto`,
         width: "100%",
         pt: [3, 5],
-        pb: [3, 5],
+        pb: [0, 5],
         px: [4],
         mb: [5, 0],
         fontFamily: "monospace",
@@ -23,7 +23,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          top: "-1px",
+          top: "-18px",
         }}
       >
         {inSurvey ? (
@@ -35,10 +35,12 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
               window.dispatchEvent(new Event("popstate"))
             }}
           >
-            <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
+            <Logomark style={{ position: "relative", top: 14 }} />
           </Link>
         ) : (
-          <Logomark style={{ position: "relative", top: 6 }} fill={"#62a6ef"} />
+          <Link to={isLoggedIn ? "/conversations" : "/"}>
+            <Logomark style={{ position: "relative", top: 14 }} />
+          </Link>
         )}
         {!inSurvey && (
           <Link sx={{ variant: "links.nav", ml: "10px" }} to={isLoggedIn ? "/conversations" : "/"}>
