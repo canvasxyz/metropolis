@@ -23,7 +23,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          top: "-18px",
+          marginTop: "-18px",
         }}
       >
         {inSurvey ? (
@@ -31,8 +31,10 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
             to={document.location.pathname}
             onClick={(e) => {
               e.preventDefault()
-              history.pushState({}, "", document.location.pathname + "#intro")
-              window.dispatchEvent(new Event("popstate"))
+              if (document.location.hash !== "") {
+                history.pushState({}, "", document.location.pathname + "#intro")
+                window.dispatchEvent(new Event("popstate"))
+              }
             }}
           >
             <Logomark style={{ position: "relative", top: 14 }} />
