@@ -28,25 +28,37 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         <Box sx={{ flex: 1 }}>
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
-              Polis+ is a collaborative intelligence tool, for groups to explore their knowledge and
-              opinion space around a domain in realtime.
+              Public House is a tool that lets groups explore their knowledge and opinions around
+              any domain, in realtime.
             </Text>
             <Text sx={{ my: 3 }}>
-              Starting from a prompt, participants write and vote on each others’ comments.
-              Statistical methods are used to identify points of agreement and disagreement.
+              Participants start by writing comments around a prompt, and voting on each others’
+              comments.
             </Text>
             <Text sx={{ my: 3 }}>
-              This tool is an extended version of Polis, created by the{" "}
+              Comments are scored and clustered to reveal points of mutual agreement, and identify
+              which comments are most relevant.
+            </Text>
+            <Text sx={{ my: 3 }}>
+              Public House is{" "}
               <a
                 sx={{ variant: "styles.a" }}
-                href="https://compdemocracy.org/"
+                href="https://github.com/pubhouse/pubhouse"
                 target="_blank"
                 noreferrer="noreferrer"
-                noopener="noopener"
               >
-                Computational Democracy Project
+                fully open-source
+              </a>
+              , based on{" "}
+              <a
+                sx={{ variant: "styles.a" }}
+                href="https://github.com/compdemocracy/polis"
+                target="_blank"
+                noreferrer="noreferrer"
+              >
+                existing work
               </a>{" "}
-              and used by governments, academics, and citizens around the world.
+              used by governments, academics, and citizens around the world.
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>

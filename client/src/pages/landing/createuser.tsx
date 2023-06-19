@@ -153,7 +153,7 @@ class CreateUser extends React.Component<{
           {this.maybeErrorMessage()}
 
           <Box sx={{ mt: [3], mb: [3] }}>
-            I agree to the{" "}
+            By signing up, you agree to the{" "}
             <Link sx={{ variant: "styles.a" }} to="tos" tabIndex={110}>
               terms of service
             </Link>{" "}
