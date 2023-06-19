@@ -29,7 +29,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
               Public House is a <strong>collaborative decision-making tool</strong> that lets groups
-              explore their knowledge and opinions around any domain, in realtime.
+              explore their knowledge and opinions around any domain.
             </Text>
             <Text sx={{ my: 3 }}>
               Participants start by writing comments around a prompt, and voting on each others’
@@ -49,16 +49,16 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               >
                 fully open-source
               </a>
-              , based on a{" "}
+              , based on the{" "}
               <a
                 sx={{ variant: "styles.a" }}
                 href="https://github.com/compdemocracy/polis"
                 target="_blank"
                 noreferrer="noreferrer"
               >
-                proven toolchain
+                Polis democratic input system
               </a>{" "}
-              used over 10+ years by governments, academics, and citizens around the world.
+              used by governments, academics, and citizens around the world.
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>
@@ -84,11 +84,11 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </Box>
         <Box sx={{ flex: 2, display: ["none", "block"] }}>
           <img
-            src="/cybernetics.png"
+            src="/cybernetics_transparent.png"
             sx={{
               maxWidth: 250,
               mt: [4],
-              ml: [null, 4, 6],
+              ml: [null, 4, 5],
             }}
           />
         </Box>

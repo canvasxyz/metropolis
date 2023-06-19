@@ -27,10 +27,18 @@ const About: React.FC<{ user? }> = ({ user }) => {
           <Text sx={{ mt: [4], mb: [2] }}>
             Public House is a tool for open-ended discussions and decisions.
           </Text>
-          <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>About Public House</Text>
+          <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>What is Public House?</Text>
           <Text sx={{ my: [2] }}>
-            Public House was started as a friendlier interface to Polis in early 2023 by members of
-            the{" "}
+            Public House was started as a friendlier interface to{" "}
+            <a
+              sx={{ variant: "styles.a" }}
+              href="https://compdemocracy.org/"
+              target="_blank"
+              noreferrer="noreferrer"
+            >
+              Polis
+            </a>{" "}
+            in early 2023 by members of the{" "}
             <a
               sx={{ variant: "styles.a" }}
               href="https://canvas.xyz/"
@@ -51,16 +59,8 @@ const About: React.FC<{ user? }> = ({ user }) => {
             .
           </Text>
           <Text sx={{ my: [2] }}>
-            Polis is developed by the{" "}
-            <a
-              sx={{ variant: "styles.a" }}
-              href="https://compdemocracy.org/"
-              target="_blank"
-              noreferrer="noreferrer"
-            >
-              Computational Democracy Project
-            </a>
-            , a nonprofit working on tools for participatory and democratic governance since 2012.
+            We are exploring some new ways to use AI to enable new kinds of interactions! Stay tuned
+            for more details.
           </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>

@@ -162,7 +162,7 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Votes Required
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Number of votes before the post-survey prompt
+              Number of votes before post-survey is shown
             </Text>
           </Text>
           <input
@@ -184,7 +184,12 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Post-Survey Text</Text>
+          <Text sx={{ mb: [2] }}>
+            Post-Survey Text
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
+              Shown after reaching the votes required
+            </Text>
+          </Text>
           <textarea
             ref={(c) => (this.postsurvey = c)}
             sx={{
@@ -214,16 +219,18 @@ class ConversationConfig extends React.Component<
           Participants can write their own cards
         </CheckboxField>
 
+        {/*
         <CheckboxField field="auth_needed_to_write" label="Email required to comment">
           Email registration required to write cards
         </CheckboxField>
+        */}
 
         <CheckboxField field="strict_moderation" label="Moderator approval for comments">
-          Require moderator approval before new comments can be voted on
+          Require moderators to approve submitted comments, before voters can see them
         </CheckboxField>
 
         <CheckboxField field="help_type" label="Show help text" isIntegerBool>
-          Show explanatory text when writing comments
+          Show verbose instructions when writing comments
         </CheckboxField>
 
         {/*

@@ -37,7 +37,7 @@ function ConversationRow({ c, i, dispatch }) {
             sx={{
               width: 16,
               mt: "6px",
-              filter: c.is_archived ? "grayscale(1) opacity(0.4)" : undefined,
+              filter: c.is_archived ? "grayscale(1) opacity(0.4)" : "opacity(0.8)",
             }}
           />
         </Box>
@@ -92,7 +92,9 @@ function ConversationRow({ c, i, dispatch }) {
           <Text sx={{ display: ["inline", "none"] }}>
             <TbUser />
           </Text>{" "}
-          <Text sx={{ display: ["none", "inline"] }}>participants</Text>
+          <Text sx={{ display: ["none", "inline"] }}>
+            {c.participant_count === 1 ? "has voted" : "have voted"}
+          </Text>
         </Box>
         {!c.is_archived ? (
           <Box sx={{ flex: 1, textAlign: "right", mx: [3], maxWidth: 60 }}>

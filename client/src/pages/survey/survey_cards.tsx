@@ -130,7 +130,7 @@ const SurveyCards = ({
             sx={{ width: "100%" }}
             onClick={() => setPostsurveyDismissed(true)}
           >
-            Return to voting
+            I’d like to keep voting
           </Button>
         </Box>
       ) : (
