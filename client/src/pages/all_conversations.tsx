@@ -41,10 +41,10 @@ function ConversationRow({ c, i, dispatch }) {
             }}
           />
         </Box>
-        <Box sx={{ lineHeight: 1.35, flex: "1 1 auto", ml: [3], maxWidth: "50%" }}>
+        <Box sx={{ lineHeight: 1.35, flex: 4, ml: [3] }}>
           <Box sx={{ my: [1] }}>
             {c.is_archived ? (
-              <Text sx={{ color: "lightGray" }}>{c.topic}</Text>
+              <Text sx={{ color: "mediumGray" }}>{c.topic}</Text>
             ) : (
               <Link
                 sx={{
@@ -64,26 +64,38 @@ function ConversationRow({ c, i, dispatch }) {
             </Text>
           </Box>
           <Box sx={{ my: [2] }}>
-            <Text sx={{ fontSize: "84%", color: "mediumGray", mt: [1] }}>{c.description}</Text>
+            <Text
+              sx={{
+                fontSize: "84%",
+                color: "mediumGray",
+                mt: [1],
+                textOverflow: "ellipsis",
+                overflow: "hidden",
+                WebkitLineClamp: "3",
+                WebkitBoxOrient: "vertical",
+                display: "-webkit-box",
+              }}
+            >
+              {c.description}
+            </Text>
           </Box>
         </Box>
-        <Box sx={{ ml: [4], color: c.is_archived ? "lightGray" : "mediumGray" }}>
+        <Box
+          sx={{
+            ml: [4],
+            color: c.is_archived ? "mediumGray" : "mediumGray",
+            fontSize: "92%",
+            mt: "3px",
+          }}
+        >
           {c.participant_count}
           <Text sx={{ display: ["inline", "none"] }}>
             <TbUser />
           </Text>{" "}
           <Text sx={{ display: ["none", "inline"] }}>participants</Text>
         </Box>
-        {/*
-        <Box sx={{ ml: [4], color: c.is_archived ? "lightGray" : "mediumGray" }}>
-          {c.vote_count}
-          <Text sx={{ display: ["inline", "none"] }}>
-            <TbCheckbox />
-          </Text>{" "}
-          <Text sx={{ display: ["none", "inline"] }}>votes</Text>
-          </Box>*/}
         {!c.is_archived ? (
-          <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
+          <Box sx={{ flex: 1, textAlign: "right", mx: [3], maxWidth: 60 }}>
             <DropdownMenu
               rightAlign
               variant="outlineGray"
@@ -129,7 +141,7 @@ function ConversationRow({ c, i, dispatch }) {
             />
           </Box>
         ) : (
-          <Box sx={{ flex: 1, textAlign: "right", mx: [3] }}>
+          <Box sx={{ flex: 1, textAlign: "right", mx: [3], maxWidth: 60 }}>
             <DropdownMenu
               rightAlign
               options={[
@@ -159,6 +171,7 @@ class Conversations extends React.Component<
     history: any
   },
   {
+    showArchived: boolean
     filterMinParticipantCount: number
     sort: string
   }
@@ -174,6 +187,7 @@ class Conversations extends React.Component<
   constructor(props) {
     super(props)
     this.state = {
+      showArchived: false,
       filterMinParticipantCount: 0,
       sort: "participant_count",
     }
@@ -237,35 +251,49 @@ class Conversations extends React.Component<
           {err ? (
             <Text>{"Error loading conversations: " + err.status + " " + err.statusText}</Text>
           ) : null}
-          {conversations
-            ? conversations
-                .filter((c) => !c.is_archived)
-                .map((c, i) =>
-                  this.filterCheck(c) ? (
+          {conversations &&
+            conversations
+              .filter((c) => !c.is_archived)
+              .map(
+                (c, i) =>
+                  this.filterCheck(c) && (
                     <ConversationRow
                       key={c.conversation_id}
                       i={i}
                       c={c}
                       dispatch={this.props.dispatch}
                     />
-                  ) : null
-                )
-            : null}
+                  )
+              )}
           <br />
-          {conversations
-            ? conversations
-                .filter((c) => c.is_archived)
-                .map((c, i) =>
-                  this.filterCheck(c) ? (
+          {this.state.showArchived &&
+            conversations &&
+            conversations
+              .filter((c) => c.is_archived)
+              .map(
+                (c, i) =>
+                  this.filterCheck(c) && (
                     <ConversationRow
                       key={c.conversation_id}
                       i={i}
                       c={c}
                       dispatch={this.props.dispatch}
                     />
-                  ) : null
-                )
-            : null}
+                  )
+              )}
+          {!!conversations?.find((c) => c.is_archived) && (
+            <Button
+              variant="outlineGray"
+              sx={{ mt: [3] }}
+              onClick={() =>
+                this.setState({ ...this.state, showArchived: !this.state.showArchived })
+              }
+            >
+              {this.state.showArchived
+                ? "Hide archived conversations"
+                : "Show archived conversations"}
+            </Button>
+          )}
         </Box>
       </Box>
     )

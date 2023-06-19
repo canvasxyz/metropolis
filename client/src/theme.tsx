@@ -217,10 +217,10 @@ export default {
       fontFamily: "monospace",
       cursor: "pointer",
       border: "1px solid",
-      borderColor: "mediumGray",
+      borderColor: "lightGray",
       "&:hover": {
         color: "mediumGrayActive",
-        borderColor: "mediumGrayActive",
+        borderColor: "lightGrayActive",
       },
     },
   },

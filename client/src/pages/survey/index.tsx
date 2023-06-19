@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useEffect, useState, useRef } from "react"
+import React, { useCallback, useEffect, useState, useRef } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
 import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
@@ -57,6 +57,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
   const [conversation, setConversation] = useState<Conversation>()
+  const [state, setState] = useState<SurveyState>("loading")
 
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
   const { user } = useSelector((state: RootState) => state.user)
@@ -83,17 +84,12 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
       setUnvotedComments(unvotedComments)
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
+      if (unvotedComments.length === 0 && votedComments.length > 0 && state === "loading") {
+        setState("voting")
+      }
     })
   }, [])
 
-  const onVoted = (commentId: string) => {
-    const comment = unvotedComments.find((c) => c.tid === commentId)
-    setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
-    if (!comment) return
-    setVotedComments([...votedComments, comment])
-  }
-
-  const [state, setState] = useState<SurveyState>("loading")
   useEffect(() => {
     const hash = document.location.hash.slice(1)
     if (hash && ["intro", "instructions", "login", "voting", "redirect"].indexOf(hash) !== -1) {
@@ -119,12 +115,12 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     return () => window.removeEventListener("popstate", onpopstate)
   }, [])
 
-  const goTo = (state) => {
+  const goTo = useCallback((state) => {
     // preserve the root page
     const hash = document.location.hash.slice(1)
     setState(state)
     history.pushState({}, "", document.location.pathname + "#" + state)
-  }
+  }, [])
 
   return (
     <Box
@@ -171,7 +167,12 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               unvotedComments={unvotedComments}
               setVotedComments={setVotedComments}
               user={user}
-              onVoted={onVoted}
+              onVoted={(commentId: string) => {
+                const comment = unvotedComments.find((c) => c.tid === commentId)
+                setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
+                if (!comment) return
+                setVotedComments([...votedComments, comment])
+              }}
               conversation_id={conversation_id}
               zid_metadata={zid_metadata}
             />
