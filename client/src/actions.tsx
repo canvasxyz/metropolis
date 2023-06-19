@@ -1621,10 +1621,11 @@ const requestConversationStats = () => {
   }
 }
 
-const receiveConversationStats = (data) => {
+const receiveConversationStats = (data, conversation_id) => {
   return {
     type: RECEIVE_CONVERSATION_STATS,
     data: data,
+    conversation_id,
   }
 }
 
@@ -1647,7 +1648,7 @@ export const populateConversationStatsStore = (conversation_id, until) => {
   return (dispatch) => {
     dispatch(requestConversationStats())
     return fetchConversationStats(conversation_id, until).then(
-      (res) => dispatch(receiveConversationStats(res)),
+      (res) => dispatch(receiveConversationStats(res, conversation_id)),
       (err) => dispatch(conversationStatsFetchError(err))
     )
   }

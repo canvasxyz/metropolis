@@ -17,7 +17,10 @@ const conversation_stats = (
     case types.RECEIVE_CONVERSATION_STATS:
       return Object.assign({}, state, {
         loading: false,
-        conversation_stats: action.data,
+        conversation_stats: {
+          ...state.conversation_stats,
+          [action.conversation_id]: action.data,
+        },
       })
     default:
       return state

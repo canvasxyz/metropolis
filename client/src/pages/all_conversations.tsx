@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { RouteComponentProps, Link } from "react-router-dom"
-import React from "react"
+import React, { useEffect } from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
@@ -12,13 +12,19 @@ import {
   handleCreateConversationSubmit,
   handleCloseConversation,
   handleReopenConversation,
+  populateConversationStatsStore,
 } from "../actions"
 import { DropdownMenu } from "../components/dropdown"
 
 import Url from "../util/url"
 import { RootState, Conversation } from "../util/types"
 
-function ConversationRow({ c, i, dispatch }) {
+function ConversationRow({ c, i, stats, dispatch }) {
+  useEffect(() => {
+    const until = null
+    dispatch(populateConversationStatsStore(c.conversation_id, until))
+  }, [])
+
   return (
     <Box>
       <Flex
@@ -86,18 +92,21 @@ function ConversationRow({ c, i, dispatch }) {
             color: c.is_archived ? "mediumGray" : "mediumGray",
             fontSize: "92%",
             mt: "3px",
+            flex: [3, 1],
           }}
         >
-          {c.participant_count}
-          <Text sx={{ display: ["inline", "none"] }}>
-            <TbUser />
-          </Text>{" "}
-          <Text sx={{ display: ["none", "inline"] }}>
-            {c.participant_count === 1 ? "has voted" : "have voted"}
-          </Text>
+          <Box>
+            {c.participant_count} voter{c.participant_count === 1 ? "" : "s"}
+          </Box>
+          <Box>
+            {stats?.commentTimes?.length} comment{stats?.commentTimes?.length === 1 ? "" : "s"}
+          </Box>
+          <Box>
+            {stats?.voteTimes?.length} vote{stats?.voteTimes?.length === 1 ? "" : "s"}
+          </Box>
         </Box>
         {!c.is_archived ? (
-          <Box sx={{ flex: 1, textAlign: "right", mx: [3], maxWidth: 60 }}>
+          <Box sx={{ flex: 1, textAlign: "right", ml: [3], maxWidth: 60 }}>
             <DropdownMenu
               rightAlign
               variant="outlineGray"
@@ -143,7 +152,7 @@ function ConversationRow({ c, i, dispatch }) {
             />
           </Box>
         ) : (
-          <Box sx={{ flex: 1, textAlign: "right", mx: [3], maxWidth: 60 }}>
+          <Box sx={{ flex: 1, textAlign: "right", ml: [3], maxWidth: 60 }}>
             <DropdownMenu
               rightAlign
               options={[
@@ -170,6 +179,7 @@ class Conversations extends React.Component<
     error: Response
     loading: boolean
     conversations: Array<Conversation>
+    conversation_stats: any
     history: any
   },
   {
@@ -232,7 +242,7 @@ class Conversations extends React.Component<
 
   render() {
     const err = this.props.error
-    const { conversations } = this.props
+    const { conversations, conversation_stats } = this.props
 
     return (
       <Box sx={{ mt: [4, null, 5], mb: [5] }}>
@@ -263,6 +273,7 @@ class Conversations extends React.Component<
                       key={c.conversation_id}
                       i={i}
                       c={c}
+                      stats={conversation_stats[c.conversation_id]}
                       dispatch={this.props.dispatch}
                     />
                   )
@@ -279,6 +290,7 @@ class Conversations extends React.Component<
                       key={c.conversation_id}
                       i={i}
                       c={c}
+                      stats={conversation_stats[c.conversation_id]}
                       dispatch={this.props.dispatch}
                     />
                   )
@@ -323,4 +335,6 @@ Conversations.propTypes = {
   }),
 }
 
-export default connect((state: RootState) => state.conversations)(Conversations)
+export default connect((state: RootState) => state.stats)(
+  connect((state: RootState) => state.conversations)(Conversations)
+)

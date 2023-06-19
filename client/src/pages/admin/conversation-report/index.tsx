@@ -21,12 +21,15 @@ class ConversationStats extends React.Component<
     dispatch: Function
     match: { params: { conversation_id: string }; location: UrlObject }
     zid_metadata: { is_mod: boolean }
-    conversation_stats: {
-      firstCommentTimes: number[]
-      firstVoteTimes: number[]
-      voteTimes: number[]
-      commentTimes: number[]
-    }
+    conversation_stats: Record<
+      string,
+      {
+        firstCommentTimes: number[]
+        firstVoteTimes: number[]
+        voteTimes: number[]
+        commentTimes: number[]
+      }
+    >
   },
   {
     months: any[]
@@ -102,7 +105,11 @@ class ConversationStats extends React.Component<
     }
 
     const { conversation_stats } = this.props
-    const loading = !conversation_stats.firstCommentTimes || !conversation_stats.firstVoteTimes
+    const loading =
+      !conversation_stats ||
+      !conversation_stats[this.props.match.params.conversation_id] ||
+      !conversation_stats[this.props.match.params.conversation_id].firstCommentTimes ||
+      !conversation_stats[this.props.match.params.conversation_id].firstVoteTimes
 
     if (loading) return <Box>Loading...</Box>
 
@@ -118,12 +125,19 @@ class ConversationStats extends React.Component<
         >
           Report
         </Heading>
-        <NumberCards data={conversation_stats} />
+        <NumberCards data={conversation_stats[this.props.match.params.conversation_id]} />
         <ReportsList conversation_id={this.props.match.params.conversation_id} />
         {/* activity charts */}
-        <Voters firstVoteTimes={conversation_stats.firstVoteTimes} size={this.chartSize} />
+        <Voters
+          firstVoteTimes={
+            conversation_stats[this.props.match.params.conversation_id].firstVoteTimes
+          }
+          size={this.chartSize}
+        />
         <Commenters
-          firstCommentTimes={conversation_stats.firstCommentTimes}
+          firstCommentTimes={
+            conversation_stats[this.props.match.params.conversation_id].firstCommentTimes
+          }
           size={this.chartSize}
         />
       </div>
