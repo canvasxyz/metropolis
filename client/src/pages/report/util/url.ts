@@ -5,9 +5,7 @@ const getDomainPrefix = () => {
     return "http://localhost:8040/"
   }
 
-  if (document.domain.includes("pol.is")) return `https://${document.domain}/`
-  if (document.domain.includes("polis.io")) return `https://${document.domain}/`
-  if (document.domain.includes("plusplus.herokuapp.com")) return `https://${document.domain}/`
+  if (document.domain.includes("pubhouse.io")) return `https://${document.domain}/`
 
   return `${document.location.origin}/`
 }
