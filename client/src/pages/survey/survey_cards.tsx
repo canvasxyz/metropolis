@@ -128,7 +128,9 @@ const SurveyCards = ({
           <Button
             variant="outline"
             sx={{ width: "100%" }}
-            onClick={() => setPostsurveyDismissed(true)}
+            onClick={() => {
+              setPostsurveyDismissed(true)
+            }}
           >
             I’d like to keep voting
           </Button>

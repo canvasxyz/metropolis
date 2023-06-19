@@ -17,7 +17,7 @@ import SurveyCards from "./survey_cards"
 
 // TODO: enforce comment too long on backend
 
-type SurveyState = "loading" | "intro" | "instructions" | "login" | "voting" | "redirect"
+type SurveyState = "loading" | "intro" | "instructions" | "login" | "voting" | "postsurvey"
 
 export const surveyHeading = {
   fontSize: [4],
@@ -84,25 +84,25 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
       setUnvotedComments(unvotedComments)
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
-      if (unvotedComments.length === 0 && votedComments.length > 0 && state === "loading") {
+
+      const hash = document.location.hash.slice(1)
+      if (unvotedComments.length === 0 && allComments.length > 0) {
         setState("voting")
+      } else if (
+        hash &&
+        ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(hash) !== -1
+      ) {
+        setState(hash as SurveyState)
+      } else {
+        setState("intro")
       }
     })
-  }, [])
-
-  useEffect(() => {
-    const hash = document.location.hash.slice(1)
-    if (hash && ["intro", "instructions", "login", "voting", "redirect"].indexOf(hash) !== -1) {
-      setState(hash as SurveyState)
-    } else {
-      setState("intro")
-    }
 
     const onpopstate = (event) => {
       const newHash = document.location.hash.slice(1)
       if (
         newHash &&
-        ["intro", "instructions", "login", "voting", "redirect"].indexOf(newHash) !== -1
+        ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(newHash) !== -1
       ) {
         setState(newHash as SurveyState)
       } else if (newHash === "") {
@@ -156,7 +156,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       {state === "login" && (
         <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("instructions")} />
       )}
-      {state === "voting" && (
+      {(state === "voting" || state === "postsurvey") && (
         <React.Fragment>
           <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
             {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
