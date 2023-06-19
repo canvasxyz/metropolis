@@ -14,35 +14,34 @@ class Account extends React.Component<{ user: User }, {}> {
 
   buildAccountMarkup() {
     return (
-      <>
+      <Box>
+        <Heading
+          as="h1"
+          sx={{
+            fontSize: [5],
+            lineHeight: 1.2,
+            mt: [2, null, 5],
+            mb: [4, null, 5],
+          }}
+        >
+          Account
+        </Heading>
+        <p>Hi {this.props.user.hname.split(" ")[0]}!</p>
         <Box>
-          <Heading
-            as="h3"
-            sx={{
-              fontSize: [3, null, 4],
-              lineHeight: "body",
-              mb: [3, null, 4],
-            }}
-          >
-            Account
-          </Heading>
-          <p>Hi {this.props.user.hname.split(" ")[0]}!</p>
-          <Box>
-            <p>Name: {this.props.user.hname}</p>
-            <p>Email: {this.props.user.email || "--"}</p>
-            <p>
-              Social:{" "}
-              {!this.props.user.hasFacebook && !this.props.user.hasTwitter
-                ? "No social accounts connected"
-                : ""}
-            </p>
-            <p>
-              {this.props.user.hasFacebook ? <p>Facebook is connected</p> : ""}
-              {this.props.user.hasTwitter ? <p>Twitter is connected</p> : ""}
-            </p>
-          </Box>
+          <p>Name: {this.props.user.hname}</p>
+          <p>Email: {this.props.user.email || "--"}</p>
+          <p>
+            Social:{" "}
+            {!this.props.user.hasFacebook && !this.props.user.hasTwitter
+              ? "No social accounts connected"
+              : ""}
+          </p>
+          <p>
+            {this.props.user.hasFacebook ? <p>Facebook is connected</p> : ""}
+            {this.props.user.hasTwitter ? <p>Twitter is connected</p> : ""}
+          </p>
         </Box>
-      </>
+      </Box>
     )
   }
 

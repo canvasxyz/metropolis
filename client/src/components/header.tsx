@@ -12,7 +12,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         margin: `0 auto`,
         width: "100%",
         pt: [3, 5],
-        pb: [0, 5],
+        pb: [3, 5],
         px: [4],
         mb: [5, 0],
         fontFamily: "monospace",
@@ -23,7 +23,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          marginTop: "-18px",
+          marginTop: "-21px",
         }}
       >
         {inSurvey ? (
@@ -45,7 +45,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
           </Link>
         )}
         {!inSurvey && (
-          <Link sx={{ variant: "links.nav", ml: "10px" }} to={isLoggedIn ? "/conversations" : "/"}>
+          <Link sx={{ variant: "links.nav", ml: "9px" }} to={isLoggedIn ? "/conversations" : "/"}>
             Public House
           </Link>
         )}

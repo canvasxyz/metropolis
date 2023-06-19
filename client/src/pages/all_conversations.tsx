@@ -233,7 +233,7 @@ class Conversations extends React.Component<
     const { conversations } = this.props
 
     return (
-      <Box sx={{ mb: [5] }}>
+      <Box sx={{ mt: [4, null, 5], mb: [5] }}>
         <Heading as="h1">Manage Conversations</Heading>
         <Box sx={{ mt: [4], mb: [6] }}>
           <Button
