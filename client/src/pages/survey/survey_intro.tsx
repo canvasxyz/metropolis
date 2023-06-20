@@ -1,4 +1,6 @@
 import React from "react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import { surveyBox, surveyHeading } from "./index"
@@ -12,7 +14,9 @@ const SurveyIntro = ({ zid_metadata, onNext }) => {
       </Heading>
       <Box>
         {zid_metadata?.description ? (
-          <Text>{zid_metadata.description}</Text>
+          <Text className="react-markdown">
+            <ReactMarkdown children={zid_metadata.description} remarkPlugins={[remarkGfm]} />
+          </Text>
         ) : (
           <Text sx={{ color: "mediumGray" }}>
             The creator of this survey hasn’t created a description yet. Press continue to get

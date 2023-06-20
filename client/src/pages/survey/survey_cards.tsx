@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useState } from "react"
+import React, { useState, useRef, useLayoutEffect } from "react"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
@@ -17,10 +17,21 @@ const SurveyCards = ({
   goTo,
   zid_metadata,
 }) => {
+  const mainRef = useRef()
+  const firstCardRef = useRef()
+  useLayoutEffect(() => {
+    if (mainRef.current && firstCardRef.current) {
+      console.log(firstCardRef.current)
+      ;(mainRef.current as any).style.maxHeight =
+        (firstCardRef.current as any).offsetHeight + 60 + "px"
+    }
+  }, [votedComments.length])
+
   return (
     <Box>
       {unvotedComments.length > 0 && (
         <Box
+          ref={mainRef}
           sx={{
             position: "relative",
             maxHeight: "300px",
@@ -29,18 +40,28 @@ const SurveyCards = ({
             mb: "40px",
           }}
         >
-          {unvotedComments.slice(0, 2).map((comment, i) => {
-            return (
+          {unvotedComments[0] && (
+            <Box ref={firstCardRef}>
               <SurveyCard
-                key={comment.tid}
-                comment={comment}
+                key={unvotedComments[0].tid}
+                comment={unvotedComments[0]}
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
                 stacked={true}
               />
-            )
-          })}
+            </Box>
+          )}
+          {unvotedComments[1] && (
+            <SurveyCard
+              key={unvotedComments[1].tid}
+              comment={unvotedComments[1]}
+              conversationId={conversation_id}
+              onVoted={onVoted}
+              hasVoted={false}
+              stacked={true}
+            />
+          )}
           <Box
             sx={{
               position: "absolute",
@@ -128,7 +149,11 @@ const SurveyCards = ({
             </Text>
           </Box>
           {zid_metadata.postsurvey && (
-            <Button variant="primary" onClick={() => goTo("postsurvey")} sx={{ width: "100%" }}>
+            <Button
+              variant="primary"
+              onClick={() => goTo("postsurvey")}
+              sx={{ width: "100%", mb: [3] }}
+            >
               Continue
             </Button>
           )}
@@ -144,7 +169,15 @@ const SurveyCards = ({
         />
       ) : (
         <Box>
-          <Button variant="outlineGray" sx={{ width: "100%" }}>
+          <Button
+            variant="outlineGray"
+            sx={{ width: "100%" }}
+            onClick={() =>
+              (document.location = `/createuser?from=${encodeURIComponent(
+                document.location.pathname
+              )}`)
+            }
+          >
             Create an account to add comments
           </Button>
         </Box>

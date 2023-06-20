@@ -1,6 +1,8 @@
 /** @jsx jsx */
 
 import React, { useState } from "react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
@@ -22,7 +24,9 @@ const PostSurvey = ({
           <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
             Nice work!
           </Heading>
-          <Text sx={{ mb: [5] }}>{zid_metadata.postsurvey}</Text>
+          <Text className="react-markdown" sx={{ mb: [5] }}>
+            <ReactMarkdown children={zid_metadata.postsurvey} remarkPlugins={[remarkGfm]} />
+          </Text>
           <Button
             variant="outline"
             sx={{ width: "100%" }}
