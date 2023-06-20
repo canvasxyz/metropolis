@@ -21,8 +21,10 @@ import { RootState, Conversation } from "../util/types"
 
 function ConversationRow({ c, i, stats, dispatch }) {
   useEffect(() => {
-    const until = null
-    dispatch(populateConversationStatsStore(c.conversation_id, until))
+    if (!stats && !c.is_archived) {
+      const until = null
+      dispatch(populateConversationStatsStore(c.conversation_id, until))
+    }
   }, [])
 
   return (
@@ -98,12 +100,16 @@ function ConversationRow({ c, i, stats, dispatch }) {
           <Box>
             {c.participant_count} voter{c.participant_count === 1 ? "" : "s"}
           </Box>
-          <Box>
-            {stats?.commentTimes?.length} comment{stats?.commentTimes?.length === 1 ? "" : "s"}
-          </Box>
-          <Box>
-            {stats?.voteTimes?.length} vote{stats?.voteTimes?.length === 1 ? "" : "s"}
-          </Box>
+          {!c.is_archived && (
+            <Box>
+              {stats?.commentTimes?.length} comment{stats?.commentTimes?.length === 1 ? "" : "s"}
+            </Box>
+          )}
+          {!c.is_archived && (
+            <Box>
+              {stats?.voteTimes?.length} vote{stats?.voteTimes?.length === 1 ? "" : "s"}
+            </Box>
+          )}
         </Box>
         {!c.is_archived ? (
           <Box sx={{ flex: 1, textAlign: "right", ml: [3], maxWidth: 60 }}>
