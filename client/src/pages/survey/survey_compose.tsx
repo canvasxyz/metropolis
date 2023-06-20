@@ -36,9 +36,9 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
       .post("api/v3/comments", params)
       .fail((xhr: XMLHttpRequest, evt: string, err: string) => {
         if (err.toString() === "Conflict") {
-          setError("Comment already exists")
+          setError("Statement already exists")
         } else if (finalTxt === "") {
-          setError("Could not add empty comment")
+          setError("Could not add empty statement")
         } else {
           setError(err.toString())
         }
@@ -56,7 +56,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
           pid: currentPid,
         }
         setVotedComments([...votedComments, comment])
-        toast.success("Comment added")
+        toast.success("Statement added")
       })
   }
 
@@ -77,7 +77,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
         disabled={!!loading}
         rows={4}
         ref={inputRef}
-        placeholder="Write a new comment..."
+        placeholder="Write a new statement..."
         onKeyDown={(e) => {
           if (e.key === "Enter" && e.metaKey) {
             e.preventDefault()
@@ -100,7 +100,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
           sx={{ display: "inline-block" }}
           options={[
             {
-              name: "Add comment",
+              name: "Add statement",
               onClick: () => {
                 submitComment(inputRef.current.value, 1)
                   .then(() => {
@@ -149,27 +149,15 @@ const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedC
 
   return (
     <React.Fragment>
-      <Box>
-        {/* zid_metadata?.description && (
-          <Button sx={{ mr: [2] }} variant="outlineGray" onClick={() => setShowIntro(!showIntro)}>
-            {showIntro ? "Hide intro" : "Show intro"}
-            {showIntro ? (
-              <TbChevronsUp style={{ position: "relative", top: "3px", marginLeft: "4px" }} />
-            ) : (
-              <TbChevronsDown style={{ position: "relative", top: "2px", marginLeft: "4px" }} />
-            )}
-          </Button>
-        ) */}
-        <Button
-          variant={unvotedComments.length === 0 ? "primary" : "outline"}
-          sx={{ width: "100%", mt: [2] }}
-          onClick={() => {
-            setIsOpen(true)
-          }}
-        >
-          Add your own comment
-        </Button>
-      </Box>
+      <Button
+        variant={unvotedComments.length === 0 ? "primary" : "outline"}
+        sx={{ width: "100%", mt: [2] }}
+        onClick={() => {
+          setIsOpen(true)
+        }}
+      >
+        Add new statement
+      </Button>
       {showIntro && (
         <Box sx={{ ...surveyBox }}>
           <Text>{zid_metadata.description}</Text>
@@ -197,21 +185,19 @@ const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedC
             padding: "32px 28px 28px",
           },
         }}
-        contentLabel="Add new comment"
+        contentLabel="Add new statement"
       >
         <Heading as="h4" sx={surveyHeadingMini}>
-          Add new comment
+          Add new statement
         </Heading>
 
         {zid_metadata.help_type !== 0 && (
           <Text sx={{ mb: [4] }}>
-            <p>Add your perspectives, experiences, or ideas here. Good comments should:</p>
+            <p>Add your perspectives, experiences, or ideas here. Good statements should:</p>
             <ul>
-              <li>Raise new perspectives, experiences or issues</li>
+              <li>Raise new perspectives</li>
               <li>Be clear & concise</li>
-              <li>
-                Stand on their own (they are not direct replies to other participants’ statements)
-              </li>
+              <li>Stand on their own (no direct replies to other statements)</li>
             </ul>
           </Text>
         )}

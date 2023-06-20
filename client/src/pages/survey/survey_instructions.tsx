@@ -13,7 +13,7 @@ const SurveyInstructions = ({
   onPrev: Function
   limit: number
 }) => {
-  const cardsText = limit ? `a batch of ${limit} comments` : "comments by other people"
+  const cardsText = limit ? `a batch of ${limit} statements` : "statements by other people"
 
   return (
     <Box>
@@ -21,7 +21,7 @@ const SurveyInstructions = ({
         About this survey
       </Heading>
       <Text sx={{ mt: [4], mb: [2] }}>
-        This is a collaborative survey, where you can contribute comments for everyone to vote on.
+        This is a collaborative survey, where you can contribute statements for everyone to vote on.
       </Text>
       <Text sx={{ my: [2] }}>
         You’ll be shown {cardsText}, and asked to <strong>Agree</strong>, <strong>Disagree</strong>,
@@ -30,10 +30,10 @@ const SurveyInstructions = ({
       <Text>
         <ul>
           <li>
-            If you generally agree, select Agree. You can also check a box, to show if you identify
-            strongly with the comment.
+            If you generally agree, select Agree. You can also check a box to show if you identify
+            strongly.
           </li>
-          <li>If you disagree or think the comment doesn’t make sense, select Disagree.</li>
+          <li>If you disagree or think the statement doesn’t make sense, select Disagree.</li>
           <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
         </ul>
       </Text>

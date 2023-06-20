@@ -35,7 +35,7 @@ const PostSurvey = ({
               goTo("voting")
             }}
           >
-            I’d like to keep voting
+            Go back to voting
           </Button>
         </Box>
       ) : (

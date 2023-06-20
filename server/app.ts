@@ -976,8 +976,15 @@ helpersInitialized.then(
       want("strict_moderation", getBool, assignToP),
       want("topic", getOptionalStringLimitLength(400), assignToP),
       want("description", getOptionalStringLimitLength(5000), assignToP),
+      want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
       want("postsurvey_limit", getInt, assignToP, ""),
+      want(
+        "postsurvey_redirect",
+        getOptionalStringLimitLength(1024),
+        assignToP,
+        ""
+      ),
       want("vis_type", getInt, assignToP),
       want("help_type", getInt, assignToP),
       want("write_type", getInt, assignToP),
@@ -1222,8 +1229,15 @@ helpersInitialized.then(
       want("context", getOptionalStringLimitLength(999), assignToP, ""),
       want("topic", getOptionalStringLimitLength(400), assignToP, ""),
       want("description", getOptionalStringLimitLength(5000), assignToP, ""),
+      want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
       want("postsurvey_limit", getInt, assignToP, ""),
+      want(
+        "postsurvey_redirect",
+        getOptionalStringLimitLength(1024),
+        assignToP,
+        ""
+      ),
       want("conversation_id", getStringLimitLength(6, 300), assignToP, ""),
       want("is_data_open", getBool, assignToP, false),
       want("ownerXid", getStringLimitLength(1, 999), assignToP),

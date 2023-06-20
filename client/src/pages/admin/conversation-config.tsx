@@ -22,10 +22,12 @@ class ConversationConfig extends React.Component<
     dispatch: Function
     zid_metadata: {
       conversation_id: string
-      topic: string
-      description: string
+      topic: string // actually: title
+      description: string // actually: intro text
+      survey_caption: string
       postsurvey: string
       postsurvey_limit: string
+      postsurvey_redirect: string
     }
     error: string
     loading: boolean
@@ -34,8 +36,10 @@ class ConversationConfig extends React.Component<
 > {
   topic: HTMLInputElement
   description: HTMLTextAreaElement
+  survey_caption: HTMLTextAreaElement
   postsurvey: HTMLTextAreaElement
   postsurvey_limit: HTMLInputElement
+  postsurvey_redirect: HTMLInputElement
 
   handleStringValueChange(field) {
     return () => {
@@ -132,7 +136,7 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Intro Text</Text>
+          <Text sx={{ mb: [2] }}>Intro Page Text</Text>
           <textarea
             ref={(c) => (this.description = c)}
             sx={{
@@ -155,14 +159,46 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          Post-Survey
+          During the Survey
+        </Heading>
+
+        <Box sx={{ mb: [3] }}>
+          <Text sx={{ mb: [2] }}>
+            Caption
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
+              Optional. Shown above the survey during voting
+            </Text>
+          </Text>
+          <textarea
+            ref={(c) => (this.survey_caption = c)}
+            sx={{
+              fontFamily: "body",
+              fontSize: [2],
+              width: "100%",
+              maxWidth: "35em",
+              height: "7em",
+              resize: "none",
+              padding: [2],
+              borderRadius: 2,
+              border: "1px solid",
+              borderColor: "mediumGray",
+            }}
+            data-test-id="survey_caption"
+            onBlur={this.handleStringValueChange("survey_caption").bind(this)}
+            onChange={this.handleConfigInputTyping("survey_caption").bind(this)}
+            defaultValue={this.props.zid_metadata.survey_caption}
+          />
+        </Box>
+
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+          After the Survey
         </Heading>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
             Votes Required
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Number of votes before post-survey is shown
+              Number of votes before post-survey text is shown
             </Text>
           </Text>
           <input
@@ -187,10 +223,11 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Post-Survey Text
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Shown after reaching the votes required
+              Optional. Markdown supported
             </Text>
           </Text>
           <textarea
+            placeholder="You’re all done! Thanks for contributing your input."
             ref={(c) => (this.postsurvey = c)}
             sx={{
               fontFamily: "body",
@@ -208,6 +245,32 @@ class ConversationConfig extends React.Component<
             onBlur={this.handleStringValueChange("postsurvey").bind(this)}
             onChange={this.handleConfigInputTyping("postsurvey").bind(this)}
             defaultValue={this.props.zid_metadata.postsurvey}
+          />
+        </Box>
+
+        <Box sx={{ mb: [3] }}>
+          <Text sx={{ mb: [2] }}>
+            Post-Survey Redirect
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
+              Optional. Shown as a button after the survey
+            </Text>
+          </Text>
+          <input
+            placeholder="https://"
+            ref={(c) => (this.postsurvey_redirect = c)}
+            sx={{
+              fontFamily: "body",
+              fontSize: [2],
+              width: "100%",
+              maxWidth: "35em",
+              borderRadius: 2,
+              padding: [2],
+              border: "1px solid",
+              borderColor: "mediumGray",
+            }}
+            onBlur={this.handleStringValueChange("postsurvey_redirect").bind(this)}
+            onChange={this.handleConfigInputTyping("postsurvey_redirect").bind(this)}
+            defaultValue={this.props.zid_metadata.postsurvey_redirect || ""}
           />
         </Box>
 

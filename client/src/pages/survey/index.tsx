@@ -1,6 +1,8 @@
 /** @jsx jsx */
 
 import React, { useCallback, useEffect, useState, useRef } from "react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { connect, useDispatch, useSelector } from "react-redux"
 import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
@@ -174,9 +176,16 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("instructions")} />
       )}
       {(state === "voting" || state === "postsurvey") && (
-        <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
-          {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
-        </Heading>
+        <Box>
+          <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
+            {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
+          </Heading>
+          {zid_metadata.survey_caption && (
+            <Box sx={{ fontSize: "92%" }}>
+              <ReactMarkdown children={zid_metadata.survey_caption} remarkPlugins={[remarkGfm]} />
+            </Box>
+          )}
+        </Box>
       )}
       {state === "voting" && (
         <Box sx={{ mt: [5] }}>

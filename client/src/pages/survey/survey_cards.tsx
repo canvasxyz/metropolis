@@ -118,7 +118,7 @@ const SurveyCards = ({
                 },
               }}
             >
-              {unvotedComments.length} left
+              {unvotedComments.length > 1 ? `${unvotedComments.length - 1} more` : "Last one"}
             </Text>
           </Box>
         </Box>
@@ -126,11 +126,11 @@ const SurveyCards = ({
       {unvotedComments.length === 0 && votedComments.length === 0 && (
         <Box sx={{ ...surveyBox, pt: [5] }}>
           <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
-            No comments
+            No statements
           </Heading>
           <Text sx={{ mb: [3] }}>
-            Nobody has added any comments to this survey yet. If commenting is enabled, you could be
-            the first!
+            Nobody has added any statements to this survey yet. If adding statements is enabled, you
+            could be the first!
           </Text>
         </Box>
       )}
@@ -142,19 +142,19 @@ const SurveyCards = ({
               You’re done for now!
             </Heading>
             <Text sx={{ mb: [2] }}>
-              You’ve voted on all {votedComments.length} comments submitted so far.
+              You’ve voted on all {votedComments.length} statements submitted so far.
             </Text>
             <Text sx={{ mb: [2] }}>
-              Come back to this page to see new comments as they’re written by others.
+              Come back to this page to see new statements as they’re written by others.
             </Text>
           </Box>
           {zid_metadata.postsurvey && (
             <Button
-              variant="primary"
+              variant="outline"
               onClick={() => goTo("postsurvey")}
               sx={{ width: "100%", mb: [3] }}
             >
-              Continue
+              I’m all done
             </Button>
           )}
         </React.Fragment>
@@ -178,7 +178,7 @@ const SurveyCards = ({
               )}`)
             }
           >
-            Create an account to add comments
+            Create an account to add statements
           </Button>
         </Box>
       )}
