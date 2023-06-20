@@ -16,8 +16,6 @@ const SurveyCards = ({
   onVoted,
   zid_metadata,
 }) => {
-  const [postsurveyDismissed, setPostsurveyDismissed] = useState(false)
-
   return (
     <Box>
       {unvotedComments.length > 0 && (
@@ -115,56 +113,19 @@ const SurveyCards = ({
         </Box>
       )}
 
-      {zid_metadata.postsurvey &&
-      !!zid_metadata.postsurvey_limit &&
-      zid_metadata.postsurvey_limit >= 5 &&
-      (unvotedComments.length === 0 || votedComments.length >= zid_metadata.postsurvey_limit) &&
-      !postsurveyDismissed ? (
-        <Box sx={{ ...surveyBox, pt: [5], pb: [5] }}>
-          <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
-            Nice work!
-          </Heading>
-          <Text sx={{ mb: [5] }}>{zid_metadata.postsurvey}</Text>
-          <Button
-            variant="outline"
-            sx={{ width: "100%" }}
-            onClick={() => {
-              setPostsurveyDismissed(true)
-            }}
-          >
-            I’d like to keep voting
+      {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
+        <SurveyCompose
+          zid_metadata={zid_metadata}
+          votedComments={votedComments}
+          unvotedComments={unvotedComments}
+          setVotedComments={setVotedComments}
+        />
+      ) : (
+        <Box>
+          <Button variant="outlineGray" sx={{ width: "100%" }}>
+            Create an account to add comments
           </Button>
         </Box>
-      ) : (
-        <React.Fragment>
-          {unvotedComments.length === 0 && (
-            <Box sx={{ ...surveyBox, pt: [5] }}>
-              <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
-                You’re done for now!
-              </Heading>
-              <Text sx={{ mb: [2] }}>
-                You’ve voted on all {votedComments.length} comments submitted so far.
-              </Text>
-              <Text sx={{ mb: [2] }}>
-                Come back to this page to see new comments as they’re written by others.
-              </Text>
-            </Box>
-          )}
-          {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
-            <SurveyCompose
-              zid_metadata={zid_metadata}
-              votedComments={votedComments}
-              unvotedComments={unvotedComments}
-              setVotedComments={setVotedComments}
-            />
-          ) : (
-            <Box>
-              <Button variant="outlineGray" sx={{ width: "100%" }}>
-                Create an account to add comments
-              </Button>
-            </Box>
-          )}
-        </React.Fragment>
       )}
     </Box>
   )

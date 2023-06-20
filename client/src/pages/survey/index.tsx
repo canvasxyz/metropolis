@@ -14,6 +14,7 @@ import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
+import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
 
@@ -70,6 +71,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   }, [conversation_id])
 
   useEffect(() => {
+    if (!zid_metadata || Object.keys(zid_metadata).length === 0) return
+
     Promise.all([
       api.get("api/v3/comments", {
         lastServerToken: new Date(0).getTime(),
@@ -87,7 +90,17 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
 
       const hash = document.location.hash.slice(1)
       if (unvotedComments.length === 0 && allComments.length > 0) {
+        // voted on all comments
+        setState("postsurvey")
+        history.replaceState({}, "", document.location.pathname + "#postsurvey")
+      } else if (allComments.length - unvotedComments.length > zid_metadata.postsurvey_limit) {
+        // voted on enough comments to go to postsurvey (TODO)
+        setState("postsurvey")
+        history.replaceState({}, "", document.location.pathname + "#postsurvey")
+      } else if (allComments.length - unvotedComments.length > 0) {
+        // voted on some comments
         setState("voting")
+        history.replaceState({}, "", document.location.pathname + "#voting")
       } else if (
         hash &&
         ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(hash) !== -1
@@ -113,7 +126,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     }
     window.addEventListener("popstate", onpopstate)
     return () => window.removeEventListener("popstate", onpopstate)
-  }, [])
+  }, [zid_metadata && Object.keys(zid_metadata).length > 0])
 
   const goTo = useCallback((state) => {
     // preserve the root page
@@ -157,27 +170,38 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("instructions")} />
       )}
       {(state === "voting" || state === "postsurvey") && (
-        <React.Fragment>
-          <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
-            {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
-          </Heading>
-          <Box sx={{ mt: [5] }}>
-            <SurveyCards
-              votedComments={votedComments}
-              unvotedComments={unvotedComments}
-              setVotedComments={setVotedComments}
-              user={user}
-              onVoted={(commentId: string) => {
-                const comment = unvotedComments.find((c) => c.tid === commentId)
-                setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
-                if (!comment) return
-                setVotedComments([...votedComments, comment])
-              }}
-              conversation_id={conversation_id}
-              zid_metadata={zid_metadata}
-            />
-          </Box>
-        </React.Fragment>
+        <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
+          {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
+        </Heading>
+      )}
+      {state === "voting" && (
+        <Box sx={{ mt: [5] }}>
+          <SurveyCards
+            votedComments={votedComments}
+            unvotedComments={unvotedComments}
+            setVotedComments={setVotedComments}
+            user={user}
+            onVoted={(commentId: string) => {
+              const comment = unvotedComments.find((c) => c.tid === commentId)
+              setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
+              if (!comment) return
+              setVotedComments([...votedComments, comment])
+            }}
+            conversation_id={conversation_id}
+            zid_metadata={zid_metadata}
+          />
+        </Box>
+      )}
+      {state === "postsurvey" && (
+        <Box sx={{ mt: [5] }}>
+          <PostSurvey
+            votedComments={votedComments}
+            user={user}
+            goTo={goTo}
+            conversation_id={conversation_id}
+            zid_metadata={zid_metadata}
+          />
+        </Box>
       )}
     </Box>
   )
