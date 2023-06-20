@@ -68,6 +68,7 @@ type ModerationObject = { isMod: ModerationState | undefined };
 
 export type CommentType = {
   zid: any;
+  voted_by_pid: any;
   not_voted_by_pid: any;
   include_social?: any;
   withoutTids: any;
@@ -132,8 +133,11 @@ export type ConversationType = {
   strict_moderation?: any;
   topic?: any;
   description?: any;
+  survey_caption?: any;
   postsurvey?: any;
   postsurvey_limit?: number;
+  postsurvey_submissions?: number;
+  postsurvey_redirect?: number;
   vis_type?: any;
   help_type?: any;
   socialbtn_type?: any;

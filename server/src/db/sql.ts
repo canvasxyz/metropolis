@@ -9,6 +9,7 @@ const sql_conversations: any = sql.define({
     "survey_caption",
     "postsurvey",
     "postsurvey_limit",
+    "postsurvey_submissions",
     "postsurvey_redirect",
     "participant_count",
     "is_anon",

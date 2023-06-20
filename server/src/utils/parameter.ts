@@ -350,32 +350,32 @@ function getRidFromReportId(report_id: string) {
   // 369   );
   // ~~~
   // @ts-ignore
-  return new MPromise(
-    "getRidFromReportId",
-    function (resolve: any, reject: any) {
-      let cachedRid = reportIdToRidCache.get(report_id);
-      if (cachedRid) {
-        resolve(cachedRid);
-        return;
-      }
-      pg.query_readOnly(
-        "select rid from reports where report_id = ($1);",
-        [report_id],
-        function (err: any, results: { rows: string | any[] }) {
-          logger.error("polis_err_fetching_rid_for_report_id " + report_id, err);
-          if (err) {
-            return reject(err);
-          } else if (!results || !results.rows || !results.rows.length) {
-            return reject("polis_err_fetching_rid_for_report_id");
-          } else {
-            let rid = results.rows[0].rid;
-            reportIdToRidCache.set(report_id, rid);
-            return resolve(rid);
-          }
-        }
-      );
+  return new MPromise("getRidFromReportId", function (
+    resolve: any,
+    reject: any
+  ) {
+    let cachedRid = reportIdToRidCache.get(report_id);
+    if (cachedRid) {
+      resolve(cachedRid);
+      return;
     }
-  );
+    pg.query_readOnly(
+      "select rid from reports where report_id = ($1);",
+      [report_id],
+      function (err: any, results: { rows: string | any[] }) {
+        logger.error("polis_err_fetching_rid_for_report_id " + report_id, err);
+        if (err) {
+          return reject(err);
+        } else if (!results || !results.rows || !results.rows.length) {
+          return reject("polis_err_fetching_rid_for_report_id");
+        } else {
+          let rid = results.rows[0].rid;
+          reportIdToRidCache.set(report_id, rid);
+          return resolve(rid);
+        }
+      }
+    );
+  });
 }
 
 // conversation_id is the client/ public API facing string ID
@@ -518,6 +518,13 @@ function resolve_pidThing(
           fail(res, 500, "polis_err_mypid_resolve_error", err);
           next(err);
         });
+    } else if (
+      existingValue === "mypid" &&
+      pidThingStringName === "voted_by_pid"
+    ) {
+      // handle logged-out user asking for voted_by_pid
+      assigner(req, pidThingStringName, null);
+      next();
     } else if (existingValue === "mypid") {
       // don't assign anything, since we have no uid to look it up.
       next();

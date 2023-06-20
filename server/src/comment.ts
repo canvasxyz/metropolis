@@ -298,6 +298,7 @@ function _getCommentsList(o: {
   tids: any;
   mod: any;
   not_voted_by_pid: any;
+  voted_by_pid: any;
   withoutTids: any;
   moderation: any;
   random: any;
@@ -305,82 +306,92 @@ function _getCommentsList(o: {
 }) {
   // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
   // @ts-ignore
-  return new MPromise(
-    "_getCommentsList",
-    function (resolve: (rows: Row[]) => void, reject: (arg0: any) => void) {
-      Conversation.getConversationInfo(o.zid).then(function (conv: {
-        strict_moderation: any;
-        prioritize_seed: any;
-      }) {
-        let q = SQL.sql_comments
-          .select(SQL.sql_comments.star())
-          .where(SQL.sql_comments.zid.equals(o.zid));
-        if (!_.isUndefined(o.pid)) {
-          q = q.and(SQL.sql_comments.pid.equals(o.pid));
-        }
-        if (!_.isUndefined(o.tids)) {
-          q = q.and(SQL.sql_comments.tid.in(o.tids));
-        }
-        if (!_.isUndefined(o.mod)) {
-          q = q.and(SQL.sql_comments.mod.equals(o.mod));
-        }
-        if (!_.isUndefined(o.not_voted_by_pid)) {
-          // 'SELECT * FROM comments WHERE zid = 12 AND tid NOT IN (SELECT tid FROM votes WHERE pid = 1);'
-          // Don't return comments the user has already voted on.
-          q = q.and(
-            SQL.sql_comments.tid.notIn(
-              SQL.sql_votes_latest_unique
-                .subQuery()
-                .select(SQL.sql_votes_latest_unique.tid)
-                .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
-                .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid))
-            )
-          );
-        }
+  return new MPromise("_getCommentsList", function (
+    resolve: (rows: Row[]) => void,
+    reject: (arg0: any) => void
+  ) {
+    Conversation.getConversationInfo(o.zid).then(function (conv: {
+      strict_moderation: any;
+      prioritize_seed: any;
+    }) {
+      let q = SQL.sql_comments
+        .select(SQL.sql_comments.star())
+        .where(SQL.sql_comments.zid.equals(o.zid));
+      if (!_.isUndefined(o.pid)) {
+        q = q.and(SQL.sql_comments.pid.equals(o.pid));
+      }
+      if (!_.isUndefined(o.tids)) {
+        q = q.and(SQL.sql_comments.tid.in(o.tids));
+      }
+      if (!_.isUndefined(o.mod)) {
+        q = q.and(SQL.sql_comments.mod.equals(o.mod));
+      }
+      if (!_.isUndefined(o.not_voted_by_pid)) {
+        // 'SELECT * FROM comments WHERE zid = 12 AND tid NOT IN (SELECT tid FROM votes WHERE pid = 1);'
+        // Don't return comments the user has already voted on.
+        q = q.and(
+          SQL.sql_comments.tid.notIn(
+            SQL.sql_votes_latest_unique
+              .subQuery()
+              .select(SQL.sql_votes_latest_unique.tid)
+              .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
+              .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid))
+          )
+        );
+      } else if (!_.isUndefined(o.voted_by_pid)) {
+        q = q.and(
+          SQL.sql_comments.tid.in(
+            SQL.sql_votes_latest_unique
+              .subQuery()
+              .select(SQL.sql_votes_latest_unique.tid)
+              .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
+              .and(SQL.sql_votes_latest_unique.pid.equals(o.voted_by_pid))
+          )
+        );
+      }
 
-        if (!_.isUndefined(o.withoutTids)) {
-          q = q.and(SQL.sql_comments.tid.notIn(o.withoutTids));
-        }
-        if (o.moderation) {
+      if (!_.isUndefined(o.withoutTids)) {
+        q = q.and(SQL.sql_comments.tid.notIn(o.withoutTids));
+      }
+      if (o.moderation) {
+      } else {
+        q = q.and(SQL.sql_comments.active.equals(true));
+        if (conv.strict_moderation) {
+          q = q.and(SQL.sql_comments.mod.equals(Utils.polisTypes.mod.ok));
         } else {
-          q = q.and(SQL.sql_comments.active.equals(true));
-          if (conv.strict_moderation) {
-            q = q.and(SQL.sql_comments.mod.equals(Utils.polisTypes.mod.ok));
-          } else {
-            q = q.and(SQL.sql_comments.mod.notEquals(Utils.polisTypes.mod.ban));
-          }
+          q = q.and(SQL.sql_comments.mod.notEquals(Utils.polisTypes.mod.ban));
         }
+      }
 
-        q = q.and(SQL.sql_comments.velocity.gt(0)); // filter muted comments
+      q = q.and(SQL.sql_comments.velocity.gt(0)); // filter muted comments
 
-        if (!_.isUndefined(o.random)) {
-          if (conv.prioritize_seed) {
-            q = q.order("is_seed desc, random()");
-          } else {
-            q = q.order("random()");
-          }
+      if (!_.isUndefined(o.random)) {
+        if (conv.prioritize_seed) {
+          q = q.order("is_seed desc, random()");
         } else {
-          q = q.order(SQL.sql_comments.created);
+          q = q.order("random()");
         }
-        if (!_.isUndefined(o.limit)) {
-          q = q.limit(o.limit);
+      } else {
+        q = q.order(SQL.sql_comments.created);
+      }
+      if (!_.isUndefined(o.limit)) {
+        q = q.limit(o.limit);
+      } else {
+        q = q.limit(999); // TODO paginate
+      }
+      return pg.query(q.toString(), [], function (err: any, docs: Docs) {
+        if (err) {
+          reject(err);
+          return;
+        }
+        if (docs.rows && docs.rows.length) {
+          resolve(docs.rows);
         } else {
-          q = q.limit(999); // TODO paginate
+          resolve([]);
         }
-        return pg.query(q.toString(), [], function (err: any, docs: Docs) {
-          if (err) {
-            reject(err);
-            return;
-          }
-          if (docs.rows && docs.rows.length) {
-            resolve(docs.rows);
-          } else {
-            resolve([]);
-          }
-        });
       });
-    }
-  );
+    });
+  });
 }
 
 function getNumberOfCommentsRemaining(zid: any, pid: any) {
@@ -442,7 +453,6 @@ export {
   getComment,
   getComments,
   _getCommentsForModerationList,
-  _getCommentsList,
   getNumberOfCommentsRemaining,
   translateAndStoreComment,
   detectLanguage,
@@ -452,7 +462,6 @@ export default {
   getComment,
   getComments,
   _getCommentsForModerationList,
-  _getCommentsList,
   getNumberOfCommentsRemaining,
   translateAndStoreComment,
   detectLanguage,

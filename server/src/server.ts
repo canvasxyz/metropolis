@@ -5621,8 +5621,8 @@ Email verified! You can close this tab or hit the back button.
     }
 
     pgQuery(
-      "insert into conversations (topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_redirect, link_url, owner, modified, created, participant_count) " +
-        "(select '(SNAPSHOT) ' || topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_redirect, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
+      "insert into conversations (topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, owner, modified, created, participant_count) " +
+        "(select '(SNAPSHOT) ' || topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
       [zid, uid],
       function (err: any, result: { rows: any[] }) {
         if (err) {
@@ -6307,7 +6307,6 @@ Email verified! You can close this tab or hit the back button.
   const getUser = User.getUser;
   const getComments = Comment.getComments;
   const _getCommentsForModerationList = Comment._getCommentsForModerationList;
-  const _getCommentsList = Comment._getCommentsList;
   const getNumberOfCommentsRemaining = Comment.getNumberOfCommentsRemaining;
 
   function handle_GET_participation(
@@ -8532,6 +8531,7 @@ Email verified! You can close this tab or hit the back button.
         survey_caption: string;
         postsurvey: string;
         postsurvey_limit: number;
+        postsurvey_submissions: number;
         postsurvey_redirect: number;
         vis_type: any;
         help_type: any;
@@ -8604,6 +8604,9 @@ Email verified! You can close this tab or hit the back button.
         }
         if (!_.isUndefined(req.p.postsurvey_limit)) {
           fields.postsurvey_limit = req.p.postsurvey_limit;
+        }
+        if (!_.isUndefined(req.p.postsurvey_submissions)) {
+          fields.postsurvey_submissions = req.p.postsurvey_submissions;
         }
         if (!_.isUndefined(req.p.postsurvey_redirect)) {
           fields.postsurvey_redirect = req.p.postsurvey_redirect;
@@ -10022,6 +10025,7 @@ Email verified! You can close this tab or hit the back button.
         survey_caption: any;
         postsurvey: any;
         postsurvey_limit: any;
+        postsurvey_submissions: any;
         postsurvey_redirect: any;
         is_active: any;
         is_data_open: any;
@@ -10077,6 +10081,7 @@ Email verified! You can close this tab or hit the back button.
                 survey_caption: req.p.survey_caption,
                 postsurvey: req.p.postsurvey,
                 // postsurvey_limit: req.p.postsurvey_limit,
+                // postsurvey_submissions: req.p.postsurvey_submissions,
                 // postsurvey_redirect: req.p.postsurvey_redirect,
                 is_active: req.p.is_active,
                 is_data_open: req.p.is_data_open,
@@ -13076,9 +13081,10 @@ Thanks for using Polis!
         conv = {
           topic: conv.topic,
           description: conv.description,
-          topic: conv.topic,
+          survey_caption: conv.survey_caption,
           postsurvey: conv.postsurvey,
           postsurvey_limit: conv.postsurvey_limit,
+          postsurvey_submissions: conv.postsurvey_submissions,
           postsurvey_redirect: conv.postsurvey_redirect,
           created: conv.created,
           link_url: conv.link_url,

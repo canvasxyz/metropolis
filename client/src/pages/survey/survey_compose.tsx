@@ -33,32 +33,36 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
       agid: 1,
     }
 
-    return api
-      .post("api/v3/comments", params)
-      .fail((xhr: XMLHttpRequest, evt: string, err: string) => {
-        if (err.toString() === "Conflict") {
-          setError("Statement already exists")
-        } else if (finalTxt === "") {
-          setError("Could not add empty statement")
-        } else {
-          setError(err.toString())
-        }
-      })
-      .then(({ tid, currentPid }: { tid: string; currentPid: string }) => {
-        const comment: Comment = {
-          txt: params.txt,
-          tid,
-          created: null,
-          tweet_id: null,
-          quote_src_url: null,
-          is_seed: false,
-          is_meta: false,
-          lang: null,
-          pid: currentPid,
-        }
-        setVotedComments([...votedComments, comment])
-        toast.success("Statement added")
-      })
+    return new Promise<void>((resolve, reject) =>
+      api
+        .post("api/v3/comments", params)
+        .fail((xhr: XMLHttpRequest, evt: string, err: string) => {
+          if (err.toString() === "Conflict") {
+            setError("Someone has already submitted this comment")
+          } else if (finalTxt === "") {
+            setError("Could not add empty statement")
+          } else {
+            setError(err.toString())
+          }
+          reject(err)
+        })
+        .then(({ tid, currentPid }: { tid: string; currentPid: string }) => {
+          const comment: Comment = {
+            txt: params.txt,
+            tid,
+            created: null,
+            tweet_id: null,
+            quote_src_url: null,
+            is_seed: false,
+            is_meta: false,
+            lang: null,
+            pid: currentPid,
+          }
+          setVotedComments([...votedComments, comment])
+          toast.success("Statement added")
+          resolve()
+        })
+    )
   }
 
   return (
@@ -88,7 +92,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
                 importantRef.current.checked = false
                 setError("")
               })
-              .done(() => {
+              .finally(() => {
                 setLoading(false)
                 inputRef.current.focus()
               })
@@ -109,7 +113,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
                     importantRef.current.checked = false
                     setError("")
                   })
-                  .done(() => {
+                  .finally(() => {
                     setLoading(false)
                     inputRef.current.focus()
                   })
@@ -125,7 +129,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
                     importantRef.current.checked = false
                     setError("")
                   })
-                  .done(() => {
+                  .finally(() => {
                     setLoading(false)
                   })
               },

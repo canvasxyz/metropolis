@@ -34,8 +34,6 @@ export const UPDATE_ZID_METADATA_STARTED = "UPDATE_ZID_METADATA_STARTED"
 export const UPDATE_ZID_METADATA_SUCCESS = "UPDATE_ZID_METADATA_SUCCESS"
 export const UPDATE_ZID_METADATA_ERROR = "UPDATE_ZID_METADATA_ERROR"
 
-export const OPTIMISTIC_ZID_METADATA_UPDATE = "OPTIMISTIC_ZID_METADATA_UPDATE"
-
 /* report */
 export const UPDATE_REPORT_STARTED = "UPDATE_REPORT_STARTED"
 export const UPDATE_REPORT_SUCCESS = "UPDATE_REPORT_SUCCESS"
@@ -774,14 +772,6 @@ export const handleZidMetadataUpdate = (zm, field, value) => {
     return updateZidMetadata(zm, field, value)
       .then((res) => dispatch(updateZidMetadataSuccess(res)))
       .fail((err) => dispatch(updateZidMetadataError(err)))
-  }
-}
-
-export const optimisticZidMetadataUpdateOnTyping = (zm, field, value) => {
-  zm[field] = value
-  return {
-    type: OPTIMISTIC_ZID_METADATA_UPDATE,
-    data: zm,
   }
 }
 

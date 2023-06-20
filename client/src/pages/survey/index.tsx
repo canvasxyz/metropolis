@@ -86,33 +86,40 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         lastServerToken: new Date(0).getTime(),
         conversation_id,
       }),
-    ]).then(([unvotedComments, allComments]) => {
+      api.get("api/v3/comments", {
+        lastServerToken: new Date(0).getTime(),
+        voted_by_pid: "mypid",
+        conversation_id,
+      }),
+    ]).then(([unvotedComments, allComments, allSubmissions]) => {
       const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
       setUnvotedComments(unvotedComments)
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
 
       const hash = document.location.hash.slice(1)
-      if (unvotedComments.length === 0 && allComments.length > 0 && zid_metadata.postsurvey) {
-        // voted on all comments
-        setState("postsurvey")
-        history.replaceState({}, "", document.location.pathname + "#postsurvey")
-      } else if (
-        allComments.length - unvotedComments.length > zid_metadata.postsurvey_limit &&
+      if (
+        ((unvotedComments.length === 0 && allComments.length > 0) || // voted on all comments
+          (zid_metadata.postsurvey_limit &&
+            allComments.length - unvotedComments.length >= zid_metadata.postsurvey_limit)) && // or, voted on enough comments
+        (!zid_metadata.postsurvey_submissions || // no submissions requirement
+          allSubmissions.length >= zid_metadata.postsurvey_submissions) && // or, made enough submissions
         zid_metadata.postsurvey
       ) {
-        // voted on enough comments to go to postsurvey
+        // voted on enough/all comments AND made enough submissions, initialize to postsurvey
         setState("postsurvey")
         history.replaceState({}, "", document.location.pathname + "#postsurvey")
-      } else if (allComments.length - unvotedComments.length > 0) {
-        // voted on some comments
+      } else if (allComments.length - unvotedComments.length > 0 || allSubmissions.length > 0) {
+        // voted on some comments OR made some submissions, initialize to voting
         setState("voting")
         history.replaceState({}, "", document.location.pathname + "#voting")
       } else if (
+        // voted on not enough comments, initialize to previous url hash
         hash &&
         ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(hash) !== -1
       ) {
         setState(hash as SurveyState)
       } else {
+        // new user, initialize to intro
         setState("intro")
       }
     })

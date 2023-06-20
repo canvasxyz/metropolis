@@ -38,5 +38,6 @@ export type Conversation = {
   description: string
   postsurvey: string
   postsurvey_limit: string
+  postsurvey_submissions: string
   // TODO ...
 }

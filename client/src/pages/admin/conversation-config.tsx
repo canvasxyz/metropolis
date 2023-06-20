@@ -8,7 +8,7 @@ import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
 import toast from "react-hot-toast"
 
-import { handleZidMetadataUpdate, optimisticZidMetadataUpdateOnTyping } from "../../actions"
+import { handleZidMetadataUpdate } from "../../actions"
 import NoPermission from "./no-permission"
 import { CheckboxField } from "./CheckboxField"
 import SeedComment from "./seed-comment"
@@ -27,6 +27,7 @@ class ConversationConfig extends React.Component<
       survey_caption: string
       postsurvey: string
       postsurvey_limit: string
+      postsurvey_submissions: string
       postsurvey_redirect: string
     }
     error: string
@@ -39,6 +40,7 @@ class ConversationConfig extends React.Component<
   survey_caption: HTMLTextAreaElement
   postsurvey: HTMLTextAreaElement
   postsurvey_limit: HTMLInputElement
+  postsurvey_submissions: HTMLInputElement
   postsurvey_redirect: HTMLInputElement
 
   handleStringValueChange(field) {
@@ -50,14 +52,6 @@ class ConversationConfig extends React.Component<
         }
       }
       this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
-    }
-  }
-
-  handleConfigInputTyping(field) {
-    return (e) => {
-      this.props.dispatch(
-        optimisticZidMetadataUpdateOnTyping(this.props.zid_metadata, field, e.target.value)
-      )
     }
   }
 
@@ -73,15 +67,6 @@ class ConversationConfig extends React.Component<
         }
         this.props.dispatch(handleZidMetadataUpdate(this.props.zid_metadata, field, val))
       }
-    }
-  }
-  handleIntegerInputTyping(field) {
-    return (e) => {
-      const val = parseInt(e.target.value, 10)
-      if (isNaN(val) || val.toString() !== this[field].value) {
-        return
-      }
-      this.props.dispatch(optimisticZidMetadataUpdateOnTyping(this.props.zid_metadata, field, val))
     }
   }
 
@@ -130,7 +115,6 @@ class ConversationConfig extends React.Component<
               borderColor: "mediumGray",
             }}
             onBlur={this.handleStringValueChange("topic").bind(this)}
-            onChange={this.handleConfigInputTyping("topic").bind(this)}
             defaultValue={this.props.zid_metadata.topic}
           />
         </Box>
@@ -153,7 +137,6 @@ class ConversationConfig extends React.Component<
             }}
             data-test-id="description"
             onBlur={this.handleStringValueChange("description").bind(this)}
-            onChange={this.handleConfigInputTyping("description").bind(this)}
             defaultValue={this.props.zid_metadata.description}
           />
         </Box>
@@ -185,7 +168,6 @@ class ConversationConfig extends React.Component<
             }}
             data-test-id="survey_caption"
             onBlur={this.handleStringValueChange("survey_caption").bind(this)}
-            onChange={this.handleConfigInputTyping("survey_caption").bind(this)}
             defaultValue={this.props.zid_metadata.survey_caption}
           />
         </Box>
@@ -198,7 +180,7 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Votes Required
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Number of votes before post-survey text is shown
+              Number of votes users should submit
             </Text>
           </Text>
           <input
@@ -214,17 +196,38 @@ class ConversationConfig extends React.Component<
               borderColor: "mediumGray",
             }}
             onBlur={this.handleIntegerValueChange("postsurvey_limit").bind(this)}
-            onChange={this.handleIntegerInputTyping("postsurvey_limit").bind(this)}
             defaultValue={this.props.zid_metadata.postsurvey_limit || ""}
           />
         </Box>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
-            Post-Survey Text
+            Statements Required
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Optional. Markdown supported
+              Number of statements users should submit
             </Text>
+          </Text>
+          <input
+            ref={(c) => (this.postsurvey_submissions = c)}
+            sx={{
+              fontFamily: "body",
+              fontSize: [2],
+              width: "100%",
+              maxWidth: "35em",
+              borderRadius: 2,
+              padding: [2],
+              border: "1px solid",
+              borderColor: "mediumGray",
+            }}
+            onBlur={this.handleIntegerValueChange("postsurvey_submissions").bind(this)}
+            defaultValue={this.props.zid_metadata.postsurvey_submissions || ""}
+          />
+        </Box>
+
+        <Box sx={{ mb: [3] }}>
+          <Text sx={{ mb: [2] }}>
+            Post-Survey Text
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
           </Text>
           <textarea
             placeholder="You’re all done! Thanks for contributing your input."
@@ -243,7 +246,6 @@ class ConversationConfig extends React.Component<
             }}
             data-test-id="postsurvey"
             onBlur={this.handleStringValueChange("postsurvey").bind(this)}
-            onChange={this.handleConfigInputTyping("postsurvey").bind(this)}
             defaultValue={this.props.zid_metadata.postsurvey}
           />
         </Box>
@@ -269,7 +271,6 @@ class ConversationConfig extends React.Component<
               borderColor: "mediumGray",
             }}
             onBlur={this.handleStringValueChange("postsurvey_redirect").bind(this)}
-            onChange={this.handleConfigInputTyping("postsurvey_redirect").bind(this)}
             defaultValue={this.props.zid_metadata.postsurvey_redirect || ""}
           />
         </Box>

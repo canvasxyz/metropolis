@@ -684,6 +684,7 @@ helpersInitialized.then(
         assignToP,
         "get:comments:not_voted_by_pid"
       ),
+      resolve_pidThing("voted_by_pid", assignToP, "get:comments:voted_by_pid"),
       resolve_pidThing("pid", assignToP, "get:comments:pid"),
       handle_GET_comments
     );
@@ -979,6 +980,7 @@ helpersInitialized.then(
       want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
       want("postsurvey_limit", getInt, assignToP, ""),
+      want("postsurvey_submissions", getInt, assignToP, ""),
       want(
         "postsurvey_redirect",
         getOptionalStringLimitLength(1024),
@@ -1232,6 +1234,7 @@ helpersInitialized.then(
       want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
       want("postsurvey_limit", getInt, assignToP, ""),
+      want("postsurvey_submissions", getInt, assignToP, ""),
       want(
         "postsurvey_redirect",
         getOptionalStringLimitLength(1024),
