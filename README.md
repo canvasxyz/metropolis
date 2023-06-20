@@ -59,9 +59,17 @@ npm install
 npm run dev
 ```
 
-6. Create user: http://localhost:8080/createuser
+6. Run all database migrations before starting:
 
-Setting up for production:
+```
+cat server/postgres/migrations/* | psql polis-dev
+```
+
+7. Create user: http://localhost:8080/createuser
+
+8. To run in production mode locally, use *npm run start*, and access the site at http://localhost:8040/ instead.
+
+9. To run in production mode on Heroku, set up the Heroku CLI and then run:
 
 ```
 heroku addons:create heroku-postgresql:mini
@@ -78,30 +86,23 @@ To send password reset emails, configure Sendgrid with a single sender identity
 from within the Sendgrid control panel. Then, set that email address and the
 Sendgrid API key in `server/.env`.
 
-Run all migrations before starting:
+10. To run all migrations on production, or to run one specific migration:
 
 ```
 cat server/postgres/migrations/* | heroku run "psql \$DATABASE_URL"
-```
-
-To run one migration:
-
-```
 cat server/postgres/migrations/000000_initial.sql | heroku run "psql \$DATABASE_URL"
 ```
 
-[️Production configuration](docs/configuration.md):
-- Set up the domain name you'll be serving from
-- Enable and add API keys for 3rd party services (e.g. automatic comment translation, spam filtering, etc)
-- [🔏 Set up SSL/HTTPS](docs/ssl.md), to keep the site secure
-- [📈 Scale](docs/scaling.md) for large or many concurrent conversations
+11. You may wish to set a custom domain name and Heroku SSL on production.
 
-Analyzing bundle size:
+12. To analyze bundle size:
 - `cd client`
 - `npx webpack --profile --json > stats.json`
 - `npx webpack-bundle-analyzer ./stats.json`
 
 ### Facebook App Integration
+
+(Untested)
 
 Optionally, you can [register with Facebook](https://developers.facebook.com/docs/development) and get a Facebook App ID
 to use the Facebook auth features.
@@ -111,16 +112,15 @@ when building and running this application.
 
 ### Twitter Integration
 
+(Untested)
+
 To enable twitter widgets for user authentication, set the ENABLE_TWITTER_WIDGETS environment variable to `true` in the
 top level `.env` file, or manually pass it in when building and running this application.
 
 ### Acknowledgements
 
-This platform is substantively based on the Polis platform developed by the Computational Democracy Project.
-For the Polis codebase, see [Github](https://github.com/compdemocracy/polis).
+This platform is substantively based on the Polis platform developed by the Computational Democracy Project. For the Polis codebase, see [Github](https://github.com/compdemocracy/polis).
 
-For a detailed methods paper, see [Polis: Scaling Deliberation by
-Mapping High Dimensional Opinion
-Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558).
+For a detailed methods paper, see [Polis: Scaling Deliberation by Mapping High Dimensional Opinion Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558).
 
 (c) 2012-present, authors, under [AGPLv3 with additional permission under section 7](/LICENSE)
