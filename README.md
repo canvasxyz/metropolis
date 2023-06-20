@@ -1,4 +1,4 @@
-# Polis
+# Public House: An interaction-optimized Polis client
 
 Setting up dependencies:
 
