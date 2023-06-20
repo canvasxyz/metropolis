@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useLayoutEffect } from "react"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { TbExternalLink } from "react-icons/tb"
 
 import { surveyBox, surveyHeadingMini } from "./index"
 import SurveyCard from "./survey_card"
@@ -148,13 +149,20 @@ const SurveyCards = ({
               Come back to this page to see new statements as they’re written by others.
             </Text>
           </Box>
-          {zid_metadata.postsurvey && (
+          {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
             <Button
-              variant="outline"
-              onClick={() => goTo("postsurvey")}
+              variant="primary"
+              onClick={() =>
+                zid_metadata.postsurvey
+                  ? goTo("postsurvey")
+                  : window.open(zid_metadata.postsurvey_redirect)
+              }
               sx={{ width: "100%", mb: [3] }}
             >
-              I’m all done
+              Go to next steps
+              {!zid_metadata.postsurvey && (
+                <TbExternalLink style={{ marginLeft: "5px", position: "relative", top: "2px" }} />
+              )}
             </Button>
           )}
         </React.Fragment>

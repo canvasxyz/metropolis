@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react"
+import { TbMessageDots } from "react-icons/tb"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
@@ -157,6 +158,7 @@ const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedC
         }}
       >
         Add new statement
+        <TbMessageDots style={{ marginLeft: "6px", position: "relative", top: "2px" }} />
       </Button>
       {showIntro && (
         <Box sx={{ ...surveyBox }}>
