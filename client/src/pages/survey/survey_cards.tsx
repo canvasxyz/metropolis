@@ -14,6 +14,7 @@ const SurveyCards = ({
   unvotedComments,
   setVotedComments,
   onVoted,
+  goTo,
   zid_metadata,
 }) => {
   return (
@@ -111,6 +112,27 @@ const SurveyCards = ({
             the first!
           </Text>
         </Box>
+      )}
+
+      {unvotedComments.length === 0 && (
+        <React.Fragment>
+          <Box sx={{ ...surveyBox, pt: [5] }}>
+            <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
+              You’re done for now!
+            </Heading>
+            <Text sx={{ mb: [2] }}>
+              You’ve voted on all {votedComments.length} comments submitted so far.
+            </Text>
+            <Text sx={{ mb: [2] }}>
+              Come back to this page to see new comments as they’re written by others.
+            </Text>
+          </Box>
+          {zid_metadata.postsurvey && (
+            <Button variant="primary" onClick={() => goTo("postsurvey")} sx={{ width: "100%" }}>
+              Continue
+            </Button>
+          )}
+        </React.Fragment>
       )}
 
       {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (

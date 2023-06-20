@@ -7,7 +7,14 @@ import { surveyBox, surveyHeadingMini } from "./index"
 import SurveyCard from "./survey_card"
 import SurveyCompose from "./survey_compose"
 
-const PostSurvey = ({ user, conversation_id, votedComments, zid_metadata, goTo }) => {
+const PostSurvey = ({
+  user,
+  conversation_id,
+  votedComments,
+  zid_metadata,
+  goTo,
+  setVotingAfterPostSurvey,
+}) => {
   return (
     <React.Fragment>
       {zid_metadata.postsurvey ? (
@@ -20,6 +27,7 @@ const PostSurvey = ({ user, conversation_id, votedComments, zid_metadata, goTo }
             variant="outline"
             sx={{ width: "100%" }}
             onClick={() => {
+              setVotingAfterPostSurvey(true)
               goTo("voting")
             }}
           >

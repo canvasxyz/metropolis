@@ -59,6 +59,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   const [votedComments, setVotedComments] = useState([])
   const [conversation, setConversation] = useState<Conversation>()
   const [state, setState] = useState<SurveyState>("loading")
+  const [votingAfterPostSurvey, setVotingAfterPostSurvey] = useState(false)
 
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
   const { user } = useSelector((state: RootState) => state.user)
@@ -89,12 +90,15 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
 
       const hash = document.location.hash.slice(1)
-      if (unvotedComments.length === 0 && allComments.length > 0) {
+      if (unvotedComments.length === 0 && allComments.length > 0 && zid_metadata.postsurvey) {
         // voted on all comments
         setState("postsurvey")
         history.replaceState({}, "", document.location.pathname + "#postsurvey")
-      } else if (allComments.length - unvotedComments.length > zid_metadata.postsurvey_limit) {
-        // voted on enough comments to go to postsurvey (TODO)
+      } else if (
+        allComments.length - unvotedComments.length > zid_metadata.postsurvey_limit &&
+        zid_metadata.postsurvey
+      ) {
+        // voted on enough comments to go to postsurvey
         setState("postsurvey")
         history.replaceState({}, "", document.location.pathname + "#postsurvey")
       } else if (allComments.length - unvotedComments.length > 0) {
@@ -181,11 +185,20 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             unvotedComments={unvotedComments}
             setVotedComments={setVotedComments}
             user={user}
+            goTo={goTo}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c.tid === commentId)
               setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
               if (!comment) return
-              setVotedComments([...votedComments, comment])
+              const newVotedComments = [...votedComments, comment]
+              setVotedComments(newVotedComments)
+
+              if (
+                zid_metadata.postsurvey &&
+                newVotedComments.length > zid_metadata.postsurvey_limit &&
+                !votingAfterPostSurvey
+              )
+                goTo("postsurvey")
             }}
             conversation_id={conversation_id}
             zid_metadata={zid_metadata}
@@ -198,6 +211,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             votedComments={votedComments}
             user={user}
             goTo={goTo}
+            setVotingAfterPostSurvey={setVotingAfterPostSurvey}
             conversation_id={conversation_id}
             zid_metadata={zid_metadata}
           />

@@ -79,7 +79,7 @@ class ModerateCommentsSeed extends React.Component<
           />
         </Box>
         <Box>
-          <Button onClick={this.handleSubmitSeed.bind(this)}>
+          <Button variant="outline" onClick={this.handleSubmitSeed.bind(this)}>
             {this.state.success ? "Success!" : this.state.loading ? "Saving..." : "Submit"}
           </Button>
           {this.state.error ? <Text sx={{ mt: [2], color: "red" }}>{this.state.error}</Text> : null}

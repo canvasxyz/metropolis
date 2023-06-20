@@ -216,14 +216,12 @@ class ConversationConfig extends React.Component<
         </Heading>
 
         <CheckboxField field="write_type" label="Enable comments" isIntegerBool>
-          Participants can write their own cards
+          Participants can write their own cards (Recommended: ON)
         </CheckboxField>
 
-        {/*
         <CheckboxField field="auth_needed_to_write" label="Email required to comment">
-          Email registration required to write cards
+          Email registration required to write cards (Recommended: OFF)
         </CheckboxField>
-        */}
 
         <CheckboxField field="strict_moderation" label="Moderator approval for comments">
           Require moderators to approve submitted comments, before voters can see them
