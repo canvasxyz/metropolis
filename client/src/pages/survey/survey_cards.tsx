@@ -24,7 +24,7 @@ const SurveyCards = ({
     if (mainRef.current && firstCardRef.current) {
       console.log(firstCardRef.current)
       ;(mainRef.current as any).style.maxHeight =
-        (firstCardRef.current as any).offsetHeight + 60 + "px"
+        (firstCardRef.current as any).offsetHeight + 100 + "px"
     }
   }, [votedComments.length])
 
@@ -113,10 +113,6 @@ const SurveyCards = ({
                 fontSize: "0.92em",
                 color: "lightGrayActive",
                 bg: "lighterGray",
-                cursor: "pointer",
-                "&:hover": {
-                  color: "mediumGray",
-                },
               }}
             >
               {unvotedComments.length > 1 ? `${unvotedComments.length - 1} more` : "Last one"}
@@ -169,12 +165,17 @@ const SurveyCards = ({
       )}
 
       {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
-        <SurveyCompose
-          zid_metadata={zid_metadata}
-          votedComments={votedComments}
-          unvotedComments={unvotedComments}
-          setVotedComments={setVotedComments}
-        />
+        <Box>
+          <Box sx={{ fontSize: "92%", mt: [3], mb: [3] }}>
+            Are your perspectives or experiences missing? If so, add them here:
+          </Box>
+          <SurveyCompose
+            zid_metadata={zid_metadata}
+            votedComments={votedComments}
+            unvotedComments={unvotedComments}
+            setVotedComments={setVotedComments}
+          />
+        </Box>
       ) : (
         <Box>
           <Button

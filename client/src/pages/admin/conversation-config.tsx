@@ -149,10 +149,11 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Caption
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Optional. Shown above the survey during voting
+              Shown above the survey during voting
             </Text>
           </Text>
           <textarea
+            placeholder="Please review the statements below and add your own:"
             ref={(c) => (this.survey_caption = c)}
             sx={{
               fontFamily: "body",
@@ -172,13 +173,9 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
-        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          After the Survey
-        </Heading>
-
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
-            Votes Required
+            Votes Expected
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
               Number of votes users should submit
             </Text>
@@ -202,7 +199,7 @@ class ConversationConfig extends React.Component<
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
-            Statements Required
+            Statements Expected
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
               Number of statements users should submit
             </Text>
@@ -223,6 +220,10 @@ class ConversationConfig extends React.Component<
             defaultValue={this.props.zid_metadata.postsurvey_submissions || ""}
           />
         </Box>
+
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+          After the Survey
+        </Heading>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>

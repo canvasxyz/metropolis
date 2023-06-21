@@ -12,11 +12,11 @@ import { surveyBox, surveyHeadingMini } from "./index"
 
 Modal.setAppElement("#root")
 
-const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments }> = ({
-  zid_metadata,
-  votedComments,
-  setVotedComments,
-}) => {
+const SurveyComposeBox: React.FC<{
+  zid_metadata
+  votedComments
+  setVotedComments
+}> = ({ zid_metadata, votedComments, setVotedComments }) => {
   const inputRef = useRef<HTMLInputElement>()
   const importantRef = useRef<HTMLInputElement>()
   const [error, setError] = useState("")
@@ -102,7 +102,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
       />
       <Box sx={{ mb: [3] }}>
         <DropdownButton
-          sx={{ display: "inline-block" }}
+          sx={{ display: "inline-block", fontSize: "94%" }}
           options={[
             {
               name: "Add statement",
@@ -137,7 +137,7 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
           ]}
         />
       </Box>
-      <Box sx={{ fontFamily: "monospace" }}>
+      <Box sx={{ fontFamily: "monospace", fontSize: "92%" }}>
         <label>
           <input type="checkbox" ref={importantRef} onChange={() => false} />
           &nbsp;This option is important to me
@@ -148,72 +148,83 @@ const SurveyComposeBox: React.FC<{ zid_metadata; votedComments; setVotedComments
   )
 }
 
-const SurveyCompose = ({ zid_metadata, votedComments, unvotedComments, setVotedComments }) => {
+const SurveyCompose = ({
+  zid_metadata,
+  votedComments,
+  unvotedComments,
+  setVotedComments,
+  showAsModal = false,
+}) => {
   const [showIntro, setShowIntro] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <React.Fragment>
-      <Button
-        variant={unvotedComments.length === 0 ? "primary" : "outline"}
-        sx={{ width: "100%", mt: [2] }}
-        onClick={() => {
-          setIsOpen(true)
-        }}
-      >
-        Add new statement
-        <TbMessageDots style={{ marginLeft: "6px", position: "relative", top: "2px" }} />
-      </Button>
-      {showIntro && (
-        <Box sx={{ ...surveyBox }}>
-          <Text>{zid_metadata.description}</Text>
-        </Box>
-      )}
-      <Modal
-        isOpen={isOpen}
-        onRequestClose={() => setIsOpen(false)}
-        style={{
-          overlay: {
-            backgroundColor: "rgba(40, 40, 40, 0.3)",
-          },
-          content: {
-            borderRadius: "8px",
-            top: "50%",
-            left: "50%",
-            right: "auto",
-            bottom: "auto",
-            marginRight: "-50%",
-            transform: "translate(-50%, -50%)",
-            minHeight: "200px",
-            width: "96vw", // for mobile
-            maxWidth: "540px",
-            overflow: "visible",
-            padding: "32px 28px 28px",
-          },
-        }}
-        contentLabel="Add new statement"
-      >
-        <Heading as="h4" sx={surveyHeadingMini}>
+      {showAsModal && (
+        <Button
+          variant={unvotedComments.length === 0 ? "primary" : "outline"}
+          sx={{ width: "100%", mt: [2] }}
+          onClick={() => {
+            setIsOpen(true)
+          }}
+        >
           Add new statement
-        </Heading>
-
-        {zid_metadata.help_type !== 0 && (
-          <Text sx={{ mb: [4] }}>
-            <p>Add your perspectives, experiences, or ideas here. Good statements should:</p>
-            <ul>
-              <li>Raise new perspectives</li>
-              <li>Be clear & concise</li>
-              <li>Stand on their own (no direct replies to other statements)</li>
-            </ul>
-          </Text>
-        )}
-
+          <TbMessageDots style={{ marginLeft: "6px", position: "relative", top: "2px" }} />
+        </Button>
+      )}
+      {!showAsModal ? (
         <SurveyComposeBox
           zid_metadata={zid_metadata}
           votedComments={votedComments}
           setVotedComments={setVotedComments}
         />
-      </Modal>
+      ) : (
+        <Modal
+          isOpen={isOpen}
+          onRequestClose={() => setIsOpen(false)}
+          style={{
+            overlay: {
+              backgroundColor: "rgba(40, 40, 40, 0.3)",
+            },
+            content: {
+              borderRadius: "8px",
+              top: "50%",
+              left: "50%",
+              right: "auto",
+              bottom: "auto",
+              marginRight: "-50%",
+              transform: "translate(-50%, -50%)",
+              minHeight: "200px",
+              width: "96vw", // for mobile
+              maxWidth: "540px",
+              overflow: "visible",
+              padding: "32px 28px 28px",
+            },
+          }}
+          contentLabel="Add new statement"
+        >
+          <Heading as="h4" sx={surveyHeadingMini}>
+            Add new statement
+          </Heading>
+
+          {zid_metadata.help_type !== 0 && (
+            <Text sx={{ mb: [4] }}>
+              <p>Add your perspectives, experiences, or ideas here. Good statements should:</p>
+              <ul>
+                <li>Raise new perspectives</li>
+                <li>Be clear & concise</li>
+                <li>Stand on their own (no direct replies to other statements)</li>
+              </ul>
+            </Text>
+          )}
+
+          <SurveyComposeBox
+            zid_metadata={zid_metadata}
+            votedComments={votedComments}
+            setVotedComments={setVotedComments}
+          />
+        </Modal>
+      )}
     </React.Fragment>
   )
 }

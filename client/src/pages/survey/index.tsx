@@ -152,7 +152,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     <Box
       sx={{
         margin: "0 auto",
-        maxWidth: "29em",
+        maxWidth: "30em",
         letterSpacing: "-0.06px",
         fontSize: ["1em", "1.05em"],
         lineHeight: ["1.4", "1.5"],
@@ -187,42 +187,46 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
             {!zid_metadata.topic ? "About this survey" : zid_metadata.topic}
           </Heading>
-          {zid_metadata.survey_caption && (
-            <Box sx={{ fontSize: "92%" }}>
-              <ReactMarkdown children={zid_metadata.survey_caption} remarkPlugins={[remarkGfm]} />
-            </Box>
-          )}
         </Box>
       )}
       {state === "voting" && (
-        <Box sx={{ mt: [5] }}>
-          <SurveyCards
-            votedComments={votedComments}
-            unvotedComments={unvotedComments}
-            setVotedComments={setVotedComments}
-            user={user}
-            goTo={goTo}
-            onVoted={(commentId: string) => {
-              const comment = unvotedComments.find((c) => c.tid === commentId)
-              setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
-              if (!comment) return
-              const newVotedComments = [...votedComments, comment]
-              setVotedComments(newVotedComments)
+        <React.Fragment>
+          <Box sx={{ fontSize: "92%", mt: [3] }}>
+            {zid_metadata.survey_caption ? (
+              <ReactMarkdown children={zid_metadata.survey_caption} remarkPlugins={[remarkGfm]} />
+            ) : (
+              <Text>Please review the statements below and add your own:</Text>
+            )}
+          </Box>
+          <Box sx={{ mt: [5], mb: [5] }}>
+            <SurveyCards
+              votedComments={votedComments}
+              unvotedComments={unvotedComments}
+              setVotedComments={setVotedComments}
+              user={user}
+              goTo={goTo}
+              onVoted={(commentId: string) => {
+                const comment = unvotedComments.find((c) => c.tid === commentId)
+                setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
+                if (!comment) return
+                const newVotedComments = [...votedComments, comment]
+                setVotedComments(newVotedComments)
 
-              if (
-                zid_metadata.postsurvey &&
-                newVotedComments.length > zid_metadata.postsurvey_limit &&
-                !votingAfterPostSurvey
-              )
-                goTo("postsurvey")
-            }}
-            conversation_id={conversation_id}
-            zid_metadata={zid_metadata}
-          />
-        </Box>
+                if (
+                  zid_metadata.postsurvey &&
+                  newVotedComments.length > zid_metadata.postsurvey_limit &&
+                  !votingAfterPostSurvey
+                )
+                  goTo("postsurvey")
+              }}
+              conversation_id={conversation_id}
+              zid_metadata={zid_metadata}
+            />
+          </Box>
+        </React.Fragment>
       )}
       {state === "postsurvey" && (
-        <Box sx={{ mt: [5] }}>
+        <Box sx={{ mt: [5], mb: [5] }}>
           <PostSurvey
             votedComments={votedComments}
             user={user}
