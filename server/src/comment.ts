@@ -298,7 +298,7 @@ function _getCommentsList(o: {
   tids: any;
   mod: any;
   not_voted_by_pid: any;
-  voted_by_pid: any;
+  submitted_by_pid: any;
   withoutTids: any;
   moderation: any;
   random: any;
@@ -338,16 +338,8 @@ function _getCommentsList(o: {
               .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid))
           )
         );
-      } else if (!_.isUndefined(o.voted_by_pid)) {
-        q = q.and(
-          SQL.sql_comments.tid.in(
-            SQL.sql_votes_latest_unique
-              .subQuery()
-              .select(SQL.sql_votes_latest_unique.tid)
-              .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
-              .and(SQL.sql_votes_latest_unique.pid.equals(o.voted_by_pid))
-          )
-        );
+      } else if (!_.isUndefined(o.submitted_by_pid)) {
+        q = q.and(SQL.sql_comments.pid.equals(o.submitted_by_pid));
       }
 
       if (!_.isUndefined(o.withoutTids)) {

@@ -684,7 +684,11 @@ helpersInitialized.then(
         assignToP,
         "get:comments:not_voted_by_pid"
       ),
-      resolve_pidThing("voted_by_pid", assignToP, "get:comments:voted_by_pid"),
+      resolve_pidThing(
+        "submitted_by_pid",
+        assignToP,
+        "get:comments:submitted_by_pid"
+      ),
       resolve_pidThing("pid", assignToP, "get:comments:pid"),
       handle_GET_comments
     );

@@ -90,7 +90,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       }),
       api.get("api/v3/comments", {
         lastServerToken: new Date(0).getTime(),
-        voted_by_pid: "mypid",
+        submitted_by_pid: "mypid",
         conversation_id,
       }),
     ]).then(([unvotedComments, allComments, allSubmissions]) => {
