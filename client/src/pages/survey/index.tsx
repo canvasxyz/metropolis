@@ -16,6 +16,7 @@ import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
+import SurveyFloatingPromptBox from "./survey_floating_prompt"
 import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
@@ -59,6 +60,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   const dispatch = useDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
+  const [submittedComments, setSubmittedComments] = useState([])
   const [conversation, setConversation] = useState<Conversation>()
   const [state, setState] = useState<SurveyState>("loading")
   const [votingAfterPostSurvey, setVotingAfterPostSurvey] = useState(false)
@@ -95,6 +97,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
       setUnvotedComments(unvotedComments)
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
+      setSubmittedComments(allSubmissions) // TODO: keep this updated
 
       const hash = document.location.hash.slice(1)
       if (
@@ -162,12 +165,18 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         {(zid_metadata.is_mod || zid_metadata.is_owner) && (
           <Button
             variant="outlineDark"
-            sx={{ position: "fixed", top: [3], right: [3], px: [2], pt: "4px", pb: "3px" }}
+            sx={{ position: "fixed", top: [4], left: [4], px: [2], pt: "4px", pb: "3px" }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
             <TbSettings /> Admin Panel
           </Button>
         )}
+        <SurveyFloatingPromptBox
+          zid_metadata={zid_metadata}
+          votedComments={votedComments}
+          unvotedComments={unvotedComments}
+          submittedComments={submittedComments}
+        />
       </Box>
       {state === "intro" && (
         <SurveyIntro zid_metadata={zid_metadata} onNext={() => goTo("instructions")} />
@@ -203,6 +212,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               votedComments={votedComments}
               unvotedComments={unvotedComments}
               setVotedComments={setVotedComments}
+              submittedComments={submittedComments}
+              setSubmittedComments={setSubmittedComments}
               user={user}
               goTo={goTo}
               onVoted={(commentId: string) => {

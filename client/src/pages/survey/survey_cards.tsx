@@ -14,6 +14,8 @@ const SurveyCards = ({
   votedComments,
   unvotedComments,
   setVotedComments,
+  submittedComments,
+  setSubmittedComments,
   onVoted,
   goTo,
   zid_metadata,
@@ -174,6 +176,8 @@ const SurveyCards = ({
             votedComments={votedComments}
             unvotedComments={unvotedComments}
             setVotedComments={setVotedComments}
+            submittedComments={submittedComments}
+            setSubmittedComments={setSubmittedComments}
           />
         </Box>
       ) : (

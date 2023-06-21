@@ -16,7 +16,15 @@ const SurveyComposeBox: React.FC<{
   zid_metadata
   votedComments
   setVotedComments
-}> = ({ zid_metadata, votedComments, setVotedComments }) => {
+  submittedComments
+  setSubmittedComments
+}> = ({
+  zid_metadata,
+  votedComments,
+  setVotedComments,
+  submittedComments,
+  setSubmittedComments,
+}) => {
   const inputRef = useRef<HTMLInputElement>()
   const importantRef = useRef<HTMLInputElement>()
   const [error, setError] = useState("")
@@ -59,6 +67,7 @@ const SurveyComposeBox: React.FC<{
             pid: currentPid,
           }
           setVotedComments([...votedComments, comment])
+          setSubmittedComments([...submittedComments, comment])
           toast.success("Statement added")
           resolve()
         })
@@ -98,7 +107,6 @@ const SurveyComposeBox: React.FC<{
               })
           }
         }}
-        autoFocus
       />
       <Box sx={{ mb: [3] }}>
         <DropdownButton
@@ -153,6 +161,8 @@ const SurveyCompose = ({
   votedComments,
   unvotedComments,
   setVotedComments,
+  submittedComments,
+  setSubmittedComments,
   showAsModal = false,
 }) => {
   const [showIntro, setShowIntro] = useState(false)
@@ -177,6 +187,8 @@ const SurveyCompose = ({
           zid_metadata={zid_metadata}
           votedComments={votedComments}
           setVotedComments={setVotedComments}
+          submittedComments={submittedComments}
+          setSubmittedComments={setSubmittedComments}
         />
       ) : (
         <Modal
@@ -222,6 +234,8 @@ const SurveyCompose = ({
             zid_metadata={zid_metadata}
             votedComments={votedComments}
             setVotedComments={setVotedComments}
+            submittedComments={submittedComments}
+            setSubmittedComments={setSubmittedComments}
           />
         </Modal>
       )}
