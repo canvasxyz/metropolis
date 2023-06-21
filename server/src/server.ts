@@ -6287,6 +6287,7 @@ Email verified! You can close this tab or hit the back button.
     let uid = req.p.uid;
 
     if (req.p.errIfNoAuth && !uid) {
+      fail(res, 500, "polis_err_getting_user_info", new Error());
       return;
     }
 
