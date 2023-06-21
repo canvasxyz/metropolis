@@ -170,7 +170,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         {(zid_metadata.is_mod || zid_metadata.is_owner) && (
           <Button
             variant="outlineDark"
-            sx={{ position: "fixed", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
+            sx={{ position: "fixed", bottom: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
             <TbSettings /> Admin Panel
