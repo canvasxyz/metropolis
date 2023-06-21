@@ -22,22 +22,21 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           width: ["90vw", null],
         }}
       >
-        Tools for collective meaning
+        Collaboratively explore any topic, domain, or idea
       </Heading>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
-              Public House is a <strong>collaborative decision-making tool</strong> that lets groups
+              Public House is a <strong>collective intelligence tool</strong> that lets groups
               explore their knowledge and opinions around any domain.
             </Text>
             <Text sx={{ my: 3 }}>
-              Participants start by writing comments around a prompt, and voting on each others’
-              comments.
+              Participants start from a prompt, write comments, and vote on each others’ comments.
             </Text>
             <Text sx={{ my: 3 }}>
-              Comments are scored and clustered to reveal points of mutual agreement, and identify
-              which comments are most relevant.
+              Comments are scored for relevance, and clustered to identify groups with mutual
+              agreement.
             </Text>
             <Text sx={{ my: 3 }}>
               Public House is{" "}

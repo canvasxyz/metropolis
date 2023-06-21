@@ -119,8 +119,17 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
+        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+          Before the Survey
+        </Heading>
+
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Intro Page Text</Text>
+          <Text sx={{ mb: [2] }}>
+            Intro Page Text
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
+              Shown before starting
+            </Text>
+          </Text>
           <textarea
             ref={(c) => (this.description = c)}
             sx={{
@@ -148,9 +157,7 @@ class ConversationConfig extends React.Component<
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
             Caption
-            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Shown above the survey during voting
-            </Text>
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Shown during voting</Text>
           </Text>
           <textarea
             placeholder="Please review the statements below and add your own:"
@@ -177,7 +184,7 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Votes Expected
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Number of votes users should submit
+              Optional. Number of votes users should submit
             </Text>
           </Text>
           <input
@@ -201,7 +208,7 @@ class ConversationConfig extends React.Component<
           <Text sx={{ mb: [2] }}>
             Statements Expected
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Number of statements users should submit
+              Optional. Number of statements users should submit
             </Text>
           </Text>
           <input
@@ -221,6 +228,10 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
+        <Box>
+          Once both requirements are met, participants will be redirected to the post-survey page.
+        </Box>
+
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
           After the Survey
         </Heading>
@@ -231,7 +242,7 @@ class ConversationConfig extends React.Component<
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
           </Text>
           <textarea
-            placeholder="You’re all done! Thanks for contributing your input."
+            placeholder="You’re all done! Thanks for contributing your input. You can expect to hear back from us after..."
             ref={(c) => (this.postsurvey = c)}
             sx={{
               fontFamily: "body",
@@ -253,7 +264,7 @@ class ConversationConfig extends React.Component<
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
-            Post-Survey Redirect
+            Post-Survey Link
             <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
               Optional. Shown as a button after the survey
             </Text>
