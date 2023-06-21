@@ -16,14 +16,20 @@ const SurveyComposeBox: React.FC<{
   zid_metadata
   votedComments
   setVotedComments
+  unvotedComments
+  allComments
   submittedComments
   setSubmittedComments
+  setState
 }> = ({
   zid_metadata,
   votedComments,
   setVotedComments,
+  unvotedComments,
+  allComments,
   submittedComments,
   setSubmittedComments,
+  setState,
 }) => {
   const inputRef = useRef<HTMLInputElement>()
   const importantRef = useRef<HTMLInputElement>()
@@ -47,10 +53,13 @@ const SurveyComposeBox: React.FC<{
         .fail((xhr: XMLHttpRequest, evt: string, err: string) => {
           if (err.toString() === "Conflict") {
             setError("Someone has already submitted this comment")
+            toast.error("Already exists")
           } else if (finalTxt === "") {
             setError("Could not add empty statement")
+            toast.error("Invalid statement")
           } else {
             setError(err.toString())
+            toast.error(err.toString())
           }
           reject(err)
         })
@@ -69,6 +78,18 @@ const SurveyComposeBox: React.FC<{
           setVotedComments([...votedComments, comment])
           setSubmittedComments([...submittedComments, comment])
           toast.success("Statement added")
+
+          if (
+            (!zid_metadata.postsurvey_limit ||
+              votedComments.length - submittedComments.length + 1 >=
+                zid_metadata.postsurvey_limit) &&
+            zid_metadata.postsurvey_submissions &&
+            submittedComments.length + 1 >= zid_metadata.postsurvey_submissions
+          ) {
+            setState("postsurvey")
+            history.replaceState({}, "", document.location.pathname + "#postsurvey")
+          }
+
           resolve()
         })
     )
@@ -162,7 +183,9 @@ const SurveyCompose = ({
   unvotedComments,
   setVotedComments,
   submittedComments,
+  allComments,
   setSubmittedComments,
+  setState,
   showAsModal = false,
 }) => {
   const [showIntro, setShowIntro] = useState(false)
@@ -187,8 +210,11 @@ const SurveyCompose = ({
           zid_metadata={zid_metadata}
           votedComments={votedComments}
           setVotedComments={setVotedComments}
+          unvotedComments={unvotedComments}
+          allComments={allComments}
           submittedComments={submittedComments}
           setSubmittedComments={setSubmittedComments}
+          setState={setState}
         />
       ) : (
         <Modal
@@ -234,8 +260,11 @@ const SurveyCompose = ({
             zid_metadata={zid_metadata}
             votedComments={votedComments}
             setVotedComments={setVotedComments}
+            unvotedComments={unvotedComments}
+            allComments={allComments}
             submittedComments={submittedComments}
             setSubmittedComments={setSubmittedComments}
+            setState={setState}
           />
         </Modal>
       )}

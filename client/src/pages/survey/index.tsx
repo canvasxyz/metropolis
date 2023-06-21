@@ -16,6 +16,7 @@ import SurveyIntro from "./survey_intro"
 import SurveyInstructions from "./survey_instructions"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
+import SurveyCompose from "./survey_compose"
 import SurveyFloatingPromptBox from "./survey_floating_prompt"
 import PostSurvey from "./survey_post"
 
@@ -100,13 +101,17 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       setSubmittedComments(allSubmissions) // TODO: keep this updated
 
       const hash = document.location.hash.slice(1)
+      // decide which screen should be shown, based on whether the
+      // user has completed voting requirements. because this is a
+      // function of the user's submissions (among other factors),
+      // this is an extremely hacky implementation of a state machine.
       if (
         ((unvotedComments.length === 0 && allComments.length > 0) || // voted on all comments
           (zid_metadata.postsurvey_limit &&
-            allComments.length - unvotedComments.length >= zid_metadata.postsurvey_limit)) && // or, voted on enough comments
+            allComments.length - unvotedComments.length - allSubmissions.length >=
+              zid_metadata.postsurvey_limit)) && // or, voted on enough comments
         (!zid_metadata.postsurvey_submissions || // no submissions requirement
-          allSubmissions.length >= zid_metadata.postsurvey_submissions) && // or, made enough submissions
-        zid_metadata.postsurvey
+          allSubmissions.length >= zid_metadata.postsurvey_submissions) // or, made enough submissions
       ) {
         // voted on enough/all comments AND made enough submissions, initialize to postsurvey
         setState("postsurvey")
@@ -165,7 +170,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         {(zid_metadata.is_mod || zid_metadata.is_owner) && (
           <Button
             variant="outlineDark"
-            sx={{ position: "fixed", top: [4], left: [4], px: [2], pt: "4px", pb: "3px" }}
+            sx={{ position: "fixed", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
             <TbSettings /> Admin Panel
@@ -176,6 +181,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           votedComments={votedComments}
           unvotedComments={unvotedComments}
           submittedComments={submittedComments}
+          goTo={goTo}
         />
       </Box>
       {state === "intro" && (
@@ -236,16 +242,55 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           </Box>
         </React.Fragment>
       )}
+
       {state === "postsurvey" && (
         <Box sx={{ mt: [5], mb: [5] }}>
           <PostSurvey
             votedComments={votedComments}
+            unvotedComments={unvotedComments}
+            submittedComments={submittedComments}
             user={user}
             goTo={goTo}
             setVotingAfterPostSurvey={setVotingAfterPostSurvey}
             conversation_id={conversation_id}
             zid_metadata={zid_metadata}
           />
+        </Box>
+      )}
+
+      {state === "voting" && (
+        <Box sx={{ mb: [5] }}>
+          {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
+            <Box>
+              <Box sx={{ fontSize: "92%", mt: [3], mb: [3] }}>
+                Are your perspectives or experiences missing? If so, add them here:
+              </Box>
+              <SurveyCompose
+                zid_metadata={zid_metadata}
+                votedComments={votedComments}
+                unvotedComments={unvotedComments}
+                setVotedComments={setVotedComments}
+                allComments={votedComments.concat(unvotedComments)}
+                submittedComments={submittedComments}
+                setSubmittedComments={setSubmittedComments}
+                setState={setState}
+              />
+            </Box>
+          ) : (
+            <Box>
+              <Button
+                variant="outlineGray"
+                sx={{ width: "100%" }}
+                onClick={() =>
+                  (document.location = `/createuser?from=${encodeURIComponent(
+                    document.location.pathname
+                  )}`)
+                }
+              >
+                Create an account to add statements
+              </Button>
+            </Box>
+          )}
         </Box>
       )}
     </Box>

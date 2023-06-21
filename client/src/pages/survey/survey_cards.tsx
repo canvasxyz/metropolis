@@ -6,7 +6,6 @@ import { TbExternalLink } from "react-icons/tb"
 
 import { surveyBox, surveyHeadingMini } from "./index"
 import SurveyCard from "./survey_card"
-import SurveyCompose from "./survey_compose"
 
 const SurveyCards = ({
   user,
@@ -24,7 +23,6 @@ const SurveyCards = ({
   const firstCardRef = useRef()
   useLayoutEffect(() => {
     if (mainRef.current && firstCardRef.current) {
-      console.log(firstCardRef.current)
       ;(mainRef.current as any).style.maxHeight =
         (firstCardRef.current as any).offsetHeight + 100 + "px"
     }
@@ -164,36 +162,6 @@ const SurveyCards = ({
             </Button>
           )}
         </React.Fragment>
-      )}
-
-      {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
-        <Box>
-          <Box sx={{ fontSize: "92%", mt: [3], mb: [3] }}>
-            Are your perspectives or experiences missing? If so, add them here:
-          </Box>
-          <SurveyCompose
-            zid_metadata={zid_metadata}
-            votedComments={votedComments}
-            unvotedComments={unvotedComments}
-            setVotedComments={setVotedComments}
-            submittedComments={submittedComments}
-            setSubmittedComments={setSubmittedComments}
-          />
-        </Box>
-      ) : (
-        <Box>
-          <Button
-            variant="outlineGray"
-            sx={{ width: "100%" }}
-            onClick={() =>
-              (document.location = `/createuser?from=${encodeURIComponent(
-                document.location.pathname
-              )}`)
-            }
-          >
-            Create an account to add statements
-          </Button>
-        </Box>
       )}
     </Box>
   )

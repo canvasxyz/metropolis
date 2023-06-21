@@ -520,9 +520,9 @@ function resolve_pidThing(
         });
     } else if (
       existingValue === "mypid" &&
-      pidThingStringName === "voted_by_pid"
+      pidThingStringName === "submitted_by_pid"
     ) {
-      // handle logged-out user asking for voted_by_pid
+      // handle logged-out user asking for submitted_by_pid
       assigner(req, pidThingStringName, null);
       next();
     } else if (existingValue === "mypid") {
