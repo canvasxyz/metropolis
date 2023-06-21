@@ -1,5 +1,8 @@
 {
   "private": true,
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "dev": "concurrently -n cli,srv,tsc,math -c cyan,red,red,blue 'npm run dev --workspace=polis-client' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server' 'export $(cat .env) && cd math && clojure -M:run full'",
     "math": "export $(cat .env) && cd math && clojure -M:run full",
