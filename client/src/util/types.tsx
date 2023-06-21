@@ -37,6 +37,7 @@ export type Conversation = {
   topic: string
   description: string
   postsurvey: string
+  postsurvey_redirect: string
   postsurvey_limit: string
   postsurvey_submissions: string
   // TODO ...

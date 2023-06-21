@@ -983,8 +983,8 @@ helpersInitialized.then(
       want("description", getOptionalStringLimitLength(5000), assignToP),
       want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
-      want("postsurvey_limit", getInt, assignToP, ""),
-      want("postsurvey_submissions", getInt, assignToP, ""),
+      want("postsurvey_limit", getInt, assignToP, null),
+      want("postsurvey_submissions", getInt, assignToP, null),
       want(
         "postsurvey_redirect",
         getOptionalStringLimitLength(1024),
@@ -1237,8 +1237,8 @@ helpersInitialized.then(
       want("description", getOptionalStringLimitLength(5000), assignToP, ""),
       want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
       want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
-      want("postsurvey_limit", getInt, assignToP, ""),
-      want("postsurvey_submissions", getInt, assignToP, ""),
+      want("postsurvey_limit", getInt, assignToP, null),
+      want("postsurvey_submissions", getInt, assignToP, null),
       want(
         "postsurvey_redirect",
         getOptionalStringLimitLength(1024),
