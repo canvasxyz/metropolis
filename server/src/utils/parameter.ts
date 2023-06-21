@@ -523,7 +523,7 @@ function resolve_pidThing(
       pidThingStringName === "submitted_by_pid"
     ) {
       // handle logged-out user asking for submitted_by_pid
-      assigner(req, pidThingStringName, null);
+      assigner(req, pidThingStringName, null as any);
       next();
     } else if (existingValue === "mypid") {
       // don't assign anything, since we have no uid to look it up.

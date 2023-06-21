@@ -68,7 +68,7 @@ type ModerationObject = { isMod: ModerationState | undefined };
 
 export type CommentType = {
   zid: any;
-  voted_by_pid: any;
+  submitted_by_pid: any;
   not_voted_by_pid: any;
   include_social?: any;
   withoutTids: any;
