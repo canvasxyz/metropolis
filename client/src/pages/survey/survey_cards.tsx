@@ -117,20 +117,10 @@ const SurveyCards = ({
             >
               {unvotedComments.length > 1 &&
               zid_metadata.postsurvey_limit &&
-              zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length > 1
+              zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length > 0
                 ? `${
-                    zid_metadata.postsurvey_limit -
-                    votedComments.length -
-                    submittedComments.length -
-                    1
+                    zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length
                   } more`
-                : unvotedComments.length > 1 &&
-                  zid_metadata.postsurvey_limit &&
-                  zid_metadata.postsurvey_limit -
-                    votedComments.length -
-                    submittedComments.length ===
-                    1
-                ? "One more"
                 : unvotedComments.length > 1
                 ? `${unvotedComments.length - 1} cards left`
                 : "Last card"}
