@@ -181,6 +181,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           votedComments={votedComments}
           unvotedComments={unvotedComments}
           submittedComments={submittedComments}
+          state={state}
           goTo={goTo}
         />
       </Box>

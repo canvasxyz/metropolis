@@ -115,7 +115,25 @@ const SurveyCards = ({
                 bg: "lighterGray",
               }}
             >
-              {unvotedComments.length > 1 ? `${unvotedComments.length - 1} more` : "Last one"}
+              {unvotedComments.length > 1 &&
+              zid_metadata.postsurvey_limit &&
+              zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length > 1
+                ? `${
+                    zid_metadata.postsurvey_limit -
+                    votedComments.length -
+                    submittedComments.length -
+                    1
+                  } more`
+                : unvotedComments.length > 1 &&
+                  zid_metadata.postsurvey_limit &&
+                  zid_metadata.postsurvey_limit -
+                    votedComments.length -
+                    submittedComments.length ===
+                    1
+                ? "One more"
+                : unvotedComments.length > 1
+                ? `${unvotedComments.length - 1} cards left`
+                : "Last card"}
             </Text>
           </Box>
         </Box>

@@ -2,6 +2,7 @@ import React from "react"
 import { Box, Button } from "theme-ui"
 
 const SurveyFloatingPromptBox = ({
+  state,
   zid_metadata,
   votedComments,
   unvotedComments,
@@ -23,7 +24,8 @@ const SurveyFloatingPromptBox = ({
 
   return (
     <React.Fragment>
-      {(zid_metadata.postsurvey_limit || zid_metadata.postsurvey_submissions) &&
+      {state === "voting" &&
+        (zid_metadata.postsurvey_limit || zid_metadata.postsurvey_submissions) &&
         (!allDone || document.location.hash === "postsurvey") && (
           <Box
             sx={{
