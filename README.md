@@ -89,8 +89,8 @@ Sendgrid API key in `server/.env`.
 10. To run all migrations on production, or to run one specific migration:
 
 ```
-cat server/postgres/migrations/* | heroku run "psql \$DATABASE_URL"
-cat server/postgres/migrations/000000_initial.sql | heroku run "psql \$DATABASE_URL"
+cat server/postgres/migrations/* | heroku psql
+cat server/postgres/migrations/000000_initial.sql | heroku psql
 ```
 
 11. You may wish to set a custom domain name and Heroku SSL on production.
