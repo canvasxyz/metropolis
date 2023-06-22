@@ -54,8 +54,8 @@ const SurveyFloatingPromptBox = ({
                 <Button onClick={() => goTo("postsurvey")}>Finish up</Button>
               </React.Fragment>
             )}
-            {!allDone && zid_metadata.postsurvey_limit && (
-              <Box>
+            {!allDone && zid_metadata.postsurvey_limit && votesLeft !== 0 && (
+              <Box sx={{ mt: [1], mb: [2] }}>
                 <Box sx={{ lineHeight: 1.3 }}>
                   Vote on {votesLeft} more statement{votesLeft === 1 ? "" : "s"} to continue:
                 </Box>
@@ -84,7 +84,7 @@ const SurveyFloatingPromptBox = ({
             {!allDone &&
               zid_metadata.postsurvey_submissions &&
               (!zid_metadata.postsurvey_limit || votesLeft === 0) && (
-                <Box sx={{ mt: [4], mb: [2] }}>
+                <Box sx={{ mt: [1], mb: [2] }}>
                   <Box sx={{ lineHeight: 1.3 }}>
                     {submittedComments.length === 0
                       ? "Try submitting a few statements too"
