@@ -48,6 +48,30 @@ export const surveyBox = {
   mb: [3, null, 4],
 }
 
+// reorder the next comments according to the backend api
+const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id, withoutTid) => {
+  api
+    .get("api/v3/nextComment", {
+      conversation_id,
+      not_voted_by_pid: "mypid",
+      without: [withoutTid],
+    })
+    .then((nextComment) => {
+      const trimmedUnvotedComments = unvotedComments.filter((c) => c.tid !== nextComment.tid)
+      // check: unvotedComments should contain nextComment, but
+      // there could be a race condition if selectNextComment
+      // is called many times within a short interval
+      if (trimmedUnvotedComments.length !== unvotedComments.length - 1) {
+        console.warn("Unexpected: nextComment not found in unvoted comments")
+      }
+      setUnvotedComments(
+        trimmedUnvotedComments.length === unvotedComments.length - 1
+          ? [trimmedUnvotedComments[0], nextComment, ...trimmedUnvotedComments.slice(1)]
+          : [...unvotedComments]
+      )
+    })
+}
+
 const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   match: {
     params: { conversation_id },
@@ -81,29 +105,55 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
 
     Promise.all([
       api.get("api/v3/comments", {
-        lastServerToken: new Date(0).getTime(),
+        conversation_id,
         not_voted_by_pid: "mypid",
+      }),
+      api.get("api/v3/comments", {
         conversation_id,
       }),
       api.get("api/v3/comments", {
-        lastServerToken: new Date(0).getTime(),
         conversation_id,
-      }),
-      api.get("api/v3/comments", {
-        lastServerToken: new Date(0).getTime(),
         submitted_by_pid: "mypid",
-        conversation_id,
       }),
-    ]).then(([unvotedComments, allComments, allSubmissions]) => {
+      api.get("api/v3/nextComment", {
+        conversation_id,
+        not_voted_by_pid: "mypid",
+        // without: number[]
+      }),
+    ]).then(([unvotedComments, allComments, allSubmissions, firstComment]) => {
       const unvotedCommentIds = unvotedComments.map((c: Comment) => c.tid)
-      setUnvotedComments(unvotedComments)
+      const trimmedUnvotedComments = unvotedComments.filter((c) => c.tid !== firstComment.tid)
+
+      // select the first comment using backend api
+      // check: unvotedComments should contain firstComment
+      if (trimmedUnvotedComments.length !== unvotedComments.length - 1) {
+        console.warn("Unexpected: nextComment not found in unvoted comments")
+      }
+      const newUnvotedComments =
+        trimmedUnvotedComments.length === unvotedComments.length - 1
+          ? [firstComment, ...trimmedUnvotedComments]
+          : [...unvotedComments]
+
+      setUnvotedComments(newUnvotedComments)
       setVotedComments(allComments.filter((c: Comment) => unvotedCommentIds.indexOf(c.tid) === -1))
       setSubmittedComments(allSubmissions) // TODO: keep this updated
+
+      // select next comment using backend api
+      if (unvotedComments.length > 2) {
+        setTimeout(() => {
+          selectNextComment(
+            newUnvotedComments,
+            setUnvotedComments,
+            zid_metadata.conversation_id,
+            newUnvotedComments[0]?.tid
+          )
+        }, 0)
+      }
 
       const hash = document.location.hash.slice(1)
       // decide which screen should be shown, based on whether the
       // user has completed voting requirements. because this is a
-      // function of the user's submissions (among other factors),
+      // function of not just the user's votes but also submissions,
       // this is an extremely hacky implementation of a state machine.
       if (
         ((unvotedComments.length === 0 && allComments.length > 0) || // voted on all comments
@@ -225,7 +275,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
               goTo={goTo}
               onVoted={(commentId: string) => {
                 const comment = unvotedComments.find((c) => c.tid === commentId)
-                setUnvotedComments(unvotedComments.filter((c) => c.tid !== commentId))
+                const newUnvotedComments = unvotedComments.filter((c) => c.tid !== commentId)
+                setUnvotedComments(newUnvotedComments)
                 if (!comment) return
                 const newVotedComments = [...votedComments, comment]
                 setVotedComments(newVotedComments)
@@ -234,8 +285,16 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
                   zid_metadata.postsurvey &&
                   newVotedComments.length > zid_metadata.postsurvey_limit &&
                   !votingAfterPostSurvey
-                )
+                ) {
                   goTo("postsurvey")
+                } else {
+                  selectNextComment(
+                    newUnvotedComments,
+                    setUnvotedComments,
+                    zid_metadata.conversation_id,
+                    newUnvotedComments[0]?.tid
+                  )
+                }
               }}
               conversation_id={conversation_id}
               zid_metadata={zid_metadata}
