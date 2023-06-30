@@ -11,6 +11,7 @@ var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlug
 var mri = require("mri")
 var glob = require("glob")
 var fs = require("fs")
+var lodashTemplate = require("lodash/template")
 
 // CLI commands for deploying built artefact.
 var argv = process.argv.slice(2)
@@ -18,6 +19,8 @@ var cliArgs = mri(argv)
 
 var enableTwitterWidgets = process.env.ENABLE_TWITTER_WIDGETS === "true"
 var fbAppId = process.env.FB_APP_ID
+
+var embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "pubhouse.io"
 
 module.exports = (env, options) => {
   var isDevBuild = options.mode === "development"
@@ -46,7 +49,23 @@ module.exports = (env, options) => {
     },
     plugins: [
       new CopyPlugin({
-        patterns: [{ from: "public", globOptions: { ignore: ["**/index.ejs"] } }],
+        patterns: [
+          {
+            from: "public",
+            globOptions: { ignore: ["**/index.ejs", "**/embed.ejs", "**/embed.html"] },
+          },
+        ],
+      }),
+      new CopyPlugin({
+        patterns: [
+          {
+            from: "./public/embed.ejs",
+            to: "./embed.js",
+            transform: (content, path) => {
+              return lodashTemplate(content.toString())({ embedServiceHostname })
+            },
+          },
+        ],
       }),
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, "public/index.ejs"),
