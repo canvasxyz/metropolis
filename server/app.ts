@@ -1,5 +1,6 @@
 "use strict";
 
+import fs from "fs";
 import * as dotenv from "dotenv";
 import path from "path";
 dotenv.config();
@@ -1482,18 +1483,16 @@ helpersInitialized.then(
 
     app.use(express.static(path.join(__dirname, "client")));
 
-    // app.get(
-    //   /^\/embed$/,
-    //   makeFileFetcher(hostname, staticFilesPort, "/embed.html", {
-    //     "Content-Type": "text/html",
-    //   })
-    // );
-    // app.get(
-    //   /^\/embedReport$/,
-    //   makeFileFetcher(hostname, staticFilesPort, "/embedReport.html", {
-    //     "Content-Type": "text/html",
-    //   })
-    // );
+    const fetchEmbed = (req: express.Request, res: express.Response) => {
+      const path = req.path === "/embed" ? "/embed/index.html" : req.path;
+      const headers = fs.readFileSync(__dirname + path + ".headersJson", {
+        encoding: "utf8",
+      });
+      res.set(JSON.parse(headers));
+      res.sendfile(__dirname + path);
+    };
+
+    app.get(/^\/embed(\/.*)?/, fetchEmbed);
 
     // app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
     // app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);

@@ -80,7 +80,7 @@ module.exports = (env, options) => {
   return {
     entry: ["./js/main", "./css/polis_main.scss"],
     output: {
-      publicPath: "/",
+      publicPath: "/embed/",
       filename: `js/participation_bundle.[chunkhash:8].js`,
       path: path.resolve(__dirname, outputDirectory),
       clean: true,
