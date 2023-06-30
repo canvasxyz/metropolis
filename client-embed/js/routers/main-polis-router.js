@@ -49,20 +49,20 @@ var polisRouter = Backbone.Router.extend({
     window.location = route;
   },
   initialize: function(options) {
-    this.r(/^conversation\/create(\/ep1_[0-9A-Za-z]+)?/, "createConversation");
-    this.r("user/create(/:params)", "createUser");
-    this.r(/^user\/logout(\/.+)/, "deregister");
-    this.r("welcome/:einvite", "createUserViewFromEinvite");
-    this.r("", "landingPageView");
+    this.r(/^embed\/conversation\/create(\/ep1_[0-9A-Za-z]+)?/, "createConversation");
+    this.r("embed/user/create(/:params)", "createUser");
+    this.r(/^embed\/user\/logout(\/.+)/, "deregister");
+    this.r("embed/welcome/:einvite", "createUserViewFromEinvite");
+    this.r("embed", "landingPageView");
 
-    this.r(/^([0-9][0-9A-Za-z]+)\/?(\?.*)?$/, "participationViewWithQueryParams"); // conversation_id / query params
-    this.r(/^([0-9][0-9A-Za-z]+)(\/ep1_[0-9A-Za-z]+)?$/, "participationView"); // conversation_id / encodedStringifiedJson
-    this.r(/^ot\/([0-9][0-9A-Za-z]+)\/(.*)/, "participationViewWithSuzinvite"); // ot/conversation_id/suzinvite
-    this.r(/^demo\/([0-9][0-9A-Za-z]+)/, "demoConversation");
+    this.r(/^embed\/([0-9][0-9A-Za-z]+)\/?(\?.*)?$/, "participationViewWithQueryParams"); // conversation_id / query params
+    this.r(/^embed\/([0-9][0-9A-Za-z]+)(\/ep1_[0-9A-Za-z]+)?$/, "participationView"); // conversation_id / encodedStringifiedJson
+    this.r(/^embed\/ot\/([0-9][0-9A-Za-z]+)\/(.*)/, "participationViewWithSuzinvite"); // ot/conversation_id/suzinvite
+    this.r(/^embed\/demo\/([0-9][0-9A-Za-z]+)/, "demoConversation");
 
-    this.r(/^settings(\/ep1_[0-9A-Za-z]+)?/, "settings");
+    this.r(/^embed\/settings(\/ep1_[0-9A-Za-z]+)?/, "settings");
 
-    //this.r(/^summary\/([0-9][0-9A-Za-z]+)$/, "summaryView");  // summary/conversation_id
+    //this.r(/^embed\/summary\/([0-9][0-9A-Za-z]+)$/, "summaryView");  // summary/conversation_id
 
     this.on("route", function(route, params) {
       // if (needsFooter(route)) {

@@ -160,11 +160,11 @@
 
         var path = document.location.pathname;
         var shouldPreload =
-          path.match(/^([0-9][0-9A-Za-z]+)/) ||
-          path.match(/^ot\/([0-9][0-9A-Za-z]+)/) ||
-          path.match(/^demo\/([0-9][0-9A-Za-z]+)/) ||
-          path.match(/^share\/([0-9][0-9A-Za-z]+)$/) ||
-          path.match(/^m\/([0-9][0-9A-Za-z]+)\/?(.*)$/);
+          path.match(/^\/embed\/([0-9][0-9A-Za-z]+)/) ||
+          path.match(/^\/embed\/ot\/([0-9][0-9A-Za-z]+)/) ||
+          path.match(/^\/embed\/demo\/([0-9][0-9A-Za-z]+)/) ||
+          path.match(/^\/embed\/share\/([0-9][0-9A-Za-z]+)$/) ||
+          path.match(/^\/embed\/m\/([0-9][0-9A-Za-z]+)\/?(.*)$/);
 
         window.xsThresh = 600; // nexus 7
 

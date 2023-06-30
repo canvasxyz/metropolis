@@ -251,7 +251,7 @@
         }
         if (!resizeWasHandled) {
           console.log(data.polisFrameId);
-          var frameId = "polis_" + data.polisFrameId;
+          var frameId = "polis_" + data.polisFrameId.replace("embed_", "");
           var iframe = document.getElementById(frameId);
           var h = data.height;
           if (h > maxHeightsSeen[frameId] || typeof maxHeightsSeen[frameId] === "undefined") {
