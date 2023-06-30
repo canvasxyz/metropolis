@@ -7,11 +7,11 @@ s.disagree = "Disagree";
 s.pass = "Pass / Unsure";
 
 
-s.importantCheckbox = "Important";
+s.importantCheckbox = "This statement is important to me";
 s.importantCheckboxDesc =
-  "Check this box if you believe this statement is especially important to you or highly relevant to the conversation, irrespective of your vote."
-s.howImportantPrompt = "This statement is important to me";
+  "Check this box if you believe this statement is especially important to you, or particularly relevant to the conversation, irrespective of your vote."
 
+s.howImportantPrompt = "How important is this statement?";
 s.howImportantLow = "Low";
 s.howImportantMedium = "Medium";
 s.howImportantHigh = "High";
