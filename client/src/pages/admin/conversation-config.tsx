@@ -307,6 +307,11 @@ class ConversationConfig extends React.Component<
           Show verbose instructions when writing comments
         </CheckboxField>
 
+        <CheckboxField field="importance_enabled" label="Importance Enabled">
+          [Experimental] Show the "This comment is important" checkbox on the embed interface (only
+          embeds!)
+        </CheckboxField>
+
         {/*
         <CheckboxField
           field="subscribe_type"

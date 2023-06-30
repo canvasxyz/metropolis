@@ -146,6 +146,7 @@ export type ConversationType = {
   help_bgcolor?: any;
   style_btn?: any;
   write_type?: any;
+  importance_enabled?: any;
   owner_sees_participation_stats?: any;
   link_url?: any;
   course_invite?: any;
@@ -213,4 +214,5 @@ export type Vote = {
   weight: any;
   starred: any;
   parent_url: any;
+  high_priority: any;
 };

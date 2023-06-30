@@ -4,14 +4,15 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "concurrently -n cli,srv,tsc,math -c cyan,red,red,blue 'npm run dev --workspace=polis-client' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server' 'export $(cat .env) && cd math && clojure -M:run full'",
+    "dev": "concurrently -n cli,cle,srv,tsc,math -c cyan,cyanred,red,blue 'npm run dev --workspace=polis-client' 'npm run build:dev --workspace=client-embed' 'npm run start:dev --workspace=polis-server' 'npm run build:dev --workspace=polis-server' 'export $(cat .env) && cd math && clojure -M:run full'",
     "math": "export $(cat .env) && cd math && clojure -M:run full",
     "start": "npm run build && npm run serve:prod",
-    "build": "rimraf server/build && npm run build:prod --workspace=polis-client && copyfiles -E -u 2 \"client/build/**/*\" server/dist/client && npm run build --workspace=polis-server",
+    "build": "rimraf client/build client-embed/dist server/dist && npm run build:prod --workspace=polis-client && npm run build:prod --workspace=client-embed && copyfiles -E -u 2 \"client/build/**/*\" server/dist/client && copyfiles -E -u 2 \"client-embed/dist/**/*\" server/dist/embed && npm run build --workspace=polis-server",
     "serve:prod": "npm run serve:prod --workspace=polis-server"
   },
   "workspaces": [
     "client",
+    "client-embed",
     "server"
   ],
   "devDependencies": {

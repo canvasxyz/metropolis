@@ -19,6 +19,8 @@ var cliArgs = mri(argv)
 var enableTwitterWidgets = process.env.ENABLE_TWITTER_WIDGETS === "true"
 var fbAppId = process.env.FB_APP_ID
 
+var embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "pubhouse.io"
+
 module.exports = (env, options) => {
   var isDevBuild = options.mode === "development"
   var isDevServer = process.env.WEBPACK_SERVE
@@ -46,7 +48,12 @@ module.exports = (env, options) => {
     },
     plugins: [
       new CopyPlugin({
-        patterns: [{ from: "public", globOptions: { ignore: ["**/index.ejs"] } }],
+        patterns: [
+          {
+            from: "public",
+            globOptions: { ignore: ["**/index.ejs"] },
+          },
+        ],
       }),
       new HtmlWebPackPlugin({
         template: path.resolve(__dirname, "public/index.ejs"),

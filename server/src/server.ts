@@ -604,7 +604,8 @@ function initializePolisHelpers() {
     conv?: { zid: any },
     tid?: any,
     voteType?: any,
-    weight?: number
+    weight?: number,
+    high_priority?: boolean
   ) {
     let zid = conv?.zid;
     weight = weight || 0;
@@ -614,8 +615,8 @@ function initializePolisHelpers() {
       reject: (arg0: string) => void
     ) {
       let query =
-        "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, created) VALUES ($1, $2, $3, $4, $5, default) RETURNING *;";
-      let params = [pid, zid, tid, voteType, weight_x_32767];
+        "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;";
+      let params = [pid, zid, tid, voteType, weight_x_32767, high_priority];
       pgQuery(query, params, function (err: any, result: { rows: any[] }) {
         if (err) {
           if (isDuplicateKey(err)) {
@@ -643,7 +644,8 @@ function initializePolisHelpers() {
     zid?: any,
     tid?: any,
     voteType?: any,
-    weight?: number
+    weight?: number,
+    high_priority?: boolean
   ) {
     return (
       pgQueryP_readOnly("select * from conversations where zid = ($1);", [zid])
@@ -689,7 +691,15 @@ function initializePolisHelpers() {
           return conv;
         })
         .then(function (conv: any) {
-          return doVotesPost(uid, pid, conv, tid, voteType, weight);
+          return doVotesPost(
+            uid,
+            pid,
+            conv,
+            tid,
+            voteType,
+            weight,
+            high_priority
+          );
         })
     );
   }
@@ -1109,6 +1119,7 @@ function initializePolisHelpers() {
     "localhost:8080",
     "localhost:8040",
     "localhost:5000",
+    "localhost:3000",
     "pubhouse.io",
     "facebook.com",
     "api.twitter.com",
@@ -7283,7 +7294,7 @@ Email verified! You can close this tab or hit the back button.
                         let createdTime = comment.created;
                         let votePromise = _.isUndefined(vote)
                           ? Promise.resolve()
-                          : votesPost(uid, pid, zid, tid, vote, 0);
+                          : votesPost(uid, pid, zid, tid, vote, 0, false);
 
                         return (
                           votePromise
@@ -7915,7 +7926,8 @@ Email verified! You can close this tab or hit the back button.
               zid,
               req.p.tid,
               req.p.vote,
-              req.p.weight
+              req.p.weight,
+              req.p.high_priority
             );
           })
           .then(function (o: { vote: any }) {
@@ -8542,6 +8554,7 @@ Email verified! You can close this tab or hit the back button.
         help_bgcolor: string;
         style_btn: any;
         write_type: any;
+        importance_enabled: any;
         owner_sees_participation_stats: any;
         launch_presentation_return_url_hex: any;
         link_url: any;
@@ -8647,6 +8660,9 @@ Email verified! You can close this tab or hit the back button.
         }
         if (!_.isUndefined(req.p.write_type)) {
           fields.write_type = req.p.write_type;
+        }
+        if (!_.isUndefined(req.p.importance_enabled)) {
+          fields.importance_enabled = req.p.importance_enabled;
         }
         ifDefinedSet("auth_needed_to_vote", req.p, fields);
         ifDefinedSet("auth_needed_to_write", req.p, fields);
@@ -13092,6 +13108,7 @@ Thanks for using Polis!
           parent_url: conv.parent_url,
           vis_type: conv.vis_type,
           write_type: conv.write_type,
+          importance_enabled: conv.importance_enabled,
           help_type: conv.help_type,
           socialbtn_type: conv.socialbtn_type,
           bgcolor: conv.bgcolor,
@@ -13362,6 +13379,7 @@ Thanks for using Polis!
     middleware_log_middleware_errors,
     middleware_log_request_body,
     middleware_responseTime_start,
+    doGetConversationPreloadInfo,
     // handlers
     handle_DELETE_metadata_answers,
     handle_DELETE_metadata_questions,
