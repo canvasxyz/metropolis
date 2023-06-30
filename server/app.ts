@@ -998,6 +998,7 @@ helpersInitialized.then(
       want("help_type", getInt, assignToP),
       want("write_type", getInt, assignToP),
       want("socialbtn_type", getInt, assignToP),
+      want("importance_enabled", getBool, assignToP, false),
       want("bgcolor", getOptionalStringLimitLength(20), assignToP),
       want("help_color", getOptionalStringLimitLength(20), assignToP),
       want("help_bgcolor", getOptionalStringLimitLength(20), assignToP),
