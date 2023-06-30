@@ -1109,6 +1109,7 @@ function initializePolisHelpers() {
     "localhost:8080",
     "localhost:8040",
     "localhost:5000",
+    "localhost:3000",
     "pubhouse.io",
     "facebook.com",
     "api.twitter.com",
@@ -13362,6 +13363,7 @@ Thanks for using Polis!
     middleware_log_middleware_errors,
     middleware_log_request_body,
     middleware_responseTime_start,
+    doGetConversationPreloadInfo,
     // handlers
     handle_DELETE_metadata_answers,
     handle_DELETE_metadata_questions,

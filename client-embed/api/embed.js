@@ -119,7 +119,7 @@
       alert("Error: need data-conversation_id or data-site_id");
       return;
     }
-    var src = serviceUrl+ "/" + path.join("/");
+    var src = serviceUrl+ "/embed/" + path.join("/");
 
     appendIfPresent("parent_url");
     if (o.parent_url) {
@@ -279,6 +279,3 @@
       }
   }
 }());
-
-
-

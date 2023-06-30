@@ -11,7 +11,6 @@ var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlug
 var mri = require("mri")
 var glob = require("glob")
 var fs = require("fs")
-var lodashTemplate = require("lodash/template")
 
 // CLI commands for deploying built artefact.
 var argv = process.argv.slice(2)
@@ -52,18 +51,7 @@ module.exports = (env, options) => {
         patterns: [
           {
             from: "public",
-            globOptions: { ignore: ["**/index.ejs", "**/embed.ejs", "**/embed.html"] },
-          },
-        ],
-      }),
-      new CopyPlugin({
-        patterns: [
-          {
-            from: "./public/embed.ejs",
-            to: "./embed.js",
-            transform: (content, path) => {
-              return lodashTemplate(content.toString())({ embedServiceHostname })
-            },
+            globOptions: { ignore: ["**/index.ejs"] },
           },
         ],
       }),

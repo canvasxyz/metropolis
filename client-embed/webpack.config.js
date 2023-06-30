@@ -11,7 +11,8 @@ const fs = require("fs")
 const pkg = require("./package.json")
 const TerserPlugin = require("terser-webpack-plugin")
 
-const embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "pubhouse.io"
+const embedServiceHostname =
+  process.env.EMBED_SERVICE_HOSTNAME || "localhost:8040" // "pubhouse.io"
 const fbAppId = process.env.FB_APP_ID
 const gaTrackingId = process.env.GA_TRACKING_ID
 const outputDirectory = "dist"

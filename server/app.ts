@@ -78,6 +78,7 @@ helpersInitialized.then(
       redirectIfNotHttps,
       timeout,
       writeDefaultHead,
+      doGetConversationPreloadInfo,
 
       middleware_log_request_body,
       middleware_log_middleware_errors,
@@ -1484,15 +1485,49 @@ helpersInitialized.then(
     app.use(express.static(path.join(__dirname, "client")));
 
     const fetchEmbed = (req: express.Request, res: express.Response) => {
-      const path = req.path === "/embed" ? "/embed/index.html" : req.path;
+      const isIndex = req.path === "/embed";
+      const isEmbedJs = req.path === "/embed.js";
+      const isConversation = req.path.match(/^\/embed\/[a-z0-9]+$/);
+
+      // embed.js is on a different root path
+      if (isEmbedJs) {
+        const headers = fs.readFileSync(
+          __dirname + "/embed/embed.js.headersJson",
+          {
+            encoding: "utf8",
+          }
+        );
+        res.set(JSON.parse(headers));
+        res.sendfile(__dirname + "/embed/embed.js");
+        return;
+      }
+
+      // conversations need preload data
+      const path = isIndex || isConversation ? "/embed/index.html" : req.path;
       const headers = fs.readFileSync(__dirname + path + ".headersJson", {
         encoding: "utf8",
       });
       res.set(JSON.parse(headers));
+      if (isConversation) {
+        const conversation_id = req.path.match(/^\/embed\/([0-9a-z]+)$/)![1];
+        doGetConversationPreloadInfo(conversation_id).then(function (x: any) {
+          const file = fs.readFileSync(__dirname + path, { encoding: "utf8" });
+          const preloadData = JSON.stringify({ conversation: x });
+          res.send(
+            file
+              .toString()
+              .replace('"REPLACE_THIS_WITH_PRELOAD_DATA"', preloadData)
+          );
+        });
+        return;
+      }
+      // all other files just need headers
       res.sendfile(__dirname + path);
     };
 
-    app.get(/^\/embed(\/.*)?/, fetchEmbed);
+    app.get(/^\/embed$/, fetchEmbed);
+    app.get(/^\/embed.js$/, fetchEmbed);
+    app.get(/^\/embed\/(.*)/, fetchEmbed);
 
     // app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
     // app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);
