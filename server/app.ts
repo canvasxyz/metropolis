@@ -814,6 +814,7 @@ helpersInitialized.then(
       ),
       need("vote", getIntInRange(-1, 1), assignToP),
       want("starred", getBool, assignToP),
+      want("high_priority", getBool, assignToP, false),
       want("weight", getNumberInRange(-1, 1), assignToP, 0),
       resolve_pidThing("pid", assignToP, "post:votes"),
       want("xid", getStringLimitLength(1, 999), assignToP),
