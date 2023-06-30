@@ -92,13 +92,16 @@ module.exports = (env, options) => {
         // The following modules need deep importing of JS files
         handlebars: path.resolve(
           __dirname,
-          "node_modules/handlebars/dist/cjs/handlebars.runtime.js"
+          "../node_modules/handlebars/dist/cjs/handlebars.runtime.js"
         ),
         handlebones: path.resolve(
           __dirname,
-          "node_modules/handlebones/handlebones"
+          "../node_modules/handlebones/handlebones"
         ),
-        deepcopy: path.resolve(__dirname, "node_modules/deepcopy/deepcopy.js"),
+        deepcopy: path.resolve(
+          __dirname,
+          "../node_modules/deepcopy/deepcopy.js"
+        ),
       },
       fallback: {
         util: require.resolve("util/"),
@@ -122,7 +125,7 @@ module.exports = (env, options) => {
             },
           },
           {
-            from: "node_modules/font-awesome/fonts/**/*",
+            from: "../node_modules/font-awesome/fonts/**/*",
             to: "./fonts/[name][ext]",
           },
         ],
