@@ -12,6 +12,7 @@
   },
   "workspaces": [
     "client",
+    "polis-client-embed",
     "server"
   ],
   "devDependencies": {

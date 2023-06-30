@@ -1,4 +1,8 @@
-# Public House: An interaction-optimized Polis client
+# Public House: An interactivity-optimized Polis client
+
+### Roadmap
+
+### Setup
 
 Setting up dependencies:
 
