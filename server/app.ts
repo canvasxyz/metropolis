@@ -99,7 +99,6 @@ helpersInitialized.then(
       handle_GET_conversationStats,
       handle_GET_math_correlationMatrix,
       handle_GET_dataExport,
-      handle_GET_dataExport_results,
       handle_GET_domainWhitelist,
       handle_GET_dummyButton,
       handle_GET_einvites,
@@ -272,7 +271,7 @@ helpersInitialized.then(
     );
 
     app.get(
-      "/api/v3/dataExport",
+      "/api/v3/dataExport/:export",
       moveToBody,
       auth(assignToP),
       need(
@@ -281,23 +280,7 @@ helpersInitialized.then(
         assignToPCustom("zid")
       ),
       need("conversation_id", getStringLimitLength(1, 1000), assignToP),
-      want("format", getStringLimitLength(1, 100), assignToP),
-      want("unixTimestamp", getStringLimitLength(99), assignToP),
       handle_GET_dataExport
-    );
-
-    app.get(
-      "/api/v3/dataExport/results",
-      moveToBody,
-      auth(assignToP),
-      need(
-        "conversation_id",
-        getConversationIdFetchZid,
-        assignToPCustom("zid")
-      ),
-      need("conversation_id", getStringLimitLength(1, 1000), assignToP),
-      want("filename", getStringLimitLength(1, 1000), assignToP),
-      handle_GET_dataExport_results
     );
 
     // TODO doesn't scale, stop sending entire mapping.

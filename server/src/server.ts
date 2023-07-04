@@ -2,6 +2,7 @@
 
 "use strict";
 
+import { Parser } from "@json2csv/plainjs";
 import akismetLib from "akismet";
 import AWS from "aws-sdk";
 import badwords from "badwords/object";
@@ -1990,45 +1991,90 @@ function initializePolisHelpers() {
     setInterval(runExportTest, 6 * 60 * 60 * 1000); // every 6 hours
   }
   function handle_GET_dataExport(
-    req: { p: { uid?: any; zid: any; unixTimestamp: number; format: any } },
-    res: { json: (arg0: {}) => void }
+    req: { params: { export?: string; format?: string }; p: { zid: any } },
+    res: any
   ) {
-    getUserInfoForUid2(req.p.uid)
-      .then((user: { email: any }) => {
-        return doAddDataExportTask(
-          Config.mathEnv,
-          user.email,
-          req.p.zid,
-          req.p.unixTimestamp * 1000,
-          req.p.format,
-          Math.abs((Math.random() * 999999999999) >> 0)
-        )
-          .then(() => {
-            res.json({});
-          })
-          .catch((err: any) => {
-            fail(res, 500, "polis_err_data_export123", err);
-          });
-      })
-      .catch((err: any) => {
-        fail(res, 500, "polis_err_data_export123b", err);
-      });
-  }
-  function handle_GET_dataExport_results(
-    req: { p: { filename: string } },
-    res: { redirect: (arg0: any) => void }
-  ) {
-    var url = s3Client.getSignedUrl("getObject", {
-      Bucket: "polis-datadump",
-      Key: Config.mathEnv + "/" + req.p.filename,
-      Expires: 60 * 60 * 24 * 7,
-    });
-    res.redirect(url);
+    // standard data export handler
+    const dataExportHandler = (err: any, result: { rows: any }) => {
+      if (err) {
+        console.log(err);
+        return fail(res, 500, "polis_err_data_export123");
+      }
 
-    // res.writeHead(302, {
-    //   Location: protocol + "://" + req?.headers?.host + path,
-    // });
-    // return res.end();
+      if (req.params.export.endsWith("csv")) {
+        const parser = new Parser();
+        const csv = parser.parse(result.rows);
+        res.header("Content-Type", "text/csv");
+        res.attachment(req.params.export);
+        res.send(csv);
+      } else {
+        res.status(200).json({
+          data: result.rows,
+        });
+      }
+    };
+
+    // participants-votes.csv
+    if (
+      req.params.export === "participants" ||
+      req.params.export === "participants.csv"
+    ) {
+      return pgQuery_readOnly(
+        `select
+          participants.pid as participant,
+          (select count(comments.tid) from comments where comments.pid = participants.pid and comments.zid = ($1)) as n_comments,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.zid = ($1)) as n_votes,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.vote = 1 and votes.zid = ($1)) as n_agree,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.vote = -1 and votes.zid = ($1)) as n_disagree,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.vote = 0 and votes.zid = ($1)) as n_skip,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.vote = 1 and votes.high_priority = true and votes.zid = ($1)) as n_agree_impt,
+          (select count(votes.created) from votes where votes.pid = participants.pid and votes.vote = -1 and votes.high_priority = true and votes.zid = ($1)) as n_disagree_impt
+        from participants
+        where participants.zid = ($1)
+        order by participants.pid`,
+        [req.p.zid],
+        dataExportHandler
+      );
+    }
+
+    // comments.csv
+    if (
+      req.params.export === "comments" ||
+      req.params.export === "comments.csv"
+    ) {
+      return pgQuery_readOnly(
+        `select
+           comments.created as timestamp, comments.created as datetime,
+           comments.tid as comment_id,
+           comments.uid as author_id,
+           (select count(votes.tid) from votes where votes.tid = comments.tid and votes.vote = 1) as agree_votes,
+           (select count(votes.tid) from votes where votes.tid = comments.tid and votes.vote = -1) as disagree_votes,
+           (select count(votes.tid) from votes where votes.tid = comments.tid and votes.vote = 1 and votes.high_priority = true) as agree_impt,
+           (select count(votes.tid) from votes where votes.tid = comments.tid and votes.vote = -1 and votes.high_priority = true) as disagree_impt,
+           comments.mod as moderated,
+           comments.txt as comment_body
+         from comments
+         where comments.zid = ($1)`,
+        [req.p.zid],
+        dataExportHandler
+      );
+    }
+
+    // votes.csv
+    if (req.params.export === "votes" || req.params.export === "votes.csv") {
+      return pgQuery_readOnly(
+        `select created as timestamp, created as datetime, tid as comment_id, pid as voter_id, vote, high_priority
+       from votes where zid = ($1)`,
+        [req.p.zid],
+        dataExportHandler
+      );
+    }
+
+    res.writeHead(404);
+    res.json({
+      status: 404,
+    });
+    return;
   }
   function getBidIndexToPidMapping(zid: number, math_tick: number) {
     math_tick = math_tick || -1;
@@ -13395,7 +13441,6 @@ Thanks for using Polis!
     handle_GET_conversationStats,
     handle_GET_math_correlationMatrix,
     handle_GET_dataExport,
-    handle_GET_dataExport_results,
     handle_GET_domainWhitelist,
     handle_GET_dummyButton,
     handle_GET_einvites,

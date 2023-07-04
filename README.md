@@ -121,6 +121,15 @@ when building and running this application.
 To enable twitter widgets for user authentication, set the ENABLE_TWITTER_WIDGETS environment variable to `true` in the
 top level `.env` file, or manually pass it in when building and running this application.
 
+### Terminology
+
+- uid: User ID
+- xid: External ID (for a user)
+- pid: Participant ID (specific to a conversation)
+- zid: Conversation ID
+- tid: Statement ID
+- bid: Base Cluster ID
+
 ### Acknowledgements
 
 This platform is substantively based on the Polis platform developed by the Computational Democracy Project. For the Polis codebase, see [Github](https://github.com/compdemocracy/polis).

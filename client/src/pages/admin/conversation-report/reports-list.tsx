@@ -80,6 +80,58 @@ class ReportsList extends React.Component<
             </Button>
           )}
         </Box>
+        <Box sx={{ my: [3] }}>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/participants.csv?conversation_id=${conversation_id}`
+            }}
+          >
+            Participants (CSV)
+          </Button>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/votes.csv?conversation_id=${conversation_id}`
+            }}
+          >
+            Votes (CSV)
+          </Button>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/comments.csv?conversation_id=${conversation_id}`
+            }}
+          >
+            Comments (CSV)
+          </Button>
+        </Box>
+        <Box sx={{ my: [3] }}>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/participants?conversation_id=${conversation_id}`
+            }}
+          >
+            Participants (JSON)
+          </Button>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/votes?conversation_id=${conversation_id}`
+            }}
+          >
+            Votes (JSON)
+          </Button>
+          <Button
+            sx={{ mr: [2] }}
+            onClick={() => {
+              document.location = `/api/v3/dataExport/comments?conversation_id=${conversation_id}`
+            }}
+          >
+            Comments (JSON)
+          </Button>
+        </Box>
       </Box>
     )
   }

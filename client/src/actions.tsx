@@ -1644,43 +1644,9 @@ export const populateConversationStatsStore = (conversation_id, until) => {
   }
 }
 
-/* data export */
-
-const dataExportStarted = () => {
-  return {
-    type: DATA_EXPORT_STARTED,
-  }
-}
-
-const dataExportSuccess = () => {
-  return {
-    type: DATA_EXPORT_SUCCESS,
-  }
-}
-
-const dataExportError = () => {
-  return {
-    type: DATA_EXPORT_ERROR,
-  }
-}
-
 const dataExportGet = (conversation_id, format, unixTimestamp, untilEnabled) => {
-  /* e.g. /api/v3/dataExport?conversation_id=2arcefpshi&format=csv&unixTimestamp=1447362000 */
   let url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
-  if (untilEnabled) {
-    url += `&unixTimestamp=${unixTimestamp}`
-  }
   return $.get(url)
-}
-
-export const startDataExport = (conversation_id, format, unixTimestamp, untilEnabled) => {
-  return (dispatch) => {
-    dispatch(dataExportStarted())
-    return dataExportGet(conversation_id, format, unixTimestamp, untilEnabled).then(
-      (res) => dispatch(dataExportSuccess()),
-      (err) => dispatch(dataExportError())
-    )
-  }
 }
 
 // // poll for new comments, since others might be creating comments?

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@google-cloud/translate": "~1.0.0",
+    "@json2csv/plainjs": "^7.0.1",
     "akismet": "~0.0.11",
     "async": "~0.1.22",
     "aws-sdk": "~2.230.1",
@@ -29,6 +30,7 @@
     "express": "~3.21.2",
     "fb": "~1.0.2",
     "http-proxy": "~1.18.1",
+    "json2csv": "^6.0.0-alpha.2",
     "lru-cache": "~3.0.0",
     "mimelib": "~0.2.19",
     "morgan": "^1.10.0",
