@@ -2,7 +2,7 @@
 
 "use strict";
 
-import { Parser } from "@json2csv/plainjs";
+import { parse } from "json2csv";
 import akismetLib from "akismet";
 import AWS from "aws-sdk";
 import badwords from "badwords/object";
@@ -2001,9 +2001,8 @@ function initializePolisHelpers() {
         return fail(res, 500, "polis_err_data_export123");
       }
 
-      if (req.params.export.endsWith("csv")) {
-        const parser = new Parser();
-        const csv = parser.parse(result.rows);
+      if (req.params.export?.endsWith("csv")) {
+        const csv = parse(result.rows);
         res.header("Content-Type", "text/csv");
         res.attachment(req.params.export);
         res.send(csv);
