@@ -62,6 +62,12 @@ psql -d polis-dev -f postgres/migrations/000002_add_xid_constraint.sql
 psql -d polis-dev -f postgres/migrations/000003_add_origin_permanent_cookie_columns.sql
 psql -d polis-dev -f postgres/migrations/000004_drop_waitinglist_table.sql
 psql -d polis-dev -f postgres/migrations/000005_drop_slack_stripe_canvas.sql
+psql -d polis-dev -f postgres/migrations/000006_update_votes_rule.sql
+psql -d polis-dev -f postgres/migrations/000007_add_new_columns.sql
+psql -d polis-dev -f postgres/migrations/000008_add_encrypted_ip.sql
+psql -d polis-dev -f postgres/migrations/000009_add_postsurvey_text_and_limit.sql
+psql -d polis-dev -f postgres/migrations/000010_add_survey_caption_and_redirect.sql
+psql -d polis-dev -f postgres/migrations/000011_add_postsurvey_submissions.sql
 ```
 
 4. Setup environment variables:
@@ -72,7 +78,7 @@ cd server
 cp example.env .env
 ```
 
-5. Install dependencies and run:
+5. Install dependencies and run. This will start the client on port 8080, server on port 8040, and run the math worker:
 
 ```
 npm install
@@ -87,9 +93,9 @@ cat server/postgres/migrations/* | psql polis-dev
 
 7. Create user: http://localhost:8080/createuser
 
-8. To run in production mode locally, use *npm run start*, and access the site at http://localhost:8040/ instead.
+8. To run in production mode locally, use *npm run start*, and access the site at http://localhost:8040.
 
-9. To run in production mode on Heroku, set up the Heroku CLI and then run:
+9. To run in production mode on Heroku, set up the Heroku CLI and then set up plugins:
 
 ```
 heroku buildpacks:add heroku/clojure
@@ -100,6 +106,7 @@ heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
 heroku config:set SENDGRID_API_KEY=[your sendgrid api key]
 heroku config:set POLIS_FROM_ADDRESS="Admin <name@email.com>"
 heroku config:set DOMAIN_OVERRIDE=[your domain]
+heroku config:set EMBED_SERVICE_HOSTNAME=[your domain]
 heroku config:set ENCRYPTION_PASSWORD_00001=[a new password]
 git push heroku main
 ```
@@ -115,29 +122,27 @@ cat server/postgres/migrations/* | heroku psql
 cat server/postgres/migrations/000000_initial.sql | heroku psql
 ```
 
-11. You may wish to set a custom domain name and Heroku SSL on production.
+11. You may wish to set a custom domain name and Heroku SSL on
+production. This can be done in the Heroku control panel.
 
 12. To analyze bundle size:
 - `cd client`
 - `npx webpack --profile --json > stats.json`
 - `npx webpack-bundle-analyzer ./stats.json`
 
-### Facebook App Integration
+### Facebook Integration (Untested)
 
-(Untested)
+Optionally, you can [register with
+Facebook](https://developers.facebook.com/docs/development) and get a
+Facebook App ID to use the Facebook auth features. If you do so, set
+the FB_APP_ID environment variable in the top level `.env` file, or
+manually pass it in when building and running this application.
 
-Optionally, you can [register with Facebook](https://developers.facebook.com/docs/development) and get a Facebook App ID
-to use the Facebook auth features.
+### Twitter Integration (Untested)
 
-If you do so, set the FB_APP_ID environment variable in the top level `.env` file, or manually pass it in
-when building and running this application.
-
-### Twitter Integration
-
-(Untested)
-
-To enable twitter widgets for user authentication, set the ENABLE_TWITTER_WIDGETS environment variable to `true` in the
-top level `.env` file, or manually pass it in when building and running this application.
+To enable twitter widgets for user authentication, set the
+ENABLE_TWITTER_WIDGETS environment variable to `true` in the top level
+`.env` file, or manually pass it in when building and running.
 
 ### Terminology
 
@@ -147,6 +152,12 @@ top level `.env` file, or manually pass it in when building and running this app
 - zid: Conversation ID
 - tid: Statement ID
 - bid: Base Cluster ID
+
+### Troubleshooting
+
+In case a server isn't starting on the right port, check your
+currently running processes (`ps`) and make sure those ports
+aren't taken by other services.
 
 ### Acknowledgements
 
