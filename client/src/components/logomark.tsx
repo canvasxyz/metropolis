@@ -4,7 +4,7 @@ import { Box, jsx } from "theme-ui"
 
 class Logomark extends React.Component<{ style: React.CSSProperties }> {
   render() {
-    return <img src="/igloo_outline.png" width="43" style={this.props.style} />
+    return <img src="/bubbles.svg" width="43" style={this.props.style} />
   }
 }
 

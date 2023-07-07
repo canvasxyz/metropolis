@@ -27,40 +27,9 @@ const About: React.FC<{ user? }> = ({ user }) => {
           <Text sx={{ mt: [4], mb: [2] }}>
             Public House is a tool for open-ended discussions and decisions.
           </Text>
-          <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>What is Public House?</Text>
           <Text sx={{ my: [2] }}>
-            Public House was started as a friendlier interface to{" "}
-            <a
-              sx={{ variant: "styles.a" }}
-              href="https://compdemocracy.org/"
-              target="_blank"
-              noreferrer="noreferrer"
-            >
-              Polis
-            </a>{" "}
-            in early 2023 by members of the{" "}
-            <a
-              sx={{ variant: "styles.a" }}
-              href="https://canvas.xyz/"
-              target="_blank"
-              noreferrer="noreferrer"
-            >
-              Canvas
-            </a>{" "}
-            peer-to-peer computing project, with input from friends at the{" "}
-            <a
-              sx={{ variant: "styles.a" }}
-              href="https://cip.org/"
-              target="_blank"
-              noreferrer="noreferrer"
-            >
-              Collective Intelligence Project
-            </a>
-            .
-          </Text>
-          <Text sx={{ my: [2] }}>
-            We are exploring some new ways to use AI to enable new kinds of interactions! Stay tuned
-            for more details.
+            We are exploring ways to use AI to enable new kinds of interactions in collective
+            governance! Stay tuned for more details.
           </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>
@@ -68,12 +37,15 @@ const About: React.FC<{ user? }> = ({ user }) => {
             <a sx={{ variant: "styles.a" }} href="https://github.com/raykyri/polis" target="_blank">
               Github
             </a>
-            . If you encounter any bugs or issues, have ideas, or would like to make a contribution,
-            please feel free to open an issue or pull request.
+            .
+          </Text>
+          <Text sx={{ my: [2] }}>
+            If you encounter any bugs or issues, have ideas, or would like to contribute, please
+            feel free to open an issue or pull request.
           </Text>
         </Box>
         <Box sx={{ mt: [7, null, 4], ml: [null, null, 5], textAlign: "center", flex: 1 }}>
-          <img src="./conversation_bear.png" width="160" />
+          <img src="./bubbles.png" width="160" />
         </Box>
       </Flex>
     </React.Fragment>

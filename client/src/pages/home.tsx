@@ -22,14 +22,14 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           width: ["90vw", null],
         }}
       >
-        Collaboratively explore any topic, domain, or idea
+        Collaboratively explore any domain
       </Heading>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
-              Public House is a <strong>collective intelligence tool</strong> that lets groups
-              explore their knowledge and opinions around any domain.
+              Public House is a collective-response conversation tool that lets groups explore their
+              knowledge and opinions in any domain.
             </Text>
             <Text sx={{ my: 3 }}>
               Participants start from a prompt, write comments, and vote on each others’ comments.
