@@ -222,7 +222,7 @@
       ;; Error in parsing (this should really catch the below condition as well
       errors
       (utils/exit 1 (apply str "Found the following errors:\n"
-                               (clojure.string/join "\n" errors) "\n" 
+                               (clojure.string/join "\n" errors) "\n"
                                usage summary))
       ;; otherwise, run the thing
       :else
@@ -259,7 +259,3 @@
 
   (stop!)
   :endcomment)
-
-
-
-

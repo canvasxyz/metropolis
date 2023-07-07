@@ -76,6 +76,7 @@ cat server/postgres/migrations/* | psql polis-dev
 9. To run in production mode on Heroku, set up the Heroku CLI and then run:
 
 ```
+heroku buildpacks:add heroku/clojure
 heroku addons:create heroku-postgresql:mini
 heroku addons:create sendgrid:starter
 heroku config:set NODE_OPTIONS="--max_old_space_size=2560"

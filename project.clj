@@ -1,7 +1,7 @@
 (defproject io.pubhouse/pubhouse "1.0.0-SNAPSHOT"
   :description "A sample project"
   :url "http://github.com/pubhouse/pubhouse"
-  :plugins [[lein-dotenv "RELEASE"]]
+  :plugins [[lein-dotenv "1.0.0"]]
   :dependencies [[org.clojure/clojure "1.11.1"]
         [org.clojure/spec.alpha "0.3.218"]
         [org.clojure/core.async "1.6.673"]
@@ -59,8 +59,7 @@
         [org.clojure/test.check "1.1.1"]
         [irresponsible/tentacles "0.6.9"]
         [techascent/tech.ml.dataset "6.104"]]
-  :repositories [["java.net" "https://download.java.net/maven/2"]
-        ["twitter4j" {:url "https://twitter4j.org/maven2"}]]
+  :repositories [["clojars.org" "https://repo.clojars.org"]]
   :main polismath.runner
   :aliases {"poller" ["run"]}
   :source-paths ["math/src"]
