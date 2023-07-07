@@ -1,4 +1,9 @@
 .DS_Store
 .env
 prod.env
+
+# For Node
 /node_modules
+
+# For Clojure
+/target
