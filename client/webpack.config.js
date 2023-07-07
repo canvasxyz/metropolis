@@ -19,7 +19,7 @@ var cliArgs = mri(argv)
 var enableTwitterWidgets = process.env.ENABLE_TWITTER_WIDGETS === "true"
 var fbAppId = process.env.FB_APP_ID
 
-var embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "pubhouse.io"
+var embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "pubhub.dev"
 
 module.exports = (env, options) => {
   var isDevBuild = options.mode === "development"

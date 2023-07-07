@@ -20,12 +20,12 @@ const About: React.FC<{ user? }> = ({ user }) => {
           mb: [4, null, 5],
         }}
       >
-        About Public House
+        About PubHub
       </Heading>
       <Flex sx={{ display: ["block", null, "flex"], mb: [4, null, 5] }}>
         <Box sx={{ maxWidth: [null, null, 500] }}>
           <Text sx={{ mt: [4], mb: [2] }}>
-            Public House is a tool for open-ended discussions and decisions.
+            PubHub is a tool for open-ended discussions and decisions.
           </Text>
           <Text sx={{ my: [2] }}>
             We are exploring ways to use AI to enable new kinds of interactions in collective
