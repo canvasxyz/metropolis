@@ -79,6 +79,7 @@ cat server/postgres/migrations/* | psql polis-dev
 heroku buildpacks:add heroku/clojure
 heroku addons:create heroku-postgresql:mini
 heroku addons:create sendgrid:starter
+heroku config:set MATH_ENV=prod
 heroku config:set NODE_OPTIONS="--max_old_space_size=2560"
 heroku config:set SENDGRID_API_KEY=[your sendgrid api key]
 heroku config:set POLIS_FROM_ADDRESS="Admin <name@email.com>"

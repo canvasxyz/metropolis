@@ -431,7 +431,11 @@ class Report extends React.Component<
       return (
         <div>
           <div>Error Loading</div>
-          <div>{this.state.errorText}</div>
+          <div sx={{ my: [2] }}>
+            Maybe this survey doesn’t have any data, or an error was encountered while generating
+            the report?
+          </div>
+          <div sx={{ my: [2] }}>{this.state.errorText}</div>
         </div>
       )
     }
