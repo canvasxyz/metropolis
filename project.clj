@@ -1,6 +1,6 @@
-(defproject io.pubhouse/pubhouse "1.0.0-SNAPSHOT"
+(defproject dev.pubhub/pubhub "1.0.0-SNAPSHOT"
   :description "A sample project"
-  :url "http://github.com/pubhouse/pubhouse"
+  :url "http://github.com/pubhubdevhub/pubhub"
   :plugins [[lein-dotenv "1.0.0"]]
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.11.1"]

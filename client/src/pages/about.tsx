@@ -20,16 +20,16 @@ const About: React.FC<{ user? }> = ({ user }) => {
           mb: [4, null, 5],
         }}
       >
-        About Public House
+        About PubHub
       </Heading>
       <Flex sx={{ display: ["block", null, "flex"], mb: [4, null, 5] }}>
         <Box sx={{ maxWidth: [null, null, 500] }}>
           <Text sx={{ mt: [4], mb: [2] }}>
-            Public House is a tool for open-ended discussions and decisions.
+            PubHub is a tool for open-ended discussions and decisions.
           </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>What is Public House?</Text>
           <Text sx={{ my: [2] }}>
-            Public House was started as a friendlier interface to{" "}
+            PubHub was started as a friendly interface to{" "}
             <a
               sx={{ variant: "styles.a" }}
               href="https://compdemocracy.org/"
@@ -47,7 +47,7 @@ const About: React.FC<{ user? }> = ({ user }) => {
             >
               Canvas
             </a>{" "}
-            peer-to-peer computing project, with input from friends at the{" "}
+            peer-to-peer computing project with friends at the{" "}
             <a
               sx={{ variant: "styles.a" }}
               href="https://cip.org/"

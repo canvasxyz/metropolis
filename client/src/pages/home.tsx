@@ -28,8 +28,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
-              Public House is a <strong>collective intelligence tool</strong> that lets groups
-              explore their knowledge and opinions around any domain.
+              PubHub is a <strong>collective intelligence tool</strong> that lets groups explore
+              their knowledge and opinions around any domain.
             </Text>
             <Text sx={{ my: 3 }}>
               Participants start from a prompt, write comments, and vote on each others’ comments.
@@ -39,10 +39,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               agreement.
             </Text>
             <Text sx={{ my: 3 }}>
-              Public House is{" "}
+              PubHub is{" "}
               <a
                 sx={{ variant: "styles.a" }}
-                href="https://github.com/pubhouse/pubhouse"
+                href="https://github.com/pubhubdevhub/pubhub"
                 target="_blank"
                 noreferrer="noreferrer"
               >

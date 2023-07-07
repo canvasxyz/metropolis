@@ -5,7 +5,9 @@ const getDomainPrefix = () => {
     return "http://localhost:8040/"
   }
 
-  if (document.domain.includes("pubhouse.io")) return `https://${document.domain}/`
+  if (document.domain.includes("pubhub.dev") || document.domain.includes("pubhouse.io")) {
+    return `https://${document.domain}/`
+  }
 
   return `${document.location.origin}/`
 }
