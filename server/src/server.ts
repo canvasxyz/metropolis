@@ -2002,6 +2002,10 @@ function initializePolisHelpers() {
         return fail(res, 500, "polis_err_data_export123");
       }
 
+      if (result.rows.length === 0) {
+        return fail(res, 404, "No data");
+      }
+
       if (req.params.export?.endsWith("csv")) {
         const csv = parse(result.rows);
         res.header("Content-Type", "text/csv");
