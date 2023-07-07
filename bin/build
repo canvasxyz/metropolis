@@ -1,4 +1,0 @@
-#!/bin/bash
-
-cd math
-clojure -A:dev
