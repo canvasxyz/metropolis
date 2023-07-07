@@ -1,6 +1,22 @@
-# Public House: An interactivity-optimized Polis client
+# PubHub: An open-data Polis client
 
-### Roadmap
+PubHub is a version of the Polis collective-response tool built on
+open data and modern web technologies.
+
+So far, we have implemented:
+
+- A unified React frontend using hooks, replacing three separate
+  frontends in the original version of Polis.
+- A simpler response interface which supports all functionality
+  present in the original interface. This is still being worked on.
+
+In the near future, we expect to implement:
+
+- A new machine learning and AI analysis toolchain.
+- Open data, where all Polis interactions are signed by either
+  a custodial or non-custodial keypair.
+- Support for multiple authenticated-data standards, SSO providers,
+  and decentralized identity providers.
 
 ### Setup
 
@@ -134,8 +150,11 @@ top level `.env` file, or manually pass it in when building and running this app
 
 ### Acknowledgements
 
-This platform is substantively based on the Polis platform developed by the Computational Democracy Project. For the Polis codebase, see [Github](https://github.com/compdemocracy/polis).
-
-For a detailed methods paper, see [Polis: Scaling Deliberation by Mapping High Dimensional Opinion Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558).
+This platform is based on the Polis platform developed by the
+Computational Democracy Project. For the Polis codebase, see
+[Github](https://github.com/compdemocracy/polis). For a Polis
+methods paper, see [Polis: Scaling Deliberation by Mapping High
+Dimensional Opinion
+Spaces](https://www.e-revistes.uji.es/index.php/recerca/article/view/5516/6558).
 
 (c) 2012-present, authors, under [AGPLv3 with additional permission under section 7](/LICENSE)
