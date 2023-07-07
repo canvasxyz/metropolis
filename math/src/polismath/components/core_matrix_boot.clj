@@ -3,7 +3,7 @@
 (ns polismath.components.core-matrix-boot
   (:require [polismath.utils :as utils]
             [clojure.core.matrix :as matrix]
-            [clojure.core.matrix.impl.ndarray :as ndarray]
+            ;[clojure.core.matrix.impl.ndarray :as ndarray]
             [taoensso.timbre :as log]
             [com.stuartsierra.component :as component]
             [cheshire.generate :refer [add-encoder encode-seq remove-encoder]]))
@@ -23,10 +23,11 @@
                    ;; XXX Need to figure out why this doesn't exist yet
                    ;'clojure.core.matrix.impl.ndarray.NDArray])
                    ;; Could this be the new ns?
-                   'mikera.arrayz.NDArray
+                   ;'mikera.arrayz.NDArray
                    'mikera.matrixx.Matrix
                    ;'clojure.core.matrix.impl.ndarray.NDArray
-                   'clojure.core.matrix.impl.ndarray_object.NDArray])
+                   ;'clojure.core.matrix.impl.ndarray_object.NDArray
+])
 
 
 (def dummy-matrix [[1 2 3] [4 5 6]])
@@ -41,8 +42,8 @@
       (matrix/set-current-implementation implementation)
       (matrix/matrix dummy-matrix)
       ;(matrix/matrix :ndarray-object dummy-matrix)
-      (matrix/matrix :ndarray-double dummy-matrix)
-      (matrix/matrix :ndarray dummy-matrix)
+      ;(matrix/matrix :ndarray-double dummy-matrix)
+      ;(matrix/matrix :ndarray dummy-matrix)
       ;; Adding encoders so things work properly with serialization
       ;(require '[clojure.core.matrix.impl.ndarray])
       (doseq [t matrix-types]
@@ -66,4 +67,3 @@
 ;(component/start (create-core-matrix-booter {:config {:math {:matrix-implementation :vectorz}}}))
 
 :ok
-
