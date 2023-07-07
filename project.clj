@@ -2,6 +2,7 @@
   :description "A sample project"
   :url "http://github.com/pubhouse/pubhouse"
   :plugins [[lein-dotenv "1.0.0"]]
+  :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.11.1"]
         [org.clojure/spec.alpha "0.3.218"]
         [org.clojure/core.async "1.6.673"]
