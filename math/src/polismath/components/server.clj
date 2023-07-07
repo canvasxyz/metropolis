@@ -6,7 +6,7 @@
     [clojure.core.async :as async :refer [chan >!! <!! >! <! go]]
     [taoensso.timbre :as log]
 
-    [ring.adapter.jetty :as jetty]
+    ;[ring.adapter.jetty :as jetty]
     [com.stuartsierra.component :as component]
 
     [polismath.components.env :as env]
@@ -46,21 +46,21 @@
   component/Lifecycle
   (start [component]
     (log/info ">> Starting server component with config:" (:server config))
-    (let [wrapped-handler (wrap-handler (:handler app))
-          jetty-server (jetty/run-jetty wrapped-handler
-                                        (merge {:join? false :port 8080}
-                                               (:server config)
-                                               opts))]
-      (.start jetty-server)
-      (assoc component :jetty-server jetty-server)))
+    ; (let [wrapped-handler (wrap-handler (:handler app))
+    ;       jetty-server (jetty/run-jetty wrapped-handler
+    ;                                     (merge {:join? false :port 8080}
+    ;                                            (:server config)
+    ;                                            opts))]
+    ;   (.start jetty-server)
+    ;   (assoc component :jetty-server jetty-server)))
+    )
   (stop [component]
     (log/info "<< Stopping server component")
-    (try
-      (.stop jetty-server)
-      (catch Exception e
-        (log/error e "Unable to stop server!")))
+    ; (try
+    ;   (.stop jetty-server)
+    ;   (catch Exception e
+    ;     (log/error e "Unable to stop server!")))
     component))
-
 
 (defn create-server
   ;; Default handler just return the healthcheck response always
