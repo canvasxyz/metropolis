@@ -10,7 +10,7 @@
         org.clojure/tools.trace {:mvn/version "0.7.11"}
         org.clojure/tools.reader {:mvn/version "1.3.6"}
 
-        org.flatland/ordered {:mvn/version "1.15.10"} 
+        org.flatland/ordered {:mvn/version "1.15.10"}
         ;; Other stuff
         commons-collections/commons-collections {:mvn/version "20040616"}
         cheshire/cheshire {:mvn/version "5.11.0"}
@@ -55,11 +55,10 @@
         org.clojure/test.check {:mvn/version "1.1.1"}
         irresponsible/tentacles {:mvn/version "0.6.9"}
         techascent/tech.ml.dataset {:mvn/version "6.104"}}
- :aliases {:dev 
-           {:extra-paths ["dev" "test"]
-            :extra-deps {cider/cider-nrepl {:mvn/version "0.30.0"}
-                         metasoarous/oz {:mvn/version "2.0.0-alpha5"}}
-            :main-opts ["-m" "nrepl.cmdline" "--middleware" "[cider.nrepl/cider-middleware]"]}
+ :aliases {:dev
+            {:extra-paths ["dev" "test"]
+             :extra-deps {cider/cider-nrepl {:mvn/version "0.30.0"}
+                          metasoarous/oz {:mvn/version "2.0.0-alpha5"}}}
            :run
            {:main-opts ["-m" "polismath.runner"]}
            :dev-poller
@@ -72,4 +71,3 @@
  ;:jvm-opts ^:replace []
  :jvm-opts ["-Xmx4g"]}
  ;:mvn/repos {"twitter4j" {:url "https://twitter4j.org/maven2"}}}
-  
