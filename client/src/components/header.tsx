@@ -46,7 +46,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         )}
         {!inSurvey && (
           <Link sx={{ variant: "links.nav", ml: "9px" }} to={isLoggedIn ? "/conversations" : "/"}>
-            PubHub
+            Quest
           </Link>
         )}
       </Box>

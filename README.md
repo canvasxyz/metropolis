@@ -1,14 +1,15 @@
-# PubHub: An open-data Polis client
+# Quest
 
-PubHub is a version of the Polis collective-response tool built on
-open data and modern web technologies.
+Quest is a version of the Polis collective-response tool, updated
+with a new survey frontend and extended to support decentralized
+identity.
 
 So far, we have implemented:
 
 - A unified React frontend using hooks, replacing three separate
   frontends in the original version of Polis.
 - A simpler response interface which supports all functionality
-  present in the original interface. This is still being worked on.
+  present in the original interface.
 
 In the near future, we expect to implement:
 

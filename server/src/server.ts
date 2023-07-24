@@ -1121,8 +1121,7 @@ function initializePolisHelpers() {
     "localhost:8040",
     "localhost:5000",
     "localhost:3000",
-    "pubhub.dev",
-    "pubhouse.io",
+    "quest.im",
     "facebook.com",
     "api.twitter.com",
     "", // for API

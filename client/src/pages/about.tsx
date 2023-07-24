@@ -20,12 +20,12 @@ const About: React.FC<{ user? }> = ({ user }) => {
           mb: [4, null, 5],
         }}
       >
-        About PubHub
+        About Quest
       </Heading>
       <Flex sx={{ display: ["block", null, "flex"], mb: [4, null, 5] }}>
         <Box sx={{ maxWidth: [null, null, 500] }}>
           <Text sx={{ mt: [4], mb: [2] }}>
-            PubHub is a tool for open-ended discussions and decisions.
+            Quest is a tool for open-ended discussions and decisions.
           </Text>
           <Text sx={{ my: [2] }}>
             We are exploring ways to use AI to enable new kinds of interactions in collective

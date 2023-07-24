@@ -1,6 +1,6 @@
-(defproject dev.pubhub/pubhub "1.0.0-SNAPSHOT"
+(defproject xyz.canvas/quest "1.0.0-SNAPSHOT"
   :description "A sample project"
-  :url "http://github.com/pubhubdevhub/pubhub"
+  :url "http://github.com/canvasxyz/quest"
   :plugins [[lein-dotenv "1.0.0"]]
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.11.1"]

@@ -1,5 +1,5 @@
 {
-  "name": "polis-server",
+  "name": "quest-server",
   "license": "AGPL-3.0",
   "main": "./dist/app.js",
   "scripts": {

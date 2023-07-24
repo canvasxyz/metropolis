@@ -28,36 +28,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
             <Text sx={{ my: 3 }}>
-              PubHub is a collective-response conversation tool that lets groups explore their
-              knowledge and opinions in any domain.
-            </Text>
-            <Text sx={{ my: 3 }}>
-              Participants start from a prompt, write comments, and vote on each others’ comments.
-            </Text>
-            <Text sx={{ my: 3 }}>
-              Comments are scored for relevance, and clustered to identify groups with mutual
-              agreement.
-            </Text>
-            <Text sx={{ my: 3 }}>
-              PubHub is{" "}
-              <a
-                sx={{ variant: "styles.a" }}
-                href="https://github.com/pubhubdevhub/pubhub"
-                target="_blank"
-                noreferrer="noreferrer"
-              >
-                fully open-source
-              </a>
-              , based on the{" "}
-              <a
-                sx={{ variant: "styles.a" }}
-                href="https://github.com/compdemocracy/polis"
-                target="_blank"
-                noreferrer="noreferrer"
-              >
-                Polis democratic input system
-              </a>{" "}
-              used by governments, academics, and citizens around the world.
+              Quest is a better way for community members to{" "}
+              <Text sx={{ display: "inline" }}>learn about each other</Text>,{" "}
+              <Text sx={{ display: "inline" }}>discover new ideas</Text>, and{" "}
+              <Text sx={{ display: "inline" }}>build a foundation for effective governance</Text>.
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>
