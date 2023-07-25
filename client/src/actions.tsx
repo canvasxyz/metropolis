@@ -904,18 +904,19 @@ const createConversationPostError = (err) => {
   }
 }
 
-const postCreateConversation = (topic) => {
+const postCreateConversation = (topic, description) => {
   return api.post("/api/v3/conversations", {
     topic,
+    description,
     is_draft: true,
     is_active: true,
   })
 }
 
-export const handleCreateConversationSubmit = (topic) => {
+export const handleCreateConversationSubmit = (topic, description) => {
   return (dispatch) => {
     dispatch(createConversationStart())
-    return postCreateConversation(topic)
+    return postCreateConversation(topic, description)
       .then(
         (res) => {
           dispatch(createConversationPostSuccess(res))

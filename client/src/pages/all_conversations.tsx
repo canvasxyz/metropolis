@@ -4,7 +4,7 @@ import { RouteComponentProps, Link } from "react-router-dom"
 import React, { useEffect } from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { Box, Heading, Button, Text, Flex, jsx } from "theme-ui"
+import { Box, Grid, Heading, Button, Text, Flex, jsx } from "theme-ui"
 import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
 import {
@@ -39,17 +39,7 @@ function ConversationRow({ c, i, stats, dispatch }) {
           borderTop: i === 0 ? "1px solid #e6e7e8" : "none",
         }}
       >
-        <Box>
-          <img
-            src="/polldoc.png"
-            sx={{
-              width: 16,
-              mt: "6px",
-              filter: c.is_archived ? "grayscale(1) opacity(0.4)" : "opacity(0.8)",
-            }}
-          />
-        </Box>
-        <Box sx={{ lineHeight: 1.35, flex: 4, ml: [3] }}>
+        <Box sx={{ lineHeight: 1.35, flex: 4 }}>
           <Box sx={{ my: [1] }}>
             {c.is_archived ? (
               <Text sx={{ color: "mediumGray" }}>{c.topic}</Text>
@@ -250,21 +240,84 @@ class Conversations extends React.Component<
     const err = this.props.error
     const { conversations, conversation_stats } = this.props
 
+    const prefillOptions = [
+      {
+        title: "Quick Start",
+        prefill:
+          "What makes you excited about being a part of this group? What was your best experience since joining?",
+        bestFor: "General Organizations",
+      },
+      {
+        title: "Delegate Onboarding",
+        prefill:
+          "As a delegate, what perspectives do you bring to the table? Which of these statements do you agree with?",
+        bestFor: "DAOs, Formal Governance",
+      },
+      {
+        title: "User Feedback",
+        prefill:
+          "How could we improve our user interface or product? Which features should we prioritize?",
+        bestFor: "Startups, Product Teams",
+      },
+      {
+        title: "Constitution Building",
+        prefill:
+          "Which values, practices, and processes should be included in our constitution? Who should we be inspired by?",
+        bestFor: "Formal Governance",
+      },
+      {
+        title: "Custom Prompt",
+        prefillPlaceholder:
+          "Write and customize your own survey. You can use case studies provided in the documentation as reference.",
+        bestFor: "BYOB",
+      },
+    ]
+
     return (
       <Box sx={{ mt: [4, null, 5], mb: [5] }}>
-        <Heading as="h1">Manage Conversations</Heading>
-        <Box sx={{ mt: [4], mb: [6] }}>
-          <Button
-            onClick={() => {
-              const title = prompt("Title of new conversation?")
-              if (!title || !title.trim()) return
-              this.props.dispatch(handleCreateConversationSubmit(title))
-            }}
-          >
-            Create new conversation
-          </Button>
+        <Heading as="h1">New Conversation</Heading>
+        <Box sx={{ mt: 5, mb: 6 }}>
+          <Grid width={240}>
+            {prefillOptions.map((option, index) => (
+              <Box
+                key={index}
+                sx={{
+                  border: "1px solid",
+                  borderColor: "lighterGray",
+                  borderRadius: "7px",
+                  cursor: "pointer",
+                  lineHeight: "1.4",
+                  "&:hover": { borderColor: "primary" },
+                  px: [4],
+                  py: [3],
+                }}
+                onClick={() => {
+                  if (!confirm("Create a new " + option.title + " survey?")) return
+                  this.props.dispatch(handleCreateConversationSubmit(option.title, option.prefill))
+                }}
+              >
+                <Box sx={{ my: [1], fontWeight: "700" }}>{option.title}</Box>
+                <Box sx={{ my: [2], fontSize: ".9em", fontStyle: "italic", color: "mediumGray" }}>
+                  {option.prefill || option.prefillPlaceholder}
+                </Box>
+                {option.bestFor && (
+                  <Box
+                    sx={{
+                      fontSize: ".9em",
+                      color: "mediumGray",
+                      fontWeight: 600,
+                      mb: [2],
+                    }}
+                  >
+                    Best for: {option.bestFor}
+                  </Box>
+                )}
+              </Box>
+            ))}
+          </Grid>
         </Box>
-        <Box>
+        <Heading as="h1">Manage Conversations</Heading>
+        <Box mt={5}>
           <Box sx={{ mb: [3] }}>{this.props.loading ? "Loading conversations..." : null}</Box>
           {err ? (
             <Text>{"Error loading conversations: " + err.status + " " + err.statusText}</Text>

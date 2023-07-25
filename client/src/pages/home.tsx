@@ -11,22 +11,21 @@ const Index: React.FC<{ user? }> = ({ user }) => {
 
   return (
     <React.Fragment>
-      <Heading
-        as="h1"
-        sx={{
-          fontSize: [5],
-          lineHeight: 1.2,
-          mt: [2, 5],
-          mb: [3],
-          maxWidth: "20em",
-          width: ["90vw", null],
-        }}
-      >
-        Collaboratively explore any domain
-      </Heading>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
+            <Heading
+              as="h1"
+              sx={{
+                fontSize: [5],
+                lineHeight: 1.2,
+                mt: [2, 5],
+                mb: [3],
+                maxWidth: "20em",
+              }}
+            >
+              The self-organizing network survey
+            </Heading>
             <Text sx={{ my: 3 }}>
               Quest is a better way for community members to{" "}
               <Text sx={{ display: "inline" }}>learn about each other</Text>,{" "}
