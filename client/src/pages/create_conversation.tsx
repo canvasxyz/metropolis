@@ -125,7 +125,6 @@ const CreateConversation = ({ dispatch, user }) => {
               fontWeight: "700",
               borderBottom: step === 1 ? "2px solid" : "",
               borderBottomColor: "body",
-              cursor: "pointer",
               opacity: step === 1 ? 1 : 0.4,
             }}
           >

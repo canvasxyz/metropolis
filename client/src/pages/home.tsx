@@ -24,13 +24,16 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 maxWidth: "20em",
               }}
             >
-              The self-organizing network survey
+              Self-organizing network governance
             </Heading>
             <Text sx={{ my: 3 }}>
-              Quest is a better way for community members to{" "}
-              <Text sx={{ display: "inline" }}>learn about each other</Text>,{" "}
-              <Text sx={{ display: "inline" }}>discover new ideas</Text>, and{" "}
-              <Text sx={{ display: "inline" }}>build a foundation for effective governance</Text>.
+              Quest is a self-organizing survey for community members to{" "}
+              <Text sx={{ display: "inline", color: "#5663e2" }}>learn about each other</Text>,{" "}
+              <Text sx={{ display: "inline", color: "#ea4a4b" }}>explore new ideas</Text>, and{" "}
+              <Text sx={{ display: "inline", color: "#80b60c" }}>
+                build a foundation for good governance
+              </Text>
+              .
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>
@@ -65,6 +68,29 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           />
         </Box>
       </Flex>
+      <Box sx={{ mt: [9] }}>
+        <Heading as="h3">How it works</Heading>
+        <p>1. The survey operator asks a question, and seeds it with suggested responses.</p>
+        <p>
+          2. Participants vote on responses, while contributing their own. The survey updates in
+          realtime to prioritize the best responses.
+        </p>
+        <p>
+          3. We use statistical methods to build a detailed profile of the community, identifying
+          key opinion groups, points of consensus, and points of further exploration.
+        </p>
+        <p>
+          4. Data contributed can be used to build member directories, delegate profiles, working
+          groups, and more!
+        </p>
+      </Box>
+      <Box sx={{ mt: [9], mb: [8] }}>
+        <Heading as="h3">Background</Heading>
+        <p>
+          Quest is a user-friendly rewrite of Polis, an academically validated collective-response
+          survey that has been used with groups of 100 to over 200,000.
+        </p>
+      </Box>
     </React.Fragment>
   )
 }

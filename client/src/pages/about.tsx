@@ -24,20 +24,20 @@ const About: React.FC<{ user? }> = ({ user }) => {
       </Heading>
       <Flex sx={{ display: ["block", null, "flex"], mb: [4, null, 5] }}>
         <Box sx={{ maxWidth: [null, null, 500] }}>
-          <Text sx={{ mt: [4], mb: [2] }}>
-            Quest is a tool for open-ended discussions and decisions.
+          <Text sx={{ mt: [2], mb: [2] }}>
+            Quest is a self-organizing survey and network governance tool.
           </Text>
           <Text sx={{ my: [2] }}>
-            We are exploring ways to use AI to enable new kinds of interactions in collective
-            governance! Stay tuned for more details.
+            We are exploring ways to use AI and decentralized identity to enable new kinds of
+            collective governance.
           </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>
-            Development happens in public on{" "}
+            Development happens on{" "}
             <a sx={{ variant: "styles.a" }} href="https://github.com/raykyri/polis" target="_blank">
               Github
-            </a>
-            .
+            </a>{" "}
+            and the project is open source, under the AGPL.
           </Text>
           <Text sx={{ my: [2] }}>
             If you encounter any bugs or issues, have ideas, or would like to contribute, please

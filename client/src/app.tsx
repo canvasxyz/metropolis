@@ -156,7 +156,7 @@ class App extends React.Component<
                 pt: "1px", // prevent margins from spilling over
                 pb: "1em",
                 px: [4],
-                minHeight: "calc(100vh - 9em)",
+                minHeight: "calc(100vh - 9em - 6px)",
               }}
             >
               <Route exact path="/" render={() => <Home user={this.props.user} />} />
