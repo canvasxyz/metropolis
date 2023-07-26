@@ -111,7 +111,10 @@ const CreateConversation = ({ dispatch, user }) => {
               cursor: "pointer",
               opacity: step === 0 ? 1 : 0.4,
             }}
-            onClick={() => setStep(0)}
+            onClick={() => {
+              setStep(0)
+              history.pushState("select", null, "")
+            }}
           >
             Select Template
           </Box>
@@ -174,21 +177,22 @@ const CreateConversation = ({ dispatch, user }) => {
         )}
         {step === 1 && (
           <Box>
-            <Label sx={{ display: "block", mb: [4] }}>
+            <Label sx={{ display: "block", mb: [5] }}>
               <Box sx={{ fontWeight: "700" }}>Title</Box>
-              <Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
+              {/*<Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 A descriptive name for your survey.
-              </Box>
+                </Box>*/}
               <Box>
                 <Input
                   placeholder={prefillOptions[prefillSelection].prefillTitle}
                   onChange={(i) => {
                     setTitle(i.target.value)
                   }}
+                  defaultValue={title}
                 />
               </Box>
             </Label>
-            <Label sx={{ display: "block", mb: [4] }}>
+            <Label sx={{ display: "block", mb: [5] }}>
               <Box sx={{ fontWeight: "700" }}>Instructions</Box>
               <Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 Explain to users that they’re participating in a collaborative survey, and suggest
@@ -268,6 +272,7 @@ const CreateConversation = ({ dispatch, user }) => {
                   onChange={(i) => {
                     setDescription(i.target.value)
                   }}
+                  defaultValue={description}
                 ></Textarea>
               </Box>
             </Label>
