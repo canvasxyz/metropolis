@@ -198,13 +198,7 @@ class App extends React.Component<
                   }
                   return (
                     <Box>
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/create"
-                        component={CreateConversation}
-                      />
+                      <Route exact path="/create" component={CreateConversation} />
                       <PrivateRoute
                         isLoading={this.isLoading()}
                         authed={this.isAuthed()}

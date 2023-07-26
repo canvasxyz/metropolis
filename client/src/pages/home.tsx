@@ -27,7 +27,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               Self-organizing network governance
             </Heading>
             <Text sx={{ my: 3 }}>
-              Quest is a self-organizing survey for community members to{" "}
+              Quest is a governance tool for community members to{" "}
               <Text sx={{ display: "inline", color: "#5663e2" }}>learn about each other</Text>,{" "}
               <Text sx={{ display: "inline", color: "#ea4a4b" }}>explore new ideas</Text>, and{" "}
               <Text sx={{ display: "inline", color: "#80b60c" }}>
@@ -50,8 +50,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                   {" "}
                   or{" "}
                 </Text>
-                <Link sx={{ variant: "links.button" }} to="/signin">
-                  Sign in
+                <Link sx={{ variant: "links.button" }} to="/create">
+                  Preview creating a conversation
                 </Link>
               </Box>
             )}
@@ -70,7 +70,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       </Flex>
       <Box sx={{ mt: [9] }}>
         <Heading as="h3">How it works</Heading>
-        <p>1. The survey operator asks a question, and seeds it with suggested responses.</p>
+        <p>1. The survey creator asks a question, and seeds it with suggested responses.</p>
         <p>
           2. Participants vote on responses, while contributing their own. The survey updates in
           realtime to prioritize the best responses.
@@ -81,7 +81,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </p>
         <p>
           4. Data contributed can be used to build member directories, delegate profiles, working
-          groups, and more!
+          groups, and more.
         </p>
       </Box>
       <Box sx={{ mt: [9], mb: [8] }}>

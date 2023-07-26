@@ -280,8 +280,10 @@ const CreateConversation = ({ dispatch, user }) => {
               onClick={() => {
                 dispatch(handleCreateConversationSubmit(title, description))
               }}
+              disabled={!user}
+              sx={user ? {} : { opacity: 0.4, pointerEvents: "none" }}
             >
-              Create this conversation
+              {user ? "Create this conversation" : "Log in to create conversations"}
             </Button>
           </Box>
         )}
