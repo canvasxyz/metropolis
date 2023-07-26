@@ -35,6 +35,18 @@ export default {
     mediumGreen: "#5fa240",
     mediumGreenActive: "#448b24",
   },
+  forms: {
+    input: {
+      fontFamily: "body",
+      backgroundColor: "#ffffff",
+      my: [2],
+    },
+    textarea: {
+      fontFamily: "body",
+      backgroundColor: "#ffffff",
+      my: [2],
+    },
+  },
   links: {
     text: {
       fontWeight: "600",

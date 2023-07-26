@@ -29,7 +29,8 @@ import SignOut from "./pages/landing/signout"
 import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
-import AllConversations from "./pages/all_conversations"
+import CreateConversation from "./pages/create_conversation"
+import ManageConversations from "./pages/manage_conversations"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import Survey from "./pages/survey"
@@ -201,8 +202,15 @@ class App extends React.Component<
                         isLoading={this.isLoading()}
                         authed={this.isAuthed()}
                         exact
+                        path="/create"
+                        component={CreateConversation}
+                      />
+                      <PrivateRoute
+                        isLoading={this.isLoading()}
+                        authed={this.isAuthed()}
+                        exact
                         path="/conversations"
-                        component={AllConversations}
+                        component={ManageConversations}
                       />
                       <PrivateRoute
                         isLoading={this.isLoading()}
