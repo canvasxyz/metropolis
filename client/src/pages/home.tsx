@@ -11,6 +11,11 @@ const Index: React.FC<{ user? }> = ({ user }) => {
 
   return (
     <React.Fragment>
+      <Box
+        sx={{ my: [2], textAlign: "center", background: "#fbf5e9", py: [3], borderRadius: "4px" }}
+      >
+        Alpha release: Most features are complete, but voting is still being redesigned.
+      </Box>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
