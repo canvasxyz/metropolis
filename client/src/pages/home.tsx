@@ -28,11 +28,6 @@ const Index: React.FC<{ user? }> = ({ user }) => {
 
   return (
     <React.Fragment>
-      <Box
-        sx={{ my: [3], textAlign: "center", background: "#fbf5e9", py: [3], borderRadius: "4px" }}
-      >
-        💡 Alpha release: We are still redesigning some features.
-      </Box>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
           <Box sx={{ flex: 1 }}>
@@ -41,9 +36,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               sx={{
                 fontSize: [5],
                 lineHeight: 1.2,
-                mt: [2, 5],
+                mt: [2, 8],
                 mb: [3],
                 maxWidth: "20em",
+                fontWeight: "500",
               }}
             >
               Self-organizing network governance
@@ -84,12 +80,17 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             src="/cybernetics_transparent.png"
             sx={{
               maxWidth: 250,
-              mt: [4],
+              mt: [7],
               ml: [null, 4, 5],
             }}
           />
         </Box>
       </Flex>
+      <Box
+        sx={{ my: [8], textAlign: "center", background: "#fbf5e9", py: [3], borderRadius: "4px" }}
+      >
+        Metropolis is still in alpha. Some functionality will change rapidly.
+      </Box>
       <Box sx={{ mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
@@ -134,7 +135,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       <Box sx={{ mt: [9] }}>
         <Heading as="h3">Background</Heading>
         <p>
-          Metropolis is an extended, multi-modal version of{" "}
+          Metropolis is an extended version of{" "}
           <Link
             href="https://forum.effectivealtruism.org/posts/9jxBki5YbS7XTnyQy/polis-why-and-how-to-use-it"
             target="_blank"
@@ -144,7 +145,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             Polis
           </Link>
           , an academically validated collective-response survey that has been used with groups of
-          100 to 200,000 for:
+          100 to 200,000 for initiatives like:
         </p>
         <p>
           <ul>
@@ -159,9 +160,9 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           Coming soon
         </Heading>
         <Grid gap={[2]} columns={[2]}>
-          <Box sx={comingSoon}>Web3 login</Box>
           <Box sx={comingSoon}>Token gating</Box>
-          <Box sx={comingSoon}>Twitter integration</Box>
+          <Box sx={comingSoon}>Multi-modal surveys</Box>
+          <Box sx={comingSoon}>Collect from Twitter</Box>
           <Box sx={comingSoon}>Knowledge graph</Box>
         </Grid>
       </Box>

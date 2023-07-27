@@ -203,8 +203,35 @@ const CreateConversation = ({ dispatch, user }) => {
                       sx={{ display: "inline", color: "primary", cursor: "pointer" }}
                       onClick={() => setShowExample(!showExample)}
                     >
-                      {showExample ? "Hide example" : "Show an example"}
-                    </Text>
+                      {showExample ? "Hide example" : "Show example"}
+                    </Text>{" "}
+                    {showExample && (
+                      <React.Fragment>
+                        {" "}
+                        or{" "}
+                        <Text
+                          sx={{ display: "inline", color: "primary", cursor: "pointer" }}
+                          onClick={() => {
+                            if (!confirm("Overwrite your existing description?")) return
+                            const desc =
+                              prefillOptions[prefillSelection].prefillIntro +
+                              "\n\n" +
+                              prefillOptions[prefillSelection].prefill
+                                .concat(prefillOptions[prefillSelection].prefillExtra)
+                                .split("?")
+                                .map((item, index) => (item ? `- ${item.trim()}?` : ""))
+                                .join("\n") +
+                              "\n" +
+                              "You can vote on answers by other members, or add your own."
+                            if (descriptionRef.current) (descriptionRef.current as any).value = desc
+                            setDescription(desc)
+                            setShowExample(false)
+                          }}
+                        >
+                          Use this example
+                        </Text>
+                      </React.Fragment>
+                    )}
                     {showExample && (
                       <Box
                         sx={{
@@ -236,28 +263,6 @@ const CreateConversation = ({ dispatch, user }) => {
                           </ul>
                         )}
                         <Box>You can vote on answers by other members, or add your own.</Box>
-                        <Box sx={{ mt: 2 }}>
-                          <Text
-                            sx={{ display: "inline", color: "primary", cursor: "pointer" }}
-                            onClick={() => {
-                              const desc =
-                                prefillOptions[prefillSelection].prefillIntro +
-                                "\n\n" +
-                                prefillOptions[prefillSelection].prefill
-                                  .concat(prefillOptions[prefillSelection].prefillExtra)
-                                  .split("?")
-                                  .map((item, index) => (item ? `- ${item.trim()}?` : ""))
-                                  .join("\n") +
-                                "\n" +
-                                "You can vote on answers by other members, or add your own."
-                              if (descriptionRef.current)
-                                (descriptionRef.current as any).value = desc
-                              setDescription(desc)
-                            }}
-                          >
-                            Use this example
-                          </Text>
-                        </Box>
                       </Box>
                     )}
                   </React.Fragment>
