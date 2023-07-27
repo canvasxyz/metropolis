@@ -3,7 +3,6 @@ import React, { Component } from "react"
 import { Flex, Box, jsx } from "theme-ui"
 
 import { Link } from "react-router-dom"
-import Logomark from "./logomark"
 
 const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, inSurvey }) => {
   return (
@@ -23,7 +22,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          marginTop: "-21px",
+          marginTop: "3px",
         }}
       >
         {inSurvey ? (
@@ -37,11 +36,19 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
               }
             }}
           >
-            <Logomark style={{ position: "relative", top: 14 }} />
+            <img
+              src="/foundation.svg"
+              width="20"
+              style={{ position: "relative", top: 3, opacity: 0.81 }}
+            />
           </Link>
         ) : (
           <Link to={isLoggedIn ? "/conversations" : "/"}>
-            <Logomark style={{ position: "relative", top: 14 }} />
+            <img
+              src="/foundation.svg"
+              width="20"
+              style={{ position: "relative", top: 3, opacity: 0.81 }}
+            />
           </Link>
         )}
         {!inSurvey && (

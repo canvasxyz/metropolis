@@ -45,7 +45,7 @@ const About: React.FC<{ user? }> = ({ user }) => {
           </Text>
         </Box>
         <Box sx={{ mt: [7, null, 4], ml: [null, null, 5], textAlign: "center", flex: 1 }}>
-          <img src="./bubbles.png" width="160" />
+          <img src="./foundation.svg" width="160" />
         </Box>
       </Flex>
     </React.Fragment>
