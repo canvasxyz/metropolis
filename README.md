@@ -1,10 +1,7 @@
-# Quest
+# Metropolis
 
-Quest is a version of the Polis collective-response tool, updated
-with a new survey frontend and extended to support decentralized
-identity.
-
-So far, we have implemented:
+Metropolis is an extended version of the Polis collective-response
+tool. So far, we have implemented:
 
 - A unified React frontend using hooks, replacing three separate
   frontends in the original version of Polis.
