@@ -25,7 +25,7 @@ const CreateConversation = ({ dispatch, user }) => {
   const [prefillSelection, setPrefillSelection] = useState<number>()
   const descriptionRef = useRef()
 
-  const [showExample, setShowExample] = useState<boolean>(false)
+  const [showExample, setShowExample] = useState<boolean>(true)
   const [title, setTitle] = useState<string>()
   const [description, setDescription] = useState<string>()
 
@@ -235,7 +235,7 @@ const CreateConversation = ({ dispatch, user }) => {
                               })}
                           </ul>
                         )}
-                        <Box>You can vote on answers by other members, or add your own!</Box>
+                        <Box>You can vote on answers by other members, or add your own.</Box>
                         <Box sx={{ mt: 2 }}>
                           <Text
                             sx={{ display: "inline", color: "primary", cursor: "pointer" }}
@@ -249,7 +249,7 @@ const CreateConversation = ({ dispatch, user }) => {
                                   .map((item, index) => (item ? `- ${item.trim()}?` : ""))
                                   .join("\n") +
                                 "\n" +
-                                "You can vote on answers by other members, or add your own!"
+                                "You can vote on answers by other members, or add your own."
                               if (descriptionRef.current)
                                 (descriptionRef.current as any).value = desc
                               setDescription(desc)

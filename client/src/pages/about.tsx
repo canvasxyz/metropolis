@@ -27,10 +27,6 @@ const About: React.FC<{ user? }> = ({ user }) => {
           <Text sx={{ mt: [2], mb: [2] }}>
             Quest is a self-organizing survey and network governance tool.
           </Text>
-          <Text sx={{ my: [2] }}>
-            We are exploring ways to use AI and decentralized identity to enable new kinds of
-            collective governance.
-          </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>
             Development happens on{" "}
