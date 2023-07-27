@@ -1,4 +1,4 @@
-(defproject xyz.canvas/quest "1.0.0-SNAPSHOT"
+(defproject xyz.canvas/metropolis "1.0.0-SNAPSHOT"
   :description "A sample project"
   :url "http://github.com/canvasxyz/quest"
   :plugins [[lein-dotenv "1.0.0"]]

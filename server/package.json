@@ -1,5 +1,5 @@
 {
-  "name": "quest-server",
+  "name": "metropolis-server",
   "license": "AGPL-3.0",
   "main": "./dist/app.js",
   "scripts": {

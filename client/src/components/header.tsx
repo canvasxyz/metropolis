@@ -56,7 +56,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
             sx={{ variant: "links.nav", ml: "9px", fontWeight: "bold" }}
             to={isLoggedIn ? "/conversations" : "/"}
           >
-            Quest
+            Metropolis
           </Link>
         )}
       </Box>

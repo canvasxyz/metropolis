@@ -40,7 +40,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               Self-organizing network governance
             </Heading>
             <Text sx={{ my: 3 }}>
-              Quest is a governance tool for community members to{" "}
+              Metropolis is a governance tool for community members to{" "}
               <Text sx={{ display: "inline", color: "#5663e2" }}>learn about each other</Text>,{" "}
               <Text sx={{ display: "inline", color: "#ea4a4b" }}>explore new ideas</Text>, and{" "}
               <Text sx={{ display: "inline", color: "#80b60c" }}>
@@ -125,7 +125,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       <Box sx={{ mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>
         <p>
-          Quest is an extended, multi-modal version of{" "}
+          Metropolis is an extended, multi-modal version of{" "}
           <Link
             href="https://forum.effectivealtruism.org/posts/9jxBki5YbS7XTnyQy/polis-why-and-how-to-use-it"
             target="_blank"

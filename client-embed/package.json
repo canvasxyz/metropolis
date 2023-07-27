@@ -1,5 +1,5 @@
 {
-  "name": "quest-client-embed",
+  "name": "metropolis-client-embed",
   "version": "1.0.0",
   "scripts": {
     "analyze": "webpack --mode=production --analyze",

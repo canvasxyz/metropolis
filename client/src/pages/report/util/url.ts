@@ -5,7 +5,7 @@ const getDomainPrefix = () => {
     return "http://localhost:8040/"
   }
 
-  if (document.domain.includes("quest.im")) {
+  if (document.domain.includes("metropolis.town")) {
     return `https://${document.domain}/`
   }
 
