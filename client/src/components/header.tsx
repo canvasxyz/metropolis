@@ -37,7 +37,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
             }}
           >
             <img
-              src="/foundation.svg"
+              src="/foundation.png"
               width="20"
               style={{ position: "relative", top: 3, opacity: 0.81 }}
             />
@@ -45,7 +45,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         ) : (
           <Link to={isLoggedIn ? "/conversations" : "/"}>
             <img
-              src="/foundation.svg"
+              src="/foundation.png"
               width="20"
               style={{ position: "relative", top: 3, opacity: 0.81 }}
             />
