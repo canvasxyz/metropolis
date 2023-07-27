@@ -105,7 +105,7 @@ const CreateConversation = ({ dispatch, user }) => {
             sx={{
               mr: 4,
               pb: 1,
-              fontWeight: "700",
+              fontWeight: "600",
               borderBottom: step === 0 ? "2px solid" : "",
               borderBottomColor: "body",
               cursor: "pointer",
@@ -122,7 +122,7 @@ const CreateConversation = ({ dispatch, user }) => {
             sx={{
               mr: 4,
               pb: 1,
-              fontWeight: "700",
+              fontWeight: "600",
               borderBottom: step === 1 ? "2px solid" : "",
               borderBottomColor: "body",
               opacity: step === 1 ? 1 : 0.4,
@@ -163,7 +163,7 @@ const CreateConversation = ({ dispatch, user }) => {
                     sx={{
                       fontSize: ".9em",
                       color: "mediumGray",
-                      fontWeight: 600,
+                      fontWeight: "600",
                       mb: [2],
                     }}
                   >
@@ -177,7 +177,7 @@ const CreateConversation = ({ dispatch, user }) => {
         {step === 1 && (
           <Box>
             <Label sx={{ display: "block", mb: [5] }}>
-              <Box sx={{ fontWeight: "700" }}>Title</Box>
+              <Box sx={{ fontWeight: "700", mb: [1] }}>Title</Box>
               {/*<Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 A descriptive name for your survey.
                 </Box>*/}
@@ -192,7 +192,7 @@ const CreateConversation = ({ dispatch, user }) => {
               </Box>
             </Label>
             <Label sx={{ display: "block", mb: [5] }}>
-              <Box sx={{ fontWeight: "700" }}>Instructions</Box>
+              <Box sx={{ fontWeight: "700", mb: [1] }}>Instructions</Box>
               <Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 Explain to users that they’re participating in a collaborative survey, and suggest
                 some questions you’d like them to address or answer.

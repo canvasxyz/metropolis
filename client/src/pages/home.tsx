@@ -22,7 +22,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       <Box
         sx={{ my: [3], textAlign: "center", background: "#fbf5e9", py: [3], borderRadius: "4px" }}
       >
-        Alpha release.
+        💡 Alpha release: We are still redesigning some features.
       </Box>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
@@ -85,7 +85,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
         </Heading>
-        <Grid gap={2} columns={[2, "1fr 2fr"]}>
+        <Grid gap={2} columns={[2, "1fr 2fr"]} sx={{ fontSize: "0.96em" }}>
           <Box sx={grid}>Learn about members</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
             “What makes you excited to be in this community?’’
@@ -125,7 +125,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       <Box sx={{ mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>
         <p>
-          Quest is an extended version of{" "}
+          Quest is an extended, multi-modal version of{" "}
           <Link
             href="https://forum.effectivealtruism.org/posts/9jxBki5YbS7XTnyQy/polis-why-and-how-to-use-it"
             target="_blank"
@@ -135,7 +135,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             Polis
           </Link>
           , an academically validated collective-response survey that has been used with groups of
-          100 to over 200,000 in civic technology settings:
+          100 to 200,000 for:
         </p>
         <p>
           <ul>

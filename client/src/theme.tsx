@@ -1,20 +1,20 @@
 export default {
   space: [0, 4, 8, 16, 24, 32, 42, 56, 72, 96, 128, 256, 512],
   fonts: {
-    heading: "'Alliance No.2', monospace",
-    body: "'Alliance No.2', sans-serif",
-    survey: "'Alliance No.2', sans-serif",
-    monospace: "'Alliance No.2', monospace",
+    heading: "Rubik, sans-serif",
+    body: "Rubik, sans-serif",
+    survey: "Rubik, sans-serif",
+    monospace: "Rubik, monospace",
   },
   fontSizes: [12, 14, 16, 20, 24, 36, 48, 64, 96],
   fontWeights: {
     body: 400,
     survey: 400,
-    heading: 700,
+    heading: 600,
     bold: 700,
   },
   lineHeights: {
-    body: 1.5,
+    body: 1.45,
     heading: 1.125,
   },
   colors: {
