@@ -17,6 +17,15 @@ const Index: React.FC<{ user? }> = ({ user }) => {
     lineHeight: 1.35,
   }
 
+  const comingSoon = {
+    py: 4,
+    width: "100%",
+    textAlign: "center",
+    color: "#777",
+    bg: "#eee",
+    borderRadius: "8px",
+  }
+
   return (
     <React.Fragment>
       <Box
@@ -122,7 +131,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           groups, areas of consensus, and points of further exploration.
         </p>
       </Box>
-      <Box sx={{ mt: [9], mb: [8] }}>
+      <Box sx={{ mt: [9] }}>
         <Heading as="h3">Background</Heading>
         <p>
           Metropolis is an extended, multi-modal version of{" "}
@@ -144,6 +153,17 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             <li>Developing governance strategies for AI</li>
           </ul>
         </p>
+      </Box>
+      <Box sx={{ mt: [9], mb: [8] }}>
+        <Heading as="h3" sx={{ mb: [4] }}>
+          Coming soon
+        </Heading>
+        <Grid gap={[2]} columns={[2]}>
+          <Box sx={comingSoon}>Web3 login</Box>
+          <Box sx={comingSoon}>Token gating</Box>
+          <Box sx={comingSoon}>Twitter integration</Box>
+          <Box sx={comingSoon}>Knowledge graph</Box>
+        </Grid>
       </Box>
     </React.Fragment>
   )
