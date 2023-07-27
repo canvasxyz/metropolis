@@ -49,7 +49,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               <Text sx={{ display: "inline", color: "#5663e2" }}>learn about each other</Text>,{" "}
               <Text sx={{ display: "inline", color: "#ea4a4b" }}>explore new ideas</Text>, and{" "}
               <Text sx={{ display: "inline", color: "#80b60c" }}>
-                build a foundation for good governance
+                build a foundation for governance
               </Text>
               .
             </Text>
@@ -100,10 +100,6 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           <Box sx={{ ...grid, fontStyle: "italic" }}>
             “What makes you excited to be in this community?’’
           </Box>
-          <Box sx={grid}>Source opportunities</Box>
-          <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “Who would you be excited to see us collaborate with?’’
-          </Box>
           <Box sx={grid}>Collect feedback</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
             “How could we improve our user interface?’’
@@ -122,10 +118,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       </Box>
       <Box sx={{ mt: [9] }}>
         <Heading as="h3">How it works</Heading>
-        <p>1. The survey creator asks a question, and seeds it with suggested responses.</p>
+        <p>1. The survey creator asks a question, seeding it with 10-15 suggested responses.</p>
         <p>
-          2. Participants vote on responses, while contributing their own. The survey updates in
-          realtime to prioritize the highest-signal responses.
+          2. Participants vote on responses, and contribute their own. The survey selects the
+          highest-signal responses for users to vote on in realtime.
         </p>
         <p>
           3. We use statistical methods to build a detailed profile of top responses, key opinion
@@ -154,6 +150,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             <li>Developing governance strategies for AI</li>
           </ul>
         </p>
+        <p>
+          Polis is typically used as a large-scale opinion poll, but we think there’s a way it can
+          be useful for small communities.
+        </p>
       </Box>
       <Box sx={{ mt: [9], mb: [8] }}>
         <Heading as="h3" sx={{ mb: [4] }}>
@@ -161,8 +161,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </Heading>
         <Grid gap={[2]} columns={[2]}>
           <Box sx={comingSoon}>Token gating</Box>
-          <Box sx={comingSoon}>Multi-modal surveys</Box>
           <Box sx={comingSoon}>Collect from Twitter</Box>
+          <Box sx={comingSoon}>Multi-modal surveys</Box>
           <Box sx={comingSoon}>Knowledge graph</Box>
         </Grid>
       </Box>
