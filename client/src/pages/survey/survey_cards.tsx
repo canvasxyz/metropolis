@@ -19,113 +19,53 @@ const SurveyCards = ({
   goTo,
   zid_metadata,
 }) => {
-  const mainRef = useRef()
-  const firstCardRef = useRef()
-  useLayoutEffect(() => {
-    if (mainRef.current && firstCardRef.current) {
-      ;(mainRef.current as any).style.maxHeight =
-        (firstCardRef.current as any).offsetHeight + 100 + "px"
-    }
-  }, [votedComments.length])
-
   return (
     <Box>
       {unvotedComments.length > 0 && (
-        <Box
-          ref={mainRef}
-          sx={{
-            position: "relative",
-            maxHeight: "300px",
-            overflow: "hidden",
-            pb: "40px",
-            mb: "40px",
-          }}
-        >
+        <Box sx={{ position: "relative" }}>
           {unvotedComments[0] && (
-            <Box ref={firstCardRef}>
-              <SurveyCard
-                key={unvotedComments[0].tid}
-                comment={unvotedComments[0]}
-                conversationId={conversation_id}
-                onVoted={onVoted}
-                hasVoted={false}
-                stacked={true}
-              />
-            </Box>
-          )}
-          {unvotedComments[1] && (
             <SurveyCard
-              key={unvotedComments[1].tid}
-              comment={unvotedComments[1]}
+              key={unvotedComments[0].tid}
+              comment={unvotedComments[0]}
               conversationId={conversation_id}
               onVoted={onVoted}
               hasVoted={false}
               stacked={true}
             />
           )}
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              l: 0,
-              width: "100%",
-              textAlign: "center",
-              pt: "120px",
-              pointerEvents: "none",
-              backgroundImage: `
-  linear-gradient(
-    to bottom,
-    hsla(0, 0%, 100%, 0) 0%,
-    hsla(0, 0%, 100%, 0.013) 8.1%,
-    hsla(0, 0%, 100%, 0.049) 15.5%,
-    hsla(0, 0%, 100%, 0.104) 22.5%,
-    hsla(0, 0%, 100%, 0.175) 29%,
-    hsla(0, 0%, 100%, 0.259) 35.3%,
-    hsla(0, 0%, 100%, 0.352) 41.2%,
-    hsla(0, 0%, 100%, 0.45) 47.1%,
-    hsla(0, 0%, 100%, 0.55) 52.9%,
-    hsla(0, 0%, 100%, 0.648) 58.8%,
-    hsla(0, 0%, 100%, 0.741) 64.7%,
-    hsla(0, 0%, 100%, 0.825) 71%,
-    hsla(0, 0%, 100%, 0.896) 77.5%,
-    hsla(0, 0%, 100%, 0.951) 84.5%,
-    hsla(0, 0%, 100%, 0.987) 91.9%,
-    hsl(0, 0%, 100%) 100%
-  )`,
-            }}
-          ></Box>
-          <Box
-            sx={{
-              position: "absolute",
-              bottom: 0,
-              l: 0,
-              width: "100%",
-              textAlign: "center",
-              pt: "0px",
-            }}
-          >
-            <Text
-              sx={{
-                display: "inline-block",
-                borderRadius: "9999px",
-                p: "2px 12px 1px",
-                fontFamily: "monospace",
-                fontSize: "0.92em",
-                color: "lightGrayActive",
-                bg: "lighterGray",
-              }}
-            >
-              {unvotedComments.length > 1 &&
-              zid_metadata.postsurvey_limit &&
-              zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length > 0
-                ? `${
-                    zid_metadata.postsurvey_limit - votedComments.length - submittedComments.length
-                  } more`
-                : unvotedComments.length > 1
-                ? `${unvotedComments.length - 1} cards left`
-                : "Last card"}
-            </Text>
-          </Box>
+          {unvotedComments[1] &&
+            unvotedComments.slice(0, 5).map((comment, index) => (
+              <Box
+                sx={{
+                  zIndex: -1,
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  transform:
+                    index === 0
+                      ? "rotate(-0.25deg)"
+                      : index === 1
+                      ? "rotate(0.25deg)"
+                      : index === 2
+                      ? "rotate(-0.65deg)"
+                      : index === 3
+                      ? "rotate(0.65deg)"
+                      : index === 4
+                      ? "rotate(-1deg)"
+                      : "rotate(1deg)",
+                }}
+              >
+                <SurveyCard
+                  key={unvotedComments[1].tid}
+                  comment={unvotedComments[1]}
+                  conversationId={conversation_id}
+                  onVoted={onVoted}
+                  hasVoted={false}
+                  stacked={true}
+                />
+              </Box>
+            ))}
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
