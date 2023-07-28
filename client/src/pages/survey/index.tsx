@@ -223,7 +223,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             sx={{ position: "fixed", bottom: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
-            <TbSettings /> Admin Panel
+            <TbSettings /> Edit
           </Button>
         )}
         <SurveyFloatingPromptBox

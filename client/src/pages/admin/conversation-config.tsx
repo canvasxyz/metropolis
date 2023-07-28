@@ -87,18 +87,17 @@ class ConversationConfig extends React.Component<
         >
           Configure
         </Heading>
-        <Box sx={{ mb: [4] }}>
-          {this.props.loading ? (
-            <Text>Saving...</Text>
-          ) : (
-            <Text>⚡ Changes automatically saved</Text>
-          )}
-          {this.props.error ? <Text>Error Saving</Text> : null}
-        </Box>
+        <Box sx={{ mb: [4] }}>{this.props.error ? <Text>Error Saving</Text> : null}</Box>
 
         <CheckboxField field="is_active" label="Conversation is open">
-          Uncheck to disable voting and commenting
+          Uncheck to disable voting
         </CheckboxField>
+
+        <Box sx={{ mt: [4], mb: [4] }}>
+          <Link sx={{ variant: "styles.a" }} to={"/c/" + this.props.zid_metadata.conversation_id}>
+            Go to survey
+          </Link>
+        </Box>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>Title</Text>
@@ -119,17 +118,8 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
-        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          Before the Survey
-        </Heading>
-
         <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>
-            Intro Page Text
-            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Shown before starting
-            </Text>
-          </Text>
+          <Text sx={{ mb: [2] }}>Instructions</Text>
           <textarea
             ref={(c) => (this.description = c)}
             sx={{
@@ -151,41 +141,18 @@ class ConversationConfig extends React.Component<
         </Box>
 
         <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          During the Survey
+          Post-Survey Redirect
         </Heading>
 
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>
-            Caption
-            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Shown during voting</Text>
-          </Text>
-          <textarea
-            placeholder="Please review the statements below and add your own:"
-            ref={(c) => (this.survey_caption = c)}
-            sx={{
-              fontFamily: "body",
-              fontSize: [2],
-              width: "100%",
-              maxWidth: "35em",
-              height: "7em",
-              resize: "none",
-              padding: [2],
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "mediumGray",
-            }}
-            data-test-id="survey_caption"
-            onBlur={this.handleStringValueChange("survey_caption").bind(this)}
-            defaultValue={this.props.zid_metadata.survey_caption}
-          />
+        <Box sx={{ mb: [4], fontStyle: "italic" }}>
+          Once participants have submitted both the votes and statements expected, they will be
+          guided to the post-survey page.
         </Box>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
             Votes Expected
-            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Optional. Number of votes users should submit
-            </Text>
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
           </Text>
           <input
             ref={(c) => (this.postsurvey_limit = c)}
@@ -207,9 +174,7 @@ class ConversationConfig extends React.Component<
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
             Statements Expected
-            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
-              Optional. Number of statements users should submit
-            </Text>
+            <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
           </Text>
           <input
             ref={(c) => (this.postsurvey_submissions = c)}
@@ -227,14 +192,6 @@ class ConversationConfig extends React.Component<
             defaultValue={this.props.zid_metadata.postsurvey_submissions || ""}
           />
         </Box>
-
-        <Box>
-          Once both requirements are met, participants will be redirected to the post-survey page.
-        </Box>
-
-        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-          After the Survey
-        </Heading>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>
@@ -287,7 +244,7 @@ class ConversationConfig extends React.Component<
           />
         </Box>
 
-        <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+        <Heading as="h3" sx={{ mt: [6], mb: 4 }}>
           Customize the user interface
         </Heading>
 
@@ -342,7 +299,7 @@ class ConversationConfig extends React.Component<
           <Box
             sx={{ my: [2], px: [3], py: [1], border: "1px solid lightGray", borderRadius: "6px" }}
           >
-            <pre>
+            <pre style={{ fontSize: "14px" }}>
               {"<div"}
               {" class='polis'"}
               {" data-conversation_id='" + this.props.zid_metadata.conversation_id + "'>"}

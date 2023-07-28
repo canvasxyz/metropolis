@@ -30,7 +30,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
   const samples = [
     "The level of conflict we have right now is healthy. We shouldn't expect total agreement among everyone.",
     "I really like the iOS widgets. We should explore more projects like that - avatars, digital pets, and toys could reach lots of people.",
-    "It can be hard to understand why the organization works the way it does. We should have a writer come in and help tell that story.",
+    "It can be hard to understand why the organization works the way it does. We should have a writer come in and help tell the story.",
   ]
 
   return (
@@ -93,8 +93,12 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             )}
           </Box>
           <Box sx={{ mt: [4] }}>
+            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/c/65vvimnjkp">
+              Try a survey
+            </RouterLink>{" "}
+            or{" "}
             <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
-              Create a survey
+              create one
             </RouterLink>
           </Box>
         </Box>

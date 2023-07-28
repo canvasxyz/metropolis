@@ -52,7 +52,7 @@ const zid = (
       delete filtered_action_data.modified
 
       if (JSON.stringify(filtered_zid_metadata) !== JSON.stringify(filtered_action_data)) {
-        toast.success("Config updated")
+        toast.success("Changes saved")
       }
       return Object.assign({}, state, {
         loading: false,
