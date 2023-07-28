@@ -12,7 +12,6 @@ import type { RootState, Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
-import SurveyIntro from "./survey_intro"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
@@ -21,7 +20,7 @@ import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
 
-type SurveyState = "loading" | "intro" | "login" | "voting" | "postsurvey"
+type SurveyState = "loading" | "login" | "voting" | "postsurvey"
 
 export const surveyHeading = {
   fontSize: [4],
@@ -172,21 +171,21 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       } else if (
         // voted on not enough comments, initialize to previous url hash
         hash &&
-        ["intro", "login", "voting", "postsurvey"].indexOf(hash) !== -1
+        ["login", "voting", "postsurvey"].indexOf(hash) !== -1
       ) {
         setState(hash as SurveyState)
       } else {
         // new user, initialize to intro
-        setState("intro")
+        setState("voting")
       }
     })
 
     const onpopstate = (event) => {
       const newHash = document.location.hash.slice(1)
-      if (newHash && ["intro", "login", "voting", "postsurvey"].indexOf(newHash) !== -1) {
+      if (newHash && ["login", "voting", "postsurvey"].indexOf(newHash) !== -1) {
         setState(newHash as SurveyState)
       } else if (newHash === "") {
-        setState("intro")
+        setState("voting")
       } else {
         console.error("Invalid state:", newHash)
       }
@@ -234,12 +233,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           goTo={goTo}
         />
       </Box>
-      {state === "intro" && (
-        <SurveyIntro zid_metadata={zid_metadata} onNext={() => goTo("voting")} />
-      )}
-      {state === "login" && (
-        <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("intro")} />
-      )}
+      {state === "login" && <SurveyLogin onNext={() => goTo("voting")} />}
       {(state === "voting" || state === "postsurvey") && (
         <Box>
           <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>
@@ -249,26 +243,34 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       )}
       {state === "voting" && (
         <React.Fragment>
-          <Box>
-            <Text sx={{ mt: [4], mb: [2] }}>
-              This is a collaborative survey, where you can contribute statements for everyone to
-              vote on.
+          {zid_metadata?.description ? (
+            <Text className="react-markdown">
+              <ReactMarkdown children={zid_metadata.description} remarkPlugins={[remarkGfm]} />
             </Text>
-            <Text sx={{ my: [2] }}>
-              You’ll be shown {cardsText}, and asked to <strong>Agree</strong>,{" "}
-              <strong>Disagree</strong>, or <strong>Skip</strong>.
-            </Text>
-            <Text>
-              <ul>
-                <li>
-                  If you generally agree, select Agree. You can also check a box to show if you
-                  identify strongly.
-                </li>
-                <li>If you disagree or think the statement doesn’t make sense, select Disagree.</li>
-                <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
-              </ul>
-            </Text>
-          </Box>
+          ) : (
+            <Box>
+              <Text sx={{ mt: [4], mb: [2] }}>
+                This is a collaborative survey, where you can contribute statements for everyone to
+                vote on.
+              </Text>
+              <Text sx={{ my: [2] }}>
+                You’ll be shown {cardsText}, and asked to <strong>Agree</strong>,{" "}
+                <strong>Disagree</strong>, or <strong>Skip</strong>.
+              </Text>
+              <Text>
+                <ul>
+                  <li>
+                    If you generally agree, select Agree. You can also check a box to show if you
+                    identify strongly.
+                  </li>
+                  <li>
+                    If you disagree or think the statement doesn’t make sense, select Disagree.
+                  </li>
+                  <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
+                </ul>
+              </Text>
+            </Box>
+          )}
           <Box sx={{ mt: [5], mb: [5] }}>
             <SurveyCards
               votedComments={votedComments}

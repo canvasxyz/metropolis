@@ -3,7 +3,7 @@ import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 
 import { surveyHeading } from "./index"
 
-const SurveyLogin = ({ onNext, onPrev }) => {
+const SurveyLogin = ({ onNext }) => {
   return (
     <Box>
       <Heading as="h3" sx={surveyHeading}>
@@ -19,18 +19,6 @@ const SurveyLogin = ({ onNext, onPrev }) => {
             Continue
           </Button>
         </Box>
-        <Link
-          onClick={onPrev}
-          sx={{
-            display: "inline",
-            my: [2],
-            mx: "22px",
-            fontFamily: "monospace",
-            color: "mediumGray",
-          }}
-        >
-          Back
-        </Link>
       </Flex>
     </Box>
   )
