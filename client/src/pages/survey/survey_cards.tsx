@@ -36,6 +36,7 @@ const SurveyCards = ({
           {unvotedComments[1] &&
             unvotedComments.slice(0, 5).map((comment, index) => (
               <Box
+                key={comment.txt}
                 sx={{
                   zIndex: -1,
                   position: "absolute",

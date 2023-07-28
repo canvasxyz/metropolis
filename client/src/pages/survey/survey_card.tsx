@@ -134,7 +134,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
         px: ["24px", "32px"],
-        pt: ["22px", "25px"],
+        pt: ["22px", "27px"],
         pb: ["16px", "19px"],
         overflow: "scroll",
       }}

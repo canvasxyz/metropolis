@@ -12,7 +12,6 @@ import type { RootState, Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
-import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 import SurveyFloatingPromptBox from "./survey_floating_prompt"
@@ -20,7 +19,7 @@ import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
 
-type SurveyState = "loading" | "login" | "voting" | "postsurvey"
+type SurveyState = "loading" | "voting" | "postsurvey"
 
 export const surveyHeading = {
   fontSize: [4],
@@ -148,41 +147,12 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         }, 0)
       }
 
-      const hash = document.location.hash.slice(1)
-      // decide which screen should be shown, based on whether the
-      // user has completed voting requirements. because this is a
-      // function of not just the user's votes but also submissions,
-      // this is an extremely hacky implementation of a state machine.
-      if (
-        ((unvotedComments.length === 0 && allComments.length > 0) || // voted on all comments
-          (zid_metadata.postsurvey_limit &&
-            allComments.length - unvotedComments.length - allSubmissions.length >=
-              zid_metadata.postsurvey_limit)) && // or, voted on enough comments
-        (!zid_metadata.postsurvey_submissions || // no submissions requirement
-          allSubmissions.length >= zid_metadata.postsurvey_submissions) // or, made enough submissions
-      ) {
-        // voted on enough/all comments AND made enough submissions, initialize to postsurvey
-        setState("postsurvey")
-        history.replaceState({}, "", document.location.pathname + "#postsurvey")
-      } else if (allComments.length - unvotedComments.length > 0 || allSubmissions.length > 0) {
-        // voted on some comments OR made some submissions, initialize to voting
-        setState("voting")
-        history.replaceState({}, "", document.location.pathname + "#voting")
-      } else if (
-        // voted on not enough comments, initialize to previous url hash
-        hash &&
-        ["login", "voting", "postsurvey"].indexOf(hash) !== -1
-      ) {
-        setState(hash as SurveyState)
-      } else {
-        // new user, initialize to intro
-        setState("voting")
-      }
+      setState("voting")
     })
 
     const onpopstate = (event) => {
       const newHash = document.location.hash.slice(1)
-      if (newHash && ["login", "voting", "postsurvey"].indexOf(newHash) !== -1) {
+      if (newHash && ["voting", "postsurvey"].indexOf(newHash) !== -1) {
         setState(newHash as SurveyState)
       } else if (newHash === "") {
         setState("voting")
@@ -233,7 +203,6 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           goTo={goTo}
         />
       </Box>
-      {state === "login" && <SurveyLogin onNext={() => goTo("voting")} />}
       {(state === "voting" || state === "postsurvey") && (
         <Box>
           <Heading as="h3" sx={{ ...surveyHeading, mb: [4] }}>

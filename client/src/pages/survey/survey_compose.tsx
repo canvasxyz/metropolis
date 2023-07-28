@@ -32,7 +32,6 @@ const SurveyComposeBox: React.FC<{
   setState,
 }) => {
   const inputRef = useRef<HTMLInputElement>()
-  const importantRef = useRef<HTMLInputElement>()
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -119,7 +118,6 @@ const SurveyComposeBox: React.FC<{
             submitComment(inputRef.current.value, 1)
               .then(() => {
                 inputRef.current.value = ""
-                importantRef.current.checked = false
                 setError("")
               })
               .finally(() => {
@@ -139,7 +137,6 @@ const SurveyComposeBox: React.FC<{
                 submitComment(inputRef.current.value, 1)
                   .then(() => {
                     inputRef.current.value = ""
-                    importantRef.current.checked = false
                     setError("")
                   })
                   .finally(() => {
@@ -155,7 +152,6 @@ const SurveyComposeBox: React.FC<{
                 submitComment(inputRef.current.value, -1)
                   .then(() => {
                     inputRef.current.value = ""
-                    importantRef.current.checked = false
                     setError("")
                   })
                   .finally(() => {
@@ -166,13 +162,7 @@ const SurveyComposeBox: React.FC<{
           ]}
         />
       </Box>
-      <Box sx={{ fontFamily: "monospace" }}>
-        <label>
-          <input type="checkbox" ref={importantRef} onChange={() => false} />
-          &nbsp;This option is important to me
-        </label>
-        {error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}
-      </Box>
+      <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
     </form>
   )
 }
