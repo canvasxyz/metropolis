@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom"
+import { Link as RouterLink } from "react-router-dom"
 import React, { useEffect } from "react"
-import { Box, Text, Flex } from "theme-ui"
+import { Box, Text, Flex, Link } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 
 import {
@@ -35,16 +35,17 @@ function ConversationRow({ c, i, stats, dispatch }) {
             {c.is_archived ? (
               <Text sx={{ color: "mediumGray" }}>{c.topic}</Text>
             ) : (
-              <Link
-                sx={{
-                  variant: "links.text",
-                  cursor: "pointer",
-                  fontWeight: 600,
-                }}
-                to={`/c/${c.conversation_id}`}
-              >
-                {c.topic}
-              </Link>
+              <RouterLink to={`/c/${c.conversation_id}`}>
+                <Text
+                  sx={{
+                    variant: "links.text",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  {c.topic}
+                </Text>
+              </RouterLink>
             )}
           </Box>
           <Box sx={{ my: [2] }}>

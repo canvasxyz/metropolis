@@ -131,7 +131,7 @@ const SurveyComposeBox: React.FC<{
       />
       <Box sx={{ mb: [3] }}>
         <DropdownButton
-          sx={{ display: "inline-block", fontSize: "94%" }}
+          sx={{ display: "inline-block" }}
           options={[
             {
               name: "Add statement",
@@ -166,7 +166,7 @@ const SurveyComposeBox: React.FC<{
           ]}
         />
       </Box>
-      <Box sx={{ fontFamily: "monospace", fontSize: "92%" }}>
+      <Box sx={{ fontFamily: "monospace" }}>
         <label>
           <input type="checkbox" ref={importantRef} onChange={() => false} />
           &nbsp;This option is important to me

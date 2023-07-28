@@ -13,7 +13,6 @@ import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyIntro from "./survey_intro"
-import SurveyInstructions from "./survey_instructions"
 import SurveyLogin from "./survey_login"
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
@@ -22,7 +21,7 @@ import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
 
-type SurveyState = "loading" | "intro" | "instructions" | "login" | "voting" | "postsurvey"
+type SurveyState = "loading" | "intro" | "login" | "voting" | "postsurvey"
 
 export const surveyHeading = {
   fontSize: [4],
@@ -173,7 +172,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       } else if (
         // voted on not enough comments, initialize to previous url hash
         hash &&
-        ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(hash) !== -1
+        ["intro", "login", "voting", "postsurvey"].indexOf(hash) !== -1
       ) {
         setState(hash as SurveyState)
       } else {
@@ -184,10 +183,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
 
     const onpopstate = (event) => {
       const newHash = document.location.hash.slice(1)
-      if (
-        newHash &&
-        ["intro", "instructions", "login", "voting", "postsurvey"].indexOf(newHash) !== -1
-      ) {
+      if (newHash && ["intro", "login", "voting", "postsurvey"].indexOf(newHash) !== -1) {
         setState(newHash as SurveyState)
       } else if (newHash === "") {
         setState("intro")
@@ -206,13 +202,16 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     history.pushState({}, "", document.location.pathname + "#" + state)
   }, [])
 
+  const cardsText = zid_metadata.postsurvey_limit
+    ? `a batch of ${zid_metadata.postsurvey_limit} statements`
+    : "statements by other people"
+
   return (
     <Box
       sx={{
         margin: "0 auto",
         maxWidth: "30em",
         letterSpacing: "-0.06px",
-        fontSize: ["1em", "1.05em"],
         lineHeight: ["1.4", "1.5"],
       }}
     >
@@ -236,17 +235,10 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         />
       </Box>
       {state === "intro" && (
-        <SurveyIntro zid_metadata={zid_metadata} onNext={() => goTo("instructions")} />
-      )}
-      {state === "instructions" && (
-        <SurveyInstructions
-          onNext={() => goTo("voting") /* goTo("login") */}
-          onPrev={() => goTo("intro")}
-          limit={null /* TODO */}
-        />
+        <SurveyIntro zid_metadata={zid_metadata} onNext={() => goTo("voting")} />
       )}
       {state === "login" && (
-        <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("instructions")} />
+        <SurveyLogin onNext={() => goTo("voting")} onPrev={() => goTo("intro")} />
       )}
       {(state === "voting" || state === "postsurvey") && (
         <Box>
@@ -257,12 +249,25 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       )}
       {state === "voting" && (
         <React.Fragment>
-          <Box sx={{ fontSize: "92%", mt: [3] }}>
-            {zid_metadata.survey_caption ? (
-              <ReactMarkdown children={zid_metadata.survey_caption} remarkPlugins={[remarkGfm]} />
-            ) : (
-              <Text>Please review the statements below and add your own:</Text>
-            )}
+          <Box>
+            <Text sx={{ mt: [4], mb: [2] }}>
+              This is a collaborative survey, where you can contribute statements for everyone to
+              vote on.
+            </Text>
+            <Text sx={{ my: [2] }}>
+              You’ll be shown {cardsText}, and asked to <strong>Agree</strong>,{" "}
+              <strong>Disagree</strong>, or <strong>Skip</strong>.
+            </Text>
+            <Text>
+              <ul>
+                <li>
+                  If you generally agree, select Agree. You can also check a box to show if you
+                  identify strongly.
+                </li>
+                <li>If you disagree or think the statement doesn’t make sense, select Disagree.</li>
+                <li>If you don’t think it’s relevant or are unsure, select Skip.</li>
+              </ul>
+            </Text>
           </Box>
           <Box sx={{ mt: [5], mb: [5] }}>
             <SurveyCards
@@ -322,7 +327,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <Box sx={{ mb: [5] }}>
           {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
             <Box>
-              <Box sx={{ fontSize: "92%", mt: [3], mb: [3] }}>
+              <Box sx={{ mt: [3], mb: [3] }}>
                 Are your perspectives or experiences missing? If so, add them here:
               </Box>
               <SurveyCompose

@@ -37,23 +37,38 @@ export default {
   },
   forms: {
     input: {
+      fontSize: "inherit !important",
       fontFamily: "body",
       backgroundColor: "#ffffff",
       my: [2],
     },
     textarea: {
+      fontSize: "inherit !important",
       fontFamily: "body",
       backgroundColor: "#ffffff",
       my: [2],
     },
   },
   links: {
-    text: {
+    a: {
       fontWeight: "600",
       color: "primary",
+      "&:active": {
+        color: "primary",
+      },
+      "&:hover": {
+        color: "primary",
+        textDecoration: "underline",
+      },
       "&:visited": {
         color: "primary",
       },
+      textDecoration: "none",
+      cursor: "pointer",
+    },
+    text: {
+      fontWeight: "600",
+      color: "primary",
       "&:active": {
         color: "primary",
       },
