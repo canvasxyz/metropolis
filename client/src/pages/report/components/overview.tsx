@@ -39,27 +39,21 @@ const Overview = ({
     <div>
       <p style={globals.primaryHeading}>Overview</p>
       <p style={globals.paragraph}>
-        Pol.is is a real-time survey system that helps identify the different ways a large group of
-        people think about a divisive or complicated topic. Here’s a basic breakdown of some terms
-        you’ll need to know in order to understand this report.
+        Metropolis is a real-time survey system that helps identify different ways a group thinks
+        about a topic or question.
       </p>
       <p style={globals.paragraph}>
-        <strong>Participants:</strong> These are the people who participated in the conversation by
-        voting and writing statements. Based on how they voted, each participant is sorted into an
-        opinion group.
+        Participants submit responses for other participants to vote on. Responses are assigned a
+        number in the order they’re submitted.
       </p>
       <p style={globals.paragraph}>
-        <strong>Statements:</strong> Participants may submit statements for other participants to
-        vote on. Statements are assigned a number in the order they’re submitted.
-      </p>
-      <p style={globals.paragraph}>
-        <strong>Opinion groups:</strong> Groups are made of participants who voted similarly to each
-        other, and differently from the other groups.
+        Voters are sorted into opinion groups, which include participants who voted similarly to
+        each other, and differently from other opinion groups.
       </p>
 
       <p style={globals.paragraph}>
         {conversation && conversation.ownername
-          ? "This pol.is conversation was run by " + conversation.ownername + ". "
+          ? "This conversation was run by " + conversation.ownername + ". "
           : null}
         {conversation && conversation.topic ? "The topic was '" + conversation.topic + "'. " : null}
       </p>
@@ -83,11 +77,3 @@ const Overview = ({
 }
 
 export default Overview
-
-// <p style={globals.paragraph}> {conversation && conversation.participant_count ? "A total of "+ptptCount+" people participated. " : null} </p>
-
-// It was presented {conversation ? conversation.medium : "loading"} to an audience of {conversation ? conversation.audiences : "loading"}.
-// The conversation was run for {conversation ? conversation.duration : "loading"}.
-// {demographics ? demographics.foo : "loading"} were women
-
-// {conversation && conversation.description ? "The specific question was '"+conversation.description+"'. ": null}

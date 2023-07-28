@@ -29,7 +29,7 @@ const MajorityStrict = ({
 
   return (
     <div>
-      <p style={globals.primaryHeading}> Majority </p>
+      <p style={globals.primaryHeading}>Statements with general agreement</p>
       <p style={globals.paragraph}>Here&apos;s what most people agreed with.</p>
       <p style={globals.paragraph}>
         60% or more of all participants voted one way or the other, regardless of whether large

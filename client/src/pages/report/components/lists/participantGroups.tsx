@@ -39,7 +39,7 @@ class ParticipantGroups extends React.Component<{
     return (
       <div style={Object.assign({}, styles.base, this.props.style)}>
         <div>
-          <p style={globals.primaryHeading}> Opinion Groups </p>
+          <p style={globals.primaryHeading}>Opinion groups</p>
           <p style={globals.paragraph}>
             Across {this.props.ptptCount} total participants,{" "}
             {this.props.math["group-votes"].length} opinion groups emerged. There are two factors

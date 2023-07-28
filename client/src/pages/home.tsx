@@ -183,9 +183,9 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           Coming soon
         </Heading>
         <Grid gap={[2]} columns={[2]}>
+          <Box sx={comingSoon}>Advanced analysis UI</Box>
+          <Box sx={comingSoon}>Web3 login</Box>
           <Box sx={comingSoon}>Token gating</Box>
-          <Box sx={comingSoon}>Collect from Twitter</Box>
-          <Box sx={comingSoon}>Multi-modal surveys</Box>
           <Box sx={comingSoon}>Knowledge graph</Box>
         </Grid>
       </Box>

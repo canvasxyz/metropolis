@@ -1,8 +1,6 @@
-// Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 /** @jsx jsx */
 
-import React, { useRef, useCallback, useState } from "react"
+import React, { useRef, useCallback, useState, useEffect } from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
@@ -13,6 +11,7 @@ import NoPermission from "./no-permission"
 import { CheckboxField } from "./CheckboxField"
 import SeedComment from "./seed-comment"
 
+import api from "../../util/api"
 import Url from "../../util/url"
 import ComponentHelpers from "../../util/component-helpers"
 import { RootState } from "../../util/types"
@@ -80,6 +79,17 @@ const ConversationConfig: React.FC<{
     [dispatch, handleZidMetadataUpdate, zid_metadata]
   )
 
+  const [reports, setReports] = useState()
+  useEffect(() => {
+    api
+      .get("/api/v3/reports", {
+        conversation_id: zid_metadata.conversation_id,
+      })
+      .then((reports) => {
+        setReports(reports)
+      })
+  }, [])
+
   if (zid_metadata && !zid_metadata.is_owner && !zid_metadata.is_mod) {
     return <NoPermission />
   }
@@ -106,6 +116,14 @@ const ConversationConfig: React.FC<{
         <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
           Go to survey
         </Link>
+        {reports && reports[0] && (
+          <Link
+            sx={{ variant: "styles.a", ml: [3] }}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+          >
+            Go to report
+          </Link>
+        )}
       </Box>
 
       <Box sx={{ mb: [3] }}>
@@ -330,6 +348,14 @@ const ConversationConfig: React.FC<{
         <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
           Go to survey
         </Link>
+        {reports && reports[0] && (
+          <Link
+            sx={{ variant: "styles.a", ml: [3] }}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+          >
+            Go to report
+          </Link>
+        )}
       </Box>
     </Box>
   )
