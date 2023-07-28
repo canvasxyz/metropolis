@@ -26,7 +26,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
 
   const animateOut = (el) =>
     new Promise<void>((resolve, reject) => {
-      el.parentElement.classList.add("animation-exit")
+      el.parentElement.parentElement.classList.add("animation-exit")
       setTimeout(() => resolve(), 400)
     })
 
@@ -129,76 +129,71 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         position: "relative",
         border: "1px solid",
         borderColor: "#ddd",
-        borderRadius: "8px",
-        bg: "background",
+        borderRadius: "2px",
+        bg: "bgOffWhite",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         width: "100%",
-        px: ["24px", "40px"],
-        pt: ["20px", "30px"],
-        pb: ["18px", "28px"],
+        px: ["24px", "32px"],
+        pt: ["22px", "25px"],
+        pb: ["16px", "19px"],
         overflow: "scroll",
       }}
     >
-      <Text
-        sx={{
-          mb: 4,
-          wordBreak: "break-word",
-        }}
-      >
-        {txt}
-      </Text>
-      {hasVoted && (
-        <Box sx={{ position: "absolute", top: [3], right: [3] }}>
-          <DropdownMenu
-            rightAlign
-            options={
-              editingVote
-                ? [
-                    { name: "Agree & Boost", onClick: (e) => agreeBoost(commentId, e.target) },
-                    { name: "Agree", onClick: (e) => agree(commentId, e.target) },
-                    { name: "Disagree", onClick: (e) => disagree(commentId, e.target) },
-                    { name: "Skip", onClick: (e) => skip(commentId, e.target) },
-                    {
-                      name: "Cancel",
-                      onClick: () => setEditingVote(false),
-                    },
-                  ]
-                : [{ name: "Edit your vote", onClick: () => setEditingVote(true) }]
-            }
-          />
+      <Box>
+        <Text
+          sx={{
+            mb: [3],
+            wordBreak: "break-word",
+          }}
+        >
+          {txt}
+        </Text>
+        {hasVoted && (
+          <Box sx={{ position: "absolute", top: [3], right: [3] }}>
+            <DropdownMenu
+              rightAlign
+              options={
+                editingVote
+                  ? [
+                      { name: "Agree & Boost", onClick: (e) => agreeBoost(commentId, e.target) },
+                      { name: "Agree", onClick: (e) => agree(commentId, e.target) },
+                      { name: "Disagree", onClick: (e) => disagree(commentId, e.target) },
+                      { name: "Skip", onClick: (e) => skip(commentId, e.target) },
+                      {
+                        name: "Cancel",
+                        onClick: () => setEditingVote(false),
+                      },
+                    ]
+                  : [{ name: "Edit your vote", onClick: () => setEditingVote(true) }]
+              }
+            />
+          </Box>
+        )}
+        <Box sx={{ marginLeft: "-15px" }}>
+          <Button variant="text" onClick={(e) => agreeBoost(commentId, e.target)}>
+            <img src="/boost.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
+            {/*<TbArrowBigUpLine style={{ position: "relative", top: "4px" }} />*/}
+            <Text sx={{ display: ["none", "inline"] }}>Agree & </Text>Boost
+          </Button>
+          <Button variant="text" onClick={(e) => agree(commentId, e.target)}>
+            <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
+            {/*<TbCheck style={{ position: "relative", top: "4px" }} />*/}
+            Agree
+          </Button>
+          <Button variant="text" onClick={(e) => disagree(commentId, e.target)}>
+            <img
+              src="/disagree.svg"
+              width="18"
+              sx={{ position: "relative", top: "2px", mr: [2] }}
+            />
+            {/*<TbX style={{ position: "relative", top: "4px" }} />*/}
+            Disagree
+          </Button>
+          <Button variant="text" onClick={(e) => skip(commentId, e.target)}>
+            Skip
+          </Button>
         </Box>
-      )}
-      <Button
-        variant="outlineGreen"
-        sx={{ mr: 2, borderColor: "mediumGreen", px: [2, 3], py: [1, 2] }}
-        onClick={(e) => agreeBoost(commentId, e.target)}
-      >
-        <TbArrowBigUpLine style={{ position: "relative", top: "2px" }} />
-        &nbsp;Boost
-      </Button>
-      <Button
-        variant="outlineGreen"
-        sx={{ mr: 2, borderColor: "mediumGreen", px: [2, 3], py: [1, 2] }}
-        onClick={(e) => agree(commentId, e.target)}
-      >
-        <TbCheck style={{ position: "relative", top: "2px" }} />
-        &nbsp;Agree
-      </Button>
-      <Button
-        variant="outlineRed"
-        sx={{ mr: 2, borderColor: "mediumRed", px: [2, 3], py: [1, 2] }}
-        onClick={(e) => disagree(commentId, e.target)}
-      >
-        <TbX style={{ position: "relative", top: "2px" }} />
-        &nbsp;Disagree
-      </Button>
-      <Button
-        variant="outlineGray"
-        sx={{ mr: 2, px: [2, 3], py: [1, 2] }}
-        onClick={(e) => skip(commentId, e.target)}
-      >
-        Skip
-      </Button>
+      </Box>
     </Box>
   )
 }

@@ -19,6 +19,7 @@ export default {
   },
   colors: {
     text: "#44474d",
+    textLight: "#111",
     background: "#fbf5e9",
     primary: "#607adb",
     secondary: "#F6F7F8",
@@ -26,6 +27,7 @@ export default {
     lightGray: "#afafaf",
     lighterGray: "#e4e5e5",
     bgGray: "#eee9de",
+    bgOffWhite: "#fbf7f1",
     primaryActive: "#607adb", // TODO
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#63676e",
@@ -148,6 +150,17 @@ export default {
     },
   },
   buttons: {
+    text: {
+      bg: "transparent",
+      color: "text",
+      cursor: "pointer",
+      fontFamily: "monospace",
+      fontSize: "0.96em",
+      "&:hover": {
+        backgroundColor: "bgGray",
+        color: "textLight",
+      },
+    },
     primary: {
       color: "background",
       bg: "primary",
