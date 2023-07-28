@@ -12,20 +12,24 @@ const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
         px: [4],
       }}
     >
-      {!inSurvey && <Text as="span">(c) {new Date().getFullYear()} Authors</Text>}
-      <Link sx={{ variant: "styles.a", ml: 3 }} to="/tos">
+      {!inSurvey && (
+        <Text as="span" sx={{ mr: 3 }}>
+          (c) {new Date().getFullYear()} Authors
+        </Text>
+      )}
+      <Link sx={{ variant: "styles.a", mr: 3 }} to="/tos">
         Terms
       </Link>{" "}
-      <Link sx={{ variant: "styles.a", ml: 3, pr: "1px" }} to="/privacy">
+      <Link sx={{ variant: "styles.a", mr: 3, pr: "1px" }} to="/privacy">
         Privacy
       </Link>
       {inSurvey && (
-        <Link sx={{ variant: "styles.a", ml: 3 }} to="/">
+        <Link sx={{ variant: "styles.a", mr: 3 }} to="/">
           About
         </Link>
       )}
       {!inSurvey && (
-        <Link sx={{ variant: "styles.a", ml: 3 }} to="/about">
+        <Link sx={{ variant: "styles.a", mr: 3 }} to="/about">
           About
         </Link>
       )}

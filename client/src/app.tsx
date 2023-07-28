@@ -136,97 +136,115 @@ class App extends React.Component<
           position="bottom-right"
           toastOptions={{
             duration: 5000,
-            style: {
-              fontFamily: "Space Grotesk, monospace",
-            },
           }}
         />
         <Switch>
           <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
-          <Box
-            sx={{
-              margin: `0 auto`,
-              maxWidth: inReport ? "62em" : "45em",
-              pb: [4],
-            }}
-          >
-            <Header isLoggedIn={this.props.isLoggedIn} user={this.props.user} inSurvey={inSurvey} />
+          <Box>
             <Box
               sx={{
-                pt: "1px", // prevent margins from spilling over
-                pb: "1em",
-                px: [4],
-                minHeight: "calc(100vh - 9em - 6px)",
+                margin: `0 auto`,
+                maxWidth: inReport ? "62em" : "48em",
+                pb: [4],
               }}
             >
-              <Route exact path="/" render={() => <Home user={this.props.user} />} />
-              <Route exact path="/about" render={() => <About />} />
-              <Route
-                exact
-                path="/signin"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
-              <Route
-                exact
-                path="/signin/*"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
-              <Route
-                exact
-                path="/signin/**/*"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
-              <Route exact path="/signout" component={SignOut} />
-              <Route exact path="/signout/*" component={SignOut} />
-              <Route exact path="/signout/**/*" component={SignOut} />
-              <Route exact path="/createuser" component={CreateUser} />
-              <Route exact path="/createuser/*" component={CreateUser} />
-              <Route exact path="/createuser/**/*" component={CreateUser} />
-
-              <Route exact path="/pwreset" component={PasswordReset} />
-              <Route path="/pwreset/*" component={PasswordReset} />
-              <Route exact path="/pwresetinit" component={PasswordResetInit} />
-
-              <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
-              <Route exact path="/tos" component={TOS} />
-              <Route exact path="/privacy" component={Privacy} />
-
-              <Route
-                render={(routeProps) => {
-                  if (routeProps.location.pathname.split("/")[1] === "m") {
-                    return null
-                  }
-                  return (
-                    <Box>
-                      <Route exact path="/create" component={CreateConversation} />
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/conversations"
-                        component={ManageConversations}
-                      />
-                      <PrivateRoute
-                        isLoading={this.isLoading()}
-                        authed={this.isAuthed()}
-                        exact
-                        path="/account"
-                        component={Account}
-                      />
-                      <Route path="/c/:conversation_id" component={Survey} />
-                      <Route path="/r/:conversation_id/:report_id" component={Report} />
-                    </Box>
-                  )
+              {document.location.pathname !== "/" && (
+                <Header
+                  isLoggedIn={this.props.isLoggedIn}
+                  user={this.props.user}
+                  inSurvey={inSurvey}
+                />
+              )}
+              <Box
+                sx={{
+                  pt: "1px", // prevent margins from spilling over
+                  pb: "1em",
+                  px: [4, 5],
+                  minHeight: "calc(100vh - 9em - 8px)",
                 }}
-              />
-              <PrivateRoute
-                authed={this.isAuthed()}
-                isLoading={this.isLoading()}
-                path="/m/:conversation_id"
-                component={ConversationAdmin}
-              />
+              >
+                <Route exact path="/" render={() => <Home user={this.props.user} />} />
+                <Route exact path="/about" render={() => <About />} />
+                <Route
+                  exact
+                  path="/signin"
+                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+                />
+                <Route
+                  exact
+                  path="/signin/*"
+                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+                />
+                <Route
+                  exact
+                  path="/signin/**/*"
+                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+                />
+                <Route exact path="/signout" component={SignOut} />
+                <Route exact path="/signout/*" component={SignOut} />
+                <Route exact path="/signout/**/*" component={SignOut} />
+                <Route exact path="/createuser" component={CreateUser} />
+                <Route exact path="/createuser/*" component={CreateUser} />
+                <Route exact path="/createuser/**/*" component={CreateUser} />
+
+                <Route exact path="/pwreset" component={PasswordReset} />
+                <Route path="/pwreset/*" component={PasswordReset} />
+                <Route exact path="/pwresetinit" component={PasswordResetInit} />
+
+                <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
+                <Route exact path="/tos" component={TOS} />
+                <Route exact path="/privacy" component={Privacy} />
+
+                <Route
+                  render={(routeProps) => {
+                    if (routeProps.location.pathname.split("/")[1] === "m") {
+                      return null
+                    }
+                    return (
+                      <Box>
+                        <Route exact path="/create" component={CreateConversation} />
+                        <PrivateRoute
+                          isLoading={this.isLoading()}
+                          authed={this.isAuthed()}
+                          exact
+                          path="/conversations"
+                          component={ManageConversations}
+                        />
+                        <PrivateRoute
+                          isLoading={this.isLoading()}
+                          authed={this.isAuthed()}
+                          exact
+                          path="/account"
+                          component={Account}
+                        />
+                        <Route path="/c/:conversation_id" component={Survey} />
+                        <Route path="/r/:conversation_id/:report_id" component={Report} />
+                      </Box>
+                    )
+                  }}
+                />
+                <PrivateRoute
+                  authed={this.isAuthed()}
+                  isLoading={this.isLoading()}
+                  path="/m/:conversation_id"
+                  component={ConversationAdmin}
+                />
+              </Box>
+              <Footer inSurvey={inSurvey} />
             </Box>
-            <Footer inSurvey={inSurvey} />
+            <Box
+              sx={{
+                position: "fixed",
+                width: "100%",
+                bottom: 0,
+                height: "150px",
+                opacity: 0.15,
+                transform: "scaleY(-1)",
+                zIndex: -1,
+                backgroundImage:
+                  "linear-gradient(180deg, #CEC3AB 0%, #D4CAB4 8%, #D9D0BC 15%, #DED6C3 23%, #E3DBCA 29%, #E7E0D0 36%, #EBE4D5 42%, #EEE8DA 48%, #F1EBDE 54%, #F4EEE2 61%, #F6F1E5 68%, #F8F2E7 75%, #F9F4E9 83%, #FAF5EA 91%, #FAF5EA 100%);",
+              }}
+            ></Box>
           </Box>
         </Switch>
       </React.Fragment>

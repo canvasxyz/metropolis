@@ -6,7 +6,7 @@ export default {
     survey: "Rubik, sans-serif",
     monospace: "Rubik, monospace",
   },
-  fontSizes: [12, 14, 16, 20, 24, 36, 48, 64, 96],
+  fontSizes: [12, 14, 16, 20, 24, 36, 40, 64, 96],
   fontWeights: {
     body: 400,
     survey: 400,
@@ -19,14 +19,14 @@ export default {
   },
   colors: {
     text: "#44474d",
-    background: "#fff",
-    primary: "#3241cd",
+    background: "#fbf5e9",
+    primary: "#607adb",
     secondary: "#F6F7F8",
     mediumGray: "#8f8f8f",
     lightGray: "#afafaf",
     lighterGray: "#e4e5e5",
-    bgGray: "#fcfcfc",
-    primaryActive: "#3241cd",
+    bgGray: "#eee9de",
+    primaryActive: "#607adb", // TODO
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#63676e",
     lightGrayActive: "#9f9f9f",
@@ -111,7 +111,7 @@ export default {
       fontWeight: "body",
       cursor: "pointer",
       borderBottom: "1.5px solid",
-      borderBottomColor: "background",
+      borderBottomColor: "transparent",
     },
     activeNav: {
       fontFamily: "monospace",
@@ -269,7 +269,7 @@ export default {
       cursor: "pointer",
       borderBottom: "solid",
       borderWidth: 2,
-      borderColor: "background",
+      borderColor: "transparent",
     },
   },
 }
