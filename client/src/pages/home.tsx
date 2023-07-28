@@ -97,15 +97,15 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               Try a survey
             </RouterLink>
             ,{" "}
+            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
+              create a survey
+            </RouterLink>
+            , or{" "}
             <RouterLink
               sx={{ variant: "links.text", fontWeight: 400 }}
               to="/r/65vvimnjkp/r8zmxnjabtcz8daf9hjrk"
             >
               read a report
-            </RouterLink>
-            , or{" "}
-            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
-              create one
             </RouterLink>
           </Box>
         </Box>
