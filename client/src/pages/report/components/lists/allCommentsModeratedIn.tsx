@@ -112,10 +112,11 @@ class allCommentsModeratedIn extends React.Component<
     }
 
     return (
-      <div>
-        <p style={globals.primaryHeading}> All statements </p>
+      <div style={{ marginBottom: "100px" }}>
+        <p style={globals.primaryHeading}>All statements</p>
         <p style={globals.paragraph}>
-          Group votes across all statements, excluding those statements which were moderated out.
+          Use this view to explore all statements by group, as a starting point for deeper analysis.
+          Statements which were moderated out are excluded.
         </p>
         <label htmlFor="allCommentsSortMode">Sort by: </label>
         <select

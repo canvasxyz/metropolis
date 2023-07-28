@@ -24,9 +24,6 @@ const Uncertainty = ({
         Across all {ptptCount} participants, there was uncertainty about the following statements.
         Greater than 30% of participants who saw these statements &apos;passed&apos;.
       </p>
-      <p style={globals.paragraph}>
-        Areas of uncertainty can provide avenues to educate and open dialogue with your community.
-      </p>
       <div style={{ marginTop: 50 }}>
         <CommentList
           conversation={conversation}

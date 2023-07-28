@@ -95,8 +95,15 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           <Box sx={{ mt: [4] }}>
             <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/c/65vvimnjkp">
               Try a survey
-            </RouterLink>{" "}
-            or{" "}
+            </RouterLink>
+            ,{" "}
+            <RouterLink
+              sx={{ variant: "links.text", fontWeight: 400 }}
+              to="/r/65vvimnjkp/r8zmxnjabtcz8daf9hjrk"
+            >
+              read a report
+            </RouterLink>
+            , or{" "}
             <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
               create one
             </RouterLink>
@@ -136,10 +143,11 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           textAlign: "center",
           backgroundColor: "bgGray",
           py: [3],
+          px: [3],
           borderRadius: "4px",
         }}
       >
-        Metropolis is still in alpha. Functionality may change rapidly.
+        Metropolis is in alpha. Your data is safe, but functionality may change rapidly.
       </Box>
       <Box sx={{ mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
@@ -184,9 +192,9 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         </Heading>
         <Grid gap={[2]} columns={[2]}>
           <Box sx={comingSoon}>Advanced analysis UI</Box>
+          <Box sx={comingSoon}>Advanced voting UI</Box>
           <Box sx={comingSoon}>Web3 login</Box>
           <Box sx={comingSoon}>Token gating</Box>
-          <Box sx={comingSoon}>Knowledge graph</Box>
         </Grid>
       </Box>
       <Box sx={{ mt: [9], mb: [8] }}>
@@ -201,8 +209,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           >
             Polis
           </Link>
-          , an academically validated collective-response survey that has been used with groups of
-          up to 200,000 by governments and independent media.
+          , an academically validated collective-response survey used with groups of up to 200,000
+          by governments and independent media.
         </p>
         <p>
           Polis is typically used as a large-scale opinion poll. Metropolis is optimized for small
