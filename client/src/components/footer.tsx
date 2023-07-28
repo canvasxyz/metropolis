@@ -9,12 +9,12 @@ const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
       sx={{
         textAlign: inSurvey ? "center" : "",
         fontFamily: "monospace",
-        px: [4],
+        px: [4, 5],
       }}
     >
       {!inSurvey && (
         <Text as="span" sx={{ mr: 3 }}>
-          (c) {new Date().getFullYear()} Authors
+          &copy; {new Date().getFullYear()} Authors
         </Text>
       )}
       <Link sx={{ variant: "styles.a", mr: 3 }} to="/tos">

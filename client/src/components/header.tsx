@@ -12,7 +12,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         width: "100%",
         pt: [3, 5],
         pb: [3, 5],
-        px: [4],
+        px: [4, 5],
         mb: [5, 0],
         fontFamily: "monospace",
         borderBottom: ["1px solid lightGray", "none"],
@@ -22,7 +22,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          marginTop: "3px",
+          marginTop: "4px",
         }}
       >
         {inSurvey ? (

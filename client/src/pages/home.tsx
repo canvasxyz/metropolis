@@ -37,7 +37,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
     <React.Fragment>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
-          <Box sx={{ flex: 1, maxWidth: ["none", "20em"] }}>
+          <Box sx={{ flex: 1, maxWidth: ["none", "24em"], pr: [3] }}>
             <Box sx={{ mt: [6, 9], pb: [1] }}>
               <img
                 src="/foundation.png"
@@ -66,8 +66,10 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               Use it to{" "}
               <Text sx={{ display: "inline", color: "#cf5555" }}>build member profiles</Text>,{" "}
               <Text sx={{ display: "inline", color: "#6579d4" }}>match voters with delegates</Text>,{" "}
-              <Text sx={{ display: "inline", color: "#5ba143" }}>identify new ideas</Text>, and
-              more.
+              <Text sx={{ display: "inline", color: "#5ba143" }}>
+                identify new ideas to explore
+              </Text>
+              , and more.
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>
@@ -90,8 +92,13 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               </Box>
             )}
           </Box>
+          <Box sx={{ mt: [4] }}>
+            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
+              Create a survey
+            </RouterLink>
+          </Box>
         </Box>
-        <Box sx={{ flex: 3, display: ["none", "block"], mt: [9], pt: "8px", pl: [3] }}>
+        <Box sx={{ flex: 3, display: ["none", "block"], mt: [9], pt: "4px", pl: [3] }}>
           {samples.map((sample, index) => (
             <Box
               key={index}
@@ -137,21 +144,21 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         <Grid gap={2} columns={[2, "1fr 2fr"]} sx={{ fontSize: "0.96em" }}>
           <Box sx={grid}>Learn about members</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “What makes you excited to be in this community?’’
+            “What makes you excited to be in this community? Which events so far have you enjoyed
+            the most?’’
           </Box>
           <Box sx={grid}>Collect feedback</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “How could we improve our user interface?’’
+            “How could we improve our user interface and product?’’
           </Box>
           <Box sx={grid}>Set priorities</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
             “Which initiatives should we focus on this year?’’
           </Box>
-          <Box sx={{ borderBottom: "1px solid", ...grid, pb: "12px" }}>
-            Build representative & delegate profiles
-          </Box>
+          <Box sx={{ borderBottom: "1px solid", ...grid, pb: "12px" }}>Delegation support</Box>
           <Box sx={{ borderBottom: "1px solid", fontStyle: "italic", ...grid, pb: "12px" }}>
-            “As a delegate, who do you represent, and what perspectives do you bring to the table?’’
+            “As a delegate, who do you represent? What perspectives do you bring to the table? What
+            proposals would you like to support?’’
           </Box>
         </Grid>
       </Box>
@@ -194,8 +201,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           up to 200,000 by governments and independent media.
         </p>
         <p>
-          Polis is typically used as a large-scale opinion poll. Metropolis is optimized for digital
-          communities with a shared mission and values.
+          Polis is typically used as a large-scale opinion poll. Metropolis is optimized for small
+          communities with a shared mission.
         </p>
       </Box>
     </React.Fragment>
