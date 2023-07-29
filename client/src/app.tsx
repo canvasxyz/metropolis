@@ -129,6 +129,7 @@ class App extends React.Component<
     const { location } = this.props
     const inReport = document.location.pathname?.startsWith("/r/")
     const inSurvey = document.location.pathname?.startsWith("/c/")
+    const inHomepage = document.location.pathname === "/"
 
     return (
       <React.Fragment>
@@ -144,7 +145,7 @@ class App extends React.Component<
             <Box
               sx={{
                 margin: `0 auto`,
-                maxWidth: inReport ? "62em" : "48em",
+                maxWidth: inHomepage ? "56em" : inReport ? "62em" : "48em",
                 pb: [4],
               }}
             >

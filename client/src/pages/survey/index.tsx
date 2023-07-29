@@ -299,7 +299,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
             <Box>
               <Box sx={{ mt: [3], mb: [3] }}>
-                Are your perspectives or experiences missing? If so, add them here:
+                Do you have suggestions to add, or are your perspectives or experiences missing? If
+                so, add them here:
               </Box>
               <SurveyCompose
                 zid_metadata={zid_metadata}

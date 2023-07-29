@@ -127,7 +127,7 @@ class SignIn extends React.Component<{
           </Box>
           {this.maybeErrorMessage()}
           <Button
-            sx={{ mt: [4], my: [2] }}
+            sx={{ mt: [4], my: [2], px: [4] }}
             id="signinButton"
             onClick={this.handleLoginClicked.bind(this)}
           >

@@ -14,7 +14,6 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         pb: [3, 5],
         px: [4, 5],
         mb: [5, 0],
-        fontFamily: "monospace",
         borderBottom: ["1px solid lightGray", "none"],
         justifyContent: inSurvey ? "center" : "space-between",
       }}
@@ -22,7 +21,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
       <Box
         sx={{
           position: "relative",
-          marginTop: "4px",
+          marginTop: "3px",
         }}
       >
         {inSurvey ? (
@@ -61,7 +60,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         )}
       </Box>
       {!inSurvey && (
-        <Box sx={{ mt: [1] }}>
+        <Box sx={{ mt: [1], fontSize: "0.94em" }}>
           {isLoggedIn ? (
             <React.Fragment>
               <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>

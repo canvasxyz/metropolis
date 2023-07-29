@@ -40,7 +40,7 @@ function ConversationRow({ c, i, stats, dispatch }) {
                   sx={{
                     variant: "links.text",
                     cursor: "pointer",
-                    fontWeight: 600,
+                    fontWeight: 500,
                   }}
                 >
                   {c.topic}

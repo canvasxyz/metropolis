@@ -164,7 +164,7 @@ class CreateUser extends React.Component<{
             .
           </Box>
           <Button
-            sx={{ my: [2] }}
+            sx={{ my: [2], px: [4] }}
             id="createUserButton"
             onClick={this.handleLoginClicked.bind(this)}
           >

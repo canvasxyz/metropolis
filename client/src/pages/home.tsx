@@ -28,9 +28,9 @@ const Index: React.FC<{ user? }> = ({ user }) => {
   }
 
   const samples = [
-    "The level of conflict we have right now is healthy. We shouldn't expect total agreement among everyone.",
+    "The level of conflict we have right now is okay. We shouldn't expect total agreement among everyone.",
     "I really like the iOS widgets. We should explore more projects like that - avatars, digital pets, and toys could reach lots of people.",
-    "It can be hard to understand why the organization works the way it does. We should have a writer come in and help tell the story.",
+    "It can be hard to understand why the organization works the way it does. Since governance is an important part of our legitimacy, it would help to have a writer come in and do a profile to tell our story.",
   ]
 
   return (
@@ -73,7 +73,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             </Text>
             {user ? (
               <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.button" }} to="/conversations">
+                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
                   Go to conversations
                 </RouterLink>
               </Box>
@@ -82,34 +82,42 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 <RouterLink sx={{ variant: "links.button" }} to="/createuser">
                   Sign up
                 </RouterLink>
-                <Text sx={{ display: "inline", my: [2], mx: [1], fontFamily: "monospace" }}>
-                  {" "}
-                  or{" "}
+                <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
+                  or
                 </Text>
                 <RouterLink sx={{ variant: "links.button" }} to="/signin">
                   Sign in
                 </RouterLink>
               </Box>
             )}
-          </Box>
-          <Box sx={{ mt: [4] }}>
-            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/c/65vvimnjkp">
-              Try a survey
-            </RouterLink>
-            ,{" "}
-            <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
-              create a survey
-            </RouterLink>
-            , or{" "}
-            <RouterLink
-              sx={{ variant: "links.text", fontWeight: 400 }}
-              to="/r/65vvimnjkp/r8zmxnjabtcz8daf9hjrk"
-            >
-              read a report
-            </RouterLink>
+            <Box sx={{ mt: [6, 4] }}>
+              <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/c/65vvimnjkp">
+                Try a survey
+              </RouterLink>
+              ,{" "}
+              <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
+                create a survey
+              </RouterLink>
+              , or{" "}
+              <RouterLink
+                sx={{ variant: "links.text", fontWeight: 400 }}
+                to="/r/65vvimnjkp/r8zmxnjabtcz8daf9hjrk"
+              >
+                read a report
+              </RouterLink>
+            </Box>
           </Box>
         </Box>
-        <Box sx={{ flex: 3, display: ["none", "block"], mt: [9], pt: "4px", pl: [3] }}>
+        <Box
+          sx={{
+            flex: 3,
+            display: ["none", "block"],
+            mt: [9],
+            pt: "18px",
+            mr: [0, 0, 0, "-20px"],
+            pl: [3],
+          }}
+        >
           {samples.map((sample, index) => (
             <Box
               key={index}
@@ -118,8 +126,9 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 color: "#1f1f1f",
                 fontSize: "0.91em",
                 lineHeight: 1.35,
-                px: 4,
-                py: "20px",
+                px: "30px",
+                pt: "24px",
+                pb: "24px",
                 mb: "2px",
                 boxShadow: "1px 2px 4px 0 rgba(0,0,0,0.20)",
                 borderRadius: "2px",
@@ -145,23 +154,23 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           py: [3],
           px: [3],
           borderRadius: "4px",
+          lineHeight: 1.3,
         }}
       >
-        Metropolis is in alpha. Your data is safe, but functionality may change rapidly.
+        Metropolis is in alpha. Your data is safe, but our interfaces are still evolving rapidly.
       </Box>
       <Box sx={{ mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
         </Heading>
-        <Grid gap={2} columns={[2, "1fr 2fr"]} sx={{ fontSize: "0.96em" }}>
+        <Grid gap={2} columns={[2, "1fr 2fr"]} sx={{ fontSize: "0.94em" }}>
           <Box sx={grid}>Learn about members</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “What makes you excited to be in this community? Which events so far have you enjoyed
-            the most?’’
+            “What makes you excited to be in this community?’’
           </Box>
           <Box sx={grid}>Collect feedback</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “How could we improve our user interface and product?’’
+            “How could we improve our user interface?’’
           </Box>
           <Box sx={grid}>Set priorities</Box>
           <Box sx={{ ...grid, fontStyle: "italic" }}>
@@ -169,8 +178,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           </Box>
           <Box sx={{ borderBottom: "1px solid", ...grid, pb: "12px" }}>Delegation support</Box>
           <Box sx={{ borderBottom: "1px solid", fontStyle: "italic", ...grid, pb: "12px" }}>
-            “As a delegate, who do you represent? What perspectives do you bring to the table? What
-            proposals would you like to support?’’
+            “As a delegate, who do you represent? What perspectives do you bring to the table, and
+            what kinds of proposals would you like to support?’’
           </Box>
         </Grid>
       </Box>
@@ -213,8 +222,8 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           by governments and independent media.
         </p>
         <p>
-          Polis is typically used as a large-scale opinion poll. Metropolis is optimized for small
-          communities with a shared mission.
+          Polis is typically used as a large-scale opinion poll. Metropolis is for small communities
+          with a shared mission.
         </p>
       </Box>
     </React.Fragment>
