@@ -1,6 +1,8 @@
 /** @jsx jsx */
 
 import React, { useEffect, useState, useRef } from "react"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { connect } from "react-redux"
 import { toast } from "react-hot-toast"
 import { Box, Heading, Button, Text, Input, jsx } from "theme-ui"
@@ -15,23 +17,23 @@ type SurveyCardProps = {
   conversationId: string
   onVoted: Function
   hasVoted: boolean
-  stacked: boolean
+  maxHeight?: number
 }
 
-const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: SurveyCardProps) => {
+const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: SurveyCardProps) => {
   const { tid: commentId, txt, created, pid } = comment
 
   const [voting, setVoting] = useState(false)
   const [editingVote, setEditingVote] = useState(false)
 
-  const animateOut = (el) =>
+  const animateOut = (target) =>
     new Promise<void>((resolve, reject) => {
-      el.parentElement.parentElement.classList.add("animation-exit")
-      setTimeout(() => resolve(), 400)
+      target.parentElement.parentElement.parentElement.classList.add("animation-exit")
+      setTimeout(() => resolve(), 300)
     })
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
-  const agreeBoost = (commentId: string, event: MouseEvent) => {
+  const agreeBoost = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
@@ -46,7 +48,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .then(() => {
         toast.success("Vote recorded")
-        animateOut(event).then(() => {
+        animateOut(target).then(() => {
           onVoted(commentId)
           setEditingVote(false)
         })
@@ -54,7 +56,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       .always(() => setVoting(false))
   }
 
-  const agree = (commentId: string, event: MouseEvent) => {
+  const agree = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
@@ -69,7 +71,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .then(() => {
         toast.success("Vote recorded")
-        animateOut(event).then(() => {
+        animateOut(target).then(() => {
           onVoted(commentId)
           setEditingVote(false)
         })
@@ -77,7 +79,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       .always(() => setVoting(false))
   }
 
-  const disagree = (commentId: string, event: MouseEvent) => {
+  const disagree = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
@@ -92,7 +94,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .then(() => {
         toast.success("Vote recorded")
-        animateOut(event).then(() => {
+        animateOut(target).then(() => {
           onVoted(commentId)
           setEditingVote(false)
         })
@@ -100,7 +102,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       .always(() => setVoting(false))
   }
 
-  const skip = (commentId: string, event: MouseEvent) => {
+  const skip = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
     api
@@ -115,7 +117,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
       })
       .then(() => {
         toast.success("Skip recorded")
-        animateOut(event).then(() => {
+        animateOut(target).then(() => {
           onVoted(commentId)
           setEditingVote(false)
         })
@@ -132,21 +134,24 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
         borderRadius: "2px",
         bg: "bgOffWhite",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
+        maxHeight: maxHeight,
         width: "100%",
         px: ["24px", "32px"],
         pt: ["22px", "27px"],
-        pb: ["16px", "19px"],
+        pb: ["36px"],
         overflow: "scroll",
       }}
     >
       <Box>
         <Text
           sx={{
-            mb: [3],
+            pb: [4],
             wordBreak: "break-word",
           }}
         >
-          {txt}
+          <Text className="react-markdown">
+            <ReactMarkdown children={txt} remarkPlugins={[remarkGfm]} linkTarget="_blank" />
+          </Text>
         </Text>
         {hasVoted && (
           <Box sx={{ position: "absolute", top: [3], right: [3] }}>
@@ -169,7 +174,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
             />
           </Box>
         )}
-        <Box sx={{ marginLeft: "-15px" }}>
+        <Box sx={{ position: "absolute", bottom: "14px", marginLeft: "-15px" }}>
           <Button variant="text" onClick={(e) => agreeBoost(commentId, e.target)}>
             <img src="/boost.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
             {/*<TbArrowBigUpLine style={{ position: "relative", top: "4px" }} />*/}
@@ -190,7 +195,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, stacked }: Sur
             Disagree
           </Button>
           <Button variant="text" onClick={(e) => skip(commentId, e.target)}>
-            Skip
+            Skip<Text sx={{ display: ["none", "inline"] }}> / Unsure</Text>
           </Button>
         </Box>
       </Box>

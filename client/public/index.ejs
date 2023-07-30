@@ -17,7 +17,6 @@
       padding: 0;
     }
     body {
-      font-size: 17px;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -25,13 +24,17 @@
       border-image: linear-gradient(to right, #9fd330 25%, #ffd504 25%, #ffd504 50%, #ea4a4b 50%, #ea4a4b 75%, #3242cd 75%) 5;
     }
     body, input, textarea, select {
-      font-size: 18px;
+      font-size: 17px;
     }
     strong {
       font-weight: 500;
     }
     a {
       text-decoration: none;
+    }
+    .react-markdown p {
+      margin-top: 0;
+      margin-bottom: 10px;
     }
 
     * { font-variant-ligatures: none; }
@@ -52,7 +55,7 @@
     }
 
     @keyframes slideout {
-        0% {transform: translate3d(0,-200%,0) scale(.6); opacity:.5;}
+        0% {transform: translate3d(0,-40%,0) scale(1); opacity:.8;}
         100% {transform: translate3d(0,0,0) scale(1); opacity:1;}
     }
     .animation-exit {

@@ -5,7 +5,7 @@ const getDomainPrefix = () => {
     return "http://localhost:8040/"
   }
 
-  if (document.domain.includes("metropolis.town")) {
+  if (document.domain.includes("metropolis.vote")) {
     return `https://${document.domain}/`
   }
 

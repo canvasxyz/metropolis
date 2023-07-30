@@ -172,8 +172,8 @@ const ConversationConfig: React.FC<{
       </Heading>
 
       <Box sx={{ mb: [4], fontStyle: "italic" }}>
-        Once participants have submitted both the votes and statements expected, they will be guided
-        to the post-survey page.
+        Once participants have reached the number of votes and submissions expected, they will be
+        directed to the post-survey page.
       </Box>
 
       <Box sx={{ mb: [3] }}>
@@ -276,28 +276,19 @@ const ConversationConfig: React.FC<{
       </Box>
 
       <Heading as="h3" sx={{ mt: [6], mb: 4 }}>
-        Customize the user interface
+        Permissions
       </Heading>
 
       <CheckboxField field="write_type" label="Enable comments" isIntegerBool>
         Participants can write their own cards (Recommended: ON)
       </CheckboxField>
 
-      <CheckboxField field="auth_needed_to_write" label="Email required to comment">
-        Email registration required to write cards (Recommended: OFF)
+      <CheckboxField field="auth_needed_to_write" label="Email required for responses">
+        Require an email to submit comments (Recommended: OFF)
       </CheckboxField>
 
-      <CheckboxField field="strict_moderation" label="Moderator approval for comments">
-        Require moderators to approve submitted comments, before voters can see them
-      </CheckboxField>
-
-      <CheckboxField field="help_type" label="Show help text" isIntegerBool>
-        Show verbose instructions when writing comments
-      </CheckboxField>
-
-      <CheckboxField field="importance_enabled" label="Importance Enabled">
-        [Experimental] Show the "This comment is important" checkbox on the embed interface (only
-        embeds!)
+      <CheckboxField field="strict_moderation" label="Moderation required for responses">
+        Require moderators to approve submitted comments before voters can see them
       </CheckboxField>
 
       {/*
@@ -327,7 +318,16 @@ const ConversationConfig: React.FC<{
       </Heading>
       <Box>
         <Text>Copy this HTML into your page to embed this survey.</Text>
-        <Box sx={{ my: [2], px: [3], py: [1], border: "1px solid lightGray", borderRadius: "6px" }}>
+        <Box
+          sx={{
+            mt: [2],
+            mb: [3],
+            px: [3],
+            py: [1],
+            border: "1px solid lightGray",
+            borderRadius: "6px",
+          }}
+        >
           <pre style={{ fontSize: "14px" }}>
             {"<div"}
             {" class='polis'"}
@@ -336,6 +336,10 @@ const ConversationConfig: React.FC<{
             {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
           </pre>
         </Box>
+
+        <CheckboxField field="importance_enabled" label="Show importance on embeds">
+          Show "This comment is important" checkbox on the embed interface
+        </CheckboxField>
       </Box>
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>

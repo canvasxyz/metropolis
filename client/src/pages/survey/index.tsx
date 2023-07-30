@@ -32,11 +32,11 @@ export const surveyHeadingMini = {
   fontSize: [3],
   lineHeight: "1.35",
   mt: [0],
-  mb: [4],
+  mb: [3],
 }
 
 export const surveyBox = {
-  padding: "24px 32px 25px",
+  padding: "24px 32px 20px",
   border: "1px solid",
   borderColor: "lighterGray",
   bg: "bgGray",
@@ -179,9 +179,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
     <Box
       sx={{
         margin: "0 auto",
-        maxWidth: "30em",
-        letterSpacing: "-0.06px",
-        lineHeight: ["1.4", "1.5"],
+        maxWidth: "35em",
+        lineHeight: 1.45,
       }}
     >
       <Box>
@@ -214,7 +213,11 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <React.Fragment>
           {zid_metadata?.description ? (
             <Text className="react-markdown">
-              <ReactMarkdown children={zid_metadata.description} remarkPlugins={[remarkGfm]} />
+              <ReactMarkdown
+                children={zid_metadata.description}
+                remarkPlugins={[remarkGfm]}
+                linkTarget="_blank"
+              />
             </Text>
           ) : (
             <Box>

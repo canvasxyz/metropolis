@@ -19,10 +19,23 @@ const SurveyCards = ({
   goTo,
   zid_metadata,
 }) => {
+  const cardsBoxRef = useRef<HTMLElement>()
+  const [maxHeight, setMaxHeight] = useState<number>()
+
+  useLayoutEffect(() => {
+    if (!cardsBoxRef.current) return
+    const maxh =
+      Math.max(
+        cardsBoxRef.current.children[0].scrollHeight,
+        cardsBoxRef.current.children[0].clientHeight
+      ) + 4
+    setMaxHeight(maxh)
+  }, [votedComments.length])
+
   return (
     <Box>
       {unvotedComments.length > 0 && (
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "relative" }} ref={cardsBoxRef}>
           {unvotedComments[0] && (
             <SurveyCard
               key={unvotedComments[0].tid}
@@ -30,43 +43,44 @@ const SurveyCards = ({
               conversationId={conversation_id}
               onVoted={onVoted}
               hasVoted={false}
-              stacked={true}
+              maxHeight={maxHeight}
             />
           )}
-          {unvotedComments[1] &&
-            unvotedComments.slice(0, 5).map((comment, index) => (
-              <Box
-                key={comment.txt}
-                sx={{
-                  zIndex: -1,
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  width: "100%",
-                  transform:
-                    index === 0
-                      ? "rotate(-0.25deg)"
-                      : index === 1
-                      ? "rotate(0.25deg)"
-                      : index === 2
-                      ? "rotate(-0.65deg)"
-                      : index === 3
-                      ? "rotate(0.65deg)"
-                      : index === 4
-                      ? "rotate(-1deg)"
-                      : "rotate(1deg)",
-                }}
-              >
-                <SurveyCard
-                  key={unvotedComments[1].tid}
-                  comment={unvotedComments[1]}
-                  conversationId={conversation_id}
-                  onVoted={onVoted}
-                  hasVoted={false}
-                  stacked={true}
-                />
-              </Box>
-            ))}
+          {unvotedComments.length > 1 &&
+            unvotedComments.slice(0, 5).map((comment, index) => {
+              return (
+                <Box
+                  key={comment.txt}
+                  sx={{
+                    zIndex: -1,
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    transform:
+                      index === 0
+                        ? "rotate(-0.25deg)"
+                        : index === 1
+                        ? "rotate(0.25deg)"
+                        : index === 2
+                        ? "rotate(-0.65deg)"
+                        : index === 3
+                        ? "rotate(0.65deg)"
+                        : index === 4
+                        ? "rotate(-1deg)"
+                        : "rotate(1deg)",
+                  }}
+                >
+                  <SurveyCard
+                    comment={unvotedComments[index]}
+                    conversationId={conversation_id}
+                    onVoted={onVoted}
+                    hasVoted={false}
+                    maxHeight={maxHeight}
+                  />
+                </Box>
+              )
+            })}
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
@@ -74,10 +88,7 @@ const SurveyCards = ({
           <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
             No statements
           </Heading>
-          <Text sx={{ mb: [3] }}>
-            Nobody has added any statements to this survey yet. If adding statements is enabled, you
-            could be the first!
-          </Text>
+          <Text sx={{ mb: [3] }}>Nobody has added any responses to this survey yet.</Text>
         </Box>
       )}
 

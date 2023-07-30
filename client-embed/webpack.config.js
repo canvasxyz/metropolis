@@ -12,7 +12,7 @@ const pkg = require("./package.json")
 const TerserPlugin = require("terser-webpack-plugin")
 
 const embedServiceHostname =
-  process.env.EMBED_SERVICE_HOSTNAME || "metropolis.town"
+  process.env.EMBED_SERVICE_HOSTNAME || "metropolis.vote"
 const fbAppId = process.env.FB_APP_ID
 const gaTrackingId = process.env.GA_TRACKING_ID
 const outputDirectory = "dist"

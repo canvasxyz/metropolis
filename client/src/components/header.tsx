@@ -60,7 +60,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         )}
       </Box>
       {!inSurvey && (
-        <Box sx={{ mt: [1], fontSize: "0.94em" }}>
+        <Box sx={{ mt: [1] }}>
           {isLoggedIn ? (
             <React.Fragment>
               <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>

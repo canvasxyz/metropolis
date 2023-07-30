@@ -8,7 +8,6 @@ const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
     <Box
       sx={{
         textAlign: inSurvey ? "center" : "",
-        fontSize: "0.94em",
         px: [4, 5],
       }}
     >
