@@ -7,6 +7,7 @@ dotenv.config();
 
 import Promise from "bluebird";
 import express from "express";
+import mime from "mime";
 import morgan from "morgan";
 
 import Config from "./src/config";
@@ -1416,12 +1417,6 @@ helpersInitialized.then(
       res.send("User-agent: *\n" + "Disallow: /api/");
     });
 
-    // const fetchIndexForAdminPage = express.static(
-    //   path.join(__dirname, "build", "index.html")
-    // );
-
-    express.static.mime.define({ "text/html": ["html"] });
-
     const fetchIndexForAdminPage = (
       req: express.Request,
       res: express.Response
@@ -1446,7 +1441,24 @@ helpersInitialized.then(
     app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/r\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
 
-    app.use(express.static(path.join(__dirname, "client")));
+    mime.define({
+      "text/html": ["html"],
+      "image/svg+xml": ["svg"],
+    });
+
+    // why do svgs get the wrong mimetype otherwise?
+    function setCustomHeaders(res: any, path: any) {
+      if (path.endsWith(".svg")) {
+        res.setHeader("Content-Type", "image/svg+xml");
+      }
+    }
+
+    app.use(
+      express.static(path.join(__dirname, "client"), {
+        maxAge: "1d",
+        setHeaders: setCustomHeaders,
+      })
+    );
 
     const fetchEmbed = (req: express.Request, res: express.Response) => {
       const isIndex = req.path === "/embed";
@@ -1492,16 +1504,6 @@ helpersInitialized.then(
     app.get(/^\/embed$/, fetchEmbed);
     app.get(/^\/embed.js$/, fetchEmbed);
     app.get(/^\/embed\/(.*)/, fetchEmbed);
-
-    // app.get(/^\/thirdPartyCookieTestPt1\.html$/, fetchThirdPartyCookieTestPt1);
-    // app.get(/^\/thirdPartyCookieTestPt2\.html$/, fetchThirdPartyCookieTestPt2);
-
-    // app.get(
-    //   /^\/twitterAuthReturn(\/.*)?$/,
-    //   makeFileFetcher(hostname, staticFilesPort, "/twitterAuthReturn.html", {
-    //     "Content-Type": "text/html",
-    //   })
-    // );
 
     app.listen(Config.serverPort);
     logger.info("started on port " + Config.serverPort);
