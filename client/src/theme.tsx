@@ -19,7 +19,7 @@ export default {
   },
   colors: {
     text: "#44474d",
-    textLight: "#111",
+    textDark: "#111",
     background: "#fbf5e9",
     primary: "#5c73c9",
     secondary: "#F6F7F8",
@@ -157,7 +157,7 @@ export default {
       fontSize: "0.96em",
       "&:hover": {
         backgroundColor: "bgGray",
-        color: "textLight",
+        color: "textDark",
       },
     },
     primary: {

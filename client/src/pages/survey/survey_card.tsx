@@ -1,5 +1,6 @@
 /** @jsx jsx */
 
+import $ from "jquery"
 import React, { useEffect, useState, useRef } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -28,7 +29,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
 
   const animateOut = (target) =>
     new Promise<void>((resolve, reject) => {
-      target.parentElement.parentElement.parentElement.classList.add("animation-exit")
+      $(target).closest(".survey-card").addClass("animation-exit")
       setTimeout(() => resolve(), 300)
     })
 
@@ -127,6 +128,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
 
   return (
     <Box
+      className="survey-card"
       sx={{
         position: "relative",
         border: "1px solid",

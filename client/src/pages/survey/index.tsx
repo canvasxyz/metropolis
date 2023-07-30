@@ -31,8 +31,8 @@ export const surveyHeading = {
 export const surveyHeadingMini = {
   fontSize: [3],
   lineHeight: "1.35",
-  mt: [0],
-  mb: [3],
+  mt: 0,
+  mb: "0.5em",
 }
 
 export const surveyBox = {
@@ -136,6 +136,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
       setSubmittedComments(allSubmissions) // TODO: keep this updated
 
       // select next comment using backend api
+
       if (unvotedComments.length > 2) {
         setTimeout(() => {
           selectNextComment(
