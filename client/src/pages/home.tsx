@@ -37,7 +37,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
     <React.Fragment>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
-          <Box sx={{ flex: 1, maxWidth: ["none", "24em"], pr: [3] }}>
+          <Box sx={{ flex: 1, maxWidth: ["none", "22em"], pr: [3] }}>
             <Box sx={{ mt: [6, 9], pb: [1] }}>
               <img
                 src="/foundation.png"
@@ -159,7 +159,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       >
         Metropolis is in alpha. Your data is safe, but our interfaces are still evolving rapidly.
       </Box>
-      <Box sx={{ mt: [9] }}>
+      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
         </Heading>
@@ -183,7 +183,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           </Box>
         </Grid>
       </Box>
-      <Box sx={{ mt: [9] }}>
+      <Box sx={{ maxWidth: "36em", margin: "auto", mt: [9] }}>
         <Heading as="h3">How it works</Heading>
         <p>1. The survey creator asks a question, seeding it with 10-15 suggested responses.</p>
         <p>
@@ -195,18 +195,18 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           areas of consensus, and points of further exploration.
         </p>
       </Box>
-      <Box sx={{ mt: [9] }}>
+      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ mb: [4] }}>
           Coming soon
         </Heading>
         <Grid gap={[2]} columns={[2]}>
-          <Box sx={comingSoon}>Advanced analysis UI</Box>
+          <Box sx={comingSoon}>Advanced analysis</Box>
           <Box sx={comingSoon}>Advanced voting UI</Box>
           <Box sx={comingSoon}>Web3 login</Box>
           <Box sx={comingSoon}>Token gating</Box>
         </Grid>
       </Box>
-      <Box sx={{ mt: [9], mb: [8] }}>
+      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>
         <p>
           Metropolis is an extended version of{" "}

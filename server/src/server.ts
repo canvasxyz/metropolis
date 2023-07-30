@@ -3663,24 +3663,6 @@ Feel free to reply to this email if you need help.`;
   const getUserInfoForUid = User.getUserInfoForUid;
   const getUserInfoForUid2 = User.getUserInfoForUid2;
 
-  function emailFeatureRequest(message: string) {
-    const body = `Somebody clicked a dummy button!
-
-${message}`;
-
-    return sendMultipleTextEmails(
-      polisFromAddress,
-      adminEmails,
-      "Dummy button clicked!!!",
-      body
-    ).catch(function (err: any) {
-      logger.error("polis_err_failed_to_email_for_dummy_button", {
-        message,
-        err,
-      });
-    });
-  }
-
   function emailTeam(subject: string, body: string) {
     return sendMultipleTextEmails(
       polisFromAddress,
@@ -3725,7 +3707,7 @@ We have just received a password reset request for ${userInfo.email}
 To reset your password, visit this page:
 ${serverName}/pwreset/${pwresettoken}
 
-"Thank you for using Polis`;
+"Thank you for using Metropolis!`;
 
         sendTextEmail(
           polisFromAddress,
@@ -3781,13 +3763,11 @@ ${serverName}/pwreset/${pwresettoken}
 
   function sendEinviteEmail(req: any, email: any, einvite: any) {
     let serverName = getServerNameWithProtocol(req);
-    const body = `Welcome to pol.is!
+    const body = `Welcome to Metropolis!
 
 Click this link to open your account:
 
-${serverName}/welcome/${einvite}
-
-Thank you for using Polis`;
+${serverName}/welcome/${einvite}`;
 
     return sendTextEmail(
       polisFromAddress,
@@ -4003,20 +3983,6 @@ Email verified! You can close this tab or hit the back button.
     //     // }
 
     // });
-  }
-  function handle_GET_dummyButton(
-    req: { p: { button: string; uid: string } },
-    res: {
-      status: (arg0: number) => {
-        (): any;
-        new (): any;
-        end: { (): void; new (): any };
-      };
-    }
-  ) {
-    let message = req.p.button + " " + req.p.uid;
-    emailFeatureRequest(message);
-    res.status(200).end();
   }
   function doGetConversationsRecent(
     req: { p: { uid?: any; sinceUnixTimestamp: any } },
@@ -6839,7 +6805,7 @@ Email verified! You can close this tab or hit the back button.
 
         body += createProdModerationUrl(zinvite);
 
-        body += "\n\nThank you for using Polis.";
+        body += "\n\nThank you for using Metropolis.";
 
         // NOTE: adding a changing element (date) at the end to prevent gmail from thinking the URL is a signature, and hiding it. (since the URL doesn't change between emails, Gmail tries to be smart, and hides it)
         // "Sent: " + Date.now() + "\n";
@@ -6857,7 +6823,7 @@ Email verified! You can close this tab or hit the back button.
   }
 
   function createProdModerationUrl(zinvite: string) {
-    return "https://pol.is/m/" + zinvite;
+    return "https://metropolis.vote/m/" + zinvite;
   }
 
   function createModerationUrl(
@@ -6869,9 +6835,6 @@ Email verified! You can close this tab or hit the back button.
       server = req?.protocol + "://" + domainOverride;
     }
 
-    if (req?.headers?.host?.includes("preprod.pol.is")) {
-      server = "https://preprod.pol.is";
-    }
     let url = server + "/m/" + zinvite;
     return url;
   }
@@ -7133,7 +7096,7 @@ Email verified! You can close this tab or hit the back button.
           let isSpamPromise = isSpam({
             comment_content: txt,
             comment_author: uid,
-            permalink: "https://pol.is/" + zid,
+            permalink: "https://metropolis.vote/" + zid,
             user_ip: ip,
             user_agent: req?.headers?.["user-agent"],
             referrer: req?.headers?.referer,
@@ -8775,7 +8738,7 @@ Email verified! You can close this tab or hit the back button.
                             "\n" +
                             "With gratitude,\n" +
                             "\n" +
-                            "The team at pol.is\n"
+                            "The team\n"
                         ).catch(function (err: any) {
                           logger.error(
                             "polis_err_sending_conversation_created_email",
@@ -10316,7 +10279,7 @@ Email verified! You can close this tab or hit the back button.
               "\n" +
               "With gratitude,\n" +
               "\n" +
-              "The team at pol.is";
+              "The team";
 
             return sendTextEmail(
               polisFromAddress,
@@ -10398,7 +10361,7 @@ Email verified! You can close this tab or hit the back button.
     const serverUrl = Config.getServerUrl();
     const email = req.p.email;
     const subject =
-      "Polis data export for conversation pol.is/" + req.p.conversation_id;
+      "Data export for conversation metropolis.vote/c/" + req.p.conversation_id;
     const fromAddress = `Polis Team <${Config.adminEmailDataExport}>`;
     const body = `Greetings
 
@@ -10408,7 +10371,7 @@ ${serverUrl}/api/v3/dataExport/results?filename=${req.p.filename}&conversation_i
 
 Please let us know if you have any questions about the data.
 
-Thanks for using Polis!
+Thanks for using Metropolis!
 `;
 
     sendTextEmail(fromAddress, email, subject, body)
@@ -11780,10 +11743,10 @@ Thanks for using Polis!
       return Promise.resolve(cached);
     }
     let httpUrl =
-      "https://cdn.api.twitter.com/1/urls/count.json?url=http://pol.is/" +
+      "https://cdn.api.twitter.com/1/urls/count.json?url=http://metropolis.vote/" +
       conversation_id;
     let httpsUrl =
-      "https://cdn.api.twitter.com/1/urls/count.json?url=https://pol.is/" +
+      "https://cdn.api.twitter.com/1/urls/count.json?url=https://metropolis.vote/" +
       conversation_id;
     return Promise.all([request.get(httpUrl), request.get(httpsUrl)]).then(
       function (a: any[]) {
@@ -11815,7 +11778,9 @@ Thanks for using Polis!
     if (cached) {
       return Promise.resolve(cached);
     }
-    let url = "http://graph.facebook.com/?id=https://pol.is/" + conversation_id;
+    let url =
+      "http://graph.facebook.com/?id=https://metropolis.vote/" +
+      conversation_id;
     return request.get(url).then(function (result: string) {
       let shares = JSON.parse(result).shares;
       fbShareCountCache.set(conversation_id, shares);
@@ -12614,7 +12579,7 @@ Thanks for using Polis!
 
   // function handle_GET_cache_purge(req, res) {
 
-  //   let hostname = "pol.is";
+  //   let hostname = "metropolis.vote";
   //   // NOTE: can't purge preprod independently unless we set up a separate domain on cloudflare, AFAIK
 
   //   request.post("https://www.cloudflare.com/api_json.html").form({
@@ -12654,46 +12619,6 @@ Thanks for using Polis!
       .catch(function (err: any) {
         fail(res, 500, "polis_err_fetching_einvite", err);
       });
-  }
-  function handle_POST_contributors(
-    req: {
-      p: {
-        uid: null;
-        agreement_version: any;
-        name: any;
-        email: any;
-        github_id: any;
-        company_name: any;
-      };
-    },
-    res: { json: (arg0: {}) => void }
-  ) {
-    const uid = req.p.uid || null;
-    const agreement_version = req.p.agreement_version;
-    const name = req.p.name;
-    const email = req.p.email;
-    const github_id = req.p.github_id;
-    const company_name = req.p.company_name;
-
-    pgQueryP(
-      "insert into contributor_agreement_signatures (uid, agreement_version, github_id, name, email, company_name) " +
-        "values ($1, $2, $3, $4, $5, $6);",
-      [uid, agreement_version, github_id, name, email, company_name]
-    ).then(
-      () => {
-        emailTeam(
-          "contributer agreement signed",
-          [uid, agreement_version, github_id, name, email, company_name].join(
-            "\n"
-          )
-        );
-
-        res.json({});
-      },
-      (err: any) => {
-        fail(res, 500, "polis_err_POST_contributors_misc", err);
-      }
-    );
   }
 
   function generateSingleUseUrl(
@@ -12844,7 +12769,7 @@ Thanks for using Polis!
     let serverName = getServerNameWithProtocol(req);
     let body =
       "" +
-      "Welcome to pol.is!\n" +
+      "Welcome to Metropolis!\n" +
       "\n" +
       "Click this link to open your account:\n" +
       "\n" +
@@ -12853,14 +12778,12 @@ Thanks for using Polis!
       conversation_id +
       "/" +
       suzinvite +
-      "\n" +
-      "\n" +
-      "Thank you for using Polis\n";
+      "\n";
 
     return sendTextEmail(
       polisFromAddress,
       email,
-      "Join the pol.is conversation!",
+      "Metropolis: Join the conversation!",
       body
     );
   }
@@ -13111,7 +13034,7 @@ Thanks for using Polis!
       return sendMultipleTextEmails(
         polisFromAddress,
         emails,
-        "Polis conversation created",
+        "Metropolis conversation created",
         body
       );
     });
@@ -13290,7 +13213,7 @@ Thanks for using Polis!
       "Content-Type": "text/html",
     });
     res.send(
-      "<a href='https://pol.is/" +
+      "<a href='https://metropolis.vote/" +
         conversation_id +
         "' target='_blank'>" +
         conversation_id +
@@ -13313,12 +13236,12 @@ Thanks for using Polis!
         });
         let title = info.topic || info.created;
         res.send(
-          "<a href='https://pol.is/" +
+          "<a href='https://metropolis.vote/" +
             conversation_id +
             "' target='_blank'>" +
             title +
             "</a>" +
-            "<p><a href='https://pol.is/m" +
+            "<p><a href='https://metropolis.vote/m" +
             conversation_id +
             "' target='_blank'>moderate</a></p>" +
             (info.description ? "<p>" + info.description + "</p>" : "")
@@ -13445,7 +13368,6 @@ Thanks for using Polis!
     handle_GET_math_correlationMatrix,
     handle_GET_dataExport,
     handle_GET_domainWhitelist,
-    handle_GET_dummyButton,
     handle_GET_einvites,
     handle_GET_facebook_delete,
     handle_GET_groupDemographics,
@@ -13489,7 +13411,6 @@ Thanks for using Polis!
     handle_POST_auth_pwresettoken,
     handle_POST_comments,
     handle_POST_contexts,
-    handle_POST_contributors,
     handle_POST_conversation_close,
     handle_POST_conversation_reopen,
     handle_POST_conversations,

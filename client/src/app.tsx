@@ -145,7 +145,7 @@ class App extends React.Component<
             <Box
               sx={{
                 margin: `0 auto`,
-                maxWidth: inHomepage ? "56em" : inReport ? "62em" : "48em",
+                maxWidth: inHomepage ? "62em" : inReport ? "62em" : "48em",
                 pb: [4],
               }}
             >

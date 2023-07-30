@@ -100,7 +100,6 @@ helpersInitialized.then(
       handle_GET_math_correlationMatrix,
       handle_GET_dataExport,
       handle_GET_domainWhitelist,
-      handle_GET_dummyButton,
       handle_GET_einvites,
       handle_GET_facebook_delete,
       handle_GET_groupDemographics,
@@ -147,7 +146,6 @@ helpersInitialized.then(
       handle_POST_auth_pwresettoken,
       handle_POST_comments,
       handle_POST_contexts,
-      handle_POST_contributors,
       handle_POST_conversation_close,
       handle_POST_conversation_reopen,
       handle_POST_conversations,
@@ -378,14 +376,6 @@ helpersInitialized.then(
         assignToPCustom("zid")
       ),
       handle_GET_participants
-    );
-
-    app.get(
-      "/api/v3/dummyButton",
-      moveToBody,
-      need("button", getStringLimitLength(1, 999), assignToP),
-      authOptional(assignToP),
-      handle_GET_dummyButton
     );
 
     app.get(
@@ -1374,17 +1364,6 @@ helpersInitialized.then(
       moveToBody,
       need("e", getStringLimitLength(1, 1000), assignToP),
       handle_GET_verification
-    );
-
-    app.post(
-      "/api/v3/contributors",
-      authOptional(assignToP),
-      need("agreement_version", getIntInRange(1, 999999), assignToP),
-      need("name", getStringLimitLength(746), assignToP),
-      need("email", getStringLimitLength(256), assignToP),
-      need("github_id", getStringLimitLength(256), assignToP),
-      need("company_name", getStringLimitLength(746), assignToP),
-      handle_POST_contributors
     );
 
     app.post(
