@@ -225,6 +225,38 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           Polis is typically used as a large-scale opinion poll. Metropolis is for small communities
           with a shared mission.
         </p>
+        <Box sx={{ mt: [5, 6], textAlign: "center" }}>
+          <Link
+            sx={{
+              variant: "links.button",
+              display: "inline-block",
+              mb: [3],
+              border: "none !important",
+              minWidth: "220px",
+            }}
+            href="https://gwern.net/doc/sociology/2021-small.pdf"
+            target="_blank"
+            noopener
+            noreferrer
+          >
+            Read the Polis paper
+          </Link>
+          <br />
+          <Link
+            sx={{
+              variant: "links.button",
+              display: "inline-block",
+              border: "none !important",
+              minWidth: "220px",
+            }}
+            href="https://compdemocracy.org/Case-studies/"
+            target="_blank"
+            noopener
+            noreferrer
+          >
+            Polis case studies
+          </Link>
+        </Box>
       </Box>
     </React.Fragment>
   )

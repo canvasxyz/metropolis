@@ -104,9 +104,9 @@ export default {
       borderRadius: "4px",
       backgroundColor: "primary",
       textDecoration: "none",
-      color: "background",
+      color: "background !important",
       "&:hover": {
-        bg: "primaryActive",
+        bg: "primaryActive !important",
       },
       bg: "primary",
       fontFamily: "monospace",
