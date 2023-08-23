@@ -140,7 +140,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         width: "100%",
         px: ["24px", "32px"],
         pt: ["22px", "27px"],
-        pb: ["36px"],
+        pb: ["46px", "36px"],
         overflow: "scroll",
       }}
     >
@@ -176,7 +176,9 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
             />
           </Box>
         )}
-        <Box sx={{ position: "absolute", bottom: "14px", marginLeft: "-15px" }}>
+        <Box
+          sx={{ position: "absolute", bottom: ["10px", "14px"], marginLeft: "-15px", pb: [2, 0] }}
+        >
           <Button variant="text" onClick={(e) => agreeBoost(commentId, e.target)}>
             <img src="/boost.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
             {/*<TbArrowBigUpLine style={{ position: "relative", top: "4px" }} />*/}

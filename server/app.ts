@@ -796,6 +796,17 @@ helpersInitialized.then(
       handle_POST_votes
     );
 
+    app.get(
+      "/api/v3/participants",
+      auth(assignToP),
+      need(
+        "conversation_id",
+        getConversationIdFetchZid,
+        assignToPCustom("zid")
+      ),
+      handle_GET_participants
+    );
+
     app.put(
       "/api/v3/participants_extended",
       auth(assignToP),

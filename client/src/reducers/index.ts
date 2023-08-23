@@ -18,6 +18,7 @@ import signin from "./signin"
 import comments from "./comments"
 import math from "./math"
 import participants from "./participants"
+import conversation_voters from "./voters"
 
 const rootReducer = combineReducers({
   conversations,
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   math,
   comments,
   participants,
+  conversation_voters,
   mod_comments_accepted,
   mod_comments_rejected,
   mod_comments_unmoderated,

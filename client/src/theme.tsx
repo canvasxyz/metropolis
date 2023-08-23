@@ -104,9 +104,9 @@ export default {
       borderRadius: "4px",
       backgroundColor: "primary",
       textDecoration: "none",
-      color: "background !important",
+      color: "#fbf5e9 !important",
       "&:hover": {
-        bg: "primaryActive !important",
+        bg: "#4e65bd !important",
       },
       bg: "primary",
       fontFamily: "monospace",
@@ -159,6 +159,8 @@ export default {
         backgroundColor: "bgGray",
         color: "textDark",
       },
+      pb: [0, 1],
+      pt: [0, 1],
     },
     primary: {
       color: "background",

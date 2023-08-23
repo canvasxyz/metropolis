@@ -3922,7 +3922,7 @@ Email verified! You can close this tab or hit the back button.
   }
 
   function handle_GET_participants(
-    req: { p: { uid?: any; zid: any } },
+    req: { p: { zid: any } },
     res: {
       status: (arg0: number) => {
         (): any;
@@ -3931,59 +3931,21 @@ Email verified! You can close this tab or hit the back button.
       };
     }
   ) {
-    // let pid = req.p.pid;
-    let uid = req.p.uid;
     let zid = req.p.zid;
 
     pgQueryP_readOnly(
-      "select * from participants where uid = ($1) and zid = ($2)",
-      [uid, zid]
+      "SELECT users.hname, participants.pid, participants.vote_count, participants.last_interaction, participants.created FROM users INNER JOIN participants ON users.uid = participants.uid WHERE zid = ($1) ORDER BY participants.pid;",
+      [zid]
     )
-      //     Argument of type '(rows: string | any[]) => void' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
-      // Types of parameters 'rows' and 'value' are incompatible.
-      //   Type 'unknown' is not assignable to type 'string | any[]'.
-      //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
       // @ts-ignore
       .then(function (rows: string | any[]) {
-        let ptpt = (rows && rows.length && rows[0]) || null;
-        res.status(200).json(ptpt);
+        res.status(200).json(rows);
       })
       .catch(function (err: any) {
         fail(res, 500, "polis_err_get_participant", err);
       });
-
-    // function fetchOne() {
-    //     pgQuery("SELECT * FROM users WHERE uid IN (SELECT uid FROM participants WHERE pid = ($1) AND zid = ($2));", [pid, zid], function(err, result) {
-    //         if (err || !result || !result.rows || !result.rows.length) { fail(res, 500, "polis_err_fetching_participant_info", err); return; }
-    //         let ptpt = result.rows[0];
-    //         let data = {};
-    //         // choose which fields to expose
-    //         data.hname = ptpt.hname;
-
-    //         res.status(200).json(data);
-    //     });
-    // }
-    // function fetchAll() {
-    //     // NOTE: it's important to return these in order by pid, since the array index indicates the pid.
-    //     pgQuery("SELECT users.hname, users.email, participants.pid FROM users INNER JOIN participants ON users.uid = participants.uid WHERE zid = ($1) ORDER BY participants.pid;", [zid], function(err, result) {
-    //         if (err || !result || !result.rows || !result.rows.length) { fail(res, 500, "polis_err_fetching_participant_info", err); return; }
-    //         res.json(result.rows);
-    //     });
-    // }
-    // pgQuery("SELECT is_anon FROM conversations WHERE zid = ($1);", [zid], function(err, result) {
-    //     if (err || !result || !result.rows || !result.rows.length) { fail(res, 500, "polis_err_fetching_participant_info", err); return; }
-    //     if (result.rows[0].is_anon) {
-    //         fail(res, 403, "polis_err_fetching_participant_info_conversation_is_anon");
-    //         return;
-    //     }
-    //     // if (pid !== undefined) {
-    //         fetchOne();
-    //     // } else {
-    //         // fetchAll();
-    //     // }
-
-    // });
   }
+
   function doGetConversationsRecent(
     req: { p: { uid?: any; sinceUnixTimestamp: any } },
     res: { json: (arg0: any) => void },

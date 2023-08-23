@@ -19,6 +19,7 @@ export type Comment = {
 
 export type RootState = {
   conversations: any
+  conversation_voters: any
   user: any
   signout: any
   signin: any

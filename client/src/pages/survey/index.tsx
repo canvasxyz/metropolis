@@ -302,7 +302,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <Box sx={{ mb: [5] }}>
           {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
             <Box>
-              <Box sx={{ mt: [3], mb: [3] }}>
+              <Box sx={{ mt: [4], mb: [3] }}>
                 Do you have suggestions to add, or are your perspectives or experiences missing? If
                 so, add them here:
               </Box>

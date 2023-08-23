@@ -18,6 +18,10 @@ export const REQUEST_CONVERSATIONS = "REQUEST_CONVERSATIONS"
 export const RECEIVE_CONVERSATIONS = "RECEIVE_CONVERSATIONS"
 export const CONVERSATIONS_FETCH_ERROR = "CONVERSATIONS_FETCH_ERROR"
 
+export const REQUEST_CONVERSATION_VOTERS = "REQUEST_CONVERSATION_VOTERS"
+export const RECEIVE_CONVERSATION_VOTERS = "RECEIVE_CONVERSATION_VOTERS"
+export const VOTERS_FETCH_ERROR = "VOTERS_FETCH_ERROR"
+
 export const CLOSE_CONVERSATION_SUCCESS = "CLOSE_CONVERSATION_SUCCESS"
 export const CLOSE_CONVERSATION_ERROR = "CLOSE_CONVERSATION_ERROR"
 
@@ -1187,8 +1191,41 @@ export const populateAllCommentStores = (conversation_id) => {
   }
 }
 
-// export const populateAllCommentStores = (conversation) => {
-// }
+/* participant stores */
+
+const fetchConversationVoters = (conversation_id) => {
+  return $.get("/api/v3/participants?conversation_id=" + conversation_id)
+}
+
+const votersFetchError = (err) => {
+  return {
+    type: VOTERS_FETCH_ERROR,
+    data: err,
+  }
+}
+
+const requestConversationVoters = () => {
+  return {
+    type: REQUEST_CONVERSATION_VOTERS,
+  }
+}
+
+const receiveConversationVoters = (data) => {
+  return {
+    type: RECEIVE_CONVERSATION_VOTERS,
+    data: data,
+  }
+}
+
+export const populateVoterStores = (conversation_id) => {
+  return (dispatch) => {
+    dispatch(requestConversationVoters())
+    return fetchConversationVoters(conversation_id).then(
+      (res) => dispatch(receiveConversationVoters({ conversation_id, conversation_voters: res })),
+      (err) => dispatch(votersFetchError(err))
+    )
+  }
+}
 
 /* moderator clicked accept comment */
 

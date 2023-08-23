@@ -7,10 +7,11 @@ import { Flex, Box, jsx } from "theme-ui"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
 import { RootState } from "../../util/types"
-import { populateAllCommentStores } from "../../actions"
+import { populateAllCommentStores, populateVoterStores } from "../../actions"
 
 import ConversationConfig from "./conversation-config"
 import ConversationModeration from "./conversation-moderation"
+import ConversationVoters from "./conversation-voters"
 import ConversationReport from "./conversation-report"
 
 import { UrlObject } from "url"
@@ -30,17 +31,24 @@ class ConversationAdminContainer extends React.Component<
     this.props.dispatch(populateAllCommentStores(match.params.conversation_id))
   }
 
+  loadVoters() {
+    const { match } = this.props
+    this.props.dispatch(populateVoterStores(match.params.conversation_id))
+  }
+
   UNSAFE_componentWillMount() {
     const pollFrequency = 60000
 
     this.loadZidMetadata()
     this.getCommentsRepeatedly = setInterval(() => {
       this.loadComments()
+      this.loadVoters()
     }, pollFrequency)
   }
 
   componentDidMount() {
     this.loadComments()
+    this.loadVoters()
   }
 
   loadZidMetadata() {
@@ -86,6 +94,16 @@ class ConversationAdminContainer extends React.Component<
           <Box sx={{ mb: [3] }}>
             <Link
               sx={{
+                variant: url === "voters" ? "links.activeNav" : "links.nav",
+              }}
+              to={`${match.url}/voters`}
+            >
+              Voters
+            </Link>
+          </Box>
+          <Box sx={{ mb: [3] }}>
+            <Link
+              sx={{
                 variant: url === "report" ? "links.activeNav" : "links.nav",
               }}
               to={`${match.url}/report`}
@@ -99,6 +117,7 @@ class ConversationAdminContainer extends React.Component<
             <Switch>
               <Route exact path={`${match.path}/`} component={ConversationConfig} />
               <Route path={`${match.path}/comments`} component={ConversationModeration} />
+              <Route exact path={`${match.path}/voters`} component={ConversationVoters} />
               <Route exact path={`${match.path}/report`} component={ConversationReport} />
             </Switch>
           </Box>
