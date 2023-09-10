@@ -88,7 +88,6 @@ class ManageConversations extends React.Component<
   }
 
   render() {
-    const err = this.props.error
     const { conversations, conversation_stats } = this.props
 
     return (
@@ -101,11 +100,17 @@ class ManageConversations extends React.Component<
             <Button variant="primary">Create New</Button>
           </Link>
         </Flex>
+        {this.props.loading && (
+          <Box mt={5} mb={3}>
+            Loading conversations...
+          </Box>
+        )}
+        {this.props.error && (
+          <Box mt={5} mb={3}>
+            Error loading conversations: {this.props.error.status} {this.props.error.statusText}
+          </Box>
+        )}
         <Box mt={5}>
-          <Box sx={{ mb: [3] }}>{this.props.loading ? "Loading conversations..." : null}</Box>
-          {err ? (
-            <Text>{"Error loading conversations: " + err.status + " " + err.statusText}</Text>
-          ) : null}
           {conversations &&
             conversations
               .filter((c) => !c.is_archived)
