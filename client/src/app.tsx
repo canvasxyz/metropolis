@@ -17,6 +17,7 @@ import Footer from "./components/footer"
 /* public home page */
 import Home from "./pages/home"
 import About from "./pages/about"
+import Dashboard from "./pages/dashboard"
 
 /* landing pages */
 import TOS from "./pages/landing/tos"
@@ -130,6 +131,7 @@ class App extends React.Component<
     const inReport = document.location.pathname?.startsWith("/r/")
     const inSurvey = document.location.pathname?.startsWith("/c/")
     const inHomepage = document.location.pathname === "/"
+    const inDashboard = document.location.pathname.startsWith("/dashboard")
 
     return (
       <React.Fragment>
@@ -145,26 +147,32 @@ class App extends React.Component<
             <Box
               sx={{
                 margin: `0 auto`,
-                maxWidth: inHomepage ? "62em" : inReport ? "62em" : "48em",
-                pb: [4],
+                maxWidth: inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em",
+                pb: inDashboard ? [0] : [4],
               }}
             >
-              {document.location.pathname !== "/" && (
-                <Header
-                  isLoggedIn={this.props.isLoggedIn}
-                  user={this.props.user}
-                  inSurvey={inSurvey}
-                />
-              )}
+              {document.location.pathname !== "/" &&
+                !document.location.pathname.startsWith("/dashboard") && (
+                  <Header
+                    isLoggedIn={this.props.isLoggedIn}
+                    user={this.props.user}
+                    inSurvey={inSurvey}
+                  />
+                )}
               <Box
                 sx={{
                   pt: "1px", // prevent margins from spilling over
-                  pb: "1em",
-                  px: [4, 5],
+                  pb: inDashboard ? 0 : "1em",
+                  px: inDashboard ? 0 : [4, 5],
                   minHeight: "calc(100vh - 9em - 8px)",
                 }}
               >
                 <Route exact path="/" render={() => <Home user={this.props.user} />} />
+                <Route
+                  exact
+                  path="/dashboard"
+                  render={() => <Dashboard user={this.props.user} />}
+                />
                 <Route exact path="/about" render={() => <About />} />
                 <Route
                   exact
@@ -231,7 +239,9 @@ class App extends React.Component<
                   component={ConversationAdmin}
                 />
               </Box>
-              <Footer inSurvey={inSurvey} />
+              {!document.location.pathname.startsWith("/dashboard") && (
+                <Footer inSurvey={inSurvey} />
+              )}
             </Box>
             <Box
               sx={{
