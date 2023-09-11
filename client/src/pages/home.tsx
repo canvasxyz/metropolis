@@ -148,7 +148,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       <Box
         sx={{
           mt: [9],
-          mb: [8],
+          mb: [3],
           textAlign: "center",
           backgroundColor: "bgGray",
           py: [3],
@@ -158,6 +158,20 @@ const Index: React.FC<{ user? }> = ({ user }) => {
         }}
       >
         Metropolis is in alpha. Your data is safe, but our interfaces are still evolving rapidly.
+      </Box>
+      <Box
+        sx={{
+          mt: [3],
+          mb: [8],
+          textAlign: "center",
+          backgroundColor: "bgGray",
+          py: [3],
+          px: [3],
+          borderRadius: "4px",
+          lineHeight: 1.3,
+        }}
+      >
+        <RouterLink to="/dashboard">See a dashboard of public surveys here.</RouterLink>
       </Box>
       <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
