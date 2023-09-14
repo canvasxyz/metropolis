@@ -1445,6 +1445,7 @@ helpersInitialized.then(
     app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage);
     app.get(/^\/tos$/, fetchIndexForAdminPage);
     app.get(/^\/privacy$/, fetchIndexForAdminPage);
+    app.get(/^\/dashboard(\/.*)?/, fetchIndexForAdminPage);
 
     app.get(/^\/conversations(\/.*)?/, fetchIndexForAdminPage);
     app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage);
