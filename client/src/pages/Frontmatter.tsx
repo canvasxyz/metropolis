@@ -28,7 +28,7 @@ export const Frontmatter: React.FC<FrontmatterProps> = ({source}) => {
   return  (
     <Box sx={{ my: [3], px: [3], py: [3], border: "1px solid #ddd" }}>
       {Object.entries(frontmatter).map(([key, value]) =>
-        <Box> {key}: {value}</Box>
+        <Box key={key}> {key}: {value}</Box>
       )}
     </Box>
   )

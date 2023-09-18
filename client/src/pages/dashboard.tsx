@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, Link as RouterLink } from "react-router-dom"
+import { Link, Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Conversation, RootState } from "../util/types"
 import { populateConversationsStore } from "../actions"
@@ -11,6 +11,7 @@ import remarkFrontMatter from "remark-frontmatter"
 import ReactMarkdown from "react-markdown"
 import { Frontmatter } from "./Frontmatter"
 import Survey from "./survey"
+import { TbSettings } from "react-icons/tb"
 
 
 const Dashboard: React.FC<{ user? }> = ({ user }) => {
@@ -25,9 +26,10 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
   }, [])
 
   const [selectedConversationId, setSelectedConversationId] = useState<string|null>(null)
-
+  const hist = useHistory()
   const data = useSelector((state: RootState) => state.conversations)
   const conversations = data.conversations as Array<Conversation> | null
+  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
 
   const selectedConversation = selectedConversationId && conversations !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
 
@@ -52,17 +54,19 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
               </Button>
             </Link>
           </Flex>
-          <Box sx={{ px: [4], pt: [3] }}>
+          <Box>
             {(conversations||[]).map(
               (conversation) =>
               <Box
                 sx={{
-                  fontWeight: conversation.conversation_id == selectedConversationId ? 600:200,
-                  mt: [2],
-                  pb: [1],
-                  borderBottom: "1px solid #ddd",
+                  fontWeight: 400,
+                  p: [3],
                   cursor: "pointer",
-                  userSelect: "none"
+                  userSelect: "none",
+                  backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB": "#FBF5E9",
+                  "&:hover": {
+                    backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
+                  }
                 }}
                 onClick={() => setSelectedConversationId(conversation.conversation_id)}
                 key={conversation.conversation_id}
@@ -87,24 +91,65 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
           </Box>
         </Box>
         <Box sx={{ flex: 1 }}>
-          <Box sx={{ margin: "0 auto", pt: [6, 7], px: [4], maxWidth: "720px" }}>
-            <Box sx={{ position: "absolute", top: [3], right: [3] }}>
+            {/* <Box sx={{ position: "absolute", top: [3], right: [3] }}>
               <Button variant="outline" sx={{ my: [1], px: [2], py: [1] }}>
                 View analysis
               </Button>
-            </Box>
-            {selectedConversation !== null ? <Box>
-              <Heading as="h2">{selectedConversation.topic}</Heading>
-              <Frontmatter source={selectedConversation.description} />
-              <ReactMarkdown
-                children={selectedConversation.description}
-                remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
-                linkTarget="_blank"
-              />
-              <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
-            </Box> : <Box>Select a conversation</Box>}
+            </Box> */}
+            {selectedConversation !== null
+              ? <Box>
+                  <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
+                    {(zid_metadata.is_mod || zid_metadata.is_owner) && (
+                      <Button
+                        variant="outlineDark"
+                        sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
+                        onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+                      >
+                        <TbSettings /> Edit
+                      </Button>
+                    )}
+                    <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
+                      <Heading as="h2">{selectedConversation.topic}</Heading>
+                      <Frontmatter source={selectedConversation.description} />
+                      <ReactMarkdown
+                        children={selectedConversation.description}
+                        remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                        linkTarget="_blank"
+                      />
+                    </Box>
+                  </Box>
+                  <Box sx={{width: "100%", position: "relative"}}>
+                    <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
+                    <Button
+                      variant="outlineDark"
+                      // onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+                    >
+                      Moderate
+                    </Button>
+                    <Button
+                      variant="outlineDark"
+                      // onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+                    >
+                      Results
+                    </Button>
+
+                    </Box>
+                  <Box
+                    sx={{
+                      margin: "0 auto",
+                      maxWidth: "720px",
+                      px:[4],
+                      lineHeight: 1.45,
+
+                    }}
+                  >
+                    <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
+                  </Box>
+                  </Box>
+                </Box>
+              : <Box>Select a survey</Box>
+            }
           </Box>
-        </Box>
       </Flex>
     </Box>
   )

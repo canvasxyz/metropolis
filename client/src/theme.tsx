@@ -102,6 +102,7 @@ export default {
       pt: "0.7em",
       pb: "0.64em",
       borderRadius: "4px",
+
       backgroundColor: "primary",
       textDecoration: "none",
       color: "#fbf5e9 !important",
@@ -205,15 +206,17 @@ export default {
       },
     },
     outlineDark: {
-      color: "mediumGray",
+      color: "#84817D",
       bg: "background",
       fontFamily: "monospace",
       cursor: "pointer",
       border: "1px solid",
-      borderColor: "mediumGray",
+      borderColor: "#E6E0D4",
+      boxShadow: "2px 2px 2px #E6E0D4",
       "&:hover": {
-        color: "mediumGrayActive",
-        borderColor: "mediumGrayActive",
+        boxShadow: "none",
+        // color: "mediumGrayActive",
+        // borderColor: "mediumGrayActive",
       },
     },
     outlineRed: {
