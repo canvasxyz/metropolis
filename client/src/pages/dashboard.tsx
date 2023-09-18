@@ -99,6 +99,7 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
               <ReactMarkdown
                 children={selectedConversation.description}
                 remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                linkTarget="_blank"
               />
               <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
             </Box> : <Box>Select a conversation</Box>}
