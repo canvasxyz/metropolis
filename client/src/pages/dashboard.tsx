@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link as RouterLink } from "react-router-dom"
+import { Link, Link as RouterLink } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Conversation, RootState } from "../util/types"
 import { populateConversationsStore } from "../actions"
@@ -35,15 +35,23 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
     <Box sx={{ height: "calc(100vh - 7px)" }}>
       <style>{"body { border-top: 5px solid #0090ff; border-image: none; }"}</style>
       <Flex sx={{ display: "flex", height: "100%" }}>
-        <Box sx={{ width: ["40%", null, "260px"], borderRight: "1px solid #ddd" }}>
-          <Box sx={{ width: "100%", borderBottom: "1px solid #ddd", py: [3], px: [4] }}>
-            <RouterLink to="/">
-              <Text variant="links.a" sx={{ fontWeight: 500, display: "inline" }}>
-                Metropolis
-              </Text>
-            </RouterLink>{" "}
-            / FIPs
-          </Box>
+        <Box sx={{ width: ["40%", null, "340px"], borderRight: "1px solid #ddd" }}>
+          <Flex sx={{ width: "100%", borderBottom: "1px solid #ddd", py: [3], px: [4], alignItems:"center" }}>
+            <Box sx={{flexGrow: "1"}}>
+              <RouterLink to="/">
+                <Text variant="links.a" sx={{ fontWeight: 500, display: "inline" }}>
+                  Metropolis
+                </Text>
+              </RouterLink>{" "}
+              / FIPs
+            </Box>
+
+            <Link to="/create">
+              <Button variant="outlineDark">
+                Add survey
+              </Button>
+            </Link>
+          </Flex>
           <Box sx={{ px: [4], pt: [3] }}>
             {(conversations||[]).map(
               (conversation) =>
