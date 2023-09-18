@@ -82,7 +82,9 @@
     "react-router-dom": "~5.2.0",
     "redux": "~4.0.5",
     "redux-thunk": "~2.3.0",
+    "remark": "^15.0.1",
     "remark-gfm": "^3.0.1",
+    "remark-parse-frontmatter": "^1.0.3",
     "request": "~2.65.0",
     "theme-ui": "~0.3.5",
     "victory": "~35.4.11"
