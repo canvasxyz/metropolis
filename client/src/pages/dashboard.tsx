@@ -28,10 +28,16 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
   const [selectedConversationId, setSelectedConversationId] = useState<string|null>(null)
   const hist = useHistory()
   const data = useSelector((state: RootState) => state.conversations)
-  const conversations = data.conversations as Array<Conversation> | null
+  const conversations = (data.conversations || []) as Array<Conversation>
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
 
+  const [showOpenConversations, setShowOpenConversations] = useState(true)
+  const [showArchivedConversations, setShowArchivedConversations] = useState(true)
+
   const selectedConversation = selectedConversationId && conversations !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
+
+  const openConversations = conversations.filter((conversation) => !conversation.is_archived)
+  const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
 
   return (
     <Box sx={{ height: "calc(100vh - 7px)" }}>
@@ -55,12 +61,28 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
             </Link>
           </Flex>
           <Box>
-            {(conversations||[]).map(
+            <Box
+              sx={{
+                fontWeight: 500,
+                py: [2],
+                px: [3],
+                cursor: "pointer",
+                userSelect: "none",
+                "&:hover": {
+                  backgroundColor: "#F5EEDB"
+                }
+              }}
+              onClick={() => setShowOpenConversations(!showOpenConversations)}
+            >
+              {showOpenConversations ? "▾" : "▸"} Open Surveys ({openConversations.length})
+            </Box>
+            {showOpenConversations && openConversations.map(
               (conversation) =>
               <Box
                 sx={{
-                  fontWeight: 400,
+                  fontWeight: 500,
                   p: [3],
+                  pl: [6],
                   cursor: "pointer",
                   userSelect: "none",
                   backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB": "#FBF5E9",
@@ -73,29 +95,45 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
               >
                 {conversation.topic}
               </Box>)
-              }
-            {/* <Box sx={{ mt: [2], pb: [1] }}>
-              <Box sx={{ mb: [2] }}>▾ Open FIPs</Box>
-              <Box sx={{ ml: [3] }}>
-                <Box sx={{ fontWeight: "600" }}>FIP-0100</Box>
-                <Box>FIP-0101</Box>
-              </Box>
+            }
+            <Box
+              sx={{
+                fontWeight: 500,
+                py: [2],
+                px: [3],
+                cursor: "pointer",
+                userSelect: "none",
+                "&:hover": {
+                  backgroundColor: "#F5EEDB"
+                }
+              }}
+              onClick={() => setShowArchivedConversations(!showArchivedConversations)}
+            >
+              {showArchivedConversations ? "▾" : "▸"} Past Surveys ({archivedConversations.length})
             </Box>
-            <Box sx={{ mt: [2] }}>
-              <Box sx={{ mb: [2] }}>▾ Closed FIPs</Box>
-              <Box sx={{ ml: [3] }}>
-                <Box>FIP-0102</Box>
-                <Box>FIP-0103</Box>
-              </Box>
-            </Box> */}
+            {showArchivedConversations && archivedConversations.map(
+              (conversation) =>
+              <Box
+                sx={{
+                  fontWeight: 500,
+                  p: [3],
+                  pl: [6],
+                  cursor: "pointer",
+                  userSelect: "none",
+                  backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB": "#FBF5E9",
+                  "&:hover": {
+                    backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
+                  }
+                }}
+                onClick={() => setSelectedConversationId(conversation.conversation_id)}
+                key={conversation.conversation_id}
+              >
+                {conversation.topic}
+              </Box>)
+            }
           </Box>
         </Box>
         <Box sx={{ flex: 1 }}>
-            {/* <Box sx={{ position: "absolute", top: [3], right: [3] }}>
-              <Button variant="outline" sx={{ my: [1], px: [2], py: [1] }}>
-                View analysis
-              </Button>
-            </Box> */}
             {selectedConversation !== null
               ? <Box>
                   <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
