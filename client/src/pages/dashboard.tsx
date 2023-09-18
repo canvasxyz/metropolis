@@ -10,6 +10,7 @@ import remarkGfm from "remark-gfm"
 import remarkFrontMatter from "remark-frontmatter"
 import ReactMarkdown from "react-markdown"
 import { Frontmatter } from "./Frontmatter"
+import Survey from "./survey"
 
 
 const Dashboard: React.FC<{ user? }> = ({ user }) => {
@@ -91,12 +92,7 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
                 children={selectedConversation.description}
                 remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
               />
-              <Box>
-                <Box sx={{ fontWeight: "500" }}>Temperature Check</Box>
-                <Box sx={{ my: [3], px: [3], py: [3], border: "1px solid #ddd" }}>
-                  Insert poll here
-                </Box>
-              </Box>
+              <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
             </Box> : <Box>Select a conversation</Box>}
           </Box>
         </Box>
