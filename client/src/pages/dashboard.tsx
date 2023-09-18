@@ -160,13 +160,13 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
                     <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
                     <Button
                       variant="outlineDark"
-                      // onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
                     >
                       Moderate
                     </Button>
                     <Button
                       variant="outlineDark"
-                      // onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
                     >
                       Results
                     </Button>
