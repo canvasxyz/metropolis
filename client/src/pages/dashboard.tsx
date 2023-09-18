@@ -134,60 +134,60 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
           </Box>
         </Box>
         <Box sx={{ flex: 1 }}>
-            {selectedConversation !== null
-              ? <Box>
-                  <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
-                    {(zid_metadata.is_mod || zid_metadata.is_owner) && (
-                      <Button
-                        variant="outlineDark"
-                        sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
-                        onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
-                      >
-                        <TbSettings /> Edit
-                      </Button>
-                    )}
-                    <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
-                      <Heading as="h2">{selectedConversation.topic}</Heading>
-                      <Frontmatter source={selectedConversation.description} />
-                      <ReactMarkdown
-                        children={selectedConversation.description}
-                        remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
-                        linkTarget="_blank"
-                      />
-                    </Box>
-                  </Box>
-                  <Box sx={{width: "100%", position: "relative"}}>
-                    <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
+          {selectedConversation !== null
+            ? <Box>
+                <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
+                  {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                     <Button
                       variant="outlineDark"
-                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
+                      sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
+                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
                     >
-                      Moderate
+                      <TbSettings /> Edit
                     </Button>
-                    <Button
-                      variant="outlineDark"
-                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
-                    >
-                      Results
-                    </Button>
-
-                    </Box>
-                  <Box
-                    sx={{
-                      margin: "0 auto",
-                      maxWidth: "720px",
-                      px:[4],
-                      lineHeight: 1.45,
-
-                    }}
-                  >
-                    <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
-                  </Box>
+                  )}
+                  <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
+                    <Heading as="h2">{selectedConversation.topic}</Heading>
+                    <Frontmatter source={selectedConversation.description} />
+                    <ReactMarkdown
+                      children={selectedConversation.description}
+                      remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                      linkTarget="_blank"
+                    />
                   </Box>
                 </Box>
-              : <Box>Select a survey</Box>
-            }
-          </Box>
+                <Box sx={{width: "100%", position: "relative"}}>
+                  <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
+                  <Button
+                    variant="outlineDark"
+                    onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
+                  >
+                    Moderate
+                  </Button>
+                  <Button
+                    variant="outlineDark"
+                    onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
+                  >
+                    Results
+                  </Button>
+
+                  </Box>
+                <Box
+                  sx={{
+                    margin: "0 auto",
+                    maxWidth: "720px",
+                    px:[4],
+                    lineHeight: 1.45,
+
+                  }}
+                >
+                  <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
+                </Box>
+                </Box>
+              </Box>
+            : <Box>Select a survey</Box>
+          }
+        </Box>
       </Flex>
     </Box>
   )
