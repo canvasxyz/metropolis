@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react"
 
 import Modal from "react-modal"
 import { useDispatch } from "react-redux";
-import { Box, Input, Textarea, Label, Heading, Button, Text, Flex, jsx } from "theme-ui"
+import { Box, Input, Textarea, Label, Heading, Button, Text, Flex } from "theme-ui"
 import {
   handleCreateConversationSubmit,
 } from "../actions"
@@ -29,17 +29,17 @@ const CreateConversationInner = ({ dispatch }) => {
 
 
   return (
-    <Box sx={{ mt: [4, null, 5], mb: [5] }}>
+    <Box>
       <Flex>
         <Heading as="h1" sx={{ flex: 1, position: "relative", top: "4px" }}>
           Add a survey
         </Heading>
       </Flex>
 
-      <Box sx={{ mt: 5, mb: 6 }}>
+      <Box sx={{ mt: 5 }}>
         <Box>
           <Label sx={{ display: "block", mb: [5] }}>
-            <Box sx={{ fontWeight: "700", mb: [1] }}>Title</Box>
+            <Box sx={{ mb: [1] }}>Title</Box>
             <Box>
               <Input
                 placeholder={"Placeholder title"}
@@ -52,7 +52,7 @@ const CreateConversationInner = ({ dispatch }) => {
           </Label>
           <form>
             <Flex sx={{flexDirection: "row", alignItems: "center"}}>
-              <Text sx={{ flexGrow: "1", fontWeight: "700", mb: [1] }}>
+              <Text sx={{ flexGrow: "1", mb: [1] }}>
                 <label htmlFor="new_conversation_description">Body</label>
               </Text>
               {/* TODO: implement FIP search */}
@@ -93,9 +93,12 @@ export const CreateConversationModal: React.FC<PropTypes> = ({isOpen, setIsOpen}
     onRequestClose={() => setIsOpen(false)}
     style={{
       overlay: {
-        backgroundColor: "rgba(40, 40, 40, 0.3)",
+        backgroundColor: "#FBF5E9A0",
       },
       content: {
+        backgroundColor: "#FAF5EA",
+        border: "1px #EDEBE3",
+        boxShadow: "4px 4px 8px 2px #E6E0D4",
         borderRadius: "8px",
         top: "50%",
         left: "50%",
@@ -103,11 +106,11 @@ export const CreateConversationModal: React.FC<PropTypes> = ({isOpen, setIsOpen}
         bottom: "auto",
         marginRight: "-50%",
         transform: "translate(-50%, -50%)",
-        minHeight: "200px",
+        // minHeight: "200px",
         width: "96vw", // for mobile
         maxWidth: "540px",
         overflow: "visible",
-        padding: "32px 28px 28px",
+        padding: "32px 48px 28px",
       },
     }}
     contentLabel="Add new statement"

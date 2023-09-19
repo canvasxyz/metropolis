@@ -166,6 +166,7 @@ export default {
     primary: {
       color: "background",
       bg: "primary",
+      borderRadius: [8],
       "&:hover": {
         bg: "primaryActive",
       },
@@ -205,7 +206,7 @@ export default {
         borderColor: "lightGrayActive",
       },
     },
-    outlineDark: {
+    muted: {
       color: "#84817D",
       bg: "background",
       fontFamily: "monospace",
