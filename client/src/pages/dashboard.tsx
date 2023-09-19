@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
@@ -14,7 +14,7 @@ import Survey from "./survey"
 import { TbSettings } from "react-icons/tb"
 
 
-const Dashboard: React.FC<{ user? }> = ({ user }) => {
+const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -25,7 +25,6 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
     dispatch(populateConversationsStore())
   }, [])
 
-  const [selectedConversationId, setSelectedConversationId] = useState<string|null>(null)
   const hist = useHistory()
   const data = useSelector((state: RootState) => state.conversations)
   const conversations = (data.conversations || []) as Array<Conversation>
@@ -34,7 +33,14 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
   const [showOpenConversations, setShowOpenConversations] = useState(true)
   const [showArchivedConversations, setShowArchivedConversations] = useState(true)
 
-  const selectedConversation = selectedConversationId && conversations !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
+  const navigateToConversation = useCallback((conversationId) => {
+    console.log(conversationId)
+    hist.push(`/dashboard/c/${conversationId}`)
+  },[])
+
+  selectedConversationId
+
+  const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
 
   const openConversations = conversations.filter((conversation) => !conversation.is_archived)
   const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
@@ -90,7 +96,7 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
                     backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
                   }
                 }}
-                onClick={() => setSelectedConversationId(conversation.conversation_id)}
+                onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
                 {conversation.topic}
@@ -125,7 +131,7 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
                     backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
                   }
                 }}
-                onClick={() => setSelectedConversationId(conversation.conversation_id)}
+                onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
                 {conversation.topic}
@@ -134,7 +140,7 @@ const Dashboard: React.FC<{ user? }> = ({ user }) => {
           </Box>
         </Box>
         <Box sx={{ flex: 1 }}>
-          {selectedConversation !== null
+          {!!selectedConversation
             ? <Box>
                 <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
                   {(zid_metadata.is_mod || zid_metadata.is_owner) && (

@@ -171,7 +171,11 @@ class App extends React.Component<
                 <Route
                   exact
                   path="/dashboard"
-                  render={() => <Dashboard user={this.props.user} />}
+                  render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
+                />
+                <Route
+                  path="/dashboard/c/:conversation_id"
+                  render={({match: {params: {conversation_id}}}) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
                 />
                 <Route exact path="/about" render={() => <About />} />
                 <Route
