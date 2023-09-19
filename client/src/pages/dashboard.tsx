@@ -12,6 +12,7 @@ import ReactMarkdown from "react-markdown"
 import { Frontmatter } from "./Frontmatter"
 import Survey from "./survey"
 import { TbSettings } from "react-icons/tb"
+import { CreateConversationModal } from "./CreateConversationModal"
 
 
 const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
@@ -32,6 +33,8 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
 
   const [showOpenConversations, setShowOpenConversations] = useState(true)
   const [showArchivedConversations, setShowArchivedConversations] = useState(true)
+
+  const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const navigateToConversation = useCallback((conversationId) => {
     console.log(conversationId)
@@ -60,11 +63,9 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
               / FIPs
             </Box>
 
-            <Link to="/create">
-              <Button variant="outlineDark">
-                Add survey
-              </Button>
-            </Link>
+            <Button variant="outlineDark" onClick={() => setCreateConversationModalIsOpen(true)}>
+              Add survey
+            </Button>
           </Flex>
           <Box>
             <Box
@@ -210,6 +211,10 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
           }
         </Box>
       </Flex>
+      <CreateConversationModal
+        isOpen={createConversationModalIsOpen}
+        setIsOpen={setCreateConversationModalIsOpen}
+      />
     </Box>
   )
 }
