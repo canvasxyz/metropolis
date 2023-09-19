@@ -49,7 +49,7 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
     <Box sx={{ height: "calc(100vh - 7px)" }}>
       <style>{"body { border-top: 5px solid #0090ff; border-image: none; }"}</style>
       <Flex sx={{ display: "flex", height: "100%" }}>
-        <Box sx={{ width: ["40%", null, "340px"], borderRight: "1px solid #ddd" }}>
+        <Box sx={{ overflowY:"scroll", width: ["40%", null, "340px"], borderRight: "1px solid #ddd" }}>
           <Flex sx={{ width: "100%", borderBottom: "1px solid #ddd", py: [3], px: [4], alignItems:"center" }}>
             <Box sx={{flexGrow: "1"}}>
               <RouterLink to="/">
@@ -139,7 +139,7 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
             }
           </Box>
         </Box>
-        <Box sx={{ flex: 1 }}>
+        <Box sx={{ overflowY:"scroll", flex: 1 }}>
           {!!selectedConversation
             ? <Box>
                 <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
