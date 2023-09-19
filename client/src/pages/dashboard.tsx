@@ -185,11 +185,17 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                   sx={{
                     margin: "0 auto",
                     maxWidth: "720px",
-                    px:[4],
+                    px: [4],
+                    py: [2],
                     lineHeight: 1.45,
-
                   }}
                 >
+                  <Text sx={{
+                    color: "primary", textTransform: "uppercase", fontFamily: "heading",
+                    fontWeight: 400
+                  }}>
+                  Community Response
+                  </Text>
                   <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
                 </Box>
                 </Box>
