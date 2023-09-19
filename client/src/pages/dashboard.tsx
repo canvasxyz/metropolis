@@ -193,7 +193,20 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                 </Box>
                 </Box>
               </Box>
-            : <Box>Select a survey</Box>
+            :
+              <Flex sx={{  justifyContent: "center", alignItems:"center", height: "100%"
+               }}>
+                <Flex sx={{margin: "auto", flexDirection: "column", alignItems: "center"}}>
+                  <img
+                    src="/foundation.png"
+                    width="200"
+                    style={{ opacity: 0.2 }}
+                  />
+                  <h1 sx={{mt:[1], opacity: 0.7}}>
+                    Select a survey
+                  </h1>
+                </Flex>
+              </Flex>
           }
         </Box>
       </Flex>
