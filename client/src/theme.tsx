@@ -213,6 +213,9 @@ export default {
       border: "1px solid",
       borderColor: "#E6E0D4",
       boxShadow: "2px 2px 2px #E6E0D4",
+      py: [1],
+      px: [2],
+      borderRadius: [8],
       "&:hover": {
         boxShadow: "none",
         // color: "mediumGrayActive",

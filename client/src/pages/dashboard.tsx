@@ -86,7 +86,6 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
               (conversation) =>
               <Box
                 sx={{
-                  fontWeight: 500,
                   p: [3],
                   pl: [6],
                   cursor: "pointer",
@@ -99,7 +98,8 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                 onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
-                {conversation.topic}
+                <Text sx={{fontWeight: 500}}>{conversation.topic}</Text>
+                <Text sx={{color: "#84817D"}}>2 conversations · Feedback open</Text>
               </Box>)
             }
             <Box
@@ -146,10 +146,12 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                   {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                     <Button
                       variant="outlineDark"
-                      sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px" }}
+                      sx={{ position: "absolute", top: [4], right: [4], alignItems: "center", display: "flex", gap:[1]
+                     }}
                       onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
                     >
-                      <TbSettings /> Edit
+                      <Box><TbSettings/></Box>
+                      <Text>Edit</Text>
                     </Button>
                   )}
                   <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
