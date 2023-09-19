@@ -63,7 +63,7 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
               / FIPs
             </Box>
 
-            <Button variant="muted" onClick={() => setCreateConversationModalIsOpen(true)}>
+            <Button variant="outlineSecondary" onClick={() => setCreateConversationModalIsOpen(true)}>
               Add survey
             </Button>
           </Flex>
@@ -146,7 +146,7 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                 <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
                   {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                     <Button
-                      variant="muted"
+                      variant="outlineSecondary"
                       sx={{ position: "absolute", top: [4], right: [4], alignItems: "center", display: "flex", gap:[1]
                      }}
                       onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
@@ -168,13 +168,13 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                 <Box sx={{width: "100%", position: "relative"}}>
                   <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
                   <Button
-                    variant="muted"
+                    variant="outlineSecondary"
                     onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
                   >
                     Moderate
                   </Button>
                   <Button
-                    variant="muted"
+                    variant="outlineSecondary"
                     onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
                   >
                     Results

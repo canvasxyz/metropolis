@@ -195,18 +195,6 @@ export default {
       },
     },
     outlineSecondary: {
-      color: "lightGray",
-      bg: "background",
-      fontFamily: "monospace",
-      cursor: "pointer",
-      border: "1px solid",
-      borderColor: "lightGray",
-      "&:hover": {
-        color: "lightGrayActive",
-        borderColor: "lightGrayActive",
-      },
-    },
-    muted: {
       color: "#84817D",
       bg: "background",
       fontFamily: "monospace",
