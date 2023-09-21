@@ -115,9 +115,6 @@ function queryImpl(pool: Pool, queryString?: any, ...args: undefined[]) {
 const pgPoolLevelRanks = ["info", "verbose"]; // TODO investigate
 const pgPoolLoggingLevel = -1; // -1 to get anything more important than info and verbose. // pgPoolLevelRanks.indexOf("info");
 
-// remove queryreadwriteobj
-// remove queryreadonlyobj
-
 function query(...args: any[]) {
   return queryImpl(readWritePool, ...args);
 }

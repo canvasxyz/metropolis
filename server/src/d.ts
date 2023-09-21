@@ -1,5 +1,3 @@
-import { any } from "underscore";
-
 export type Headers = {
   [key: string]: any;
   host?: string;

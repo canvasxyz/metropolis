@@ -4,7 +4,6 @@ import LruCache from "lru-cache";
 import pg from "./db/pg-query";
 import { MPromise } from "./utils/metered";
 
-import Config from "./config";
 import Conversation from "./conversation";
 import LRUCache from "lru-cache";
 import logger from "./utils/logger";

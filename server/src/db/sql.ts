@@ -48,17 +48,6 @@ const sql_conversations: any = sql.define({
   ],
 });
 
-// const sql_votes = sql.define({
-//   name: 'votes',
-//   columns: [
-//     "zid",
-//     "tid",
-//     "pid",
-//     "created",
-//     "vote",
-//   ],
-// });
-
 // 'sql_comments' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.ts(7022)
 // @ts-ignore
 const sql_comments = sql.define({

@@ -7,24 +7,12 @@ import akismetLib from "akismet";
 import AWS from "aws-sdk";
 import badwords from "badwords/object";
 import Promise from "bluebird";
-import http from "http";
-import httpProxy from "http-proxy";
-// const Promise = require('es6-promise').Promise,
 import async from "async";
-// npm list types-at-fb
 // @ts-ignore
 import FB from "fb";
-import fs from "fs";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import OAuth from "oauth";
-// const Pushover = require('pushover-notifications');
-// const pushoverInstance = new Pushover({
-//   user: process.env.PUSHOVER_GROUP_POLIS_DEV,
-//   token: process.env.PUSHOVER_POLIS_PROXY_API_KEY,
-// });
-// const postmark = require("postmark")(process.env.POSTMARK_API_KEY);
-import replaceStream from "replacestream";
 import responseTime from "response-time";
 import request from "request-promise"; // includes Request, but adds promise methods
 import LruCache from "lru-cache";
@@ -33,7 +21,7 @@ import zlib from "zlib";
 import _ from "underscore";
 import pg from "pg";
 
-import { METRICS_IN_RAM, addInRamMetric, MPromise } from "./utils/metered";
+import { addInRamMetric, MPromise } from "./utils/metered";
 import CreateUser from "./auth/create-user";
 import Password from "./auth/password";
 import dbPgQuery from "./db/pg-query";
@@ -49,8 +37,6 @@ import {
   Headers,
   Query,
   AuthRequest,
-  AuthBody,
-  AuthQuery,
   ParticipantInfo,
   PidReadyResult,
   CommentOptions,
@@ -69,7 +55,6 @@ import {
 
 AWS.config.update({ region: Config.awsRegion });
 const devMode = Config.isDevMode;
-const s3Client = new AWS.S3({ apiVersion: "2006-03-01" });
 // Property 'Client' does not exist on type '{ query: (...args: any[]) => void; query_readOnly:
 // (...args: any[]) => void; queryP: (...args: any[]) => Promise<unknown>; queryP_metered:
 // (name: any, queryString: any, params: any) => any; queryP_metered_readOnly:
@@ -110,19 +95,6 @@ import logger from "./utils/logger";
 // # notifications
 import emailSenders from "./email/senders";
 const sendTextEmail = emailSenders.sendTextEmail;
-
-const resolveWith = (x: { body?: { user_id: string } }) => {
-  return Promise.resolve(x);
-};
-
-//var SegfaultHandler = require('segfault-handler');
-
-//SegfaultHandler.registerHandler("segfault.log");
-
-// var conversion = {
-//   contact: { user_id: '8634dd66-f75e-428d-a2bf-930baa0571e9' },
-//   user: { email: 'asdf@adsf.com', user_id: "12345" },
-// };
 
 if (devMode) {
   Promise.longStackTraces();

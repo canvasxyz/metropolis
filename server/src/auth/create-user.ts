@@ -4,13 +4,10 @@ import pg from "../db/pg-query";
 import fail from "../utils/fail";
 import Config from "../config";
 import cookies from "../utils/cookies";
-import User from "../user";
 import Session from "../session";
 import Utils from "../utils/common";
 import Password from "./password";
 import emailSenders from "../email/senders";
-
-const COOKIES = cookies.COOKIES;
 
 const sendTextEmail = emailSenders.sendTextEmail;
 function createUser(req: any, res: any) {
@@ -20,7 +17,6 @@ function createUser(req: any, res: any) {
   let email = req.p.email;
   let oinvite = req.p.oinvite;
   let zinvite = req.p.zinvite;
-  let organization = req.p.organization;
   let gatekeeperTosPrivacy = req.p.gatekeeperTosPrivacy;
 
   let site_id = void 0;
