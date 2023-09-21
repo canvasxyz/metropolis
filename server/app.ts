@@ -132,6 +132,8 @@ helpersInitialized.then(
       handle_GET_twitter_oauth_callback,
       handle_GET_twitter_users,
       handle_GET_twitterBtn,
+      handle_GET_github_init,
+      handle_GET_github_oauth_callback,
       handle_GET_users,
       handle_GET_verification,
       handle_GET_votes,
@@ -1282,6 +1284,27 @@ helpersInitialized.then(
       need("oauth_verifier", getStringLimitLength(9999), assignToP), // TODO verify
       want("owner", getBool, assignToP, true),
       handle_GET_twitter_oauth_callback
+    );
+
+
+    app.get(
+      "/api/v3/github_oauth_init",
+      moveToBody,
+      authOptional(assignToP),
+      want("dest", getStringLimitLength(9999), assignToP),
+      want("owner", getBool, assignToP, true),
+      handle_GET_github_init
+    );
+
+    app.get(
+      "/api/v3/github_oauth_callback",
+      moveToBody,
+      enableAgid,
+      auth(assignToP),
+      need("code", getStringLimitLength(9999), assignToP), // TODO verify
+      want("dest", getStringLimitLength(9999), assignToP),
+      want("owner", getBool, assignToP, true),
+      handle_GET_github_oauth_callback
     );
 
     app.get(

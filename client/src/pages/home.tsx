@@ -85,7 +85,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
                   or
                 </Text>
-                <RouterLink sx={{ variant: "links.button" }} to="/signin">
+                <RouterLink sx={{ variant: "links.button" }} to="/api/v3/signin">
                   Sign in
                 </RouterLink>
               </Box>
