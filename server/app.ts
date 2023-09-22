@@ -582,7 +582,6 @@ helpersInitialized.then(
       want("password2", getPasswordWithCreatePasswordRules, assignToP),
       want("email", getOptionalStringLimitLength(999), assignToP),
       want("hname", getOptionalStringLimitLength(999), assignToP),
-      want("oinvite", getOptionalStringLimitLength(999), assignToP),
       want("encodedParams", getOptionalStringLimitLength(9999), assignToP), // TODO_SECURITY we need to add an additional key param to ensure this is secure. we don't want anyone adding themselves to other people's site_id groups.
       want("zinvite", getOptionalStringLimitLength(999), assignToP),
       want("organization", getOptionalStringLimitLength(999), assignToP),

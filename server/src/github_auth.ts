@@ -89,10 +89,10 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
     // create user
     const createQuery =
     "insert into users " +
-    "(email, hname, zinvite, oinvite, is_owner) VALUES " +
-    "($1, $2, $3, $4, $5) " +
+    "(email, hname, zinvite, is_owner) VALUES " +
+    "($1, $2, $3, $4) " +
     "returning uid;";
-    const vals = [email, githubUsername, null, null, true];
+    const vals = [email, githubUsername, null, true];
 
     const createRes = (await queryPromise(createQuery, vals)) as {rows: {uid: string}[]};
     uid = createRes.rows[0].uid;

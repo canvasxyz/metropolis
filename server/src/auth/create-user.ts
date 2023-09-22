@@ -15,7 +15,6 @@ function createUser(req: any, res: any) {
   let password = req.p.password;
   let password2 = req.p.password2; // for verification
   let email = req.p.email;
-  let oinvite = req.p.oinvite;
   let zinvite = req.p.zinvite;
   let gatekeeperTosPrivacy = req.p.gatekeeperTosPrivacy;
 
@@ -80,14 +79,14 @@ function createUser(req: any, res: any) {
           }
           let query =
             "insert into users " +
-            "(email, hname, zinvite, oinvite, is_owner" +
+            "(email, hname, zinvite, is_owner" +
             (site_id ? ", site_id" : "") +
             ") VALUES " + // TODO use sql query builder
-            "($1, $2, $3, $4, $5" +
-            (site_id ? ", $6" : "") +
+            "($1, $2, $3, $4" +
+            (site_id ? ", $5" : "") +
             ") " + // TODO use sql query builder
             "returning uid;";
-          let vals = [email, hname, zinvite || null, oinvite || null, true];
+          let vals = [email, hname, zinvite || null, true];
           if (site_id) {
             vals.push(site_id); // TODO use sql query builder
           }
