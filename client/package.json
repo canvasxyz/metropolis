@@ -83,6 +83,7 @@
     "redux": "~4.0.5",
     "redux-thunk": "~2.3.0",
     "remark": "^15.0.1",
+    "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^3.0.1",
     "remark-parse-frontmatter": "^1.0.3",
     "request": "~2.65.0",
