@@ -6,7 +6,7 @@ import pg from "../db/pg-query";
 
 function generateHashedPassword(
   password: any,
-  callback: (arg0: string | null, arg1?: undefined) => void
+  callback: (arg0: string | null, arg1?: string) => void
 ) {
   bcrypt.genSalt(12, function (errSalt: any, salt: any) {
     if (errSalt) {
