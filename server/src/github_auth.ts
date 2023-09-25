@@ -1,4 +1,7 @@
 import { Response } from "express";
+import { Octokit } from "@octokit/core";
+import { createOAuthUserAuth } from "@octokit/auth-oauth-user";
+
 import pg from "./db/pg-query";
 import { startSession } from "./session";
 import cookies from "./utils/cookies";
@@ -35,42 +38,25 @@ function startSessionPromise(uid: any) {
 }
 
 export async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; dest?: any} }, res: Response) {
-  const accessTokenResponse = await fetch(
-    "https://github.com/login/oauth/access_token",
-    {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "accept": "application/json"
-      },
-      body: JSON.stringify({
-        client_id: process.env.GH_BASIC_CLIENT_ID,
-        client_secret: process.env.GH_BASIC_SECRET_ID,
-        code: req.p.code,
-        accept: "json"
-      })
-    }
-  );
-
-  // parse the response to get the access token
-  const {access_token: accessToken} = (await accessTokenResponse.json());
-
-  // get the github user that is associated with the token
-  const userResponse = await fetch("https://api.github.com/user", {
-    method: "GET",
-    headers: {
-      "accept": "application/vnd.github+json",
-      "authorization": `Bearer ${accessToken}`,
-      "X-GitHub-Api-Version": "2022-11-28"
-    }
+  const octokit = new Octokit({
+    authStrategy: createOAuthUserAuth,
+    auth: {
+      clientId: process.env.GH_BASIC_CLIENT_ID,
+      clientSecret: process.env.GH_BASIC_SECRET_ID,
+      code: req.p.code,
+    },
   });
 
-  const githubUsername = (await userResponse.json()).login;
+  // get the github user that is associated with the token
+  const {
+    data: { login },
+  } = await octokit.request("GET /user");
+
+  const githubUsername = login;
   if(!githubUsername) {
     throw Error("invalid github access token");
   }
   console.log(`we are now authenticated as ${githubUsername}`);
-
 
   // TODO: this is a hack, we should have more semantically meaningful columns
   const email = `github: ${githubUsername}`;
