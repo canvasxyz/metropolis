@@ -28,7 +28,7 @@ function getUserInfoForUid2(uid: any) {
       if (!results.rows || !results.rows.length) {
         throw Error();
       }
-      return results.rows[0];
+      return results.rows[0] as any;
     }
   ));
 }
@@ -138,7 +138,6 @@ function createDummyUser() {
       }
 
       if (!results || !results.rows || !results.rows.length) {
-        logger.error("polis_err_create_empty_user", err);
         throw new Error("polis_err_create_empty_user");
       }
 

@@ -635,9 +635,8 @@ function initializePolisHelpers() {
                   [conv.owner, uid]
                 ),
                 getSocialInfoForUsers([uid], zid),
-                // Binding elements 'xids' and 'info' implicitly have an 'any' type.ts(7031)
-                // @ts-ignore
               ]).then(([xids, info]) => {
+                // @ts-ignore
                 var socialAccountIsLinked = info.length > 0;
                 // Object is of type 'unknown'.ts(2571)
                 // @ts-ignore
@@ -672,7 +671,7 @@ function initializePolisHelpers() {
     return votesGet(p);
   }
 
-  function votesGet(p: { zid?: any; pid?: any; tid?: any }) {
+  function votesGet(p: { zid?: any; pid?: any; tid?: any }): Promise<any[]> {
     return meteredPromise("votesGet", new Promise((resolve, reject) => {
       let q = sql_votes_latest_unique
         .select(sql_votes_latest_unique.star())
@@ -2798,7 +2797,7 @@ Feel free to reply to this email if you need help.`;
       "getZinvite",
       "select * from zinvites where zid = ($1);",
       [zid]
-    ).then(function (rows: { zinvite: any }[]) {
+    ).then(function (rows: any) {
       let conversation_id = (rows && rows[0] && rows[0].zinvite) || void 0;
       if (conversation_id) {
         zidToConversationIdCache.set(zid, conversation_id);
@@ -2926,7 +2925,7 @@ Feel free to reply to this email if you need help.`;
   ) {
     addConversationId(o, dontUseCache)
       .then(
-        function (item: { zid: any }) {
+        function (item: any) {
           // ensure we don't expose zid
           if (item.zid) {
             delete item.zid;
@@ -3860,10 +3859,7 @@ Email verified! You can close this tab or hit the back button.
   }
 
   function sendEmailByUid(uid?: any, subject?: string, body?: string | number) {
-    return getUserInfoForUid2(uid).then(function (userInfo: {
-      hname: any;
-      email: any;
-    }) {
+    return getUserInfoForUid2(uid).then(function (userInfo: any) {
       return sendTextEmail(
         polisFromAddress,
         userInfo.hname
@@ -6560,7 +6556,7 @@ Email verified! You can close this tab or hit the back button.
     //   Type '{ rid: any; include_demographics: any; zid: any; uid?: any; }' is missing the following properties from type 'O': include_voting_patterns, modIn, pid, tids, and 9 more.ts(2345)
     // @ts-ignore
     getComments(req.p)
-      .then(function (comments: any[]) {
+      .then(function (comments: any) {
         if (req.p.rid) {
           return pgQueryP(
             "select tid, selection from report_comment_selections where rid = ($1);",
@@ -6952,7 +6948,7 @@ Email verified! You can close this tab or hit the back button.
       }
       return Promise.resolve(pid);
     }
-    let twitterPrepPromise = Promise.resolve();
+    let twitterPrepPromise: Promise<any> = Promise.resolve();
     if (twitter_tweet_id) {
       twitterPrepPromise = prepForTwitterComment(twitter_tweet_id, zid);
     } else if (quote_twitter_screen_name) {
@@ -7181,7 +7177,7 @@ Email verified! You can close this tab or hit the back button.
                               );
                               return void 0;
                             })
-                            .then(function (n: number) {
+                            .then(function (n: any) {
                               if (n === 0) {
                                 return;
                               }
@@ -7680,6 +7676,7 @@ Email verified! You can close this tab or hit the back button.
       // @ts-ignore
       ifConv(getOneConversation, [req.p.zid, req.p.uid, req.p.lang]),
       // getIfConv({uri: "http://" + SELF_HOSTNAME + "/api/v3/votes", qs: votesByMeQs, headers: req.headers, gzip: true}),
+      // @ts-ignore
       ifConv(getVotesForSingleParticipant, [req.p]),
       //
       // Argument of type '(zid?: any, math_tick?: number | undefined) => Promise<any>' is not assignable to parameter of type '{ (zid: any, pid: any, withoutTids: any, include_social: any, lang?: any): CommentType; (zid: any, uid?: any, lang?: any): any; (p: any): any; (zid: any, math_tick: any): any; (o: any, req: any): any; apply?: any; }'.
@@ -9293,9 +9290,7 @@ Email verified! You can close this tab or hit the back button.
 
       conv.translations = translations;
 
-      return getUserInfoForUid2(conv.owner).then(function (ownerInfo: {
-        hname: any;
-      }) {
+      return getUserInfoForUid2(conv.owner).then(function (ownerInfo: any) {
         let ownername = ownerInfo.hname;
         if (convHasMetadata) {
           conv.hasMetadata = true;
@@ -10691,10 +10686,7 @@ Thanks for using Metropolis!
   updateSomeTwitterUsers();
   function createUserFromTwitterInfo(o: any) {
     return createDummyUser().then(function (uid?: any) {
-      return getAndInsertTwitterUser(o, uid).then(function (result: {
-        twitterUser: any;
-        twitterUserDbRecord: any;
-      }) {
+      return getAndInsertTwitterUser(o, uid).then(function (result: any) {
         let u = result.twitterUser;
         let twitterUserDbRecord = result.twitterUserDbRecord;
 
@@ -10729,9 +10721,7 @@ Thanks for using Metropolis!
   }
 
   function prepForTwitterComment(twitter_tweet_id: any, zid: any) {
-    return getTwitterTweetById(twitter_tweet_id).then(function (tweet: {
-      user: any;
-    }) {
+    return getTwitterTweetById(twitter_tweet_id).then(function (tweet: any) {
       let user = tweet.user;
       let twitter_user_id = user.id_str;
       let query = pgQueryP(
@@ -10797,9 +10787,7 @@ Thanks for using Metropolis!
           });
       } else {
         // no user records yet
-        return createUserFromTwitterInfo(o).then(function (twitterUser: {
-          uid?: any;
-        }) {
+        return createUserFromTwitterInfo(o).then(function (twitterUser: any) {
           let uid = twitterUser.uid;
           return (
             addParticipant(zid, uid)
@@ -10845,7 +10833,7 @@ Thanks for using Metropolis!
     });
   }
   function getAndInsertTwitterUser(o: any, uid?: any) {
-    return getTwitterUserInfo(o, false).then(function (userString: string) {
+    return getTwitterUserInfo(o, false).then(function (userString: any) {
       const u: UserType = JSON.parse(userString)[0];
       return (
         pgQueryP(
@@ -10933,7 +10921,7 @@ Thanks for using Metropolis!
             false
           )
             .then(
-              function (userStringPayload: string) {
+              function (userStringPayload: any) {
                 const u: UserType = JSON.parse(userStringPayload)[0];
                 return pgQueryP(
                   "insert into twitter_users (" +
@@ -12251,7 +12239,7 @@ Thanks for using Metropolis!
         // getTwitterUsersInConversation(zid, uid, twitterLimit),
         // getPolisSocialSettings(zid, uid),
         // getPidPromise(zid, uid),
-      ]).then(function (stuff: never[][]) {
+      ]).then(function (stuff: any) {
         //     // if we didn't find any FB friends or Twitter users, find some that aren't friends
         //     // This may or may not be the right thing to do, but the reasoning is that it will help people understand what Polis is. Empty buckets will be confusing.
         //     let facebookFriends = stuff[0] || [];

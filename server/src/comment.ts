@@ -73,7 +73,8 @@ function getComments(o: CommentType) {
   let convPromise = Conversation.getConversationInfo(o.zid);
   let conv: { is_anon: any } | null = null;
   return Promise.all([convPromise, commentListPromise])
-    .then(function ([conv, rows]) {
+    .then(function ([conv, rows_]) {
+      let rows = rows_ as Row[];
       let cols = [
         "txt",
         "tid",
@@ -97,19 +98,20 @@ function getComments(o: CommentType) {
         cols.push("pass_count"); //  in  moderation queries, we join in the vote count
         cols.push("count"); //  in  moderation queries, we join in the vote count
       }
-      rows = rows.map(function (row: Row) {
+      return rows.map(function (row) {
         let x = _.pick(row, cols);
         if (!_.isUndefined(x.count)) {
           x.count = Number(x.count);
         }
         return x;
       });
-      return rows;
     })
     .then(function (comments) {
       let include_social = !conv?.is_anon && o.include_social;
 
       if (include_social) {
+        // TODO: missing fields in Row type?
+        // @ts-ignore
         let nonAnonComments = comments.filter(function (c: {
           anon: any;
           is_seed: any;
@@ -117,6 +119,8 @@ function getComments(o: CommentType) {
           return !c.anon && !c.is_seed;
         });
         let uids = _.pluck(nonAnonComments, "uid");
+        // TODO: fix this
+        // @ts-ignore
         return User.getSocialInfoForUsers(uids, o.zid).then(function (
           socialInfos: any[]
         ) {
@@ -168,6 +172,7 @@ function getComments(o: CommentType) {
 
             uidToSocialInfo[info.uid] = infoToReturn;
           });
+          // @ts-ignore
           return comments.map(function (c: {
             uid: string | number;
             anon: any;
@@ -188,6 +193,7 @@ function getComments(o: CommentType) {
       }
     })
     .then(function (comments) {
+      // @ts-ignore
       comments.forEach(function (c: { uid: any; anon: any }) {
         delete c.uid;
         delete c.anon;
@@ -256,7 +262,8 @@ function _getCommentsForModerationList(o: {
           modClause,
         params
       )
-      .then((rows: Row[]) => {
+      .then((rows_) => {
+        let rows = rows_ as Row[];
         // each comment will have up to three rows. merge those into one with agree/disagree/pass counts.
         let adp: { [key: string]: Row } = {};
         for (let i = 0; i < rows.length; i++) {

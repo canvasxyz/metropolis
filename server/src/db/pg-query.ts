@@ -175,9 +175,7 @@ function queryP_metered_impl(
   if (isUndefined(name) || isUndefined(queryString) || isUndefined(params)) {
     throw new Error("polis_err_queryP_metered_impl missing params");
   }
-  return meteredPromise(name, new Promise(function (resolve, reject) {
-    f(queryString, params).then(resolve, reject);
-  }));
+  return meteredPromise(name, f(queryString, params));
 }
 
 function queryP_metered(name: any, queryString: any, params: any) {

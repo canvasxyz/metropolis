@@ -87,7 +87,7 @@ function isXidWhitelisted(owner: any, xid: any) {
 async function getConversationInfo(zid: any) {
   return meteredPromise(
     "getConversationInfo",
-    new Promise(async () => {
+    new Promise<any>(async () => {
       const {rows} = await pg.queryP("SELECT * FROM conversations WHERE zid = ($1);", [zid]) as {rows: any[]};
       return rows[0];
     })
@@ -97,7 +97,7 @@ async function getConversationInfo(zid: any) {
 function getConversationInfoByConversationId(conversation_id: any) {
   return meteredPromise(
     "getConversationInfoByConversationId",
-    new Promise(async () => {
+    new Promise<any>(async () => {
       const {rows} = await pg.queryP(
         "SELECT * FROM conversations WHERE zid = (select zid from zinvites where zinvite = ($1));",
         [conversation_id]) as { rows: any[] };
@@ -114,7 +114,7 @@ const conversationIdToZidCache = new LruCache({
 function getZidFromConversationId(conversation_id: string) {
   return meteredPromise(
     "getZidFromConversationId",
-    new Promise(async () => {
+    new Promise<any>(async () => {
       let cachedZid = conversationIdToZidCache.get(conversation_id);
       if (cachedZid) {
         return cachedZid;
