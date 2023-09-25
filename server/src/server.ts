@@ -6,7 +6,6 @@ import { parse } from "json2csv";
 import akismetLib from "akismet";
 import AWS from "aws-sdk";
 import badwords from "badwords/object";
-import Promise from "bluebird";
 import async from "async";
 // @ts-ignore
 import FB from "fb";
@@ -95,16 +94,6 @@ import logger from "./utils/logger";
 // # notifications
 import emailSenders from "./email/senders";
 const sendTextEmail = emailSenders.sendTextEmail;
-
-if (devMode) {
-  Promise.longStackTraces();
-}
-
-// Bluebird uncaught error handler.
-Promise.onPossiblyUnhandledRejection(function (err: any) {
-  logger.error("onPossiblyUnhandledRejection", err);
-  // throw err; // not throwing since we're printing stack traces anyway
-});
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
 
@@ -3038,7 +3027,7 @@ Feel free to reply to this email if you need help.`;
   }
 
   function deleteSuzinvite(suzinvite: any) {
-    return new Promise(function (resolve: () => void, reject: any) {
+    return new Promise(function (resolve, reject) {
       pgQuery(
         "DELETE FROM suzinvites WHERE suzinvite = ($1);",
         [suzinvite],
@@ -3047,7 +3036,7 @@ Feel free to reply to this email if you need help.`;
             // resolve, but complain
             logger.error("polis_err_removing_suzinvite", err);
           }
-          resolve();
+          resolve(undefined);
         }
       );
     });
@@ -3069,8 +3058,8 @@ Feel free to reply to this email if you need help.`;
 
   function createXidEntry(xid: any, owner: any, uid?: any) {
     return new Promise(function (
-      resolve: () => void,
-      reject: (arg0: Error) => void
+      resolve,
+      reject
     ) {
       pgQuery(
         "INSERT INTO xids (uid, owner, xid) VALUES ($1, $2, $3);",
@@ -3081,7 +3070,7 @@ Feel free to reply to this email if you need help.`;
             reject(new Error("polis_err_adding_xid_entry"));
             return;
           }
-          resolve();
+          resolve(undefined);
         }
       );
     });
@@ -3862,7 +3851,7 @@ Email verified! You can close this tab or hit the back button.
     path: string,
     params: { [x: string]: any; conversation_id?: any; email?: any }
   ) {
-    return new Promise(function (resolve: () => void, reject: () => void) {
+    return new Promise(function (resolve, reject) {
       params = _.clone(params);
       let hash = params[HMAC_SIGNATURE_PARAM_NAME];
       delete params[HMAC_SIGNATURE_PARAM_NAME];
@@ -3871,7 +3860,7 @@ Email verified! You can close this tab or hit the back button.
       setTimeout(function () {
         logger.debug("comparing", { correctHash, hash });
         if (correctHash === hash) {
-          resolve();
+          resolve(undefined);
         } else {
           reject();
         }
@@ -4208,20 +4197,17 @@ Email verified! You can close this tab or hit the back button.
               // @ts-ignore
               pid_to_ptpt[c.pid] = c;
             });
-            return Promise.mapSeries(
-              candidates,
-              (item: { zid: any; pid: any }, index: any, length: any) => {
-                return getNumberOfCommentsRemaining(item.zid, item.pid).then(
-                  // Argument of type '(rows: any[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
-                  // Types of parameters 'rows' and 'value' are incompatible.
-                  //  Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-                  // @ts-ignore
-                  (rows: any[]) => {
-                    return rows[0];
-                  }
-                );
-              }
-            ).then((results: any[]) => {
+            return Promise.all(candidates.map((item: { zid: any; pid: any }) =>
+              getNumberOfCommentsRemaining(item.zid, item.pid).then(
+                // Argument of type '(rows: any[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
+                // Types of parameters 'rows' and 'value' are incompatible.
+                //  Type 'unknown' is not assignable to type 'any[]'.ts(2345)
+                // @ts-ignore
+                (rows: any[]) => {
+                  return rows[0];
+                }
+              )
+            )).then((results: any[]) => {
               const needNotification = results.filter(
                 (result: { pid: string | number; remaining: number }) => {
                   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
@@ -4308,33 +4294,33 @@ Email verified! You can close this tab or hit the back button.
                   }
                 );
 
-                return Promise.each(
-                  needNotification,
-                  (
-                    item: { pid: string | number; remaining: any },
-                    index: any,
-                    length: any
-                  ) => {
-                    // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
-                    // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
-                    // @ts-ignore
-                    const uid = pid_to_ptpt[item.pid].uid;
-                    return sendNotificationEmail(
-                      uid,
-                      url,
-                      conversation_id,
+                return Promise.all(
+                  needNotification.map(
+                    (
+                      item: { pid: string | number; remaining: any },
+                      index: any,
+                      length: any
+                    ) => {
                       // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                       // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                       // @ts-ignore
-                      uidToEmail[uid],
-                      item.remaining
-                    ).then(() => {
-                      return pgQueryP(
-                        "update participants set last_notified = now_as_millis(), nsli = nsli + 1 where uid = ($1) and zid = ($2);",
-                        [uid, zid]
-                      );
-                    });
-                  }
+                      const uid = pid_to_ptpt[item.pid].uid;
+                      return sendNotificationEmail(
+                        uid,
+                        url,
+                        conversation_id,
+                        // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
+                        // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
+                        // @ts-ignore
+                        uidToEmail[uid],
+                        item.remaining
+                      ).then(() => {
+                        return pgQueryP(
+                          "update participants set last_notified = now_as_millis(), nsli = nsli + 1 where uid = ($1) and zid = ($2);",
+                          [uid, zid]
+                        );
+                      });
+                    })
                 );
               });
             });
@@ -6804,10 +6790,7 @@ Email verified! You can close this tab or hit the back button.
     mod: boolean,
     is_meta: boolean
   ) {
-    return new Promise(function (
-      resolve: () => void,
-      reject: (arg0: any) => void
-    ) {
+    return new Promise(function (resolve, reject) {
       pgQuery(
         "UPDATE COMMENTS SET active=($3), mod=($4), modified=now_as_millis(), is_meta = ($5) WHERE zid=($1) and tid=($2);",
         [zid, tid, active, mod, is_meta],
@@ -6818,7 +6801,7 @@ Email verified! You can close this tab or hit the back button.
             // TODO an optimization would be to only add the task when the comment becomes visible after the mod.
             addNotificationTask(zid);
 
-            resolve();
+            resolve(undefined);
           }
         }
       );
@@ -7250,7 +7233,7 @@ Email verified! You can close this tab or hit the back button.
                             //Each member of the union type '{ <U>(onFulfill?: ((value: void) => Resolvable<U>) | undefined, onReject?: ((error: any) => Resolvable<U>) | undefined): Bluebird<U>; <TResult1 = void, TResult2 = never>(onfulfilled?: ((value: void) => Resolvable<...>) | ... 1 more ... | undefined, onrejected?: ((reason: any) => Resolvable<...>) | ... 1 more ... | u...' has signatures, but none of those signatures are compatible with each other.ts(2349)
                             // @ts-ignore
                             .then(
-                              function (o: { vote: { created: any } }) {
+                              function (o) {
                                 if (o && o.vote && o.vote.created) {
                                   createdTime = o.vote.created;
                                 }
@@ -8197,10 +8180,7 @@ Email verified! You can close this tab or hit the back button.
   }
   function verifyMetadataAnswersExistForEachQuestion(zid: any) {
     let errorcode = "polis_err_missing_metadata_answers";
-    return new Promise(function (
-      resolve: () => void,
-      reject: (arg0: Error) => void
-    ) {
+    return new Promise(function (resolve, reject) {
       pgQuery_readOnly(
         "select pmqid from participant_metadata_questions where zid = ($1);",
         [zid],
@@ -8210,7 +8190,7 @@ Email verified! You can close this tab or hit the back button.
             return;
           }
           if (!results.rows || !results.rows.length) {
-            resolve();
+            resolve(undefined);
             return;
           }
           let pmqids = results.rows.map(function (row: { pmqid: any }) {
@@ -8244,7 +8224,7 @@ Email verified! You can close this tab or hit the back button.
               if (Object.keys(questions).length) {
                 reject(new Error(errorcode));
               } else {
-                resolve();
+                resolve(undefined);
               }
             }
           );
@@ -10618,10 +10598,7 @@ Thanks for using Metropolis!
     });
   }
   function switchToUser(req: any, res: any, uid?: any) {
-    return new Promise(function (
-      resolve: () => void,
-      reject: (arg0: string) => void
-    ) {
+    return new Promise(function (resolve, reject) {
       startSession(uid, function (errSess: any, token: any) {
         if (errSess) {
           reject(errSess);
@@ -10629,7 +10606,7 @@ Thanks for using Metropolis!
         }
         addCookies(req, res, token, uid)
           .then(function () {
-            resolve();
+            resolve(undefined);
           })
           .catch(function (err: any) {
             reject("polis_err_adding_cookies");
