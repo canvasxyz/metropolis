@@ -2,28 +2,13 @@ import { Response } from "express";
 import { Octokit } from "@octokit/core";
 import { createOAuthUserAuth } from "@octokit/auth-oauth-user";
 
-import pg from "./db/pg-query";
+import { queryP } from "./db/pg-query";
 import { startSession } from "./session";
 import cookies from "./utils/cookies";
 import fail from "./utils/fail";
 
 // this is in a separate file to server.ts so that we can use async/await
 // without interfering with the legacy promise code
-
-function queryPromise(query: string, vals: any) {
-  return new Promise((resolve, reject) => {
-    pg.query(
-      query,
-      vals,
-      (err: any, result: any) => {
-        if(err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-  });
-}
 
 function startSessionPromise(uid: any) {
   return new Promise((resolve: (arg0: string) => void, reject) => {
@@ -63,7 +48,7 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
 
   // get or create the user with this github username
   const getQuery = "select uid from users where email = $1;";
-  const getRes = (await queryPromise(getQuery, [email])) as {rows: {uid: string}[]};
+  const getRes = (await queryP(getQuery, [email])) as {rows: {uid: string}[]};
 
   let uid: string;
   if(getRes.rows.length > 1) {
@@ -80,7 +65,7 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
     "returning uid;";
     const vals = [email, githubUsername, null, true];
 
-    const createRes = (await queryPromise(createQuery, vals)) as {rows: {uid: string}[]};
+    const createRes = (await queryP(createQuery, vals)) as {rows: {uid: string}[]};
     uid = createRes.rows[0].uid;
     console.log(`created user "${githubUsername}" with uid: ${uid}`);
   }
