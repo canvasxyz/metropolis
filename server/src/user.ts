@@ -2,53 +2,35 @@ import _ from "underscore";
 import LruCache from "lru-cache";
 
 import pg from "./db/pg-query";
-import { MPromise } from "./utils/metered";
+import { meteredPromise } from "./utils/metered";
 
 import Conversation from "./conversation";
 import LRUCache from "lru-cache";
 import logger from "./utils/logger";
 
-function getUserInfoForUid(
+async function getUserInfoForUid(
   uid: any,
-  callback: (arg0: null, arg1?: undefined) => void
 ) {
-  pg.query_readOnly(
-    "SELECT email, hname from users where uid = $1",
-    [uid],
-    function (err: any, results: { rows: string | any[] }) {
-      if (err) {
-        return callback(err);
-      }
-      if (!results.rows || !results.rows.length) {
-        return callback(null);
-      }
-      callback(null, results.rows[0]);
-    }
-  );
+  const results = await pg.queryP_readOnly("SELECT email, hname from users where uid = $1", [uid]) as { rows: string | any[] };
+
+  if (!results.rows || !results.rows.length) {
+    throw Error();
+  }
+
+  return results.rows[0];
 }
 
 function getUserInfoForUid2(uid: any) {
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise(
+  return meteredPromise(
     "getUserInfoForUid2",
-    function (resolve: (arg0: any) => void, reject: (arg0: null) => any) {
-      pg.query_readOnly(
-        "SELECT * from users where uid = $1",
-        [uid],
-        function (err: any, results: { rows: string | any[] }) {
-          if (err) {
-            return reject(err);
-          }
-          if (!results.rows || !results.rows.length) {
-            return reject(null);
-          }
-          let o = results.rows[0];
-          resolve(o);
-        }
-      );
+    new Promise(async () => {
+      const results = await pg.queryP_readOnly("SELECT * from users where uid = $1", [uid]) as { rows: string | any[] };
+      if (!results.rows || !results.rows.length) {
+        throw Error();
+      }
+      return results.rows[0];
     }
-  );
+  ));
 }
 
 async function getUser(
@@ -144,26 +126,25 @@ function getFacebookInfo(uids: any[]) {
 }
 
 function createDummyUser() {
-  // (parameter) resolve: (arg0: any) => void
-  //   'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise(
+  return meteredPromise(
     "createDummyUser",
-    function (resolve: (arg0: any) => void, reject: (arg0: Error) => void) {
-      pg.query(
-        "INSERT INTO users (created) VALUES (default) RETURNING uid;",
-        [],
-        function (err: any, results: { rows: string | any[] }) {
-          if (err || !results || !results.rows || !results.rows.length) {
-            logger.error("polis_err_create_empty_user", err);
-            reject(new Error("polis_err_create_empty_user"));
-            return;
-          }
-          resolve(results.rows[0].uid);
-        }
-      );
+    new Promise(async () => {
+      let results;
+
+      try {
+        results = await pg.queryP("INSERT INTO users (created) VALUES (default) RETURNING uid;", []) as { rows: string | any[] };
+      } catch (err) {
+        throw new Error("polis_err_create_empty_user");
+      }
+
+      if (!results || !results.rows || !results.rows.length) {
+        logger.error("polis_err_create_empty_user", err);
+        throw new Error("polis_err_create_empty_user");
+      }
+
+      return results.rows[0].uid;
     }
-  );
+  ));
 }
 
 let pidCache: LRUCache<string, number> = new LruCache({
@@ -200,18 +181,15 @@ function getPid(
 function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
   let cacheKey = zid + "_" + uid;
   let cachedPid = pidCache.get(cacheKey);
-  //   (alias) function MPromise(name: string, f: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void): Promise<unknown>
-  // import MPromise
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise(
+
+  return meteredPromise(
     "getPidPromise",
-    function (resolve: (arg0: number) => void, reject: (arg0: any) => any) {
+    new Promise<number>(function (resolve, reject) {
       if (!_.isUndefined(cachedPid)) {
         resolve(cachedPid);
         return;
       }
-      const f = usePrimary ? pg.query : pg.query_readOnly;
+      const f = usePrimary ? pg.queryP : pg.queryP_readOnly;
       f(
         "SELECT pid FROM participants WHERE zid = ($1) AND uid = ($2);",
         [zid, uid],
@@ -229,7 +207,7 @@ function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
         }
       );
     }
-  );
+  ));
 }
 
 // must follow auth and need('zid'...) middleware

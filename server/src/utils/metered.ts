@@ -27,11 +27,10 @@ export function addInRamMetric(metricName: string, val: number) {
 }
 
 // metered promise
-export function MPromise(
+export function meteredPromise<P>(
   name: string,
-  f: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
-) {
-  let p = new Promise(f);
+  promise: Promise<P>
+): Promise<P> {
   let start = Date.now();
   setTimeout(function () {
     // TODO either add this arg to the function definition
@@ -41,7 +40,7 @@ export function MPromise(
     // @ts-ignore                        ~~~~~
     addInRamMetric(name + ".go", 1, start);
   }, 100);
-  p.then(
+  promise.then(
     function () {
       let end = Date.now();
       let duration = end - start;
@@ -67,7 +66,7 @@ export function MPromise(
       }, 100);
     }
   ).catch(function (err) {
-    logger.error("MPromise internal error", err);
+    logger.error("meteredPromise internal error", err);
     let end = Date.now();
     let duration = end - start;
     setTimeout(function () {
@@ -77,10 +76,10 @@ export function MPromise(
       // 73       addInRamMetric(name + ".fail", duration, end);
       // @ts-ignore
       addInRamMetric(name + ".fail", duration, end);
-      logger.error("MPromise internal error", err);
+      logger.error("meteredPromise internal error", err);
     }, 100);
   });
-  return p;
+  return promise;
 }
 
-export default { addInRamMetric, MPromise };
+export default { addInRamMetric };

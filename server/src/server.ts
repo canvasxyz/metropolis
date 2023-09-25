@@ -20,7 +20,7 @@ import zlib from "zlib";
 import _ from "underscore";
 import pg from "pg";
 
-import { addInRamMetric, MPromise } from "./utils/metered";
+import { addInRamMetric, meteredPromise } from "./utils/metered";
 import CreateUser from "./auth/create-user";
 import Password from "./auth/password";
 import dbPgQuery from "./db/pg-query";
@@ -129,20 +129,18 @@ function isSpam(o: {
   user_agent: any;
   referrer: any;
 }) {
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise("isSpam", function (
-    resolve: (arg0: any) => void,
-    reject: (arg0: any) => void
-  ) {
-    akismet.checkSpam(o, function (err: any, spam: any) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(spam);
-      }
-    });
-  });
+  return meteredPromise(
+    "isSpam",
+    new Promise((resolve, reject) => {
+      akismet.checkSpam(o, function (err: any, spam: any) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(spam);
+        }
+      });
+    })
+  );
 }
 
 var INFO: {
@@ -675,12 +673,7 @@ function initializePolisHelpers() {
   }
 
   function votesGet(p: { zid?: any; pid?: any; tid?: any }) {
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise("votesGet", function (
-      resolve: (arg0: any) => void,
-      reject: (arg0: any) => void
-    ) {
+    return meteredPromise("votesGet", new Promise((resolve, reject) => {
       let q = sql_votes_latest_unique
         .select(sql_votes_latest_unique.star())
         .where(sql_votes_latest_unique.zid.equals(p.zid));
@@ -701,7 +694,7 @@ function initializePolisHelpers() {
           }
         }
       );
-    });
+    }));
   } // End votesGet
 
   function writeDefaultHead(
@@ -765,7 +758,7 @@ function initializePolisHelpers() {
   //     query += values;
   //     query += " returning uid;";
 
-  //     return new MPromise("createDummyUser", function(resolve, reject) {
+  //     return meteredPromise("createDummyUser", new Promise(function(resolve, reject) {
   //         pgQuery(query,[], function(err, results) {
   //             if (err || !results || !results.rows || !results.rows.length) {
   //                 reject(new Error("polis_err_create_empty_user"));
@@ -776,7 +769,7 @@ function initializePolisHelpers() {
   //             });
   //             resolve(uids);
   //         });
-  //     });
+  //     }));
   // }
 
   function doXidConversationIdAuth(
@@ -2092,7 +2085,7 @@ function initializePolisHelpers() {
   function getXids(zid: any) {
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise("getXids", function (
+    return new meteredPromise("getXids", new Promise(function (
       resolve: (arg0: any) => void,
       reject: (arg0: string) => void
     ) {
@@ -2109,7 +2102,7 @@ function initializePolisHelpers() {
           resolve(result.rows);
         }
       );
-    });
+    }));
   }
   function handle_GET_xids(
     req: { p: { uid?: any; zid: any } },
@@ -2853,7 +2846,7 @@ Feel free to reply to this email if you need help.`;
 
     // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
     // @ts-ignore
-    return new MPromise("getZinvites", function (
+    return new meteredPromise("getZinvites", new Promise(function (
       resolve: (arg0: {}) => void,
       reject: (arg0: any) => void
     ) {
@@ -2877,7 +2870,7 @@ Feel free to reply to this email if you need help.`;
           }
         }
       );
-    });
+    }));
   }
 
   function addConversationId(
@@ -3559,9 +3552,7 @@ Feel free to reply to this email if you need help.`;
 
   // returns null if it's missing
   function getParticipant(zid: any, uid?: any) {
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise("getParticipant", function (
+    return meteredPromise("getParticipant", new Promise(function (
       resolve: (arg0: any) => void,
       reject: (arg0: Error) => any
     ) {
@@ -3578,7 +3569,7 @@ Feel free to reply to this email if you need help.`;
           resolve(results.rows[0]);
         }
       );
-    });
+    }));
   }
   function getAnswersForConversation(
     zid: any,
@@ -3946,15 +3937,9 @@ Email verified! You can close this tab or hit the back button.
   }
 
   function userHasAnsweredZeQuestions(zid: any, answers: string | any[]) {
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise(
+    return meteredPromise(
       "userHasAnsweredZeQuestions",
-      //     Argument of type '(resolve: () => any, reject: (arg0: Error) => void) => void'
-      // is not assignable to parameter of type '(resolve: (value: unknown) => void, reject: (reason?: any) => void) => void'.
-      // Types of parameters 'resolve' and 'resolve' are incompatible.ts(2345)
-      // @ts-ignore
-      function (resolve: () => any, reject: (arg0: Error) => void) {
+      new Promise(function (resolve, reject) {
         getAnswersForConversation(
           zid,
           function (err: any, available_answers: any) {
@@ -3978,12 +3963,12 @@ Email verified! You can close this tab or hit the back button.
                 )
               );
             } else {
-              return resolve();
+              return resolve(undefined);
             }
           }
         );
       }
-    );
+    ));
   }
   function handle_POST_participants(
     req: {
@@ -6675,30 +6660,28 @@ Email verified! You can close this tab or hit the back button.
   }
 
   function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise("getNumberOfCommentsWithModerationStatus", function (
-      resolve: (arg0: any) => void,
-      reject: (arg0: any) => void
-    ) {
-      pgQuery_readOnly(
-        "select count(*) from comments where zid = ($1) and mod = ($2);",
-        [zid, mod],
-        function (err: any, result: { rows: { count: any }[] }) {
-          if (err) {
-            reject(err);
-          } else {
-            let count =
-              result && result.rows && result.rows[0] && result.rows[0].count;
-            count = Number(count);
-            if (isNaN(count)) {
-              count = void 0;
+    return meteredPromise(
+      "getNumberOfCommentsWithModerationStatus",
+      new Promise(function (resolve, reject) {
+        pgQuery_readOnly(
+          "select count(*) from comments where zid = ($1) and mod = ($2);",
+          [zid, mod],
+          function (err: any, result: { rows: { count: any }[] }) {
+            if (err) {
+              reject(err);
+            } else {
+              let count =
+                result && result.rows && result.rows[0] && result.rows[0].count;
+              count = Number(count);
+              if (isNaN(count)) {
+                count = void 0;
+              }
+              resolve(count);
             }
-            resolve(count);
           }
-        }
-      );
-    });
+        );
+      })
+    );
   }
 
   function sendCommentModerationEmail(
@@ -10434,44 +10417,42 @@ Thanks for using Metropolis!
       "HMAC-SHA1"
     );
 
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise("getTwitterUserInfo", function (
-      resolve: (arg0: any) => void,
-      reject: (arg0?: undefined) => void
-    ) {
-      let cachedCopy = twitterUserInfoCache.get(identifier);
-      if (useCache && cachedCopy) {
-        return resolve(cachedCopy);
-      }
-      if (
-        suspendedOrPotentiallyProblematicTwitterIds.indexOf(identifier) >= 0
-      ) {
-        return reject();
-      }
-      oauth.post(
-        "https://api.twitter.com/1.1/users/lookup.json",
-        // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
-        // @ts-ignore
-        void 0, //'your user token for this app', //test user token
-        void 0, //'your user secret for this app', //test user secret
-        params,
-        "multipart/form-data",
-        function (err: any, data: any, res: any) {
-          if (err) {
-            logger.error(
-              "get twitter token failed for identifier: " + identifier,
-              err
-            );
-            suspendedOrPotentiallyProblematicTwitterIds.push(identifier);
-            reject(err);
-          } else {
-            twitterUserInfoCache.set(identifier, data);
-            resolve(data);
-          }
+    return meteredPromise(
+      "getTwitterUserInfo",
+      new Promise(function (resolve, reject) {
+        let cachedCopy = twitterUserInfoCache.get(identifier);
+        if (useCache && cachedCopy) {
+          return resolve(cachedCopy);
         }
-      );
-    });
+        if (
+          suspendedOrPotentiallyProblematicTwitterIds.indexOf(identifier) >= 0
+        ) {
+          return reject();
+        }
+        oauth.post(
+          "https://api.twitter.com/1.1/users/lookup.json",
+          // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
+          // @ts-ignore
+          void 0, //'your user token for this app', //test user token
+          void 0, //'your user secret for this app', //test user secret
+          params,
+          "multipart/form-data",
+          function (err: any, data: any, res: any) {
+            if (err) {
+              logger.error(
+                "get twitter token failed for identifier: " + identifier,
+                err
+              );
+              suspendedOrPotentiallyProblematicTwitterIds.push(identifier);
+              reject(err);
+            } else {
+              twitterUserInfoCache.set(identifier, data);
+              resolve(data);
+            }
+          }
+        );
+      })
+    );
   }
 
   function getTwitterTweetById(twitter_tweet_id: string) {
@@ -10488,12 +10469,7 @@ Thanks for using Metropolis!
       "HMAC-SHA1"
     );
 
-    // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-    // @ts-ignore
-    return new MPromise("getTwitterTweet", function (
-      resolve: (arg0: any) => void,
-      reject: (arg0: any) => void
-    ) {
+    return meteredPromise("getTwitterTweet", new Promise(function (resolve, reject) {
       oauth.get(
         "https://api.twitter.com/1.1/statuses/show.json?id=" + twitter_tweet_id,
         // Argument of type 'undefined' is not assignable to parameter of type 'string'.ts(2345)
@@ -10510,7 +10486,7 @@ Thanks for using Metropolis!
           }
         }
       );
-    });
+    }));
   }
 
   // function getTwitterUserTimeline(screen_name) {
@@ -10523,7 +10499,7 @@ Thanks for using Metropolis!
   //     null,
   //     'HMAC-SHA1'
   //   );
-  //   return new MPromise("getTwitterTweet", function(resolve, reject) {
+  //   return meteredPromise("getTwitterTweet", new Promise(function(resolve, reject) {
   //     oauth.get(
   //       'https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=' + screen_name,
   //       void 0, //'your user token for this app', //test user token
@@ -10538,7 +10514,7 @@ Thanks for using Metropolis!
   //         }
   //       }
   //     );
-  //   });
+  //   }));
   // }
 
   // Certain twitter ids may be suspended.

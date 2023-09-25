@@ -8,7 +8,7 @@ import logger from "./logger";
 import Conversation from "../conversation";
 import User from "../user";
 
-import { MPromise } from "./metered";
+import { meteredPromise } from "./metered";
 
 type Req = {
   query?: any;
@@ -339,18 +339,7 @@ const reportIdToRidCache = new LruCache({
 const getZidFromConversationId = Conversation.getZidFromConversationId;
 
 function getRidFromReportId(report_id: string) {
-  //   TS7009: 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.
-  // 344   return new MPromise(
-  //              ~~~~~~~~~~~~~
-  // 345     "getRidFromReportId",
-  //     ~~~~~~~~~~~~~~~~~~~~~~~~~
-  // ...
-  // 368     }
-  //     ~~~~~
-  // 369   );
-  // ~~~
-  // @ts-ignore
-  return new MPromise("getRidFromReportId", function (
+  return meteredPromise("getRidFromReportId", new Promise(function (
     resolve: any,
     reject: any
   ) {
@@ -375,7 +364,7 @@ function getRidFromReportId(report_id: string) {
         }
       }
     );
-  });
+  }));
 }
 
 // conversation_id is the client/ public API facing string ID

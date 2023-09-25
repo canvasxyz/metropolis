@@ -4,7 +4,7 @@ import { parse as parsePgConnectionString } from "pg-connection-string";
 
 import Config from "../config";
 import logger from "../utils/logger";
-import { MPromise } from "../utils/metered";
+import { meteredPromise } from "../utils/metered";
 
 // # DB Connections
 //
@@ -175,12 +175,9 @@ function queryP_metered_impl(
   if (isUndefined(name) || isUndefined(queryString) || isUndefined(params)) {
     throw new Error("polis_err_queryP_metered_impl missing params");
   }
-  //   (parameter) resolve: (value: unknown) => void
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise(name, function (resolve, reject) {
+  return meteredPromise(name, new Promise(function (resolve, reject) {
     f(queryString, params).then(resolve, reject);
-  });
+  }));
 }
 
 function queryP_metered(name: any, queryString: any, params: any) {

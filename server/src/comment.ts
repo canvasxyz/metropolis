@@ -4,7 +4,7 @@ import Translate from "@google-cloud/translate";
 
 import pg from "./db/pg-query";
 import SQL from "./db/sql";
-import { MPromise } from "./utils/metered";
+import { meteredPromise } from "./utils/metered";
 import Utils from "./utils/common";
 import logger from "./utils/logger";
 
@@ -73,9 +73,7 @@ function getComments(o: CommentType) {
   let convPromise = Conversation.getConversationInfo(o.zid);
   let conv: { is_anon: any } | null = null;
   return Promise.all([convPromise, commentListPromise])
-    .then(function (a) {
-      let rows = a[1];
-      conv = a[0];
+    .then(function ([conv, rows]) {
       let cols = [
         "txt",
         "tid",
@@ -304,9 +302,7 @@ function _getCommentsList(o: {
   random: any;
   limit: any;
 }) {
-  // 'new' expression, whose target lacks a construct signature, implicitly has an 'any' type.ts(7009)
-  // @ts-ignore
-  return new MPromise("_getCommentsList", async (
+  return meteredPromise("_getCommentsList", new Promise(async (
   ) => {
     const conv = await Conversation.getConversationInfo(o.zid) as {
       strict_moderation: any;
@@ -373,7 +369,7 @@ function _getCommentsList(o: {
 
     const docs = await pg.queryP(q.toString(), []) as Docs;
     return docs.rows;
-  });
+  }));
 }
 
 function getNumberOfCommentsRemaining(zid: any, pid: any) {

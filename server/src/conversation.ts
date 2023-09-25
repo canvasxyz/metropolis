@@ -1,7 +1,7 @@
 import LruCache from "lru-cache";
 
 import pg from "./db/pg-query";
-import { MPromise } from "./utils/metered";
+import { meteredPromise } from "./utils/metered";
 import logger from "./utils/logger";
 
 function createXidRecord(
@@ -85,24 +85,24 @@ function isXidWhitelisted(owner: any, xid: any) {
 }
 
 async function getConversationInfo(zid: any) {
-  return MPromise(
+  return meteredPromise(
     "getConversationInfo",
-    async () => {
+    new Promise(async () => {
       const {rows} = await pg.queryP("SELECT * FROM conversations WHERE zid = ($1);", [zid]) as {rows: any[]};
       return rows[0];
-    }
+    })
   );
 }
 
 function getConversationInfoByConversationId(conversation_id: any) {
-  return MPromise(
+  return meteredPromise(
     "getConversationInfoByConversationId",
-    async () => {
+    new Promise(async () => {
       const {rows} = await pg.queryP(
         "SELECT * FROM conversations WHERE zid = (select zid from zinvites where zinvite = ($1));",
         [conversation_id]) as { rows: any[] };
       return rows[0];
-    }
+    })
   );
 }
 
@@ -112,9 +112,9 @@ const conversationIdToZidCache = new LruCache({
 
 // NOTE: currently conversation_id is stored as zinvite
 function getZidFromConversationId(conversation_id: string) {
-  return MPromise(
+  return meteredPromise(
     "getZidFromConversationId",
-    async () => {
+    new Promise(async () => {
       let cachedZid = conversationIdToZidCache.get(conversation_id);
       if (cachedZid) {
         return cachedZid;
@@ -134,7 +134,7 @@ function getZidFromConversationId(conversation_id: string) {
         conversationIdToZidCache.set(conversation_id, zid);
         return zid;
       }
-    }
+    })
   );
 }
 
