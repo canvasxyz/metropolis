@@ -10,7 +10,7 @@ import Password from "./password";
 import emailSenders from "../email/senders";
 
 const sendTextEmail = emailSenders.sendTextEmail;
-function createUser(req: any, res: any) {
+async function createUser(req: any, res: any) {
   let hname = req.p.hname;
   let password = req.p.password;
   let password2 = req.p.password2; // for verification
@@ -58,96 +58,105 @@ function createUser(req: any, res: any) {
     return;
   }
 
-  pg.queryP("SELECT * FROM users WHERE email = ($1)", [email]).then(
-    //   Argument of type '(rows: string | any[]) => void' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
-    // Types of parameters 'rows' and 'value' are incompatible.
-    //   Type 'unknown' is not assignable to type 'string | any[]'.
-    //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-    // @ts-ignore
-    function (rows: string | any[]) {
-      if (rows.length > 0) {
-        fail(res, 403, "polis_err_reg_user_with_that_email_exists");
-        return;
-      }
+  let rows: string | any[];
 
-      Password.generateHashedPassword(
-        password,
-        function (err: any, hashedPassword: any) {
-          if (err) {
-            fail(res, 500, "polis_err_generating_hash", err);
-            return;
-          }
-          let query =
-            "insert into users " +
-            "(email, hname, zinvite, is_owner" +
-            (site_id ? ", site_id" : "") +
-            ") VALUES " + // TODO use sql query builder
-            "($1, $2, $3, $4" +
-            (site_id ? ", $5" : "") +
-            ") " + // TODO use sql query builder
-            "returning uid;";
-          let vals = [email, hname, zinvite || null, true];
-          if (site_id) {
-            vals.push(site_id); // TODO use sql query builder
-          }
+  try {
+    rows = (await pg.queryP("SELECT * FROM users WHERE email = ($1)", [email])) as any;
+  } catch (err) {
+    fail(res, 500, "polis_err_reg_checking_existing_users", err);
+    return;
+  }
 
-          pg.query(
-            query,
-            vals,
-            function (err: any, result: { rows: { uid: any }[] }) {
-              if (err) {
-                fail(res, 500, "polis_err_reg_failed_to_add_user_record", err);
-                return;
-              }
-              let uid =
-                result && result.rows && result.rows[0] && result.rows[0].uid;
+  if (rows.length > 0) {
+    fail(res, 403, "polis_err_reg_user_with_that_email_exists");
+    return;
+  }
 
-              pg.query(
-                "insert into jianiuevyew (uid, pwhash) values ($1, $2);",
-                [uid, hashedPassword],
-                function (err: any, results: any) {
-                  if (err) {
-                    fail(
-                      res,
-                      500,
-                      "polis_err_reg_failed_to_add_user_record",
-                      err
-                    );
-                    return;
-                  }
-                  Session.startSession(uid, function (err: any, token: any) {
-                    if (err) {
-                      fail(
-                        res,
-                        500,
-                        "polis_err_reg_failed_to_start_session",
-                        err
-                      );
-                      return;
-                    }
-                    cookies.addCookies(req, res, token, uid)
-                      .then(function() {
-                        res.json({
-                          uid: uid,
-                          hname: hname,
-                          email: email
-                        })
-                      })
-                      .catch(function (err: any) {
-                        fail(res, 500, "polis_err_adding_user", err);
-                      });
-                  }); // end startSession
-                }
-              ); // end insert pwhash
-            }
-          ); // end insert user
+  let hashedPassword: string;
+  try {
+    hashedPassword = await new Promise((resolve, reject) => {
+      Password.generateHashedPassword(password, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res!);
         }
-      ); // end generateHashedPassword
-    },
-    function (err: any) {
-      fail(res, 500, "polis_err_reg_checking_existing_users", err);
-    }
-  );
+      });
+    });
+  } catch (err) {
+    fail(res, 500, "polis_err_generating_hash", err);
+    return;
+  }
+
+  let query =
+    "insert into users " +
+    "(email, hname, zinvite, is_owner" +
+    (site_id ? ", site_id" : "") +
+    ") VALUES " + // TODO use sql query builder
+    "($1, $2, $3, $4" +
+    (site_id ? ", $5" : "") +
+    ") " + // TODO use sql query builder
+    "returning uid;";
+  let vals = [email, hname, zinvite || null, true];
+  if (site_id) {
+    vals.push(site_id); // TODO use sql query builder
+  }
+
+  let result: any;
+  try {
+    result = await pg.queryP(query, vals);
+  } catch (err) {
+    fail(res, 500, "polis_err_reg_failed_to_add_user_record", err);
+    return;
+  }
+
+  let uid = result && result.rows && result.rows[0] && result.rows[0].uid;
+
+  try {
+    await pg.queryP("insert into jianiuevyew (uid, pwhash) values ($1, $2);", [uid, hashedPassword]);
+  } catch (err) {
+    fail(
+      res,
+      500,
+      "polis_err_reg_failed_to_add_user_record",
+      err
+    );
+    return;
+  }
+
+  let token: any;
+  try {
+    token = await new Promise((resolve, reject) => {
+      Session.startSession(uid, (err, res) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(res);
+        }
+      });
+    });
+  } catch (err) {
+    fail(
+      res,
+      500,
+      "polis_err_reg_failed_to_start_session",
+      err
+    );
+    return;
+  }
+
+  try {
+    await cookies.addCookies(req, res, token, uid);
+  } catch (err) {
+    fail(res, 500, "polis_err_adding_user", err);
+    return;
+  }
+
+  res.json({
+    uid: uid,
+    hname: hname,
+    email: email
+  });
 }
 
 function doSendVerification(req: any, email: any) {
