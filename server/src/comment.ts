@@ -309,8 +309,8 @@ function _getCommentsList(o: {
   random: any;
   limit: any;
 }) {
-  return meteredPromise("_getCommentsList", new Promise(async (
-  ) => {
+  return meteredPromise("_getCommentsList",
+  (async () => {
     const conv = await Conversation.getConversationInfo(o.zid) as {
       strict_moderation: any;
       prioritize_seed: any;
@@ -374,9 +374,9 @@ function _getCommentsList(o: {
       q = q.limit(999); // TODO paginate
     }
 
-    const docs = await pg.queryP(q.toString(), []) as Docs;
-    return docs.rows;
-  }));
+    return await pg.queryP(q.toString(), []) as Row[];
+  })()
+  );
 }
 
 function getNumberOfCommentsRemaining(zid: any, pid: any) {

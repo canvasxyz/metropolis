@@ -23,14 +23,15 @@ async function getUserInfoForUid(
 function getUserInfoForUid2(uid: any) {
   return meteredPromise(
     "getUserInfoForUid2",
-    new Promise(async () => {
-      const results = await pg.queryP_readOnly("SELECT * from users where uid = $1", [uid]) as { rows: string | any[] };
-      if (!results.rows || !results.rows.length) {
+    (async () => {
+      const results = await pg.queryP_readOnly("SELECT * from users where uid = $1", [uid]) as string | any[];
+      console.log(results);
+      if (!results || !results.length) {
         throw Error();
       }
-      return results.rows[0] as any;
-    }
-  ));
+      return results[0];
+    })()
+  );
 }
 
 async function getUser(
@@ -128,7 +129,7 @@ function getFacebookInfo(uids: any[]) {
 function createDummyUser() {
   return meteredPromise(
     "createDummyUser",
-    new Promise(async () => {
+    (async () => {
       let results;
 
       try {
@@ -142,8 +143,8 @@ function createDummyUser() {
       }
 
       return results.rows[0].uid;
-    }
-  ));
+    })()
+  );
 }
 
 let pidCache: LRUCache<string, number> = new LruCache({
