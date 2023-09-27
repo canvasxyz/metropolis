@@ -4006,8 +4006,7 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
                       // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                       // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                       // @ts-ignore
-                      uidToEmail[uid],
-                      item.remaining
+                      uidToEmail[uid]
                     ).then(() => {
                       return pgQueryP(
                         "update participants set last_notified = now_as_millis(), nsli = nsli + 1 where uid = ($1) and zid = ($2);",
@@ -5828,7 +5827,7 @@ function do_handle_POST_auth_facebook(
               doFbNotLinkedButUserWithEmailExists(user);
             }
           } else {
-            doFbNoUserExistsYet(user);
+            doFbNoUserExistsYet();
           }
         },
         function (err: any) {
@@ -7049,12 +7048,7 @@ function getNextPrioritizedComment(
       : {};
     let nTotal = Number(numberOfCommentsRemainingRows[0].total);
     let nRemaining = Number(numberOfCommentsRemainingRows[0].remaining);
-    let c = selectProbabilistically(
-      comments,
-      commentPriorities,
-      nTotal,
-      nRemaining
-    );
+    let c = selectProbabilistically(comments, commentPriorities);
     c.remaining = nRemaining;
     c.total = nTotal;
     return c;

@@ -78,8 +78,10 @@ async function createUser(req: any, res: any) {
       Password.generateHashedPassword(password, (err, res) => {
         if (err) {
           reject(err);
+        } else if (!res) {
+          reject("polis_err_generating_hash");
         } else {
-          resolve(res!);
+          resolve(res);
         }
       });
     });

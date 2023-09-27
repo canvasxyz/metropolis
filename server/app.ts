@@ -21,7 +21,6 @@ import {
   getPidForParticipant,
   haltOnTimeout,
   HMAC_SIGNATURE_PARAM_NAME,
-  pidCache,
   redirectIfHasZidButNoConversationId,
   redirectIfNotHttps,
   timeout,
@@ -839,7 +838,7 @@ app.post(
   want("as_offtopic", getBool, assignToP, null),
   want("as_spam", getBool, assignToP, null),
   want("as_unsure", getBool, assignToP, null),
-  getPidForParticipant(assignToP, pidCache) as any,
+  getPidForParticipant(assignToP) as any,
   handle_POST_ptptCommentMod
 );
 
@@ -864,7 +863,7 @@ app.post(
     assignToPCustom("zid")
   ),
   need("starred", getIntInRange(0, 1), assignToP),
-  getPidForParticipant(assignToP, pidCache) as any,
+  getPidForParticipant(assignToP) as any,
   handle_POST_stars as any
 );
 
@@ -878,7 +877,7 @@ app.post(
     assignToPCustom("zid")
   ),
   need("trashed", getIntInRange(0, 1), assignToP),
-  getPidForParticipant(assignToP, pidCache) as any,
+  getPidForParticipant(assignToP) as any,
   handle_POST_trashes as any
 );
 
