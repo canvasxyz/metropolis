@@ -88,7 +88,7 @@ async function getConversationInfo(zid: any) {
   return meteredPromise(
     "getConversationInfo",
     (async () => {
-      const {rows} = await pg.queryP("SELECT * FROM conversations WHERE zid = ($1);", [zid]) as {rows: any[]};
+      const rows = await pg.queryP("SELECT * FROM conversations WHERE zid = ($1);", [zid]);
       return rows[0];
     })()
   );
@@ -98,9 +98,9 @@ function getConversationInfoByConversationId(conversation_id: any) {
   return meteredPromise(
     "getConversationInfoByConversationId",
     (async () => {
-      const {rows} = await pg.queryP(
+      const rows = await pg.queryP(
         "SELECT * FROM conversations WHERE zid = (select zid from zinvites where zinvite = ($1));",
-        [conversation_id]) as { rows: any[] };
+        [conversation_id]);
       return rows[0];
     })()
   );
@@ -121,16 +121,15 @@ function getZidFromConversationId(conversation_id: string) {
       }
 
       const results = await pg.queryP_readOnly(
-        "select zid from zinvites where zinvite = ($1);",
-        [conversation_id]) as { rows: string | any[] };
+        "select zid from zinvites where zinvite = ($1);", [conversation_id]);
 
-      if (!results || !results.rows || !results.rows.length) {
+      if (results.length == 0) {
         logger.error(
           "polis_err_fetching_zid_for_conversation_id " + conversation_id
         );
         throw Error("polis_err_fetching_zid_for_conversation_id");
       } else {
-        let zid = results.rows[0].zid;
+        const zid = results[0].zid;
         conversationIdToZidCache.set(conversation_id, zid);
         return zid;
       }

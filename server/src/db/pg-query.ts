@@ -130,7 +130,7 @@ function queryP_impl(config: Pool, queryString?: any, params?: undefined) {
   // Property 'isReadOnly' does not exist on type 'Pool'.ts(2339)
   // @ts-ignore
   let f = config.isReadOnly ? query_readOnly : query;
-  return new Promise(function (resolve, reject) {
+  return new Promise<any[]>(function (resolve, reject) {
     f(queryString, params, function (err: any, result: { rows: unknown }) {
       if (err) {
         return reject(err);
@@ -139,7 +139,7 @@ function queryP_impl(config: Pool, queryString?: any, params?: undefined) {
         // caller is responsible for testing if there are results
         return resolve([]);
       }
-      resolve(result.rows);
+      resolve(result.rows as any[]);
     });
   });
 }

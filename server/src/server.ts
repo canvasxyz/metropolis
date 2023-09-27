@@ -9429,7 +9429,7 @@ function getConversations(
                   })
                 );
               } else {
-                suurlsPromise = Promise.resolve();
+                suurlsPromise = Promise.resolve([]);
               }
               let upvotesPromise =
                 uid && want_upvoted
@@ -9437,18 +9437,13 @@ function getConversations(
                       "select zid from upvotes where uid = ($1);",
                       [uid]
                     )
-                  : Promise.resolve();
+                  : Promise.resolve([]);
 
               return Promise.all([suurlsPromise, upvotesPromise]).then(
-                function (x: any[]) {
-                  let suurlData = x[0];
-                  let upvotes = x[1];
-                  if (suurlData) {
-                    suurlData = _.indexBy(suurlData, "zid");
-                  }
-                  if (upvotes) {
-                    upvotes = _.indexBy(upvotes, "zid");
-                  }
+                function ([suurlData_, upvotes_]) {
+                  const suurlData = _.indexBy(suurlData_, "zid");
+                  const upvotes = _.indexBy(upvotes_, "zid");
+
                   data.forEach(function (conv: {
                     is_owner: boolean;
                     is_archived: boolean;

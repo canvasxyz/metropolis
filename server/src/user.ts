@@ -11,12 +11,13 @@ import logger from "./utils/logger";
 async function getUserInfoForUid(
   uid: any,
 ) {
-  const results = await pg.queryP_readOnly("SELECT email, hname from users where uid = $1", [uid]) as { rows: string | any[] };
-  if (!results.rows || !results.rows.length) {
+  const results = await pg.queryP_readOnly("SELECT email, hname from users where uid = $1", [uid]);
+  // what is the point of this????
+  if (results.length == 0) {
     throw Error();
   }
 
-  return results.rows[0];
+  return results[0];
 }
 
 function getUserInfoForUid2(uid: any) {
@@ -131,16 +132,16 @@ function createDummyUser() {
       let results;
 
       try {
-        results = await pg.queryP("INSERT INTO users (created) VALUES (default) RETURNING uid;", []) as { rows: string | any[] };
+        results = await pg.queryP("INSERT INTO users (created) VALUES (default) RETURNING uid;", []);
       } catch (err) {
         throw new Error("polis_err_create_empty_user");
       }
 
-      if (!results || !results.rows || !results.rows.length) {
+      if (results.length == 0) {
         throw new Error("polis_err_create_empty_user");
       }
 
-      return results.rows[0].uid;
+      return results[0].uid;
     })()
   );
 }
