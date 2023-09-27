@@ -415,7 +415,7 @@ String.prototype.hashCode = function () {
 //             exists[v.zid +"_"+ v.tid] = true;
 //         });
 //         let missing = [];
-//         for (var i = 0 ; i < comments.length; i++) {
+//         for (let i = 0 ; i < comments.length; i++) {
 //             let c = comments[i];
 //             if (!exists[c.zid + "_" + c.tid]) {
 //                 missing.push(c);
@@ -575,8 +575,8 @@ function votesPost(
               ),
               getSocialInfoForUsers([uid], zid),
             ]).then(([xids, info]) => {
-              var socialAccountIsLinked = info.length > 0;
-              var hasXid = xids.length > 0;
+              const socialAccountIsLinked = info.length > 0;
+              const hasXid = xids.length > 0;
               if (socialAccountIsLinked || hasXid) {
                 return conv;
               } else {
@@ -683,7 +683,7 @@ function redirectIfNotHttps(
 // function createDummyUsersBatch(n) {
 //     let query = "insert into users (created) values ";
 //     let values = [];
-//     for (var i = 0; i < n; i++) {
+//     for (let i = 0; i < n; i++) {
 //         values.push("(default)");
 //     }
 //     values = values.join(",");
@@ -2028,7 +2028,7 @@ function handle_POST_xidWhitelist(
   const owner = req.p.uid;
   const entries = [];
   try {
-    for (var i = 0; i < len; i++) {
+    for (let i = 0; i < len; i++) {
       entries.push("(" + escapeLiteral(xid_whitelist[i]) + "," + owner + ")");
     }
   } catch (err) {
@@ -2085,7 +2085,7 @@ function handle_GET_bid(
         let indexToBid = mathResults["base-clusters"].id;
 
         let yourBidi = -1;
-        for (var bidi = 0; bidi < b2p.length; bidi++) {
+        for (let bidi = 0; bidi < b2p.length; bidi++) {
           let pids = b2p[bidi];
           if (pids.indexOf(pid) !== -1) {
             yourBidi = bidi;
@@ -2365,7 +2365,7 @@ function hashStringToInt32(s: string) {
   if (typeof s !== "string" || !s.length) {
     return 99;
   }
-  for (var i = 0; i < s.length; i++) {
+  for (let i = 0; i < s.length; i++) {
     h = h * s.charCodeAt(i) * 31;
   }
   if (h < 0) {
@@ -2398,7 +2398,7 @@ function handle_POST_metrics(
     json: (arg0: {}) => void;
   }
 ) {
-  var enabled = false;
+  const enabled = false;
   if (!enabled) {
     return res.status(200).json({});
   }
@@ -2423,7 +2423,7 @@ function handle_POST_metrics(
   });
   const len = timesInTermsOfServerTime.length;
   const entries = [];
-  for (var i = 0; i < len; i++) {
+  for (let i = 0; i < len; i++) {
     entries.push(
       "(" +
         [
@@ -2708,7 +2708,7 @@ function addConversationId(
 
 function addConversationIds(a: any[]) {
   let zids = [];
-  for (var i = 0; i < a.length; i++) {
+  for (let i = 0; i < a.length; i++) {
     if (a[i].zid) {
       zids.push(a[i].zid);
     }
@@ -2775,7 +2775,7 @@ function finishArray(
       function (items: string | any[]) {
         // ensure we don't expose zid
         if (items) {
-          for (var i = 0; i < items.length; i++) {
+          for (let i = 0; i < items.length; i++) {
             if (items[i].zid) {
               delete items[i].zid;
             }
@@ -2964,16 +2964,16 @@ function updateLastInteractionTimeForConversation(zid: any, uid?: any) {
   );
 }
 function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
-  var userId = Config.maxmindUserID;
-  var licenseKey = Config.maxmindLicenseKey;
+  const userId = Config.maxmindUserID;
+  const licenseKey = Config.maxmindLicenseKey;
 
-  var url = "https://geoip.maxmind.com/geoip/v2.1/city/";
-  var contentType =
+  let url = "https://geoip.maxmind.com/geoip/v2.1/city/";
+  let contentType =
     "application/vnd.maxmind.com-city+json; charset=UTF-8; version=2.1";
 
   // "city" is     $0.0004 per query
   // "insights" is $0.002  per query
-  var insights = false;
+  const insights = false;
 
   if (insights) {
     url = "https://geoip.maxmind.com/geoip/v2.1/insights/";
@@ -3001,7 +3001,7 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
       },
     })
     .then(function (response: string) {
-      var parsedResponse = JSON.parse(response);
+      const parsedResponse = JSON.parse(response);
       logger.debug("maxmind response", parsedResponse);
 
       return pgQueryP(
@@ -3539,7 +3539,7 @@ function doGetConversationsRecent(
     fail(res, 403, "polis_err_no_access_for_this_user");
     return;
   }
-  var time = req.p.sinceUnixTimestamp;
+  let time = req.p.sinceUnixTimestamp;
   if (_.isUndefined(time)) {
     time = Date.now() - 1000 * 60 * 60 * 24 * 7;
   } else {
@@ -3580,7 +3580,7 @@ function userHasAnsweredZeQuestions(zid: any, answers: string | any[]) {
 
           let q2a = _.indexBy(available_answers, "pmqid");
           let a2q = _.indexBy(available_answers, "pmaid");
-          for (var i = 0; i < answers.length; i++) {
+          for (let i = 0; i < answers.length; i++) {
             let pmqid = a2q[answers[i]].pmqid;
             delete q2a[pmqid];
           }
@@ -4523,7 +4523,7 @@ function joinWithZidOrSuzinvite(o: {
               // skip creating the entry (workaround for posgres's lack of upsert)
               return o;
             }
-            var shouldCreateXidEntryPromise = o.conv.use_xid_whitelist
+            const shouldCreateXidEntryPromise = o.conv.use_xid_whitelist
               ? isXidWhitelisted(o.conv.owner, o.xid)
               : Promise.resolve(true);
             shouldCreateXidEntryPromise.then((should: any) => {
@@ -4578,7 +4578,7 @@ function getFirstForPid(votes: string | any[]) {
   let seen = {};
   let len = votes.length;
   let firstVotes = [];
-  for (var i = 0; i < len; i++) {
+  for (let i = 0; i < len; i++) {
     let vote = votes[i];
     // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
     // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
@@ -4629,7 +4629,7 @@ function isParentDomainWhitelisted(
       return true;
     }
     let ok = false;
-    for (var i = 0; i < wdomains.length; i++) {
+    for (let i = 0; i < wdomains.length; i++) {
       let w = wdomains[i];
       let wParts = w.split(".");
 
@@ -4643,7 +4643,7 @@ function isParentDomainWhitelisted(
 
         wParts = wParts.reverse();
         parts = parts.reverse();
-        for (var p = 0; p < wParts.length - 1; p++) {
+        for (let p = 0; p < wParts.length - 1; p++) {
           if (wParts[p] !== parts[p]) {
             bad = true;
             break;
@@ -4657,7 +4657,7 @@ function isParentDomainWhitelisted(
           bad2 = true;
         }
         // check for a match on each part
-        for (var p2 = 0; p2 < wParts.length; p2++) {
+        for (let p2 = 0; p2 < wParts.length; p2++) {
           if (wParts[p2] !== parts[p2]) {
             bad2 = true;
             break;
@@ -4901,7 +4901,7 @@ function handle_GET_conversationStats(
             let prevCreated = votesByParticipant.length
               ? votesByParticipant[0]
               : 0;
-            for (var v = 1; v < votesByParticipant.length; v++) {
+            for (let v = 1; v < votesByParticipant.length; v++) {
               let vote = votesByParticipant[v];
               if (interBurstGap + prevCreated < vote.created) {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
@@ -5238,12 +5238,12 @@ function handle_GET_participation(
     });
 }
 function getAgeRange(demo: Demo) {
-  var currentYear = new Date().getUTCFullYear();
-  var birthYear = demo.ms_birth_year_estimate_fb;
+  const currentYear = new Date().getUTCFullYear();
+  const birthYear = demo.ms_birth_year_estimate_fb;
   if (_.isNull(birthYear) || _.isUndefined(birthYear) || _.isNaN(birthYear)) {
     return "?";
   }
-  var age = currentYear - birthYear;
+  const age = currentYear - birthYear;
   if (age < 12) {
     return "0-11";
   } else if (age < 18) {
@@ -5281,7 +5281,7 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
     return demo.gender === 1;
   }
   function isGenderUnknown(demo: { gender: any }) {
-    var gender = demo.gender;
+    const gender = demo.gender;
     return gender !== 0 && gender !== 1;
   }
 
@@ -5295,8 +5295,8 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
       [zid]
     ),
   ]).then((a: any[]) => {
-    var votes = a[0];
-    var demo = a[1];
+    let votes = a[0];
+    let demo = a[1];
     demo = demo.map((d: Demo) => {
       return {
         pid: d.pid,
@@ -5305,13 +5305,13 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
         ageRange: getAgeRange(d),
       };
     });
-    var demoByPid = _.indexBy(demo, "pid");
+    const demoByPid = _.indexBy(demo, "pid");
 
     votes = votes.map((v: { pid: string | number }) => {
       return _.extend(v, demoByPid[v.pid]);
     });
 
-    var votesByTid = _.groupBy(votes, "tid");
+    const votesByTid = _.groupBy(votes, "tid");
 
     // TODO maybe we should actually look at gender, then a/d/p %
     // TODO maybe we should actually look at each age range, then a/d/p %
@@ -5330,17 +5330,17 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
           age: any;
         };
       }) => {
-        var votesForThisComment = votesByTid[c.tid];
+        const votesForThisComment = votesByTid[c.tid];
 
         if (!votesForThisComment || !votesForThisComment.length) {
           return c;
         }
 
-        var agrees = votesForThisComment.filter(isAgree);
-        var disagrees = votesForThisComment.filter(isDisgree);
-        var passes = votesForThisComment.filter(isPass);
+        const agrees = votesForThisComment.filter(isAgree);
+        const disagrees = votesForThisComment.filter(isDisgree);
+        const passes = votesForThisComment.filter(isPass);
 
-        var votesByAgeRange = _.groupBy(votesForThisComment, "ageRange");
+        const votesByAgeRange = _.groupBy(votesForThisComment, "ageRange");
 
         c.demographics = {
           gender: {
@@ -5706,7 +5706,7 @@ const getComment = Comment.getComment;
 function hasBadWords(txt: string) {
   txt = txt.toLowerCase();
   let tokens = txt.split(" ");
-  for (var i = 0; i < tokens.length; i++) {
+  for (let i = 0; i < tokens.length; i++) {
     if (badwords[tokens[i]]) {
       return true;
     }
@@ -6091,7 +6091,7 @@ function handle_GET_votes_me(
           fail(res, 500, "polis_err_get_votes_by_me", err);
           return;
         }
-        for (var i = 0; i < docs.rows.length; i++) {
+        for (let i = 0; i < docs.rows.length; i++) {
           docs.rows[i].weight = docs.rows[i].weight / 32767;
         }
         finishArray(res, docs.rows);
@@ -6499,7 +6499,7 @@ function handle_GET_participationInit(
         if (o.ptpt) {
           delete o.ptpt.zid;
         }
-        for (var i = 0; i < o.votes.length; i++) {
+        for (let i = 0; i < o.votes.length; i++) {
           delete o.votes[i].zid; // strip zid for security
           // delete o.votes[i].pid; // because it's extra crap. Feel free to delete this line if you need pid.
         }
@@ -7109,8 +7109,8 @@ function handle_POST_conversation_close(
     };
   }
 ) {
-  var q = "select * from conversations where zid = ($1)";
-  var params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)";
+  let params = [req.p.zid];
   if (!isPolisDev(req.p.uid)) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
@@ -7148,8 +7148,8 @@ function handle_POST_conversation_reopen(
     };
   }
 ) {
-  var q = "select * from conversations where zid = ($1)";
-  var params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)";
+  let params = [req.p.zid];
   if (!isPolisDev(req.p.uid)) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
@@ -9144,7 +9144,7 @@ function getPidsForGid(zid: any, gid: number, math_tick: number) {
     }
     let members = cluster.members; // bids
     let pids: any[] = [];
-    for (var i = 0; i < members.length; i++) {
+    for (let i = 0; i < members.length; i++) {
       let bid = members[i];
       let index = bidToIndex[bid];
       let morePids = indexToPids[index];
@@ -9417,7 +9417,7 @@ function handle_GET_logMaxmindResponse(
         res.json({});
         return;
       }
-      var o = results[0];
+      const o = results[0];
       _.each(o, (val: any, key: string) => {
         if (key.startsWith("encrypted_")) {
           o[key] = decrypt(val);
@@ -9465,7 +9465,7 @@ function handle_GET_locations(
     });
 }
 function removeNullOrUndefinedProperties(o: { [x: string]: any }) {
-  for (var k in o) {
+  for (const k in o) {
     let v = o[k];
     if (v === null || v === undefined) {
       delete o[k];

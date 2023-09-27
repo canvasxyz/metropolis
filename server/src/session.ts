@@ -33,7 +33,7 @@ function encrypt(text: string | null) {
   //   Argument of type 'string | null' is not assignable to parameter of type 'string'.
   //   Type 'null' is not assignable to type 'string'.ts(2769)
   // @ts-ignore
-  var crypted = cipher.update(text, "utf8", "hex");
+  let crypted = cipher.update(text, "utf8", "hex");
   // Type 'string' is not assignable to type 'Buffer & string'.
   // Type 'string' is not assignable to type 'Buffer'.ts(2322)
   // @ts-ignore
@@ -60,7 +60,7 @@ function decrypt(text: string) {
   //     Argument of type 'string | undefined' is not assignable to parameter of type 'BinaryLike'.ts(2769)
   // @ts-ignore
   const decipher = crypto.createDecipher(algorithm, password);
-  var dec = decipher.update(text, "hex", "utf8");
+  let dec = decipher.update(text, "hex", "utf8");
   dec += decipher.final("utf8");
   return dec;
 }

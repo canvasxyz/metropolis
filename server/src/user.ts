@@ -250,7 +250,7 @@ function getXidRecordByXidOwnerId(
             return null;
           }
 
-          var shouldCreateXidEntryPromise = !zid_optional
+          const shouldCreateXidEntryPromise = !zid_optional
             ? Promise.resolve(true)
             : Conversation.getConversationInfo(zid_optional).then(
                 (conv: { use_xid_whitelist: any }) => {

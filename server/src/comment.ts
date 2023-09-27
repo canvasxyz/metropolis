@@ -23,14 +23,6 @@ type Row = {
   pass_count: number;
 };
 
-type InfoToReturn = {
-  uid?: string | number;
-  followers_count?: any;
-  tw_verified?: any;
-  tw_followers_count?: any;
-  verified?: any;
-};
-
 type UidToSocialInfo = {
   [key: string]: any;
 };
@@ -119,11 +111,12 @@ function getComments(o: CommentType) {
             uid: string | number;
           }) {
             // whitelist properties to send
-            let infoToReturn: InfoToReturn = _.pick(info, [
-              // xInfo
-              "x_profile_image_url",
-              "x_name",
-            ]);
+            const infoToReturn = {
+              // @ts-ignore
+              x_profile_image_url: info.x_profile_image_url,
+              // @ts-ignore
+              x_name: info.x_name
+            };
 
             uidToSocialInfo[info.uid] = infoToReturn;
           });
@@ -165,15 +158,15 @@ function _getCommentsForModerationList(o: {
   mod: any;
   mod_gt: any;
 }) {
-  var strictCheck = Promise.resolve(null);
-  var include_voting_patterns = o.include_voting_patterns;
+  let strictCheck = Promise.resolve(null);
+  const include_voting_patterns = o.include_voting_patterns;
 
   if (o.modIn) {
     strictCheck = pg
       .queryP("select strict_moderation from conversations where zid = ($1);", [
         o.zid,
       ])
-      .then((c: any) => {
+      .then(() => {
         return o.strict_moderation;
       });
   }
