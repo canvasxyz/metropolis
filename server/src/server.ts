@@ -20,7 +20,9 @@ import pg from "pg";
 import { addInRamMetric, meteredPromise } from "./utils/metered";
 import CreateUser from "./auth/create-user";
 import Password from "./auth/password";
-import dbPgQuery from "./db/pg-query";
+import {
+  query, query_readOnly, queryP, queryP_metered, queryP_readOnly, queryP_readOnly_wRetryIfEmpty
+} from "./db/pg-query";
 
 import Config from "./config";
 import fail from "./utils/fail";
@@ -49,19 +51,9 @@ import {
 
 AWS.config.update({ region: Config.awsRegion });
 const devMode = Config.isDevMode;
-// Property 'Client' does not exist on type '{ query: (...args: any[]) => void; query_readOnly:
-// (...args: any[]) => void; queryP: (...args: any[]) => Promise<unknown>; queryP_metered:
-// (name: any, queryString: any, params: any) => any; queryP_metered_readOnly:
-// (name: any, queryString: any, params: any) => any; queryP_readOnly:
-// (...args: any[]) => Promise <...>; ...'.ts(2339)
-// @ts-ignore
+
 const escapeLiteral = pg.Client.prototype.escapeLiteral;
-const pgQuery = dbPgQuery.query;
-const pgQuery_readOnly = dbPgQuery.query_readOnly;
-const pgQueryP = dbPgQuery.queryP;
-const pgQueryP_metered = dbPgQuery.queryP_metered;
-const pgQueryP_readOnly = dbPgQuery.queryP_readOnly;
-const pgQueryP_readOnly_wRetryIfEmpty = dbPgQuery.queryP_readOnly_wRetryIfEmpty;
+
 const generateAndRegisterZinvite = CreateUser.generateAndRegisterZinvite;
 const generateToken = Password.generateToken;
 const generateTokenP = Password.generateTokenP;
@@ -230,7 +222,7 @@ const getUidForPwResetToken = Session.getUidForPwResetToken;
 const clearPwResetToken = Session.clearPwResetToken;
 
 function getUidForApiKey(apikey: any) {
-  return pgQueryP_readOnly_wRetryIfEmpty(
+  return queryP_readOnly_wRetryIfEmpty(
     "select uid from apikeysndvweifu WHERE apikey = ($1);",
     [apikey]
   );
@@ -279,7 +271,7 @@ function doApiKeyAuth(
 }
 
 // function getXidRecordByXidConversationId(xid, conversation_id) {
-//   return pgQueryP("select * from xids where xid = ($2) and owner = (select org_id from conversations where zid = (select zid from zinvites where zinvite = ($1)))", [zinvite, xid]);
+//   return queryP("select * from xids where xid = ($2) and owner = (select org_id from conversations where zid = (select zid from zinvites where zinvite = ($1)))", [zinvite, xid]);
 // }
 
 const createDummyUser = User.createDummyUser;
@@ -405,8 +397,8 @@ String.prototype.hashCode = function () {
 
 
 // // If there are any comments which have no votes by the owner, create a PASS vote by the owner.
-// pgQuery("select * from comments", [], function(err, comments) {
-//     pgQuery("select * from votes", [], function(err, votes) {
+// query("select * from comments", [], function(err, comments) {
+//     query("select * from votes", [], function(err, votes) {
 //         comments = comments.rows;
 //         votes = votes.rows;
 
@@ -453,12 +445,12 @@ const getPidForParticipant = User.getPidForParticipant;
 
 function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
   function doInsert() {
-    return pgQueryP(
+    return queryP(
       "insert into permanentCookieZidJoins (cookie, zid) values ($1, $2);",
       [permanentCookieToken, zid]
     );
   }
-  return pgQueryP(
+  return queryP(
     "select zid from permanentCookieZidJoins where cookie = ($1) and zid = ($2);",
     [permanentCookieToken, zid]
   ).then(
@@ -480,7 +472,7 @@ function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
 const detectLanguage = Comment.detectLanguage;
 
 if (Config.backfillCommentLangDetection) {
-  pgQueryP("select tid, txt, zid from comments where lang is null;", []).then(
+  queryP("select tid, txt, zid from comments where lang is null;", []).then(
     (comments: string | any[]) => {
       let i = 0;
       function doNext() {
@@ -490,7 +482,7 @@ if (Config.backfillCommentLangDetection) {
           detectLanguage(c.txt).then((x: DetectLanguageResult[]) => {
             const firstResult = x[0];
             logger.debug("backfill " + firstResult.language + "\t\t" + c.txt);
-            pgQueryP(
+            queryP(
               "update comments set lang = ($1), lang_confidence = ($2) where zid = ($3) and tid = ($4)",
               [firstResult.language, firstResult.confidence, c.zid, c.tid]
             ).then(() => {
@@ -520,10 +512,10 @@ function doVotesPost(
     resolve: (arg0: { conv: any; vote: any }) => void,
     reject: (arg0: string) => void
   ) {
-    let query =
+    let queryS =
       "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;";
     let params = [pid, zid, tid, voteType, weight_x_32767, high_priority];
-    pgQuery(query, params, function (err: any, result: { rows: any[] }) {
+    query(queryS, params, function (err: any, result: { rows: any[] }) {
       if (err) {
         if (isDuplicateKey(err)) {
           reject("polis_err_vote_duplicate");
@@ -554,7 +546,7 @@ function votesPost(
   high_priority?: boolean
 ) {
   return (
-    pgQueryP_readOnly("select * from conversations where zid = ($1);", [zid])
+    queryP_readOnly("select * from conversations where zid = ($1);", [zid])
       .then(function (rows: string | any[]) {
         if (!rows || !rows.length) {
           throw "polis_err_unknown_conversation";
@@ -569,7 +561,7 @@ function votesPost(
               return conv;
             }
             return Promise.all([
-              pgQueryP(
+              queryP(
                 "select * from xids where owner = ($1) and uid = ($2);",
                 [conv.owner, uid]
               ),
@@ -619,7 +611,7 @@ function votesGet(p: { zid?: any; pid?: any; tid?: any }): Promise<any[]> {
     if (!_.isUndefined(p.tid)) {
       q = q.where(sql_votes_latest_unique.tid.equals(p.tid));
     }
-    pgQuery_readOnly(
+    query_readOnly(
       q.toString(),
       function (err: any, results: { rows: any }) {
         if (err) {
@@ -680,29 +672,7 @@ function redirectIfNotHttps(
   return next();
 }
 
-// function createDummyUsersBatch(n) {
-//     let query = "insert into users (created) values ";
-//     let values = [];
-//     for (let i = 0; i < n; i++) {
-//         values.push("(default)");
-//     }
-//     values = values.join(",");
-//     query += values;
-//     query += " returning uid;";
 
-//     return meteredPromise("createDummyUser", new Promise(function(resolve, reject) {
-//         pgQuery(query,[], function(err, results) {
-//             if (err || !results || !results.rows || !results.rows.length) {
-//                 reject(new Error("polis_err_create_empty_user"));
-//                 return;
-//             }
-//             let uids = results.rows.map(function(row) {
-//                 return row.uid;
-//             });
-//             resolve(uids);
-//         });
-//     }));
-// }
 
 function doXidConversationIdAuth(
   assigner: (arg0: any, arg1: string, arg2: number) => void,
@@ -1063,7 +1033,7 @@ function addCorsHeader(
   host = host.replace(/#.*$/, "");
 
   // Remove characters starting with the first slash following the double slash at the beginning.
-  let result = /^[^\/]*\/\/[^\/]*/.exec(host);
+  let result = /^[^/]*\/\/[^/]*/.exec(host);
   if (result && result[0]) {
     host = result[0];
   }
@@ -1149,7 +1119,7 @@ function handle_GET_tryCookie(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -1183,7 +1153,7 @@ function fetchAndCacheLatestPcaData() {
     return Math.max(0, 2500 - timePassed);
   }
   // cursor.sort([["math_tick", "asc"]]);
-  pgQueryP_readOnly(
+  queryP_readOnly(
     "select * from math_main where caching_tick > ($1) order by caching_tick limit 10;",
     [lastPrefetchedMathTick]
   ).then((rows: any[]) => {
@@ -1457,7 +1427,7 @@ function getPca(zid?: any, math_tick?: number) {
 
   let queryStart = Date.now();
 
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "select * from math_main where zid = ($1) and math_env = ($2);",
     [zid, Config.mathEnv]
   ).then((rows: string | any[]) => {
@@ -1672,7 +1642,7 @@ function handle_GET_math_pca2(
 }
 
 function getZidForRid(rid: any) {
-  return pgQueryP("select zid from reports where rid = ($1);", [rid]).then(
+  return queryP("select zid from reports where rid = ($1);", [rid]).then(
     (row: string | any[]) => {
       if (!row || !row.length) {
         return null;
@@ -1704,7 +1674,7 @@ function handle_GET_math_correlationMatrix(
   }
 
   function hasCommentSelections() {
-    return pgQueryP(
+    return queryP(
       "select * from report_comment_selections where rid = ($1) and selection = 1;",
       [rid]
     ).then((rows: string | any[]) => {
@@ -1712,7 +1682,7 @@ function handle_GET_math_correlationMatrix(
     });
   }
 
-  let requestExistsPromise = pgQueryP(
+  let requestExistsPromise = queryP(
     "select * from worker_tasks where task_type = 'generate_report_data' and math_env=($2) " +
       "and task_bucket = ($1) " +
       // "and attempts < 3 " +
@@ -1721,7 +1691,7 @@ function handle_GET_math_correlationMatrix(
     [rid, math_env, math_tick]
   );
 
-  let resultExistsPromise = pgQueryP(
+  let resultExistsPromise = queryP(
     "select * from math_report_correlationmatrix where rid = ($1) and math_env = ($2) and math_tick >= ($3);",
     [rid, math_env, math_tick]
   );
@@ -1742,7 +1712,7 @@ function handle_GET_math_correlationMatrix(
                   status: "polis_report_needs_comment_selection",
                 });
               }
-              return pgQueryP(
+              return queryP(
                 "insert into worker_tasks (task_type, task_data, task_bucket, math_env) values ('generate_report_data', $1, $2, $3);",
                 [
                   JSON.stringify({
@@ -1774,7 +1744,7 @@ function doAddDataExportTask(
   format: string,
   task_bucket: number
 ) {
-  return pgQueryP(
+  return queryP(
     "insert into worker_tasks (math_env, task_data, task_type, task_bucket) values ($1, $2, 'generate_export_data', $3);",
     [
       math_env,
@@ -1809,7 +1779,7 @@ if (
       task_bucket
     ).then(() => {
       setTimeout(() => {
-        pgQueryP(
+        queryP(
           "select * from worker_tasks where task_type = 'generate_export_data' and task_bucket = ($1);",
           [task_bucket]
         ).then((rows: string | any[]) => {
@@ -1861,7 +1831,7 @@ function handle_GET_dataExport(
     req.params.export === "participants" ||
     req.params.export === "participants.csv"
   ) {
-    return pgQuery_readOnly(
+    return query_readOnly(
       `select
         participants.pid as participant,
         (select count(comments.tid) from comments where comments.pid = participants.pid and comments.zid = ($1)) as n_comments,
@@ -1884,7 +1854,7 @@ function handle_GET_dataExport(
     req.params.export === "comments" ||
     req.params.export === "comments.csv"
   ) {
-    return pgQuery_readOnly(
+    return query_readOnly(
       `select
           comments.created as timestamp, comments.created as datetime,
           comments.tid as comment_id,
@@ -1904,7 +1874,7 @@ function handle_GET_dataExport(
 
   // votes.csv
   if (req.params.export === "votes" || req.params.export === "votes.csv") {
-    return pgQuery_readOnly(
+    return query_readOnly(
       `select created as timestamp, created as datetime, tid as comment_id, pid as voter_id, vote, high_priority
       from votes where zid = ($1)`,
       [req.p.zid],
@@ -1920,7 +1890,7 @@ function handle_GET_dataExport(
 }
 function getBidIndexToPidMapping(zid: number, math_tick: number) {
   math_tick = math_tick || -1;
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "select * from math_bidtopid where zid = ($1) and math_env = ($2);",
     [zid, Config.mathEnv]
   ).then((rows: string | any[]) => {
@@ -1965,7 +1935,7 @@ function getXids(zid: any) {
     resolve: (arg0: any) => void,
     reject: (arg0: string) => void
   ) {
-    pgQuery_readOnly(
+    query_readOnly(
       "select pid, xid from xids inner join " +
         "(select * from participants where zid = ($1)) as p on xids.uid = p.uid " +
         " where owner in (select org_id from conversations where zid = ($1));",
@@ -2019,7 +1989,7 @@ function handle_POST_xidWhitelist(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -2035,7 +2005,7 @@ function handle_POST_xidWhitelist(
     return fail(res, 400, "polis_err_bad_xid", err);
   }
 
-  pgQueryP(
+  queryP(
     "insert into xid_whitelist (xid, owner) values " +
       entries.join(",") +
       " on conflict do nothing;",
@@ -2131,7 +2101,7 @@ function handle_POST_auth_password(
     generateHashedPassword(
       newPassword,
       function (err: any, hashedPassword: any) {
-        return pgQueryP(
+        return queryP(
           "insert into jianiuevyew (uid, pwhash) values " +
             "($1, $2) on conflict (uid) " +
             "do update set pwhash = excluded.pwhash;",
@@ -2235,7 +2205,7 @@ Feel free to reply to this email if you need help.`;
 
 function getUidByEmail(email: string) {
   email = email.toLowerCase();
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "SELECT uid FROM users where LOWER(email) = ($1);",
     [email]
   ).then(function (rows: string | any[]) {
@@ -2393,9 +2363,9 @@ function handle_POST_metrics(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): any; new (): any };
+      json: { (arg0: any): any; new (): any };
     };
-    json: (arg0: {}) => void;
+    json: (arg0: any) => void;
   }
 ) {
   const enabled = false;
@@ -2437,7 +2407,7 @@ function handle_POST_metrics(
     );
   }
 
-  pgQueryP(
+  queryP(
     "insert into metrics (uid, type, dur, hashedPc, created) values " +
       entries.join(",") +
       ";",
@@ -2464,7 +2434,7 @@ function handle_GET_zinvites(
   }
 ) {
   // if uid is not conversation owner, fail
-  pgQuery_readOnly(
+  query_readOnly(
     "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
     [req.p.zid, req.p.uid],
     function (err: any, results: { rows: any }) {
@@ -2484,7 +2454,7 @@ function handle_GET_zinvites(
         });
         return;
       }
-      pgQuery_readOnly(
+      query_readOnly(
         "SELECT * FROM zinvites WHERE zid = ($1);",
         [req.p.zid],
         function (err: any, results: { rows: any }) {
@@ -2554,7 +2524,7 @@ function handle_POST_zinvites(
 ) {
   let generateShortUrl = req.p.short_url;
 
-  pgQuery(
+  query(
     "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
     [req.p.zid, req.p.uid],
     function (err: any) {
@@ -2591,7 +2561,7 @@ function checkZinviteCodeValidity(
     (arg0: number | null): void;
   }
 ) {
-  pgQuery_readOnly(
+  query_readOnly(
     "SELECT * FROM zinvites WHERE zid = ($1) AND zinvite = ($2);",
     [zid, zinvite],
     function (err: any, results: { rows: string | any[] }) {
@@ -2613,7 +2583,7 @@ function getZinvite(zid: any, dontUseCache?: boolean) {
   if (!dontUseCache && cachedConversationId) {
     return Promise.resolve(cachedConversationId);
   }
-  return pgQueryP_metered(
+  return queryP_metered(
     "getZinvite",
     "select * from zinvites where zid = ($1);",
     [zid]
@@ -2664,14 +2634,14 @@ function getZinvites(zids: any[]) {
   }
 
   return meteredPromise("getZinvites", new Promise(function (
-    resolve: (arg0: {}) => void,
+    resolve: (arg0: any) => void,
     reject: (arg0: any) => void
   ) {
     if (uncachedZids.length === 0) {
       resolve(makeZidToConversationIdMap([zidsWithCachedConversationIds]));
       return;
     }
-    pgQuery_readOnly(
+    query_readOnly(
       "select * from zinvites where zid in (" + uncachedZids.join(",") + ");",
       [],
       function (err: any, result: { rows: any }) {
@@ -2802,7 +2772,7 @@ function checkSuzinviteCodeValidity(
     (arg0: number | null): void;
   }
 ) {
-  pgQuery(
+  query(
     "SELECT * FROM suzinvites WHERE zid = ($1) AND suzinvite = ($2);",
     [zid, suzinvite],
     function (err: any, results: { rows: string | any[] }) {
@@ -2820,7 +2790,7 @@ function getSUZinviteInfo(suzinvite: any) {
     resolve: (arg0: any) => void,
     reject: (arg0: Error) => any
   ) {
-    pgQuery(
+    query(
       "SELECT * FROM suzinvites WHERE suzinvite = ($1);",
       [suzinvite],
       function (err: any, results: { rows: string | any[] }) {
@@ -2838,7 +2808,7 @@ function getSUZinviteInfo(suzinvite: any) {
 
 async function deleteSuzinvite(suzinvite: any) {
   try {
-    await pgQueryP(
+    await queryP(
       "DELETE FROM suzinvites WHERE suzinvite = ($1);",
       [suzinvite]);
   } catch (err) {
@@ -2847,7 +2817,7 @@ async function deleteSuzinvite(suzinvite: any) {
 }
 
 function xidExists(xid: any, owner: any, uid?: any) {
-  return pgQueryP(
+  return queryP(
     "select * from xids where xid = ($1) and owner = ($2) and uid = ($3);",
     [xid, owner, uid]
   ).then(function (rows: string | any[]) {
@@ -2857,7 +2827,7 @@ function xidExists(xid: any, owner: any, uid?: any) {
 
 async function createXidEntry(xid: any, owner: any, uid?: any) {
   try {
-    await pgQueryP(
+    await queryP(
       "INSERT INTO xids (uid, owner, xid) VALUES ($1, $2, $3);",
       [uid, owner, xid]);
   } catch (err) {
@@ -2898,7 +2868,7 @@ function saveParticipantMetadataChoices(
     answers.join(",") +
     ");";
 
-  pgQuery(
+  query(
     q,
     [zid],
     function (
@@ -2926,7 +2896,7 @@ function saveParticipantMetadataChoices(
           // ...insert()
           //     .into("participant_metadata_choices")
           //     .
-          pgQuery(
+          query(
             "INSERT INTO participant_metadata_choices (zid, pid, pmaid, pmqid) VALUES ($1,$2,$3,$4);",
             x,
             function (err: any) {
@@ -2958,7 +2928,7 @@ function saveParticipantMetadataChoices(
 }
 
 function updateLastInteractionTimeForConversation(zid: any, uid?: any) {
-  return pgQueryP(
+  return queryP(
     "update participants set last_interaction = now_as_millis(), nsli = 0 where zid = ($1) and uid = ($2);",
     [zid, uid]
   );
@@ -3004,7 +2974,7 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
       const parsedResponse = JSON.parse(response);
       logger.debug("maxmind response", parsedResponse);
 
-      return pgQueryP(
+      return queryP(
         "update participants_extended set modified=now_as_millis(), country_iso_code=($4), encrypted_maxmind_response_city=($3), " +
           "location=ST_GeographyFromText('SRID=4326;POINT(" +
           parsedResponse.location.latitude +
@@ -3023,7 +2993,7 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
     });
 }
 
-function addExtendedParticipantInfo(zid: any, uid?: any, data?: {}) {
+function addExtendedParticipantInfo(zid: any, uid?: any, data?: any) {
   if (!data || !_.keys(data).length) {
     return Promise.resolve();
   }
@@ -3039,7 +3009,7 @@ function addExtendedParticipantInfo(zid: any, uid?: any, data?: {}) {
     .and(sql_participants_extended.uid.equals(uid));
   let qString = qUpdate.toString();
   qString = qString.replace("9876543212345", "now_as_millis()");
-  return pgQueryP(qString, []);
+  return queryP(qString, []);
 }
 
 function tryToJoinConversation(
@@ -3121,7 +3091,7 @@ function addParticipantAndMetadata(
 function joinConversation(
   zid: any,
   uid?: any,
-  info?: {},
+  info?: any,
   pmaid_answers?: any
 ) {
   function tryJoin() {
@@ -3191,7 +3161,7 @@ function isConversationOwner(
   //     callback(null); // TODO remove!
   //     return;
   // }
-  pgQuery_readOnly(
+  query_readOnly(
     "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
     [zid, uid],
     function (err: number, docs: { rows: string | any[] }) {
@@ -3213,7 +3183,7 @@ function isModerator(zid: any, uid?: any) {
   if (isPolisDev(uid)) {
     return Promise.resolve(true);
   }
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "select count(*) from conversations where owner in (select uid from users where site_id = (select site_id from users where uid = ($2))) and zid = ($1);",
     [zid, uid]
   ).then(function (rows: { count: number }[]) {
@@ -3227,7 +3197,7 @@ function getParticipant(zid: any, uid?: any) {
     resolve: (arg0: any) => void,
     reject: (arg0: Error) => any
   ) {
-    pgQuery_readOnly(
+    query_readOnly(
       "SELECT * FROM participants WHERE zid = ($1) AND uid = ($2);",
       [zid, uid],
       function (err: any, results: { rows: any[] }) {
@@ -3249,7 +3219,7 @@ function getAnswersForConversation(
     (arg0: number, arg1?: undefined): void;
   }
 ) {
-  pgQuery_readOnly(
+  query_readOnly(
     "SELECT * from participant_metadata_answers WHERE zid = ($1) AND alive=TRUE;",
     [zid],
     function (err: any, x: { rows: any }) {
@@ -3267,7 +3237,7 @@ function getChoicesForConversation(zid: any) {
     resolve: (arg0: never[]) => void,
     reject: (arg0: any) => void
   ) {
-    pgQuery_readOnly(
+    query_readOnly(
       "select * from participant_metadata_choices where zid = ($1) and alive = TRUE;",
       [zid],
       function (err: any, x: { rows: any }) {
@@ -3400,7 +3370,7 @@ async function handle_GET_verification(
 
   let emailRows;
   try {
-    emailRows = await pgQueryP("select * from einvites where einvite = ($1);", [einvite])
+    emailRows = await queryP("select * from einvites where einvite = ($1);", [einvite])
   } catch (err) {
     fail(res, 500, "polis_err_verification", err);
     return;
@@ -3413,10 +3383,10 @@ async function handle_GET_verification(
 
   let email = emailRows[0].email;
 
-  const emailValidations = await pgQueryP("select email from email_validations where email = ($1);", [email]);
+  const emailValidations = await queryP("select email from email_validations where email = ($1);", [email]);
 
   if(emailValidations.length == 0) {
-    await pgQueryP(
+    await queryP(
       "insert into email_validations (email) values ($1);",
       [email]
     );
@@ -3518,7 +3488,7 @@ function handle_GET_participants(
 ) {
   let zid = req.p.zid;
 
-  pgQueryP_readOnly(
+  queryP_readOnly(
     "SELECT users.hname, participants.pid, participants.vote_count, participants.last_interaction, participants.created FROM users INNER JOIN participants ON users.uid = participants.uid WHERE zid = ($1) ORDER BY participants.pid;",
     [zid]
   )
@@ -3546,7 +3516,7 @@ function doGetConversationsRecent(
     time *= 1000;
   }
   time = parseInt(time);
-  pgQueryP_readOnly(
+  queryP_readOnly(
     "select * from conversations where " + field + " >= ($1);",
     [time]
   )
@@ -3698,12 +3668,12 @@ function handle_POST_participants(
 async function subscribeToNotifications(zid: any, uid?: any, email?: any) {
   let type = 1; // 1 for email
   logger.info("subscribeToNotifications", { zid, uid });
-  await pgQueryP(
+  await queryP(
     "update participants_extended set subscribe_email = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, email]
   );
 
-  await pgQueryP(
+  await queryP(
     "update participants set subscribed = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, type]
   );
@@ -3713,7 +3683,7 @@ async function subscribeToNotifications(zid: any, uid?: any, email?: any) {
 
 async function unsubscribeFromNotifications(zid: any, uid?: any) {
   let type = 0; // 1 for nothing
-  await pgQueryP(
+  await queryP(
     "update participants set subscribed = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, type]
   );
@@ -3721,21 +3691,21 @@ async function unsubscribeFromNotifications(zid: any, uid?: any) {
 }
 
 function addNotificationTask(zid: any) {
-  return pgQueryP(
+  return queryP(
     "insert into notification_tasks (zid) values ($1) on conflict (zid) do update set modified = now_as_millis();",
     [zid]
   );
 }
 
 function maybeAddNotificationTask(zid: any, timeInMillis: any) {
-  return pgQueryP(
+  return queryP(
     "insert into notification_tasks (zid, modified) values ($1, $2) on conflict (zid) do nothing;",
     [zid, timeInMillis]
   );
 }
 
 function claimNextNotificationTask() {
-  return pgQueryP(
+  return queryP(
     "delete from notification_tasks where zid = (select zid from notification_tasks order by random() for update skip locked limit 1) returning *;"
   ).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
@@ -3746,7 +3716,7 @@ function claimNextNotificationTask() {
 }
 
 function getDbTime() {
-  return pgQueryP("select now_as_millis();", []
+  return queryP("select now_as_millis();", []
   ).then((rows: { now_as_millis: any }[]) => {
       return rows[0].now_as_millis;
     }
@@ -3757,7 +3727,7 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
   let shouldTryAgain = false;
 
   return (
-    pgQueryP(
+    queryP(
       "select * from participants where zid = ($1) and last_notified < ($2) and subscribed > 0;",
       [zid, timeOfLastEvent]
     )
@@ -3858,10 +3828,10 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
             }
             const pids = _.pluck(needNotification, "pid");
 
-            // return pgQueryP("select p.uid, p.pid, u.email from participants as p left join users as u on p.uid = u.uid where p.pid in (" + pids.join(",") + ")", []).then((rows) => {
+            // return queryP("select p.uid, p.pid, u.email from participants as p left join users as u on p.uid = u.uid where p.pid in (" + pids.join(",") + ")", []).then((rows) => {
 
             // })
-            return pgQueryP(
+            return queryP(
               "select uid, subscribe_email from participants_extended where uid in (select uid from participants where pid in (" +
                 pids.join(",") +
                 "));",
@@ -3895,7 +3865,7 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
                       // @ts-ignore
                       uidToEmail[uid]
                     ).then(() => {
-                      return pgQueryP(
+                      return queryP(
                         "update participants set last_notified = now_as_millis(), nsli = nsli + 1 where uid = ($1) and zid = ($2);",
                         [uid, zid]
                       );
@@ -4019,7 +3989,7 @@ function handle_GET_notifications_subscribe(
   verifyHmacForQueryParams("api/v3/notifications/subscribe", params)
     .then(
       function () {
-        return pgQueryP(
+        return queryP(
           "update participants set subscribed = 1 where uid = (select uid from users where email = ($2)) and zid = ($1);",
           [zid, email]
         ).then(function () {
@@ -4065,7 +4035,7 @@ function handle_GET_notifications_unsubscribe(
   verifyHmacForQueryParams("api/v3/notifications/unsubscribe", params)
     .then(
       function () {
-        return pgQueryP(
+        return queryP(
           "update participants set subscribed = 0 where uid = (select uid from users where email = ($2)) and zid = ($1);",
           [zid, email]
         ).then(function () {
@@ -4153,7 +4123,7 @@ function handle_POST_auth_login(
     fail(res, 403, "polis_err_login_need_password");
     return;
   }
-  pgQuery(
+  query(
     "SELECT * FROM users WHERE LOWER(email) = ($1);",
     [email],
     function (err: any, docs: { rows?: any[] }) {
@@ -4169,7 +4139,7 @@ function handle_POST_auth_login(
 
       let uid = rows[0].uid;
 
-      pgQuery(
+      query(
         "select pwhash from jianiuevyew where uid = ($1);",
         [uid],
         function (err: any, results: { rows: any[] }) {
@@ -4599,7 +4569,7 @@ function isParentDomainWhitelisted(
   isWithinIframe: any,
   domain_whitelist_override_key: any
 ) {
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "select * from site_domain_whitelist where site_id = " +
       "(select site_id from users where uid = " +
       "(select owner from conversations where zid = ($1)));",
@@ -4734,17 +4704,17 @@ function denyIfNotFromWhitelistedDomain(
 
 function setDomainWhitelist(uid?: any, newWhitelist?: any) {
   // TODO_UPSERT
-  return pgQueryP(
+  return queryP(
     "select * from site_domain_whitelist where site_id = (select site_id from users where uid = ($1));",
     [uid]
   ).then(function (rows: string | any[]) {
     if (!rows || !rows.length) {
-      return pgQueryP(
+      return queryP(
         "insert into site_domain_whitelist (site_id, domain_whitelist) values ((select site_id from users where uid = ($1)), $2);",
         [uid, newWhitelist]
       );
     } else {
-      return pgQueryP(
+      return queryP(
         "update site_domain_whitelist set domain_whitelist = ($2) where site_id = (select site_id from users where uid = ($1));",
         [uid, newWhitelist]
       );
@@ -4753,7 +4723,7 @@ function setDomainWhitelist(uid?: any, newWhitelist?: any) {
 }
 
 function getDomainWhitelist(uid?: any) {
-  return pgQueryP(
+  return queryP(
     "select * from site_domain_whitelist where site_id = (select site_id from users where uid = ($1));",
     [uid]
   ).then(function (rows: string | any[]) {
@@ -4846,9 +4816,9 @@ function handle_GET_conversationStats(
       }
 
       return Promise.all([
-        pgQueryP_readOnly(q0, args),
-        pgQueryP_readOnly(q1, args),
-        // pgQueryP_readOnly("select created from participants where zid = ($1) order by created;", [zid]),
+        queryP_readOnly(q0, args),
+        queryP_readOnly(q1, args),
+        // queryP_readOnly("select created from participants where zid = ($1) order by created;", [zid]),
       ]).then(function (a: any[]) {
         function castTimestamp(o: { created: number }) {
           o.created = Number(o.created);
@@ -5000,7 +4970,7 @@ function handle_GET_snapshot(
     return;
   }
 
-  pgQuery(
+  query(
     "insert into conversations (topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, owner, modified, created, participant_count) " +
       "(select '(SNAPSHOT) ' || topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
     [zid, uid],
@@ -5012,18 +4982,18 @@ function handle_GET_snapshot(
       let conv = result.rows[0];
 
       let newZid = conv.zid;
-      return pgQueryP(
+      return queryP(
         "insert into participants (pid, zid, uid, created, mod, subscribed) " +
           "select pid, ($2), uid, created, mod, 0 from participants where zid = ($1);",
         [zid, newZid]
       )
         .then(function () {
-          return pgQueryP(
+          return queryP(
             "insert into comments (pid, tid, zid, txt, velocity, mod, uid, active, lang, lang_confidence, created) " +
               "select pid, tid, ($2), txt, velocity, mod, uid, active, lang, lang_confidence, created from comments where zid = ($1);",
             [zid, newZid]
           ).then(function () {
-            return pgQueryP("select * from votes where zid = ($1);", [
+            return queryP("select * from votes where zid = ($1);", [
               zid,
               //               Argument of type '(votes: any[]) => Promise<void>' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
               // Types of parameters 'votes' and 'value' are incompatible.
@@ -5040,7 +5010,7 @@ function handle_GET_snapshot(
                 }) {
                   let q =
                     "insert into votes (zid, pid, tid, vote, created) values ($1, $2, $3, $4, $5);";
-                  return pgQueryP(q, [
+                  return queryP(q, [
                     newZid,
                     v.pid,
                     v.tid,
@@ -5079,13 +5049,13 @@ function handle_POST_tutorial(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
   let uid = req.p.uid;
   let step = req.p.step;
-  pgQueryP("update users set tut = ($1) where uid = ($2);", [step, uid])
+  queryP("update users set tut = ($1) where uid = ($2);", [step, uid])
     .then(function () {
       res.status(200).json({});
     })
@@ -5135,7 +5105,7 @@ function handle_GET_participation(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -5150,15 +5120,15 @@ function handle_GET_participation(
       }
 
       return Promise.all([
-        pgQueryP_readOnly(
+        queryP_readOnly(
           "select pid, count(*) from votes where zid = ($1) group by pid;",
           [zid]
         ),
-        pgQueryP_readOnly(
+        queryP_readOnly(
           "select pid, count(*) from comments where zid = ($1) group by pid;",
           [zid]
         ),
-        getXids(zid), //pgQueryP_readOnly("select pid, xid from xids inner join (select * from participants where zid = ($1)) as p on xids.uid = p.uid;", [zid]),
+        getXids(zid), //queryP_readOnly("select pid, xid from xids inner join (select * from participants where zid = ($1)) as p on xids.uid = p.uid;", [zid]),
       ]).then(function (o: any[]) {
         let voteCountRows = o[0];
         let commentCountRows = o[1];
@@ -5205,7 +5175,7 @@ function handle_GET_participation(
             // @ts-ignore
             pidToXid[pidXidRows[i].pid] = pidXidRows[i].xid;
           }
-          let xidBasedResult = {};
+          let xidBasedResult: Record<string, any> = {};
           let size = 0;
           _.each(result, function (val: any, key: string | number) {
             // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
@@ -5286,11 +5256,11 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
   }
 
   return Promise.all([
-    pgQueryP(
+    queryP(
       "select pid,tid,vote from votes_latest_unique where zid = ($1);",
       [zid]
     ),
-    pgQueryP(
+    queryP(
       "select p.pid, d.* from participants p left join demographic_data d on p.uid = d.uid where p.zid = ($1);",
       [zid]
     ),
@@ -5398,8 +5368,7 @@ function handle_GET_comments_translations(
     //   Property 'txt' is missing in type 'Row' but required in type '{ txt: any; }'.ts(2345)
     // @ts-ignore
     .then((comment: { txt: any }) => {
-      return dbPgQuery
-        .queryP(
+      return queryP(
           "select * from comment_translations where zid = ($1) and tid = ($2) and lang LIKE '$3%';",
           [zid, tid, firstTwoCharsOfLang]
         )
@@ -5437,7 +5406,7 @@ function handle_GET_comments(
   getComments(req.p)
     .then(function (comments: any) {
       if (req.p.rid) {
-        return pgQueryP(
+        return queryP(
           "select tid, selection from report_comment_selections where rid = ($1);",
           [req.p.rid]
         ).then((selections: any) => {
@@ -5514,7 +5483,7 @@ function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
   return meteredPromise(
     "getNumberOfCommentsWithModerationStatus",
     new Promise(function (resolve, reject) {
-      pgQuery_readOnly(
+      query_readOnly(
         "select count(*) from comments where zid = ($1) and mod = ($2);",
         [zid, mod],
         function (err: any, result: { rows: { count: any }[] }) {
@@ -5625,7 +5594,7 @@ function moderateComment(
   is_meta: boolean
 ) {
   return new Promise(function (resolve, reject) {
-    pgQuery(
+    query(
       "UPDATE COMMENTS SET active=($3), mod=($4), modified=now_as_millis(), is_meta = ($5) WHERE zid=($1) and tid=($2);",
       [zid, tid, active, mod, is_meta],
       function (err: any) {
@@ -5715,7 +5684,7 @@ function hasBadWords(txt: string) {
 }
 
 function commentExists(zid: any, txt: any) {
-  return pgQueryP(
+  return queryP(
     "select zid from comments where zid = ($1) and txt = ($2);",
     [zid, txt]
   ).then(function (rows: string | any[]) {
@@ -5938,7 +5907,7 @@ function handle_POST_comments(
             let lang = detection.language;
             let lang_confidence = detection.confidence;
 
-            return pgQueryP(
+            return queryP(
               "INSERT INTO COMMENTS " +
                 "(pid, zid, txt, velocity, active, mod, uid, tweet_id, quote_src_url, anon, is_seed, created, tid, lang, lang_confidence) VALUES " +
                 "($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, default, null, $12, $13) RETURNING *;",
@@ -5983,7 +5952,7 @@ function handle_POST_comments(
                       if (n === 0) {
                         return;
                       }
-                      pgQueryP_readOnly(
+                      queryP_readOnly(
                         "select * from users where site_id = (select site_id from page_ids where zid = ($1)) UNION select * from users where uid = ($2);",
                         [zid, conv.owner]
                       ).then(function (users: any) {
@@ -6083,7 +6052,7 @@ function handle_GET_votes_me(
       fail(res, 500, "polis_err_getting_pid", err);
       return;
     }
-    pgQuery_readOnly(
+    query_readOnly(
       "SELECT * FROM votes WHERE zid = ($1) AND pid = ($2);",
       [req.p.zid, req.p.pid],
       function (err: any, docs: { rows: string | any[] }) {
@@ -6198,7 +6167,7 @@ function getNextPrioritizedComment(
 }
 
 function getCommentTranslations(zid: any, tid: any) {
-  return dbPgQuery.queryP(
+  return queryP(
     "select * from comment_translations where zid = ($1) and tid = ($2);",
     [zid, tid]
   );
@@ -6245,7 +6214,7 @@ function getNextComment(
 
 // NOTE: only call this in response to a vote. Don't call this from a poll, like /api/v3/nextComment
 function addNoMoreCommentsRecord(zid: any, pid: any) {
-  return pgQueryP(
+  return queryP(
     "insert into event_ptpt_no_more_comments (zid, pid, votes_placed) values ($1, $2, " +
       "(select count(*) from votes where zid = ($1) and pid = ($2)))",
     [zid, pid]
@@ -6267,7 +6236,7 @@ function handle_GET_nextComment(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -6531,7 +6500,7 @@ function updateConversationModifiedTime(zid: any, t?: undefined) {
       "update conversations set modified = now_as_millis() where zid = ($1);";
     params = [zid];
   }
-  return pgQueryP(query, params);
+  return queryP(query, params);
 }
 
 const createXidRecordByZid = Conversation.createXidRecordByZid;
@@ -6554,7 +6523,7 @@ function handle_PUT_participants_extended(
     .where(sql_participants_extended.zid.equals(zid))
     .and(sql_participants_extended.uid.equals(uid));
 
-  pgQueryP(q.toString(), [])
+  queryP(q.toString(), [])
     .then((result: any) => {
       res.json(result);
     })
@@ -6729,7 +6698,7 @@ function handle_POST_ptptCommentMod(
   // need('as_spam', getBool, assignToP, false),
   // need('as_offtopic', getBool, assignToP, false),
 
-  return pgQueryP(
+  return queryP(
     "insert into crowd_mod (" +
       "zid, " +
       "pid, " +
@@ -6811,14 +6780,14 @@ function handle_POST_upvotes(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
   let uid = req.p.uid;
   let zid = req.p.zid;
 
-  pgQueryP("select * from upvotes where uid = ($1) and zid = ($2);", [
+  queryP("select * from upvotes where uid = ($1) and zid = ($2);", [
     uid,
     zid,
   ]).then(
@@ -6826,12 +6795,12 @@ function handle_POST_upvotes(
       if (rows && rows.length) {
         fail(res, 403, "polis_err_upvote_already_upvoted");
       } else {
-        pgQueryP("insert into upvotes (uid, zid) VALUES ($1, $2);", [
+        queryP("insert into upvotes (uid, zid) VALUES ($1, $2);", [
           uid,
           zid,
         ]).then(
           function () {
-            pgQueryP(
+            queryP(
               "update conversations set upvotes = (select count(*) from upvotes where zid = ($1)) where zid = ($1);",
               [zid]
             ).then(
@@ -6870,7 +6839,7 @@ function addStar(
       "INSERT INTO stars (pid, zid, tid, starred, created) VALUES ($1, $2, $3, $4, $5) RETURNING created;";
     params.push(created);
   }
-  return pgQueryP(query, params);
+  return queryP(query, params);
 }
 function handle_POST_stars(
   req: { p: { zid: any; tid: any; pid: any; starred: any } },
@@ -6878,7 +6847,7 @@ function handle_POST_stars(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -6911,15 +6880,15 @@ function handle_POST_trashes(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
-  let query =
+  let queryS =
     "INSERT INTO trashes (pid, zid, tid, trashed, created) VALUES ($1, $2, $3, $4, default);";
   let params = [req.p.pid, req.p.zid, req.p.tid, req.p.trashed];
-  pgQuery(
-    query,
+  query(
+    queryS,
     params,
     function (err: any, result: { rows: { created: any }[] }) {
       if (err) {
@@ -6943,7 +6912,7 @@ function handle_POST_trashes(
 function verifyMetadataAnswersExistForEachQuestion(zid: any) {
   let errorcode = "polis_err_missing_metadata_answers";
   return new Promise(function (resolve, reject) {
-    pgQuery_readOnly(
+    query_readOnly(
       "select pmqid from participant_metadata_questions where zid = ($1);",
       [zid],
       function (err: any, results: { rows: any[] }) {
@@ -6958,7 +6927,7 @@ function verifyMetadataAnswersExistForEachQuestion(zid: any) {
         let pmqids = results.rows.map(function (row: { pmqid: any }) {
           return Number(row.pmqid);
         });
-        pgQuery_readOnly(
+        query_readOnly(
           "select pmaid, pmqid from participant_metadata_answers where pmqid in (" +
             pmqids.join(",") +
             ") and alive = TRUE and zid = ($1);",
@@ -7003,7 +6972,7 @@ function handle_PUT_comments(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -7036,7 +7005,7 @@ function handle_PUT_comments(
 
 function handle_POST_reportCommentSelections(
   req: { p: { uid?: any; zid: any; rid: any; tid: any; include: any } },
-  res: { json: (arg0: {}) => void }
+  res: { json: (arg0: any) => void }
 ) {
   let uid = req.p.uid;
   let zid = req.p.zid;
@@ -7048,14 +7017,14 @@ function handle_POST_reportCommentSelections(
       if (!isMod) {
         return fail(res, 403, "polis_err_POST_reportCommentSelections_auth");
       }
-      return pgQueryP(
+      return queryP(
         "insert into report_comment_selections (rid, tid, selection, zid, modified) values ($1, $2, $3, $4, now_as_millis()) " +
           "on conflict (rid, tid) do update set selection = ($3), zid  = ($4), modified = now_as_millis();",
         [rid, tid, selection, zid]
       )
         .then(() => {
           // The old report isn't valid anymore, so when a user loads the report again a new worker_tasks entry will be created.
-          return pgQueryP(
+          return queryP(
             "delete from math_report_correlationmatrix where rid = ($1);",
             [rid]
           );
@@ -7084,7 +7053,7 @@ function generateAndReplaceZinvite(zid: any, generateShortZinvite: any) {
       if (err) {
         return reject("polis_err_creating_zinvite");
       }
-      pgQuery(
+      query(
         "update zinvites set zinvite = ($1) where zid = ($2);",
         [zinvite, zid],
         function (err: any) {
@@ -7105,7 +7074,7 @@ function handle_POST_conversation_close(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -7115,14 +7084,14 @@ function handle_POST_conversation_close(
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
-  pgQueryP(q, params)
+  queryP(q, params)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
         fail(res, 500, "polis_err_closing_conversation_no_such_conversation");
         return;
       }
       let conv = rows[0];
-      pgQueryP(
+      queryP(
         "update conversations set is_archived = true where zid = ($1);",
         [conv.zid]
       )
@@ -7144,7 +7113,7 @@ function handle_POST_conversation_reopen(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -7154,14 +7123,14 @@ function handle_POST_conversation_reopen(
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
-  pgQueryP(q, params)
+  queryP(q, params)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
         fail(res, 500, "polis_err_closing_conversation_no_such_conversation");
         return;
       }
       let conv = rows[0];
-      pgQueryP(
+      queryP(
         "update conversations set is_archived = false where zid = ($1);",
         [conv.zid]
       )
@@ -7196,7 +7165,7 @@ function handle_PUT_users(
 
   let q = sql_users.update(fields).where(sql_users.uid.equals(uid));
 
-  pgQueryP(q.toString(), [])
+  queryP(q.toString(), [])
     .then((result: any) => {
       res.json(result);
     })
@@ -7363,7 +7332,7 @@ function handle_PUT_conversations(
         .returning("*");
       verifyMetaPromise.then(
         function () {
-          pgQuery(q.toString(), function (err: any, result: { rows: any[] }) {
+          query(q.toString(), function (err: any, result: { rows: any[] }) {
             if (err) {
               fail(res, 500, "polis_err_update_conversation", err);
               return;
@@ -7532,7 +7501,7 @@ function getZidForAnswer(
     (arg0: string | null, arg1?: undefined): void;
   }
 ) {
-  pgQuery(
+  query(
     "SELECT zid FROM participant_metadata_answers WHERE pmaid = ($1);",
     [pmaid],
     function (err: any, result: { rows: string | any[] }) {
@@ -7556,7 +7525,7 @@ function getZidForQuestion(
     (arg0: string | null, arg1: undefined): void;
   }
 ) {
-  pgQuery(
+  query(
     "SELECT zid FROM participant_metadata_questions WHERE pmqid = ($1);",
     [pmqid],
     function (err: any, result: { rows: string | any[] }) {
@@ -7578,9 +7547,9 @@ function deleteMetadataAnswer(
   pmaid: any,
   callback: { (err: any): void; (arg0: null): void }
 ) {
-  // pgQuery("update participant_metadata_choices set alive = FALSE where pmaid = ($1);", [pmaid], function(err) {
+  // query("update participant_metadata_choices set alive = FALSE where pmaid = ($1);", [pmaid], function(err) {
   //     if (err) {callback(34534545); return;}
-  pgQuery(
+  query(
     "update participant_metadata_answers set alive = FALSE where pmaid = ($1);",
     [pmaid],
     function (err: any) {
@@ -7598,9 +7567,9 @@ function deleteMetadataQuestionAndAnswers(
   pmqid: any,
   callback: { (err: any): void; (arg0: null): void }
 ) {
-  // pgQuery("update participant_metadata_choices set alive = FALSE where pmqid = ($1);", [pmqid], function(err) {
+  // query("update participant_metadata_choices set alive = FALSE where pmqid = ($1);", [pmqid], function(err) {
   //     if (err) {callback(93847834); return;}
-  pgQuery(
+  query(
     "update participant_metadata_answers set alive = FALSE where pmqid = ($1);",
     [pmqid],
     function (err: any) {
@@ -7608,7 +7577,7 @@ function deleteMetadataQuestionAndAnswers(
         callback(err);
         return;
       }
-      pgQuery(
+      query(
         "update participant_metadata_questions set alive = FALSE where pmqid = ($1);",
         [pmqid],
         function (err: any) {
@@ -7651,14 +7620,14 @@ function handle_GET_metadata_questions(
     async.parallel(
       [
         function (callback: any) {
-          pgQuery_readOnly(
+          query_readOnly(
             "SELECT * FROM participant_metadata_questions WHERE alive = true AND zid = ($1);",
             [zid],
             callback
           );
         },
-        //function(callback) { pgQuery_readOnly("SELECT * FROM participant_metadata_answers WHERE alive = true AND zid = ($1);", [zid], callback); },
-        //function(callback) { pgQuery_readOnly("SELECT * FROM participant_metadata_choices WHERE alive = true AND zid = ($1);", [zid], callback); },
+        //function(callback) { query_readOnly("SELECT * FROM participant_metadata_answers WHERE alive = true AND zid = ($1);", [zid], callback); },
+        //function(callback) { query_readOnly("SELECT * FROM participant_metadata_choices WHERE alive = true AND zid = ($1);", [zid], callback); },
       ],
       function (err: any, result: { rows: any }[]) {
         if (err) {
@@ -7713,7 +7682,7 @@ function handle_POST_metadata_questions(
       fail(res, 403, "polis_err_post_participant_metadata_auth", err);
       return;
     }
-    pgQuery(
+    query(
       "INSERT INTO participant_metadata_questions (pmqid, zid, key) VALUES (default, $1, $2) RETURNING *;",
       [zid, key],
       function (err: any, results: { rows: string | any[] }) {
@@ -7744,12 +7713,12 @@ function handle_POST_metadata_answers(
       fail(res, 403, "polis_err_post_participant_metadata_auth", err);
       return;
     }
-    pgQuery(
+    query(
       "INSERT INTO participant_metadata_answers (pmqid, zid, value, pmaid) VALUES ($1, $2, $3, default) RETURNING *;",
       [pmqid, zid, value],
       function (err: any, results: { rows: string | any[] }) {
         if (err || !results || !results.rows || !results.rows.length) {
-          pgQuery(
+          query(
             "UPDATE participant_metadata_answers set alive = TRUE where pmqid = ($1) AND zid = ($2) AND value = ($3) RETURNING *;",
             [pmqid, zid, value],
             function (err: any, results: { rows: any[] }) {
@@ -7811,7 +7780,7 @@ function handle_GET_metadata_answers(
         sql_participant_metadata_answers.pmqid.equals(pmqid)
       );
     }
-    pgQuery_readOnly(
+    query_readOnly(
       query.toString(),
       function (err: any, result: { rows: any[] }) {
         if (err) {
@@ -7852,7 +7821,7 @@ function handle_GET_metadata(
       (): any;
       new (): any;
       json: {
-        (arg0: { kvp?: {}; keys?: {}; values?: {} }): void;
+        (arg0: { kvp?: any; keys?: any; values?: any }): void;
         new (): any;
       };
     };
@@ -7881,21 +7850,21 @@ function handle_GET_metadata(
     async.parallel(
       [
         function (callback: any) {
-          pgQuery_readOnly(
+          query_readOnly(
             "SELECT * FROM participant_metadata_questions WHERE zid = ($1);",
             [zid],
             callback
           );
         },
         function (callback: any) {
-          pgQuery_readOnly(
+          query_readOnly(
             "SELECT * FROM participant_metadata_answers WHERE zid = ($1);",
             [zid],
             callback
           );
         },
         function (callback: any) {
-          pgQuery_readOnly(
+          query_readOnly(
             "SELECT * FROM participant_metadata_choices WHERE zid = ($1);",
             [zid],
             callback
@@ -7987,7 +7956,7 @@ function getConversationHasMetadata(zid: any) {
     resolve: (arg0: boolean) => void,
     reject: (arg0: string) => any
   ) {
-    pgQuery_readOnly(
+    query_readOnly(
       "SELECT * from participant_metadata_questions where zid = ($1)",
       [zid],
       function (err: any, metadataResults: { rows: string | any[] }) {
@@ -8006,7 +7975,7 @@ function getConversationHasMetadata(zid: any) {
 
 function getConversationTranslations(zid: any, lang: string) {
   const firstTwoCharsOfLang = lang.substr(0, 2);
-  return pgQueryP(
+  return queryP(
     "select * from conversation_translations where zid = ($1) and lang = ($2);",
     [zid, firstTwoCharsOfLang]
   );
@@ -8031,7 +8000,7 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
 
 function getOneConversation(zid: any, uid?: any, lang?: null) {
   return Promise.all([
-    pgQueryP_readOnly(
+    queryP_readOnly(
       "select * from conversations left join  (select uid, site_id from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
       [zid]
     ),
@@ -8111,7 +8080,7 @@ function getConversations(
       " UNION ALL select zid, 2 as type from participants where uid = ($1)"; // using UNION ALL instead of UNION to ensure we get all the 1's and 2's (I'm not sure if we can guarantee the 2's won't clobber some 1's if we use UNION)
   }
   zidListQuery += ";";
-  pgQuery_readOnly(
+  query_readOnly(
     zidListQuery,
     [uid],
     function (err: any, results: { rows: any }) {
@@ -8183,7 +8152,7 @@ function getConversations(
       } else {
         query = query.limit(999); // TODO paginate
       }
-      pgQuery_readOnly(
+      query_readOnly(
         query.toString(),
         function (err: any, result: { rows: never[] }) {
           if (err) {
@@ -8210,7 +8179,7 @@ function getConversations(
               }
               let upvotesPromise =
                 uid && want_upvoted
-                  ? pgQueryP_readOnly(
+                  ? queryP_readOnly(
                       "select zid from upvotes where uid = ($1);",
                       [uid]
                     )
@@ -8351,7 +8320,7 @@ function createReport(zid: any) {
   // @ts-ignore
   return generateTokenP(20, false).then(function (report_id: string) {
     report_id = "r" + report_id;
-    return pgQueryP("insert into reports (zid, report_id) values ($1, $2);", [
+    return queryP("insert into reports (zid, report_id) values ($1, $2);", [
       zid,
       report_id,
     ]);
@@ -8359,7 +8328,7 @@ function createReport(zid: any) {
 }
 function handle_POST_reports(
   req: { p: { zid: any; uid?: any } },
-  res: { json: (arg0: {}) => void }
+  res: { json: (arg0: any) => void }
 ) {
   let zid = req.p.zid;
   let uid = req.p.uid;
@@ -8385,7 +8354,7 @@ function handle_PUT_reports(
   req: {
     p: { [x: string]: any; rid: any; uid?: any; zid: any; report_name: any };
   },
-  res: { json: (arg0: {}) => void }
+  res: { json: (arg0: any) => void }
 ) {
   let rid = req.p.rid;
   let uid = req.p.uid;
@@ -8427,7 +8396,7 @@ function handle_PUT_reports(
         let query = q.toString();
         query = query.replace("'now_as_millis()'", "now_as_millis()"); // remove quotes added by sql lib
 
-        return pgQueryP(query, []).then(() => {
+        return queryP(query, []).then(() => {
           res.json({});
         });
       })
@@ -8452,7 +8421,7 @@ function handle_GET_reports(
         "polis_err_get_reports_should_not_specify_both_report_id_and_conversation_id"
       );
     } else {
-      reportsPromise = pgQueryP("select * from reports where rid = ($1);", [
+      reportsPromise = queryP("select * from reports where rid = ($1);", [
         rid,
       ]);
     }
@@ -8462,11 +8431,11 @@ function handle_GET_reports(
         if (!doesOwnConversation) {
           throw "polis_err_permissions";
         }
-        return pgQueryP("select * from reports where zid = ($1);", [zid]);
+        return queryP("select * from reports where zid = ($1);", [zid]);
       }
     );
   } else {
-    reportsPromise = pgQueryP(
+    reportsPromise = queryP(
       "select * from reports where zid in (select zid from conversations where owner = ($1));",
       [uid]
     );
@@ -8488,7 +8457,7 @@ function handle_GET_reports(
       if (zids.length === 0) {
         return res.json(reports);
       }
-      return pgQueryP(
+      return queryP(
         "select * from zinvites where zid in (" + zids.join(",") + ");",
         []
       ).then((zinvite_entries: any) => {
@@ -8531,7 +8500,7 @@ function handle_GET_conversations(
   if (req.p.course_invite) {
     // Type 'Promise<void>' is missing the following properties from type 'Bluebird<void>': caught, error, lastly, bind, and 38 more.ts(2740)
     // @ts-ignore
-    courseIdPromise = pgQueryP_readOnly(
+    courseIdPromise = queryP_readOnly(
       "select course_id from courses where course_invite = ($1);",
       [req.p.course_invite]
       //       Argument of type '(rows: { course_id: any; }[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
@@ -8578,7 +8547,7 @@ function handle_GET_contexts(
     };
   }
 ) {
-  pgQueryP_readOnly(
+  queryP_readOnly(
     "select name from contexts where is_public = TRUE order by name;",
     []
   )
@@ -8601,7 +8570,7 @@ function handle_POST_contexts(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -8609,7 +8578,7 @@ function handle_POST_contexts(
   let name = req.p.name;
 
   function createContext() {
-    return pgQueryP(
+    return queryP(
       "insert into contexts (name, creator, is_public) values ($1, $2, $3);",
       [name, uid, true]
     )
@@ -8625,7 +8594,7 @@ function handle_POST_contexts(
         fail(res, 500, "polis_err_post_contexts_misc", err);
       });
   }
-  pgQueryP("select name from contexts where name = ($1);", [name])
+  queryP("select name from contexts where name = ($1);", [name])
     .then(
       function (rows: string | any[]) {
         let exists = rows && rows.length;
@@ -8652,7 +8621,7 @@ function isUserAllowedToCreateConversations(
   }
 ) {
   callback?.(null, true);
-  // pgQuery("select is_owner from users where uid = ($1);", [uid], function(err, results) {
+  // query("select is_owner from users where uid = ($1);", [uid], function(err, results) {
   //     if (err) { return callback(err); }
   //     if (!results || !results.rows || !results.rows.length) {
   //         return callback(1);
@@ -8772,7 +8741,7 @@ function handle_POST_conversations(
             .returning("*")
             .toString();
 
-          pgQuery(
+          query(
             q,
             [],
             function (err: any, result: { rows: { zid: any }[] }) {
@@ -8848,7 +8817,7 @@ function handle_POST_query_participants_by_metadata(
 
   function doneChecking() {
     // find list of participants who are not eliminated by the list of excluded choices.
-    pgQuery_readOnly(
+    query_readOnly(
       // 3. invert the selection of participants, so we get those who passed the filter.
       "select pid from participants where zid = ($1) and pid not in " +
         // 2. find the people who chose those answers
@@ -8880,11 +8849,11 @@ function handle_POST_sendCreatedLinkToEmail(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
-  pgQuery_readOnly(
+  query_readOnly(
     "SELECT * FROM users WHERE uid = $1",
     [req.p.uid],
     function (err: any, results: { rows: UserType[] }) {
@@ -8894,7 +8863,7 @@ function handle_POST_sendCreatedLinkToEmail(
       }
       let email = results.rows[0].email;
       let fullname = results.rows[0].hname;
-      pgQuery_readOnly(
+      query_readOnly(
         "select * from zinvites where zid = $1",
         [req.p.zid],
         function (err: any, results: { rows: { zinvite: any }[] }) {
@@ -8947,7 +8916,7 @@ function handle_POST_notifyTeam(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -8982,7 +8951,7 @@ function handle_POST_sendEmailExportReady(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -9019,11 +8988,11 @@ Thanks for using Metropolis!
 }
 
 function addParticipant(zid: any, uid?: any) {
-  return pgQueryP(
+  return queryP(
     "INSERT INTO participants_extended (zid, uid) VALUES ($1, $2);",
     [zid, uid]
   ).then(() => {
-    return pgQueryP(
+    return queryP(
       "INSERT INTO participants (pid, zid, uid, created) VALUES (NULL, $1, $2, default) RETURNING *;",
       [zid, uid]
     );
@@ -9081,7 +9050,7 @@ function getSocialParticipantsForMod(
     "select * from all_rows where (xid is not null) " +
     // "select * from all_rows " +
     ";";
-  return pgQueryP(q, params);
+  return queryP(q, params);
 }
 
 const getSocialInfoForUsers = User.getSocialInfoForUsers;
@@ -9108,15 +9077,15 @@ function handle_GET_github_oauth_callback(
 }
 
 function updateVoteCount(zid: any, pid: any) {
-  // return pgQueryP("update participants set vote_count = vote_count + 1 where zid = ($1) and pid = ($2);",[zid, pid]);
-  return pgQueryP(
+  // return queryP("update participants set vote_count = vote_count + 1 where zid = ($1) and pid = ($2);",[zid, pid]);
+  return queryP(
     "update participants set vote_count = (select count(*) from votes where zid = ($1) and pid = ($2)) where zid = ($1) and pid = ($2)",
     [zid, pid]
   );
 }
 
 function getLocationsForParticipants(zid: any) {
-  return pgQueryP_readOnly(
+  return queryP_readOnly(
     "select * from participant_locations where zid = ($1);",
     [zid]
   );
@@ -9161,14 +9130,14 @@ function getPidsForGid(zid: any, gid: number, math_tick: number) {
 }
 
 function getParticipantDemographicsForConversation(zid: any) {
-  return pgQueryP(
+  return queryP(
     "select * from demographic_data left join participants on participants.uid = demographic_data.uid where zid = ($1);",
     [zid]
   );
 }
 
 function getParticipantVotesForCommentsFlaggedWith_is_meta(zid: any) {
-  return pgQueryP(
+  return queryP(
     "select tid, pid, vote from votes_latest_unique where zid = ($1) and tid in (select tid from comments where zid = ($1) and is_meta = true)",
     [zid]
   );
@@ -9199,9 +9168,9 @@ function handle_GET_groupDemographics(
         gender_null: number;
         birth_year: number;
         birth_year_count: number;
-        meta_comment_agrees: {};
-        meta_comment_disagrees: {};
-        meta_comment_passes: {};
+        meta_comment_agrees: any;
+        meta_comment_disagrees: any;
+        meta_comment_passes: any;
       }[]
     ) => void;
   }
@@ -9395,7 +9364,7 @@ function handle_GET_groupDemographics(
 // this is for testing the encryption
 function handle_GET_logMaxmindResponse(
   req: { p: { uid?: any; zid: any; user_uid?: any } },
-  res: { json: (arg0: {}) => void }
+  res: { json: (arg0: any) => void }
 ) {
   if (!isPolisDev(req.p.uid) || !devMode) {
     // TODO fix this by piping the error from the usage of this in ./app
@@ -9403,7 +9372,7 @@ function handle_GET_logMaxmindResponse(
     // @ts-ignore
     return fail(res, 403, "polis_err_permissions", err);
   }
-  pgQueryP(
+  queryP(
     "select * from participants_extended where zid = ($1) and uid = ($2);",
     [req.p.zid, req.p.user_uid]
   )
@@ -9496,7 +9465,7 @@ function handle_PUT_ptptois(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -9510,7 +9479,7 @@ function handle_PUT_ptptois(
         fail(res, 403, "polis_err_ptptoi_permissions_123");
         return;
       }
-      return pgQueryP(
+      return queryP(
         "update participants set mod = ($3) where zid = ($1) and pid = ($2);",
         [zid, pid, mod]
       ).then(function () {
@@ -9567,7 +9536,7 @@ function handle_GET_ptptois(
 
 async function doSendEinvite(req: any, email: any) {
   const einvite = await generateTokenP(30, false);
-  await pgQueryP(
+  await queryP(
     "insert into einvites (email, einvite) values ($1, $2);",
     [email, einvite]
   );
@@ -9580,7 +9549,7 @@ function handle_POST_einvites(
     status: (arg0: number) => {
       (): any;
       new (): any;
-      json: { (arg0: {}): void; new (): any };
+      json: { (arg0: any): void; new (): any };
     };
   }
 ) {
@@ -9621,7 +9590,7 @@ function handle_GET_einvites(
 ) {
   let einvite = req.p.einvite;
 
-  pgQueryP("select * from einvites where einvite = ($1);", [einvite])
+  queryP("select * from einvites where einvite = ($1);", [einvite])
     .then(function (rows: string | any[]) {
       if (!rows.length) {
         throw new Error("polis_err_missing_einvite");
@@ -9663,7 +9632,7 @@ function createOneSuzinvite(
 ) {
   return generateSUZinvites(1).then(function (suzinviteArray: any[]) {
     let suzinvite = suzinviteArray[0];
-    return pgQueryP(
+    return queryP(
       "INSERT INTO suzinvites (suzinvite, xid, zid, owner) VALUES ($1, $2, $3, $4);",
       [suzinvite, xid, zid, owner]
     )
@@ -9703,7 +9672,7 @@ function createOneSuzinvite(
 //             return statement;
 //         });
 //         let query = "INSERT INTO suzinvites (suzinvite, xid, zid, owner) VALUES " + valuesStatements.join(",") + ";";
-//         pgQuery(query, [], function(err, results) {
+//         query(query, [], function(err, results) {
 //             if (err) { fail(res, 500, "polis_err_saving_invites", err); return; }
 //             getZinvite(zid).then(function(conversation_id) {
 //                 res.json({
@@ -9748,7 +9717,7 @@ function handle_GET_testDatabase(
     };
   }
 ) {
-  pgQueryP("select uid from users limit 1", []).then(
+  queryP("select uid from users limit 1", []).then(
     () => {
       res.status(200).json({
         status: "ok",
@@ -9789,7 +9758,7 @@ function sendSuzinviteEmail(
 }
 
 function addInviter(inviter_uid?: any, invited_email?: any) {
-  return pgQueryP(
+  return queryP(
     "insert into inviters (inviter_uid, invited_email) VALUES ($1, $2);",
     [inviter_uid, invited_email]
   );
@@ -9828,11 +9797,11 @@ function handle_POST_users_invite(
               "(" + suzinvite + ", " + xid + "," + zid + "," + owner + ")";
             return statement;
           });
-          let query =
+          let queryS =
             "INSERT INTO suzinvites (suzinvite, xid, zid, owner) VALUES " +
             valuesStatements.join(",") +
             ";";
-          pgQuery(query, [], function (err: any) {
+          query(queryS, [], function (err: any) {
             if (err) {
               fail(res, 500, "polis_err_saving_invites", err);
               return;

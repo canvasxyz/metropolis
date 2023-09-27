@@ -295,8 +295,7 @@ function _getCommentsList(o: {
     if (!_.isUndefined(o.withoutTids)) {
       q = q.and(SQL.sql_comments.tid.notIn(o.withoutTids));
     }
-    if (o.moderation) {
-    } else {
+    if (!o.moderation) {
       q = q.and(SQL.sql_comments.active.equals(true));
       if (conv.strict_moderation) {
         q = q.and(SQL.sql_comments.mod.equals(Utils.polisTypes.mod.ok));
