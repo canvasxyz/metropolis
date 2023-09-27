@@ -114,21 +114,11 @@ function getUserInfoForSessionToken(
   );
 }
 
-function startSession(uid: any, cb: (arg0: null, arg1?: string) => void) {
+async function startSession(uid: any) {
   let token = makeSessionToken();
   logger.info("startSession");
-  pg.query(
-    "insert into auth_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
-    function (err: any, repliesSetToken: any) {
-      if (err) {
-        cb(err);
-        return;
-      }
-      logger.info("startSession: token set.");
-      cb(null, token);
-    }
-  );
+  await pg.queryP("insert into auth_tokens (uid, token, created) values ($1, $2, default);", [uid, token]);
+  return token;
 }
 
 function endSession(sessionToken: any, cb: (err: any, data?: any) => void) {

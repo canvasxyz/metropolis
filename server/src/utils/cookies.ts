@@ -157,30 +157,30 @@ function setCookieTestCookie(req: any, res: any) {
   });
 }
 
-function addCookies(
+async function addCookies(
   req: { cookies: { [x: string]: any } },
   res: { header: (arg0: string, arg1: any) => void },
   token: any,
   uid: any
 ) {
-  return User.getUserInfoForUid2(uid).then(function (opts: any) {
-    let email = opts.email;
-    let created = opts.created;
+  const opts = await User.getUserInfoForUid2(uid);
+  let email = opts.email;
+  let created = opts.created;
 
-    setTokenCookie(req, res, token);
-    setUidCookie(req, res, uid);
-    setHasEmailCookie(req, res, email);
-    setUserCreatedTimestampCookie(req, res, created);
+  setTokenCookie(req, res, token);
+  setUidCookie(req, res, uid);
+  setHasEmailCookie(req, res, email);
+  setUserCreatedTimestampCookie(req, res, created);
 
-    if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
-      setPermanentCookie(
-        req,
-        res,
-        Session.makeSessionToken()
-      );
-    }
-    res.header("x-polis", token);
-  });
+  if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
+    setPermanentCookie(
+      req,
+      res,
+      Session.makeSessionToken()
+    );
+  }
+
+  res.header("x-polis", token);
 }
 
 function getPermanentCookieAndEnsureItIsSet(

@@ -25,10 +25,6 @@ type Row = {
   pass_count: number;
 };
 
-type Docs = {
-  rows: Row[];
-};
-
 type InfoToReturn = {
   uid?: string | number;
   followers_count?: any;

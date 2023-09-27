@@ -126,15 +126,7 @@ async function createUser(req: any, res: any) {
 
   let token: any;
   try {
-    token = await new Promise((resolve, reject) => {
-      Session.startSession(uid, (err, res) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(res);
-        }
-      });
-    });
+    token = await Session.startSession(uid);
   } catch (err) {
     fail(
       res,

@@ -10,18 +10,6 @@ import fail from "./utils/fail";
 // this is in a separate file to server.ts so that we can use async/await
 // without interfering with the legacy promise code
 
-function startSessionPromise(uid: any) {
-  return new Promise((resolve: (arg0: string) => void, reject) => {
-    startSession(uid, (err: any, result?: string) => {
-      if(err) {
-        reject(err)
-      } else {
-        resolve(result as string)
-      }
-    })
-  })
-}
-
 export async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; dest?: any} }, res: Response) {
   const octokit = new Octokit({
     authStrategy: createOAuthUserAuth,
@@ -48,13 +36,14 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
 
   // get or create the user with this github username
   const getQuery = "select uid from users where email = $1;";
-  const getRes = (await queryP(getQuery, [email])) as {rows: {uid: string}[]};
+  const getRes = (await queryP(getQuery, [email])) as {uid: string}[];
 
   let uid: string;
-  if(getRes.rows.length > 1) {
-    throw Error("more than one user exists with this username");
-  } else if (getRes.rows.length == 1) {
-    uid = getRes.rows[0].uid;
+  if(getRes.length > 1) {
+    fail(res, 500, "polis_more_than_one_user_with_same_email");
+    return;
+  } else if (getRes.length == 1) {
+    uid = getRes[0].uid;
     console.log(`existing user "${githubUsername}" found with uid: ${uid}`);
   } else {
     // create user
@@ -65,21 +54,18 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
     "returning uid;";
     const vals = [email, githubUsername, null, true];
 
-    const createRes = (await queryP(createQuery, vals)) as {rows: {uid: string}[]};
-    uid = createRes.rows[0].uid;
+    const createRes = (await queryP(createQuery, vals)) as {uid: string}[];
+    uid = createRes[0].uid;
     console.log(`created user "${githubUsername}" with uid: ${uid}`);
   }
 
-  const token = await startSessionPromise(uid);
+  const token = await startSession(uid);
 
-  console.log(token, uid)
   try {
     await cookies.addCookies(req as any, res, token, uid);
   } catch (err) {
     return fail(res, 500, "polis_err_adding_cookies", err);
   }
-
-  console.log(res.getHeaders());
 
   const dest = req.p.dest || "http://localhost:8080";
   res.redirect(dest);

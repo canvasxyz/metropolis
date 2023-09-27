@@ -12,7 +12,6 @@ async function getUserInfoForUid(
   uid: any,
 ) {
   const results = await pg.queryP_readOnly("SELECT email, hname from users where uid = $1", [uid]) as { rows: string | any[] };
-
   if (!results.rows || !results.rows.length) {
     throw Error();
   }
@@ -25,7 +24,6 @@ function getUserInfoForUid2(uid: any) {
     "getUserInfoForUid2",
     (async () => {
       const results = await pg.queryP_readOnly("SELECT * from users where uid = $1", [uid]) as string | any[];
-      console.log(results);
       if (!results || !results.length) {
         throw Error();
       }
