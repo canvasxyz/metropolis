@@ -82,36 +82,28 @@ const userTokenCache = new LruCache({
   max: 9000,
 });
 
-function getUserInfoForSessionToken(
-  sessionToken: unknown,
-  res: any,
-  cb: (arg0: number | null, arg1?: unknown) => void
-) {
+async function getUserInfoForSessionToken(sessionToken: unknown) {
   let cachedUid = userTokenCache.get(sessionToken);
   if (cachedUid) {
-    cb(null, cachedUid);
-    return;
+    return cachedUid;
   }
-  pg.query(
-    "select uid from auth_tokens where token = ($1);",
-    [sessionToken],
-    function (err: any, results: { rows: string | any[] }) {
-      if (err) {
-        logger.error("token_fetch_error", err);
-        cb(500);
-        return;
-      }
-      if (!results || !results.rows || !results.rows.length) {
-        logger.error("token_expired_or_missing");
 
-        cb(403);
-        return;
-      }
-      let uid = results.rows[0].uid;
-      userTokenCache.set(sessionToken, uid);
-      cb(null, uid);
-    }
-  );
+  let results;
+  try {
+    results = await pg.queryP("select uid from auth_tokens where token = ($1);", [sessionToken])
+  } catch (err) {
+    logger.error("token_fetch_error", err);
+    throw new Error("token_fetch_error");
+  }
+
+  if (results.length == 0) {
+    logger.error("token_expired_or_missing");
+    throw new Error("token_expired_or_missing");
+  }
+
+  let uid = results[0].uid;
+  userTokenCache.set(sessionToken, uid);
+  return uid;
 }
 
 async function startSession(uid: any) {
@@ -121,20 +113,11 @@ async function startSession(uid: any) {
   return token;
 }
 
-function endSession(sessionToken: any, cb: (err: any, data?: any) => void) {
-  pg.query(
-    "delete from auth_tokens where token = ($1);",
-    [sessionToken],
-    function (err: any, results: any) {
-      if (err) {
-        cb(err);
-        return;
-      }
-      cb(null);
-    }
-  );
+async function endSession(sessionToken: any) {
+  await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken]);
 }
-function setupPwReset(uid: any, cb: (arg0: null, arg1?: string) => void) {
+
+async function setupPwReset(uid: any) {
   function makePwResetToken() {
     // These can probably be shortened at some point.
     return crypto
@@ -144,43 +127,28 @@ function setupPwReset(uid: any, cb: (arg0: null, arg1?: string) => void) {
       .substr(0, 100);
   }
   let token = makePwResetToken();
-  pg.query(
-    "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
-    function (errSetToken: any, repliesSetToken: any) {
-      if (errSetToken) {
-        cb(errSetToken);
-        return;
-      }
-      cb(null, token);
-    }
-  );
+  await pg.queryP("insert into pwreset_tokens (uid, token, created) values ($1, $2, default);", [uid, token]);
 }
 
-function getUidForPwResetToken(
-  pwresettoken: any,
-  cb: (arg0: number | null, arg1?: { uid: any }) => void
-) {
-  // TODO "and created > timestamp - x"
-  pg.query(
-    "select uid from pwreset_tokens where token = ($1);",
-    [pwresettoken],
-    function (errGetToken: any, results: { rows: string | any[] }) {
-      if (errGetToken) {
-        logger.error("pwresettoken_fetch_error", errGetToken);
-        cb(500);
-        return;
-      }
-      if (!results || !results.rows || !results.rows.length) {
-        logger.error("token_expired_or_missing");
-        cb(403);
-        return;
-      }
-      cb(null, {
-        uid: results.rows[0].uid,
-      });
-    }
-  );
+async function getUidForPwResetToken(pwresettoken: any) {
+  let results;
+  try {
+    // TODO "and created > timestamp - x"
+    results = await pg.queryP(
+      "select uid from pwreset_tokens where token = ($1);",
+      [pwresettoken]);
+  } catch (err) {
+    logger.error("pwresettoken_fetch_error", err);
+    throw new Error("pwresettoken_fetch_error");
+  }
+
+  if (results.length == 0) {
+    logger.error("token_expired_or_missing");
+    throw new Error("token_expired_or_missing");
+  }
+
+  let uid = results[0].uid;
+  return {uid};
 }
 
 function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {

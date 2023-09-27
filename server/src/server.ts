@@ -416,19 +416,17 @@ function doHeaderAuth(
   if (req && req.headers) token = req?.headers?.["x-polis"];
 
   //if (req.body.uid) { next(401); return; } // shouldn't be in the post - TODO - see if we can do the auth in parallel for non-destructive operations
-  getUserInfoForSessionToken(token, res, function (err: any, uid?: any) {
-    if (err) {
-      res.status(403);
-      next("polis_err_auth_no_such_token");
-      return;
-    }
+  getUserInfoForSessionToken(token).then((uid: any) => {
     if (req.body.uid && req.body.uid !== uid) {
       res.status(401);
       next("polis_err_auth_mismatch_uid");
-      return;
+    } else {
+      assigner(req, "uid", Number(uid));
+      next();
     }
-    assigner(req, "uid", Number(uid));
-    next();
+  }).catch((err) => {
+    res.status(403);
+    next("polis_err_auth_no_such_token");
   });
 }
 
@@ -2286,54 +2284,44 @@ function handle_POST_auth_password(
   let pwresettoken = req.p.pwresettoken;
   let newPassword = req.p.newPassword;
 
-  getUidForPwResetToken(
-    pwresettoken,
-    //     Argument of type '(err: any, userParams: { uid?: any; }) => void' is not assignable to parameter of type '(arg0: number | null, arg1?: { uid: any; } | undefined) => void'.
-    // Types of parameters 'userParams' and 'arg1' are incompatible.
-    //   Type '{ uid: any; } | undefined' is not assignable to type '{ uid?: any; }'.
-    //     Type 'undefined' is not assignable to type '{ uid?: any; }'.ts(2345)
-    // @ts-ignore
-    function (err: any, userParams: { uid?: any }) {
-      if (err) {
-        fail(
-          res,
-          500,
-          "Password Reset failed. Couldn't find matching pwresettoken.",
-          err
+  getUidForPwResetToken(pwresettoken).then((userParams: {uid: any}) => {
+    let uid = Number(userParams.uid);
+    generateHashedPassword(
+      newPassword,
+      function (err: any, hashedPassword: any) {
+        return pgQueryP(
+          "insert into jianiuevyew (uid, pwhash) values " +
+            "($1, $2) on conflict (uid) " +
+            "do update set pwhash = excluded.pwhash;",
+          [uid, hashedPassword]
+        ).then(
+          (rows: any) => {
+            res.status(200).json("Password reset successful.");
+            clearPwResetToken(pwresettoken, function (err: any) {
+              if (err) {
+                logger.error("polis_err_auth_pwresettoken_clear_fail", err);
+              }
+            });
+          },
+          (err: any) => {
+            fail(res, 500, "Couldn't reset password.", err);
+          }
         );
-        return;
       }
-      let uid = Number(userParams.uid);
-      generateHashedPassword(
-        newPassword,
-        function (err: any, hashedPassword: any) {
-          return pgQueryP(
-            "insert into jianiuevyew (uid, pwhash) values " +
-              "($1, $2) on conflict (uid) " +
-              "do update set pwhash = excluded.pwhash;",
-            [uid, hashedPassword]
-          ).then(
-            (rows: any) => {
-              res.status(200).json("Password reset successful.");
-              clearPwResetToken(pwresettoken, function (err: any) {
-                if (err) {
-                  logger.error("polis_err_auth_pwresettoken_clear_fail", err);
-                }
-              });
-            },
-            (err: any) => {
-              fail(res, 500, "Couldn't reset password.", err);
-            }
-          );
-        }
-      );
-    }
-  );
+    );
+  }).catch((err) => {
+    fail(
+      res,
+      500,
+      "Password Reset failed. Couldn't find matching pwresettoken.",
+      err
+    );
+  });
 }
 
 const getServerNameWithProtocol = Config.getServerNameWithProtocol;
 
-function handle_POST_auth_pwresettoken(
+async function handle_POST_auth_pwresettoken(
   req: { p: { email: any } },
   res: {
     status: (arg0: number) => {
@@ -2356,33 +2344,34 @@ function handle_POST_auth_pwresettoken(
       .json("Password reset email sent, please check your email.");
   }
 
-  getUidByEmail(email).then(
-    function (uid?: any) {
-      setupPwReset(uid, function (err: any, pwresettoken: any) {
-        sendPasswordResetEmail(
-          uid,
-          pwresettoken,
-          server,
-          function (err: any) {
-            if (err) {
-              fail(
-                res,
-                500,
-                "Error: Couldn't send password reset email.",
-                err
-              );
-              return;
-            }
-            finish();
-          }
-        );
-      });
-    },
-    function () {
-      sendPasswordResetEmailFailure(email, server);
-      finish();
-    }
-  );
+  let uid;
+  try {
+    uid = await getUidByEmail(email)
+  } catch (err) {
+    sendPasswordResetEmailFailure(email, server);
+    finish();
+    return;
+  }
+
+  const pwresettoken = await setupPwReset(uid)
+  try {
+    // TODO: make this async
+    await sendPasswordResetEmail(
+      uid,
+      pwresettoken,
+      server
+    );
+  } catch (err) {
+    fail(
+      res,
+      500,
+      "Error: Couldn't send password reset email.",
+      err
+    );
+    return;
+  }
+
+  finish();
 }
 
 function sendPasswordResetEmailFailure(email: any, server: any) {
@@ -2477,17 +2466,7 @@ function doCookieAuth(
   let token = req.cookies[COOKIES.TOKEN];
 
   //if (req.body.uid) { next(401); return; } // shouldn't be in the post - TODO - see if we can do the auth in parallel for non-destructive operations
-  getUserInfoForSessionToken(token, res, function (err: any, uid?: any) {
-    if (err) {
-      clearCookies(req, res); // TODO_MULTI_DATACENTER_CONSIDERATION
-      if (isOptional) {
-        next();
-      } else {
-        res.status(403);
-        next("polis_err_auth_no_such_token");
-      }
-      return;
-    }
+  getUserInfoForSessionToken(token).then(uid => {
     if (req.body.uid && req.body.uid !== uid) {
       res.status(401);
       next("polis_err_auth_mismatch_uid");
@@ -2495,9 +2474,18 @@ function doCookieAuth(
     }
     assigner(req, "uid", Number(uid));
     next();
+  }).catch((err) => {
+    clearCookies(req, res); // TODO_MULTI_DATACENTER_CONSIDERATION
+    if (isOptional) {
+      next();
+    } else {
+      res.status(403);
+      next("polis_err_auth_no_such_token");
+    }
+    return;
   });
 }
-function handle_POST_auth_deregister(
+async function handle_POST_auth_deregister(
   req: { p: { showPage?: any }; cookies: { [x: string]: any } },
   res: {
     status: (arg0: number) => {
@@ -2524,13 +2512,15 @@ function handle_POST_auth_deregister(
     // nothing to do
     return finish();
   }
-  endSession(token, function (err: any, data: any) {
-    if (err) {
-      fail(res, 500, "couldn't end session", err);
-      return;
-    }
+
+  try {
+    await endSession(token);
     finish();
-  });
+  }
+  catch (err) {
+    fail(res, 500, "couldn't end session", err);
+    return;
+  }
 }
 
 function hashStringToInt32(s: string) {
