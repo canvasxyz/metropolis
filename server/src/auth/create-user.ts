@@ -158,7 +158,7 @@ function doSendVerification(req: any, email: any) {
         email,
         einvite,
       ])
-      .then(function (rows: any) {
+      .then(function () {
         return sendVerificationEmail(req, email, einvite);
       });
   });
@@ -208,7 +208,7 @@ function generateAndRegisterZinvite(zid: any, generateShort: any) {
         "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
         [zid, zinvite]
       )
-      .then(function (rows: any) {
+      .then(function () {
         return zinvite;
       });
   });

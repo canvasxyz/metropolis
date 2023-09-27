@@ -212,7 +212,6 @@ function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
 // must follow auth and need('zid'...) middleware
 function getPidForParticipant(
   assigner: (arg0: any, arg1: string, arg2: any) => void,
-  cache: any
 ) {
   return function (
     req: { p: { zid: any; uid: any } },

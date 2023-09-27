@@ -178,18 +178,12 @@ function queryP_metered_impl(
   return meteredPromise(name, f(queryString, params));
 }
 
-function queryP_metered(name: any, queryString: any, params: any) {
-  // Type 'IArguments' is not an array type or a string type.
-  // Use compiler option '--downlevelIteration' to allow iterating of iterators.ts(2569)
-  // @ts-ignore
-  return queryP_metered_impl(false, ...arguments);
+function queryP_metered(...args: any[]) {
+  return queryP_metered_impl(false, ...args);
 }
 
-function queryP_metered_readOnly(name: any, queryString: any, params: any) {
-  // Type 'IArguments' is not an array type or a string type.
-  // Use compiler option '--downlevelIteration' to allow iterating of iterators.ts(2569)
-  // @ts-ignore
-  return queryP_metered_impl(true, ...arguments);
+function queryP_metered_readOnly(...args: any[]) {
+  return queryP_metered_impl(true, ...args);
 }
 
 export {

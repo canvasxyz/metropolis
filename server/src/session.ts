@@ -155,7 +155,7 @@ function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
   pg.query(
     "delete from pwreset_tokens where token = ($1);",
     [pwresettoken],
-    function (errDelToken: any, repliesSetToken: any) {
+    function (errDelToken: any) {
       if (errDelToken) {
         cb(errDelToken);
         return;
