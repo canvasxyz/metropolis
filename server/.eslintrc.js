@@ -20,10 +20,10 @@ module.exports = {
   },
   plugins: ["@typescript-eslint", "jest"],
   rules: {
-    "@typescript-eslint/ban-ts-comment": 1,
+    "@typescript-eslint/ban-ts-comment": 0,
     "@typescript-eslint/ban-types": 1,
     "@typescript-eslint/no-empty-function": 1,
-    "@typescript-eslint/no-explicit-any": 1,
+    "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-inferrable-types": 1,
     "@typescript-eslint/no-var-requires": 1,
     "no-case-declarations": 1,
@@ -34,7 +34,7 @@ module.exports = {
     "no-prototype-builtins": 1,
     "no-useless-escape": 1,
     "no-var": 1,
-    "prefer-const": 1,
+    "prefer-const": 0,
     "prefer-rest-params": 1,
     "prefer-spread": 1
   },
