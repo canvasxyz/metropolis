@@ -62,31 +62,13 @@ async function getUser(
     );
   }
 
-  const o: any[] = await Promise.all([
+  const [info, twInfo, xInfo]: any[] = await Promise.all([
     getUserInfoForUid2(uid),
-    getFacebookInfo([uid]),
     getTwitterInfo([uid]),
     xidInfoPromise,
   ]);
-  let info = o[0];
-  let fbInfo = o[1];
-  let twInfo = o[2];
-  let xInfo = o[3];
-  let hasFacebook = fbInfo && fbInfo.length && fbInfo[0];
   let hasTwitter = twInfo && twInfo.length && twInfo[0];
   let hasXid = xInfo && xInfo.length && xInfo[0];
-  if (hasFacebook) {
-    let width = 40;
-    let height = 40;
-    fbInfo.fb_picture =
-      "https://graph.facebook.com/v2.2/" +
-      fbInfo.fb_user_id +
-      "/picture?width=" +
-      width +
-      "&height=" +
-      height;
-    delete fbInfo[0].response;
-  }
   if (hasTwitter) {
     delete twInfo[0].response;
   }
@@ -99,8 +81,6 @@ async function getUser(
     uid: uid,
     email: info.email,
     hname: info.hname,
-    hasFacebook: !!hasFacebook,
-    facebook: fbInfo && fbInfo[0],
     twitter: twInfo && twInfo[0],
     hasTwitter: !!hasTwitter,
     hasXid: !!hasXid,
@@ -114,13 +94,6 @@ async function getUser(
 function getTwitterInfo(uids: any[]) {
   return pg.queryP_readOnly(
     "select * from twitter_users where uid in ($1);",
-    uids
-  );
-}
-
-function getFacebookInfo(uids: any[]) {
-  return pg.queryP_readOnly(
-    "select * from facebook_users where uid in ($1);",
     uids
   );
 }
@@ -263,13 +236,9 @@ function getSocialInfoForUsers(uids: any[], zid: any) {
       "x as (select * from xids where uid in (" +
       uidString +
       ") and owner  in (select org_id from conversations where zid = ($1))), " +
-      "fb as (select * from facebook_users where uid in (" +
-      uidString +
-      ")), " +
       "tw as (select * from twitter_users where uid in (" +
       uidString +
       ")), " +
-      "foo as (select *, coalesce(fb.uid, tw.uid) as foouid from fb full outer join tw on tw.uid = fb.uid) " +
       "select *, coalesce(foo.foouid, x.uid) as uid from foo full outer join x on x.uid = foo.foouid;",
     [zid]
   );

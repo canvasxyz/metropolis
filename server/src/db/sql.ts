@@ -42,7 +42,6 @@ const sql_conversations: any = sql.define({
     "style_btn",
     "auth_needed_to_vote",
     "auth_needed_to_write",
-    "auth_opt_fb",
     "auth_opt_tw",
     "auth_opt_allow_3rdparty",
   ],

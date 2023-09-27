@@ -62,8 +62,6 @@ export type CommentOptions = {
 
 type ModerationState = -1 | 0 | 1;
 
-type ModerationObject = { isMod: ModerationState | undefined };
-
 export type CommentType = {
   zid: any;
   submitted_by_pid: any;
@@ -167,12 +165,6 @@ export type TwitterParameters = {
   [key: string]: any;
   user_id?: any;
   screen_name?: any;
-};
-
-export type ParticipantSocialNetworkInfo = {
-  [key: string]: any;
-  facebook?: any;
-  twitter?: any;
 };
 
 export type ParticipantOption = {

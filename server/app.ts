@@ -48,7 +48,6 @@ import {
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
   handle_GET_einvites,
-  handle_GET_facebook_delete,
   handle_GET_groupDemographics,
   handle_GET_iim_conversation,
   handle_GET_iip_conversation,
@@ -87,7 +86,6 @@ import {
   handle_GET_zinvites,
 
   handle_POST_auth_deregister,
-  handle_POST_auth_facebook,
   handle_POST_auth_login,
   handle_POST_auth_new,
   handle_POST_auth_password,
@@ -541,31 +539,6 @@ app.get(
     assignToPCustom("zid")
   ),
   handle_GET_snapshot as any
-);
-
-// this endpoint isn't really ready for general use TODO_SECURITY
-app.get(
-  "/api/v3/facebook/delete",
-  moveToBody,
-  auth(assignToP),
-  handle_GET_facebook_delete as any
-);
-
-app.post(
-  "/api/v3/auth/facebook",
-  enableAgid,
-  authOptional(assignToP),
-  want("fb_granted_scopes", getStringLimitLength(1, 9999), assignToP),
-  want("fb_friends_response", getStringLimitLength(1, 99999), assignToP),
-  want("fb_public_profile", getStringLimitLength(1, 99999), assignToP),
-  want("fb_email", getEmail, assignToP),
-  want("hname", getOptionalStringLimitLength(9999), assignToP),
-  want("provided_email", getEmail, assignToP),
-  want("conversation_id", getOptionalStringLimitLength(999), assignToP),
-  want("password", getPassword, assignToP),
-  need("response", getStringLimitLength(1, 9999), assignToP),
-  want("owner", getBool, assignToP, true),
-  handle_POST_auth_facebook
 );
 
 app.post(

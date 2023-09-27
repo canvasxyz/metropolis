@@ -1,12 +1,10 @@
 import _ from "underscore";
-import fs from "fs";
 import Translate from "@google-cloud/translate";
 
 import pg from "./db/pg-query";
 import SQL from "./db/sql";
 import { meteredPromise } from "./utils/metered";
 import Utils from "./utils/common";
-import logger from "./utils/logger";
 
 import Config from "./config";
 import Conversation from "./conversation";
@@ -28,10 +26,6 @@ type Row = {
 type InfoToReturn = {
   uid?: string | number;
   followers_count?: any;
-  fb_user_id?: any;
-  fb_verified?: any;
-  fb_public_profile?: string;
-  fb_picture?: any;
   tw_verified?: any;
   tw_followers_count?: any;
   verified?: any;
@@ -115,8 +109,6 @@ function getComments(o: CommentType) {
           return !c.anon && !c.is_seed;
         });
         let uids = _.pluck(nonAnonComments, "uid");
-        // TODO: fix this
-        // @ts-ignore
         return User.getSocialInfoForUsers(uids, o.zid).then(function (
           socialInfos: any[]
         ) {
@@ -124,15 +116,10 @@ function getComments(o: CommentType) {
           socialInfos.forEach(function (info: {
             verified: any;
             followers_count: any;
-            fb_public_profile: string;
             uid: string | number;
           }) {
             // whitelist properties to send
             let infoToReturn: InfoToReturn = _.pick(info, [
-              // fb
-              "fb_name",
-              "fb_link",
-              "fb_user_id",
               // twitter
               "name",
               "screen_name",
@@ -145,26 +132,6 @@ function getComments(o: CommentType) {
             ]);
             infoToReturn.tw_verified = !!info.verified;
             infoToReturn.tw_followers_count = info.followers_count;
-
-            // extract props from fb_public_profile
-            if (info.fb_public_profile) {
-              try {
-                let temp = JSON.parse(info.fb_public_profile);
-                infoToReturn.fb_verified = temp.verified;
-              } catch (err) {
-                logger.error(
-                  "error parsing JSON of fb_public_profile for uid: " +
-                    info.uid,
-                  err
-                );
-              }
-            }
-
-            if (!_.isUndefined(infoToReturn.fb_user_id)) {
-              let width = 40;
-              let height = 40;
-              infoToReturn.fb_picture = `https://graph.facebook.com/v2.2/${infoToReturn.fb_user_id}/picture?width=${width}&height=${height}`;
-            }
 
             uidToSocialInfo[info.uid] = infoToReturn;
           });

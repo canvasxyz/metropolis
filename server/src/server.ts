@@ -7,8 +7,6 @@ import akismetLib from "akismet";
 import AWS from "aws-sdk";
 import badwords from "badwords/object";
 import async from "async";
-// @ts-ignore
-import FB from "fb";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import OAuth from "oauth";
@@ -45,7 +43,6 @@ import {
   ConversationType,
   CommentType,
   TwitterParameters,
-  ParticipantSocialNetworkInfo,
   ParticipantOption,
   DemographicEntry,
   Demo,
@@ -67,13 +64,12 @@ const pgQueryP = dbPgQuery.queryP;
 const pgQueryP_metered = dbPgQuery.queryP_metered;
 const pgQueryP_readOnly = dbPgQuery.queryP_readOnly;
 const pgQueryP_readOnly_wRetryIfEmpty = dbPgQuery.queryP_readOnly_wRetryIfEmpty;
-const doSendVerification = CreateUser.doSendVerification;
 const generateAndRegisterZinvite = CreateUser.generateAndRegisterZinvite;
 const generateToken = Password.generateToken;
 const generateTokenP = Password.generateTokenP;
 
 // TODO: Maybe able to remove
-import { checkPassword, generateHashedPassword } from "./auth/password";
+import { generateHashedPassword } from "./auth/password";
 import cookies from "./utils/cookies";
 const COOKIES = cookies.COOKIES;
 const COOKIES_TO_CLEAR = cookies.COOKIES_TO_CLEAR;
@@ -165,9 +161,6 @@ DD.prototype.g = DA.prototype.g = function (k: string | number) {
 DD.prototype.s = DA.prototype.s = function (k: string | number, v: any) {
   this.m[k] = v;
 };
-// function emptyArray() {
-//   return [];
-// }
 
 const domainOverride = Config.domainOverride;
 
@@ -2989,20 +2982,9 @@ let LOCATION_SOURCES = {
 };
 
 function getUsersLocationName(uid?: any) {
-  return Promise.all([
-    pgQueryP_readOnly("select * from facebook_users where uid = ($1);", [
-      uid,
-    ]),
-    pgQueryP_readOnly("select * from twitter_users where uid = ($1);", [uid]),
-  ]).then(function (o: any[][]) {
-    let fb = o[0] && o[0][0];
-    let tw = o[1] && o[1][0];
-    if (fb && _.isString(fb.location)) {
-      return {
-        location: fb.location,
-        source: LOCATION_SOURCES.Facebook,
-      };
-    } else if (tw && _.isString(tw.location)) {
+  return pgQueryP_readOnly("select * from twitter_users where uid = ($1);", [uid]).then(function (rows: any[]) {
+    const tw = rows[0];
+    if (tw && _.isString(tw.location)) {
       return {
         location: tw.location,
         source: LOCATION_SOURCES.Twitter,
@@ -3483,16 +3465,6 @@ ${serverName}/welcome/${einvite}`;
     email,
     "Get Started with Polis",
     body
-  );
-}
-
-function isEmailVerified(email: any) {
-  return (
-    dbPgQuery
-      .queryP("select * from email_validations where email = ($1);", [email])
-      .then(function (rows: string | any[]) {
-        return rows.length > 0;
-      })
   );
 }
 
@@ -4687,117 +4659,6 @@ async function startSessionAndAddCookies(req: any, res: any, uid?: any) {
   await addCookies(req, res, token, uid);
 }
 
-function deleteFacebookUserRecord(o: { uid?: any }) {
-  if (!isPolisDev(o.uid)) {
-    // limit to test accounts for now
-    return Promise.reject("polis_err_not_implemented");
-  }
-  return pgQueryP("delete from facebook_users where uid = ($1);", [o.uid]);
-}
-
-function createFacebookUserRecord(
-  o: { uid?: any } & {
-    // uid provided later
-    fb_user_id: any;
-    fb_public_profile: any;
-    fb_login_status: any;
-    // fb_auth_response: fb_auth_response,
-    fb_access_token: any;
-    fb_granted_scopes: any;
-    fb_friends_response: any;
-    response: any;
-  }
-) {
-  let profileInfo = o.fb_public_profile;
-  // Create facebook user record
-  return pgQueryP(
-    "insert into facebook_users (uid, fb_user_id, fb_name, fb_link, fb_public_profile, fb_login_status, fb_access_token, fb_granted_scopes, fb_location_id, location, fb_friends_response, response) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);",
-    [
-      o.uid,
-      o.fb_user_id,
-      profileInfo.name,
-      profileInfo.link,
-      JSON.stringify(o.fb_public_profile),
-      o.fb_login_status,
-      // o.fb_auth_response,
-      o.fb_access_token,
-      o.fb_granted_scopes,
-      profileInfo.locationInfo && profileInfo.locationInfo.id,
-      profileInfo.locationInfo && profileInfo.locationInfo.name,
-      o.fb_friends_response || "",
-      o.response,
-    ]
-  );
-}
-
-function updateFacebookUserRecord(
-  o: { uid?: any } & {
-    // uid provided later
-    fb_user_id: any;
-    fb_public_profile: any;
-    fb_login_status: any;
-    // fb_auth_response: fb_auth_response,
-    fb_access_token: any;
-    fb_granted_scopes: any;
-    fb_friends_response: any;
-    response: any;
-  }
-) {
-  let profileInfo = o.fb_public_profile;
-  let fb_public_profile_string = JSON.stringify(o.fb_public_profile);
-  // Create facebook user record
-  return pgQueryP(
-    "update facebook_users set modified=now_as_millis(), fb_user_id=($2), fb_name=($3), fb_link=($4), fb_public_profile=($5), fb_login_status=($6), fb_access_token=($7), fb_granted_scopes=($8), fb_location_id=($9), location=($10), fb_friends_response=($11), response=($12) where uid = ($1);",
-    [
-      o.uid,
-      o.fb_user_id,
-      profileInfo.name,
-      profileInfo.link,
-      fb_public_profile_string,
-      o.fb_login_status,
-      // o.fb_auth_response,
-      o.fb_access_token,
-      o.fb_granted_scopes,
-      profileInfo.locationInfo && profileInfo.locationInfo.id,
-      profileInfo.locationInfo && profileInfo.locationInfo.name,
-      o.fb_friends_response || "",
-      o.response,
-    ]
-  );
-}
-
-function addFacebookFriends(uid?: any, fb_friends_response?: any[]) {
-  let fbFriendIds = (fb_friends_response || [])
-    .map(function (friend: { id: string }) {
-      return friend.id + "";
-    })
-    .filter(function (id: string) {
-      // NOTE: would just store facebook IDs as numbers, but they're too big for JS numbers.
-      let hasNonNumericalCharacters = /[^0-9]/.test(id);
-      if (hasNonNumericalCharacters) {
-        emailBadProblemTime(
-          "found facebook ID with non-numerical characters " + id
-        );
-      }
-      return !hasNonNumericalCharacters;
-    })
-    .map(function (id: string) {
-      return "'" + id + "'"; // wrap in quotes to force pg to treat them as strings
-    });
-  if (!fbFriendIds.length) {
-    return Promise.resolve();
-  } else {
-    // add friends to the table
-    // TODO periodically remove duplicates from the table, and pray for postgres upsert to arrive soon.
-    return pgQueryP(
-      "insert into facebook_friends (uid, friend) select ($1), uid from facebook_users where fb_user_id in (" +
-        fbFriendIds.join(",") +
-        ");",
-      [uid]
-    );
-  }
-}
-
 function getFirstForPid(votes: string | any[]) {
   let seen = {};
   let len = votes.length;
@@ -5300,545 +5161,7 @@ function handle_GET_snapshot(
     }
   );
 }
-function handle_GET_facebook_delete(
-  req: { p: any },
-  res: { json: (arg0: {}) => void }
-) {
-  deleteFacebookUserRecord(req.p)
-    .then(function () {
-      res.json({});
-    })
-    .catch(function (err: any) {
-      fail(res, 500, err);
-    });
-}
-function getFriends(fb_access_token: any) {
-  // 'getMoreFriends' implicitly has return type 'any' because it does not have a return type annotation and is referenced directly or indirectly in one of its return expressions.ts(7023)
-  // @ts-ignore
-  function getMoreFriends(friendsSoFar: any[], urlForNextCall: any) {
-    // urlForNextCall includes access token
-    return request.get(urlForNextCall).then(
-      function (response: { data: string | any[]; paging: { next: any } }) {
-        let len = response.data.length;
-        if (len) {
-          for (var i = 0; i < len; i++) {
-            friendsSoFar.push(response.data[i]);
-          }
-          if (response.paging.next) {
-            return getMoreFriends(friendsSoFar, response.paging.next);
-          }
-          return friendsSoFar;
-        } else {
-          return friendsSoFar;
-        }
-      },
-      function () {
-        emailBadProblemTime("getMoreFriends failed");
-        return friendsSoFar;
-      }
-    );
-  }
-  return new Promise(function (
-    resolve: (arg0: any) => void,
-    reject: (arg0: any) => void
-  ) {
-    FB.setAccessToken(fb_access_token);
-    FB.api(
-      "/me/friends",
-      function (response: {
-        error: any;
-        data: any[];
-        paging: { next: any };
-      }) {
-        if (response && !response.error) {
-          let friendsSoFar = response.data;
-          if (response.data.length && response.paging.next) {
-            getMoreFriends(friendsSoFar, response.paging.next).then(
-              resolve,
-              reject
-            );
-          } else {
-            resolve(friendsSoFar || []);
-          }
-        } else {
-          reject(response);
-        }
-      }
-    );
-  });
-} // end getFriends
 
-function getLocationInfo(fb_access_token: any, location: { id: string }) {
-  return new Promise(function (resolve: (arg0: void) => void) {
-    if (location && location.id) {
-      FB.setAccessToken(fb_access_token);
-      FB.api("/" + location.id, function (locationResponse: any) {
-        resolve(locationResponse);
-      });
-    } else {
-      resolve(undefined);
-    }
-  });
-}
-function handle_POST_auth_facebook(
-  req: {
-    p: {
-      response?: string;
-      locationInfo?: any;
-      fb_friends_response?: string;
-    };
-    headers?: { referer: string };
-    cookies?: any;
-  },
-  res: any
-) {
-  let response = JSON.parse(req?.p?.response || "");
-  let fb_access_token =
-    response && response.authResponse && response.authResponse.accessToken;
-  if (!fb_access_token) {
-    emailBadProblemTime(
-      "polis_err_missing_fb_access_token " +
-        req?.headers?.referer +
-        "\n\n" +
-        req.p.response
-    );
-    fail(res, 500, "polis_err_missing_fb_access_token");
-    return;
-  }
-  let fields = [
-    "email",
-    "first_name",
-    "friends",
-    "gender",
-    "id",
-    "is_verified",
-    "last_name",
-    "link",
-    "locale",
-    "location",
-    "name",
-    "timezone",
-    "updated_time",
-    "verified",
-  ];
-
-  FB.setAccessToken(fb_access_token);
-  FB.api(
-    "me",
-    {
-      fields: fields,
-    },
-    function (fbRes: { error: any; friends: string | any[]; location: any }) {
-      if (!fbRes || fbRes.error) {
-        fail(res, 500, "polis_err_fb_auth_check", fbRes && fbRes.error);
-        return;
-      }
-
-      const friendsPromise =
-        fbRes && fbRes.friends && fbRes.friends.length
-          ? getFriends(fb_access_token)
-          : Promise.resolve([]);
-
-      Promise.all([
-        getLocationInfo(fb_access_token, fbRes.location),
-        friendsPromise,
-      ]).then(function (a: any[]) {
-        let locationResponse = a[0];
-        let friends = a[1];
-
-        if (locationResponse) {
-          req.p.locationInfo = locationResponse;
-        }
-        if (friends) {
-          req.p.fb_friends_response = JSON.stringify(friends);
-        }
-        response.locationInfo = locationResponse;
-        do_handle_POST_auth_facebook(req, res, {
-          locationInfo: locationResponse,
-          friends: friends,
-          info: _.pick(fbRes, fields),
-        });
-      });
-    }
-  );
-}
-function do_handle_POST_auth_facebook(
-  req: {
-    p: {
-      response?: string;
-      password?: any;
-      uid?: any;
-      fb_granted_scopes?: any;
-      fb_friends_response?: any;
-    };
-    cookies?: { [x: string]: any };
-  },
-  res: {
-    json: (arg0: { uid?: any; hname: any; email: any }) => void;
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: {
-        (arg0: { uid?: any; hname: any; email: any }): void;
-        new (): any;
-      };
-      send: { (arg0: string): void; new (): any };
-    };
-  },
-  o: { locationInfo?: any; friends: any; info: any }
-) {
-  // If a pol.is user record exists, and someone logs in with a facebook account that has the same email address, we should bind that facebook account to the pol.is account, and let the user sign in.
-  let TRUST_FB_TO_VALIDATE_EMAIL = true;
-  let email = o.info.email;
-  let hname = o.info.name;
-  let fb_friends_response = o.friends;
-  let fb_user_id = o.info.id;
-  let response = JSON.parse(req?.p?.response || "");
-  let fb_public_profile = o.info;
-  let fb_login_status = response.status;
-  // let fb_auth_response = response.authResponse.
-  let fb_access_token = response.authResponse.accessToken;
-  let verified = o.info.verified;
-
-  // let existingUid = req.p.existingUid;
-  let password = req.p.password;
-  let uid = req.p.uid;
-
-  let fbUserRecord = {
-    // uid provided later
-    fb_user_id: fb_user_id,
-    fb_public_profile: fb_public_profile,
-    fb_login_status: fb_login_status,
-    // fb_auth_response: fb_auth_response,
-    fb_access_token: fb_access_token,
-    fb_granted_scopes: req.p.fb_granted_scopes,
-    fb_friends_response: req.p.fb_friends_response || "",
-    response: req.p.response,
-  };
-  function doFbUserHasAccountLinked(user: {
-    fb_user_id: any;
-    uid: string;
-    hname: any;
-    email: any;
-  }) {
-    if (user.fb_user_id === fb_user_id) {
-      updateFacebookUserRecord(
-        Object.assign(
-          {},
-          {
-            uid: user.uid,
-          },
-          fbUserRecord
-        )
-      )
-        .then(
-          function () {
-            let friendsAddedPromise = fb_friends_response
-              ? addFacebookFriends(user.uid, fb_friends_response)
-              : Promise.resolve();
-            return friendsAddedPromise.then(
-              function () {
-                startSessionAndAddCookies(req, res, user.uid)
-                  .then(function () {
-                    res.json({
-                      uid: user.uid,
-                      hname: user.hname,
-                      email: user.email,
-                      // token: token
-                    });
-                  })
-                  .catch(function (err: any) {
-                    fail(res, 500, "polis_err_reg_fb_start_session2", err);
-                  });
-              },
-              function (err: any) {
-                fail(res, 500, "polis_err_linking_fb_friends2", err);
-              }
-            );
-          },
-          function (err: any) {
-            fail(res, 500, "polis_err_updating_fb_info", err);
-          }
-        )
-        .catch(function (err: any) {
-          fail(res, 500, "polis_err_fb_auth_misc", err);
-        });
-    } else {
-      // the user with that email has a different FB account attached
-      // so clobber the old facebook_users record and add the new one.
-      deleteFacebookUserRecord(user).then(
-        function () {
-          doFbNotLinkedButUserWithEmailExists(user);
-        },
-        function (err: any) {
-          emailBadProblemTime(
-            "facebook auth where user exists with different facebook account " +
-              user.uid
-          );
-          fail(
-            res,
-            500,
-            "polis_err_reg_fb_user_exists_with_different_account",
-            err
-          );
-        }
-      );
-    }
-  } // doFbUserHasAccountLinked
-
-  function doFbNotLinkedButUserWithEmailExists(user: { uid?: any }) {
-    // user for this email exists, but does not have FB account linked.
-    // user will be prompted for their password, and client will repeat the call with password
-    // fail(res, 409, "polis_err_reg_user_exits_with_email_but_has_no_facebook_linked")
-    if (!TRUST_FB_TO_VALIDATE_EMAIL && !password) {
-      fail(res, 403, "polis_err_user_with_this_email_exists " + email);
-    } else {
-      let pwPromise = TRUST_FB_TO_VALIDATE_EMAIL
-        ? Promise.resolve(true)
-        : checkPassword(user.uid, password || "");
-      pwPromise.then(
-        function (ok: any) {
-          if (ok) {
-            createFacebookUserRecord(
-              Object.assign(
-                {},
-                {
-                  uid: user.uid,
-                },
-                fbUserRecord
-              )
-            )
-              .then(
-                function () {
-                  let friendsAddedPromise = fb_friends_response
-                    ? addFacebookFriends(user.uid, fb_friends_response)
-                    : Promise.resolve();
-                  return friendsAddedPromise
-                    .then(
-                      function () {
-                        return startSessionAndAddCookies(
-                          req,
-                          res,
-                          user.uid
-                        ).then(function () {
-                          return user;
-                        });
-                      },
-                      function (err: any) {
-                        fail(res, 500, "polis_err_linking_fb_friends", err);
-                      }
-                    )
-                    .then(
-                      //                       Argument of type '(user: { uid?: any; hname: any; email: any; }) => void' is not assignable to parameter of type '(value: void | { uid?: any; }) => void | PromiseLike<void>'.
-                      // Types of parameters 'user' and 'value' are incompatible.
-                      //   Type 'void | { uid?: any; }' is not assignable to type '{ uid?: any; hname: any; email: any; }'.
-                      //                       Type 'void' is not assignable to type '{ uid?: any; hname: any; email: any; }'.ts(2345)
-                      // @ts-ignore
-                      function (user: { uid?: any; hname: any; email: any }) {
-                        res.status(200).json({
-                          uid: user.uid,
-                          hname: user.hname,
-                          email: user.email,
-                          // token: token,
-                        });
-                      },
-                      function (err: any) {
-                        fail(res, 500, "polis_err_linking_fb_misc", err);
-                      }
-                    );
-                },
-                function (err: any) {
-                  fail(
-                    res,
-                    500,
-                    "polis_err_linking_fb_to_existing_polis_account",
-                    err
-                  );
-                }
-              )
-              .catch(function (err: any) {
-                fail(
-                  res,
-                  500,
-                  "polis_err_linking_fb_to_existing_polis_account_misc",
-                  err
-                );
-              });
-          } else {
-            fail(res, 403, "polis_err_password_mismatch");
-          }
-        },
-        function (err: any) {
-          fail(res, 500, "polis_err_password_check", err);
-        }
-      );
-    }
-  } // end doFbNotLinkedButUserWithEmailExists
-
-  function doFbNoUserExistsYet() {
-    let promise;
-    if (uid) {
-      // user record already exists, so populate that in case it has missing info
-      promise = Promise.all([
-        pgQueryP("select * from users where uid = ($1);", [uid]),
-        pgQueryP(
-          "update users set hname = ($2) where uid = ($1) and hname is NULL;",
-          [uid, hname]
-        ),
-        pgQueryP(
-          "update users set email = ($2) where uid = ($1) and email is NULL;",
-          [uid, email]
-        ),
-      ]).then(function (o: any[][]) {
-        let user = o[0][0];
-        return user;
-      });
-    } else {
-      let query =
-        "insert into users " +
-        "(email, hname) VALUES " +
-        "($1, $2) " +
-        "returning *;";
-      promise = pgQueryP(query, [email, hname]).then(function (
-        rows: string | any[]
-      ) {
-        let user = (rows && rows.length && rows[0]) || null;
-        return user;
-      });
-    }
-    // Create user record
-    promise
-      .then(function (user: any) {
-        return createFacebookUserRecord(
-          Object.assign({}, user, fbUserRecord)
-        ).then(function () {
-          return user;
-        });
-      })
-      .then(
-        function (user: { uid?: any }) {
-          if (fb_friends_response) {
-            return addFacebookFriends(user.uid, fb_friends_response).then(
-              function () {
-                return user;
-              }
-            );
-          } else {
-            // no friends, or this user is first polis user among his/her friends.
-            return user;
-          }
-        },
-        function (err: any) {
-          fail(res, 500, "polis_err_reg_fb_user_creating_record2", err);
-        }
-      )
-      .then(
-        //         Argument of type '(user: { uid?: any; }) => Bluebird<void | { uid?: any; }>' is not assignable to parameter of type '(value: void | { uid?: any; }) => void | { uid?: any; } | PromiseLike<void | { uid?: any; }>'.
-        // Types of parameters 'user' and 'value' are incompatible.
-        //   Type 'void | { uid?: any; }' is not assignable to type '{ uid?: any; }'.
-        //         Type 'void' is not assignable to type '{ uid?: any; }'.ts(2345)
-        // @ts-ignore
-        function (user: { uid?: any }) {
-          let uid = user.uid;
-          return startSessionAndAddCookies(req, res, uid).then(
-            function () {
-              return user;
-            },
-            function (err: any) {
-              fail(res, 500, "polis_err_reg_fb_user_creating_record3", err);
-            }
-          );
-        },
-        function (err: any) {
-          fail(res, 500, "polis_err_reg_fb_user_creating_record", err);
-        }
-      )
-      .then(
-        //         Argument of type '(user: { uid?: any; hname: any; email: any; }) => void' is not assignable to parameter of type '(value: void | { uid?: any; }) => void | PromiseLike<void>'.
-        // Types of parameters 'user' and 'value' are incompatible.
-        //   Type 'void | { uid?: any; }' is not assignable to type '{ uid?: any; hname: any; email: any; }'.
-        //         Type 'void' is not assignable to type '{ uid?: any; hname: any; email: any; }'.ts(2345)
-        // @ts-ignore
-        function (user: { uid?: any; hname: any; email: any }) {
-          res.json({
-            uid: user.uid,
-            hname: user.hname,
-            email: user.email,
-            // token: token
-          });
-        },
-        function (err: any) {
-          fail(res, 500, "polis_err_reg_fb_user_misc22", err);
-        }
-      )
-      .catch(function (err: any) {
-        fail(res, 500, "polis_err_reg_fb_user_misc2", err);
-      });
-  } // end doFbNoUserExistsYet
-
-  let emailVerifiedPromise = Promise.resolve(true);
-  if (!verified) {
-    if (email) {
-      // Type 'Promise<unknown>' is missing the following properties from type 'Bluebird<boolean>': caught, error, lastly, bind, and 38 more.ts(2740)
-      // @ts-ignore
-      emailVerifiedPromise = isEmailVerified(email);
-    } else {
-      emailVerifiedPromise = Promise.resolve(false);
-    }
-  }
-
-  Promise.all([emailVerifiedPromise]).then(function (a: any[]) {
-    let isVerifiedByPolisOrFacebook = a[0];
-
-    if (!isVerifiedByPolisOrFacebook) {
-      if (email) {
-        doSendVerification(req, email);
-        res.status(403).send("polis_err_reg_fb_verification_email_sent");
-        return;
-      } else {
-        res
-          .status(403)
-          .send("polis_err_reg_fb_verification_noemail_unverified");
-        return;
-      }
-    }
-
-    pgQueryP(
-      "select users.*, facebook_users.fb_user_id from users left join facebook_users on users.uid = facebook_users.uid " +
-        "where users.email = ($1) " +
-        "   or facebook_users.fb_user_id = ($2) " +
-        ";",
-      [email, fb_user_id]
-    )
-      .then(
-        function (rows: string | any[]) {
-          let user = (rows && rows.length && rows[0]) || null;
-          if (rows && rows.length > 1) {
-            // the auth provided us with email and fb_user_id where the email is one polis user, and the fb_user_id is for another.
-            // go with the one matching the fb_user_id in this case, and leave the email matching account alone.
-            user = _.find(rows, function (row: { fb_user_id: any }) {
-              return row.fb_user_id === fb_user_id;
-            });
-          }
-          if (user) {
-            if (user.fb_user_id) {
-              doFbUserHasAccountLinked(user);
-            } else {
-              doFbNotLinkedButUserWithEmailExists(user);
-            }
-          } else {
-            doFbNoUserExistsYet();
-          }
-        },
-        function (err: any) {
-          fail(res, 500, "polis_err_reg_fb_user_looking_up_email", err);
-        }
-      )
-      .catch(function (err: any) {
-        fail(res, 500, "polis_err_reg_fb_user_misc", err);
-      });
-  });
-} // end do_handle_POST_auth_facebook
 function handle_POST_auth_new(req: any, res: any) {
   CreateUser.createUser(req, res);
 } // end /api/v3/auth/new
@@ -6033,15 +5356,6 @@ function getAgeRange(demo: Demo) {
   }
 }
 
-// 0 male, 1 female, 2 other, or NULL
-function getGender(demo: Demo) {
-  var gender = demo.fb_gender;
-  if (_.isNull(gender) || _.isUndefined(gender)) {
-    gender = demo.ms_gender_estimate_fb;
-  }
-  return gender;
-}
-
 function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
   function isAgree(v: { vote: any }) {
     return v.vote === polisTypes.reactions.pull;
@@ -6079,7 +5393,8 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
     demo = demo.map((d: Demo) => {
       return {
         pid: d.pid,
-        gender: getGender(d),
+        // TODO: should we get rid of this?
+        gender: 2,
         ageRange: getAgeRange(d),
       };
     });
@@ -9625,7 +8940,6 @@ function handle_POST_conversations(
               auth_opt_allow_3rdparty:
                 req.p.auth_opt_allow_3rdparty ||
                 DEFAULTS.auth_opt_allow_3rdparty,
-              auth_opt_fb: req.p.auth_opt_fb || DEFAULTS.auth_opt_fb,
               auth_opt_tw: req.p.auth_opt_tw || DEFAULTS.auth_opt_tw,
             })
             .returning("*")
@@ -11210,50 +10524,6 @@ function pullXInfoIntoSubObjects(ptptoiRecord: any) {
   return p;
 }
 
-function pullFbTwIntoSubObjects(ptptoiRecord: any) {
-  let p = ptptoiRecord;
-  let x: ParticipantSocialNetworkInfo = {};
-  _.each(p, function (val: null, key: string) {
-    let fbMatch = /fb__(.*)/.exec(key);
-    let twMatch = /tw__(.*)/.exec(key);
-    if (fbMatch && fbMatch.length === 2 && val !== null) {
-      x.facebook = x.facebook || {};
-      x.facebook[fbMatch[1]] = val;
-    } else if (twMatch && twMatch.length === 2 && val !== null) {
-      x.twitter = x.twitter || {};
-      x.twitter[twMatch[1]] = val;
-    } else {
-      x[key] = val;
-    }
-  });
-  // extract props from fb_public_profile
-  if (x.facebook && x.facebook.fb_public_profile) {
-    try {
-      let temp = JSON.parse(x.facebook.fb_public_profile);
-      x.facebook.verified = temp.verified;
-      // shouln't return this to client
-      delete x.facebook.fb_public_profile;
-    } catch (err) {
-      logger.error(
-        "error parsing JSON of fb_public_profile for uid: " + p.uid,
-        err
-      );
-    }
-
-    if (!_.isUndefined(x.facebook.fb_user_id)) {
-      let width = 40;
-      let height = 40;
-      x.facebook.fb_picture =
-        "https://graph.facebook.com/v2.2/" +
-        x.facebook.fb_user_id +
-        "/picture?width=" +
-        width +
-        "&height=" +
-        height;
-    }
-  }
-  return x;
-}
 function handle_PUT_ptptois(
   req: { p: { zid: any; uid?: any; pid: any; mod: any } },
   res: {
@@ -11314,7 +10584,6 @@ function handle_GET_ptptois(
       if (isAllowed) {
         ptptois = ptptois.map(pullXInfoIntoSubObjects);
         ptptois = ptptois.map(removeNullOrUndefinedProperties);
-        ptptois = ptptois.map(pullFbTwIntoSubObjects);
         ptptois = ptptois.map(function (p: { conversation_id: any }) {
           p.conversation_id = req.p.conversation_id;
           return p;
@@ -11690,9 +10959,6 @@ function doGetConversationPreloadInfo(conversation_id: any) {
         conv.auth_opt_allow_3rdparty,
         DEFAULTS.auth_opt_allow_3rdparty
       );
-      let auth_opt_fb_computed =
-        auth_opt_allow_3rdparty &&
-        ifDefinedFirstElseSecond(conv.auth_opt_fb, DEFAULTS.auth_opt_fb);
       let auth_opt_tw_computed =
         auth_opt_allow_3rdparty &&
         ifDefinedFirstElseSecond(conv.auth_opt_tw, DEFAULTS.auth_opt_tw);
@@ -11725,7 +10991,6 @@ function doGetConversationPreloadInfo(conversation_id: any) {
           DEFAULTS.auth_needed_to_write
         ),
         auth_opt_allow_3rdparty: auth_opt_allow_3rdparty,
-        auth_opt_fb_computed: auth_opt_fb_computed,
         auth_opt_tw_computed: auth_opt_tw_computed,
       };
       conv.conversation_id = conversation_id;
@@ -11990,7 +11255,6 @@ export {
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
   handle_GET_einvites,
-  handle_GET_facebook_delete,
   handle_GET_groupDemographics,
   handle_GET_iim_conversation,
   handle_GET_iip_conversation,
@@ -12027,7 +11291,6 @@ export {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_facebook,
   handle_POST_auth_login,
   handle_POST_auth_new,
   handle_POST_auth_password,
