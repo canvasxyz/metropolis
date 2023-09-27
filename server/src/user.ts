@@ -291,12 +291,6 @@ function getXidRecordByXidOwnerId(
         xid,
         owner,
       ])
-      //     (local function)(rows: string | any[]): any
-      // Argument of type '(rows: string | any[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
-      //   Types of parameters 'rows' and 'value' are incompatible.
-      //     Type 'unknown' is not assignable to type 'string | any[]'.
-      //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-      // @ts-ignore
       .then(function (rows: string | any[]) {
         if (!rows || !rows.length) {
           logger.warn("getXidRecordByXidOwnerId: no xInfo yet");
@@ -347,11 +341,6 @@ function getXidRecordByXidOwnerId(
 }
 
 function getXidStuff(xid: any, zid: any) {
-  // Argument of type '(rows: string | any[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
-  // Types of parameters 'rows' and 'value' are incompatible.
-  //   Type 'unknown' is not assignable to type 'string | any[]'.
-  //   Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-  // @ts-ignore
   return Conversation.getXidRecord(xid, zid).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
       return "noXidRecord";

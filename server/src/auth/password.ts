@@ -28,11 +28,6 @@ function checkPassword(uid: any, password: any) {
         "select pwhash from jianiuevyew where uid = ($1);",
         [uid]
       )
-      //   Argument of type '(rows: string | any[]) => Promise<unknown> | null | undefined' is not assignable to parameter of type '(value: unknown) => unknown'.
-      // Types of parameters 'rows' and 'value' are incompatible.
-      //   Type 'unknown' is not assignable to type 'string | any[]'.
-      //   Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-      // @ts-ignore
       .then(function (rows: string | any[]) {
         if (!rows || !rows.length) {
           return null;
