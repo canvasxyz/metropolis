@@ -120,18 +120,10 @@ function getComments(o: CommentType) {
           }) {
             // whitelist properties to send
             let infoToReturn: InfoToReturn = _.pick(info, [
-              // twitter
-              "name",
-              "screen_name",
-              "twitter_user_id",
-              "profile_image_url_https",
-              "followers_count",
               // xInfo
               "x_profile_image_url",
               "x_name",
             ]);
-            infoToReturn.tw_verified = !!info.verified;
-            infoToReturn.tw_followers_count = info.followers_count;
 
             uidToSocialInfo[info.uid] = infoToReturn;
           });

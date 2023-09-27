@@ -73,9 +73,6 @@ import {
   handle_GET_testConnection,
   handle_GET_testDatabase,
   handle_GET_tryCookie,
-  handle_GET_twitter_oauth_callback,
-  handle_GET_twitter_users,
-  handle_GET_twitterBtn,
   handle_GET_github_init,
   handle_GET_github_oauth_callback,
   handle_GET_users,
@@ -641,8 +638,6 @@ app.post(
   ),
   want("txt", getOptionalStringLimitLength(997), assignToP),
   want("vote", getIntInRange(-1, 1), assignToP),
-  want("twitter_tweet_id", getStringLimitLength(999), assignToP),
-  want("quote_twitter_screen_name", getStringLimitLength(999), assignToP),
   want("quote_txt", getStringLimitLength(999), assignToP),
   want("quote_src_url", getUrlLimitLength(999), assignToP),
   want("anon", getBool, assignToP),
@@ -1225,28 +1220,6 @@ app.post(
 );
 
 app.get(
-  "/api/v3/twitterBtn",
-  moveToBody,
-  authOptional(assignToP),
-  want("dest", getStringLimitLength(9999), assignToP),
-  want("owner", getBool, assignToP, true),
-  handle_GET_twitterBtn as any
-);
-
-app.get(
-  "/api/v3/twitter_oauth_callback",
-  moveToBody,
-  enableAgid,
-  auth(assignToP),
-  need("dest", getStringLimitLength(9999), assignToP),
-  need("oauth_token", getStringLimitLength(9999), assignToP), // TODO verify
-  need("oauth_verifier", getStringLimitLength(9999), assignToP), // TODO verify
-  want("owner", getBool, assignToP, true),
-  handle_GET_twitter_oauth_callback as any
-);
-
-
-app.get(
   "/api/v3/github_oauth_init",
   moveToBody,
   authOptional(assignToP),
@@ -1305,14 +1278,6 @@ app.get(
   ),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP),
   handle_GET_ptptois as any
-);
-
-app.get(
-  "/api/v3/twitter_users",
-  moveToBody,
-  authOptional(assignToP),
-  want("twitter_user_id", getInt, assignToP), // if not provided, returns info for the signed-in user
-  handle_GET_twitter_users as any
 );
 
 app.post(

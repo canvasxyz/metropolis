@@ -161,12 +161,6 @@ export type ConversationType = {
   limit?: any;
 };
 
-export type TwitterParameters = {
-  [key: string]: any;
-  user_id?: any;
-  screen_name?: any;
-};
-
 export type ParticipantOption = {
   bidToPid?: any;
   asPOJO?: any;

@@ -62,16 +62,12 @@ async function getUser(
     );
   }
 
-  const [info, twInfo, xInfo]: any[] = await Promise.all([
+  const [info, xInfo]: any[] = await Promise.all([
     getUserInfoForUid2(uid),
-    getTwitterInfo([uid]),
     xidInfoPromise,
   ]);
-  let hasTwitter = twInfo && twInfo.length && twInfo[0];
   let hasXid = xInfo && xInfo.length && xInfo[0];
-  if (hasTwitter) {
-    delete twInfo[0].response;
-  }
+
   if (hasXid) {
     delete xInfo[0].owner;
     delete xInfo[0].created;
@@ -81,21 +77,12 @@ async function getUser(
     uid: uid,
     email: info.email,
     hname: info.hname,
-    twitter: twInfo && twInfo[0],
-    hasTwitter: !!hasTwitter,
     hasXid: !!hasXid,
     xInfo: xInfo && xInfo[0],
     finishedTutorial: !!info.tut,
     site_ids: [info.site_id],
     created: Number(info.created),
   };
-}
-
-function getTwitterInfo(uids: any[]) {
-  return pg.queryP_readOnly(
-    "select * from twitter_users where uid in ($1);",
-    uids
-  );
 }
 
 function createDummyUser() {
@@ -236,9 +223,6 @@ function getSocialInfoForUsers(uids: any[], zid: any) {
       "x as (select * from xids where uid in (" +
       uidString +
       ") and owner  in (select org_id from conversations where zid = ($1))), " +
-      "tw as (select * from twitter_users where uid in (" +
-      uidString +
-      ")), " +
       "select *, coalesce(foo.foouid, x.uid) as uid from foo full outer join x on x.uid = foo.foouid;",
     [zid]
   );
