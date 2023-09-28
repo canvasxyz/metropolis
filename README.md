@@ -113,6 +113,8 @@ To send password reset emails, configure Sendgrid with a single sender identity
 from within the Sendgrid control panel. Then, set that email address and the
 Sendgrid API key in `server/.env`.
 
+To enable login with Github, configure a Github application at https://github.com/settings/apps and provide the client ID and client secret at `server/.env`. For a development environment, the callback should be: http://localhost:8080/api/v3/github_oauth_callback
+
 10. To run all migrations on production, or to run one specific migration:
 
 ```

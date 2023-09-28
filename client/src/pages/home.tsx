@@ -71,23 +71,32 @@ const Index: React.FC<{ user? }> = ({ user }) => {
               </Text>
               , and more.
             </Text>
-            {user ? (
+            {!!user?.email || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
                 <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
                   Go to conversations
                 </RouterLink>
               </Box>
             ) : (
-              <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.button" }} to="/createuser">
+              <Box sx={{ mt: [4] }}>
+                <RouterLink sx={{ variant: "links.button", lineHeight: 3 }} to="/createuser">
                   Sign up
                 </RouterLink>
                 <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
                   or
                 </Text>
-                <RouterLink sx={{ variant: "links.button" }} to="/api/v3/signin">
+                <RouterLink sx={{ variant: "links.button", lineHeight: 3 }} to="/signin">
                   Sign in
                 </RouterLink>
+                <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
+                  or
+                </Text>
+                <Link
+                  sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
+                  href="/api/v3/github_oauth_init"
+                >
+                  Github Login
+                </Link>
               </Box>
             )}
             <Box sx={{ mt: [6, 4] }}>
