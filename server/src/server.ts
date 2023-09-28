@@ -79,7 +79,6 @@ import logger from "./utils/logger";
 // # notifications
 import emailSenders from "./email/senders";
 import { Request, Response } from "express";
-import { token } from "morgan";
 const sendTextEmail = emailSenders.sendTextEmail;
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
@@ -496,7 +495,7 @@ if (Config.backfillCommentLangDetection) {
   );
 }
 
-function doVotesPost(
+async function doVotesPost(
   uid?: any,
   pid?: any,
   conv?: { zid: any },
@@ -508,32 +507,27 @@ function doVotesPost(
   let zid = conv?.zid;
   weight = weight || 0;
   let weight_x_32767 = Math.trunc(weight * 32767); // weight is stored as a SMALLINT, so convert from a [-1,1] float to [-32767,32767] int
-  return new Promise(function (
-    resolve: (arg0: { conv: any; vote: any }) => void,
-    reject: (arg0: string) => void
-  ) {
-    let queryS =
-      "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;";
-    let params = [pid, zid, tid, voteType, weight_x_32767, high_priority];
-    query(queryS, params, function (err: any, result: { rows: any[] }) {
-      if (err) {
-        if (isDuplicateKey(err)) {
-          reject("polis_err_vote_duplicate");
-        } else {
-          logger.error("polis_err_vote_other", err);
-          reject("polis_err_vote_other");
-        }
-        return;
-      }
 
-      const vote = result.rows[0];
+  let queryS =
+    "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;";
+  let params = [pid, zid, tid, voteType, weight_x_32767, high_priority];
 
-      resolve({
-        conv: conv,
-        vote: vote,
-      });
-    });
-  });
+  let result: any[];
+  try {
+    result = await queryP(queryS, params);
+  } catch (err) {
+    if (err && isDuplicateKey(err as any)) {
+      throw new Error("polis_err_vote_duplicate");
+    } else {
+      logger.error("polis_err_vote_other", err);
+      throw new Error("polis_err_vote_other");
+    }
+  }
+
+  return {
+    conv: conv,
+    vote: result[0],
+  };
 }
 
 function votesPost(
@@ -2512,7 +2506,7 @@ function generateSUZinvites(numTokens: number) {
   });
 }
 
-function handle_POST_zinvites(
+async function handle_POST_zinvites(
   req: { p: { short_url: any; zid: any; uid?: any } },
   res: {
     status: (arg0: number) => {
@@ -2524,31 +2518,31 @@ function handle_POST_zinvites(
 ) {
   let generateShortUrl = req.p.short_url;
 
-  query(
+  try {
+    await queryP(
     "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
-    [req.p.zid, req.p.uid],
-    function (err: any) {
-      if (err) {
-        fail(
-          res,
-          500,
-          "polis_err_creating_zinvite_invalid_conversation_or_owner",
-          err
-        );
-        return;
-      }
+    [req.p.zid, req.p.uid]);
+  } catch (err) {
+    fail(
+      res,
+      500,
+      "polis_err_creating_zinvite_invalid_conversation_or_owner",
+      err
+    );
+    return;
+  }
 
-      generateAndRegisterZinvite(req.p.zid, generateShortUrl)
-        .then(function (zinvite: any) {
-          res.status(200).json({
-            zinvite: zinvite,
-          });
-        })
-        .catch(function (err: any) {
-          fail(res, 500, "polis_err_creating_zinvite", err);
-        });
-    }
-  );
+  let zinvite;
+  try {
+    zinvite = await generateAndRegisterZinvite(req.p.zid, generateShortUrl)
+  } catch (err) {
+    fail(res, 500, "polis_err_creating_zinvite", err);
+    return;
+  }
+
+  res.status(200).json({
+    zinvite: zinvite,
+  });
 }
 
 function checkZinviteCodeValidity(
@@ -2762,48 +2756,25 @@ function finishArray(
     });
 }
 
-function checkSuzinviteCodeValidity(
+async function checkSuzinviteCodeValidity(
   zid: any,
-  suzinvite: any,
-  callback: {
-    (err: any, foo: any): void;
-    (err: any, foo: any): void;
-    (err: any): void;
-    (arg0: number | null): void;
-  }
+  suzinvite: any
 ) {
-  query(
-    "SELECT * FROM suzinvites WHERE zid = ($1) AND suzinvite = ($2);",
-    [zid, suzinvite],
-    function (err: any, results: { rows: string | any[] }) {
-      if (err || !results || !results.rows || !results.rows.length) {
-        callback(1);
-      } else {
-        callback(null); // ok
-      }
-    }
-  );
+  return await queryP(
+      "SELECT * FROM suzinvites WHERE zid = ($1) AND suzinvite = ($2);",
+      [zid, suzinvite]);
 }
 
-function getSUZinviteInfo(suzinvite: any) {
-  return new Promise(function (
-    resolve: (arg0: any) => void,
-    reject: (arg0: Error) => any
-  ) {
-    query(
+async function getSUZinviteInfo(suzinvite: any) {
+  const results = await queryP(
       "SELECT * FROM suzinvites WHERE suzinvite = ($1);",
-      [suzinvite],
-      function (err: any, results: { rows: string | any[] }) {
-        if (err) {
-          return reject(err);
-        }
-        if (!results || !results.rows || !results.rows.length) {
-          return reject(new Error("polis_err_no_matching_suzinvite"));
-        }
-        resolve(results.rows[0]);
-      }
-    );
-  });
+      [suzinvite]);
+
+  if (!results || !results.length) {
+    throw new Error("polis_err_no_matching_suzinvite");
+  }
+
+  return results[0];
 }
 
 async function deleteSuzinvite(suzinvite: any) {
@@ -2836,31 +2807,15 @@ async function createXidEntry(xid: any, owner: any, uid?: any) {
   }
 }
 
-function saveParticipantMetadataChoicesP(zid: any, pid: any, answers: any) {
-  return new Promise(function (
-    resolve: (arg0: number) => void,
-    reject: (arg0: any) => void
-  ) {
-    saveParticipantMetadataChoices(zid, pid, answers, function (err: any) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(0);
-      }
-    });
-  });
-}
-
-function saveParticipantMetadataChoices(
+async function saveParticipantMetadataChoices(
   zid: any,
   pid: any,
-  answers: any[],
-  callback: { (err: any): void; (arg0: number): void }
+  answers: any[]
 ) {
   // answers is a list of pmaid
   if (!answers || !answers.length) {
     // nothing to save
-    return callback(0);
+    return 0;
   }
 
   let q =
@@ -2868,63 +2823,34 @@ function saveParticipantMetadataChoices(
     answers.join(",") +
     ");";
 
-  query(
-    q,
-    [zid],
-    function (
-      err: any,
-      qa_results: { [x: string]: { pmqid: any }; rows: any }
-    ) {
-      if (err) {
-        logger.error("polis_err_getting_participant_metadata_answers", err);
-        return callback(err);
-      }
+  let qa_results;
+  try {
+    qa_results = await queryP(q, [zid]);
+  } catch (err) {
+    logger.error("polis_err_getting_participant_metadata_answers", err);
+    return;
+  }
 
-      qa_results = qa_results.rows;
-      // Property 'rows' is missing in type 'Dictionary<{ pmqid: any; }>' but required in type '{ [x: string]: { pmqid: any; }; rows: any; }'.ts(2741)
-      // @ts-ignore
-      qa_results = _.indexBy(qa_results, "pmaid");
-      // construct an array of params arrays
-      answers = answers.map(function (pmaid: string | number) {
-        let pmqid = qa_results[pmaid].pmqid;
-        return [zid, pid, pmaid, pmqid];
-      });
-      // make simultaneous requests to insert the choices
-      async.map(
-        answers,
-        function (x: any, cb: (arg0: number) => void) {
-          // ...insert()
-          //     .into("participant_metadata_choices")
-          //     .
-          query(
-            "INSERT INTO participant_metadata_choices (zid, pid, pmaid, pmqid) VALUES ($1,$2,$3,$4);",
-            x,
-            function (err: any) {
-              if (err) {
-                logger.error(
-                  "polis_err_saving_participant_metadata_choices",
-                  err
-                );
-                return cb(err);
-              }
-              cb(0);
-            }
-          );
-        },
-        function (err: any) {
-          if (err) {
-            logger.error(
-              "polis_err_saving_participant_metadata_choices",
-              err
-            );
-            return callback(err);
-          }
-          // finished with all the inserts
-          callback(0);
-        }
+  const qa_resultsIndexed = _.indexBy(qa_results, "pmaid");
+  // construct an array of params arrays
+  answers = answers.map(function (pmaid: string | number) {
+    let pmqid = qa_resultsIndexed[pmaid].pmqid;
+    return [zid, pid, pmaid, pmqid];
+  });
+
+  for (const answer of answers)  {
+    try {
+      await queryP(
+        "INSERT INTO participant_metadata_choices (zid, pid, pmaid, pmqid) VALUES ($1,$2,$3,$4);",
+        answer);
+    } catch (err) {
+      logger.error(
+        "polis_err_saving_participant_metadata_choices",
+        err
       );
+      throw err;
     }
-  );
+  }
 }
 
 function updateLastInteractionTimeForConversation(zid: any, uid?: any) {
@@ -3016,7 +2942,7 @@ function tryToJoinConversation(
   zid: any,
   uid?: any,
   info?: any,
-  pmaid_answers?: string | any[]
+  pmaid_answers?: any[]
 ) {
   function doAddExtendedParticipantInfo() {
     if (info && _.keys(info).length > 0) {
@@ -3026,7 +2952,7 @@ function tryToJoinConversation(
 
   function saveMetadataChoices(pid?: number) {
     if (pmaid_answers && pmaid_answers.length) {
-      saveParticipantMetadataChoicesP(zid, pid, pmaid_answers);
+      saveParticipantMetadataChoices(zid, pid, pmaid_answers);
     }
   }
 
@@ -4103,7 +4029,7 @@ function handle_POST_convSubscriptions(
   }
 }
 
-function handle_POST_auth_login(
+async function handle_POST_auth_login(
   req: {
     p: {
       password: any;
@@ -4123,76 +4049,57 @@ function handle_POST_auth_login(
     fail(res, 403, "polis_err_login_need_password");
     return;
   }
-  query(
-    "SELECT * FROM users WHERE LOWER(email) = ($1);",
-    [email],
-    function (err: any, docs: { rows?: any[] }) {
-      const { rows } = docs;
-      if (err) {
-        fail(res, 403, "polis_err_login_unknown_user_or_password", err);
-        return;
-      }
-      if (!rows || rows.length === 0) {
-        fail(res, 403, "polis_err_login_unknown_user_or_password_noresults");
-        return;
-      }
 
-      let uid = rows[0].uid;
+  let docs;
+  try {
+    docs = await queryP(
+      "SELECT * FROM users WHERE LOWER(email) = ($1);",
+      [email]);
+  } catch (err) {
+    fail(res, 403, "polis_err_login_unknown_user_or_password", err);
+    return;
+  }
 
-      query(
-        "select pwhash from jianiuevyew where uid = ($1);",
-        [uid],
-        function (err: any, results: { rows: any[] }) {
-          // results: { pwhash: any }[]
-          const { rows } = results;
-          if (err) {
-            fail(res, 403, "polis_err_login_unknown_user_or_password", err);
-            return;
-          }
-          if (!results || rows.length === 0) {
-            fail(res, 403, "polis_err_login_unknown_user_or_password");
-            return;
-          }
+  const uid = docs[0].uid;
 
-          let hashedPassword = rows[0].pwhash;
+  let results;
+  try {
 
-          bcrypt.compare(
-            password,
-            hashedPassword,
-            function (errCompare: any, result: any) {
-              logger.debug("errCompare, result", { errCompare, result });
-              if (errCompare || !result) {
-                fail(res, 403, "polis_err_login_unknown_user_or_password");
+    results = await queryP(
+      "select pwhash from jianiuevyew where uid = ($1);", [uid]);
+  } catch (err) {
+    fail(res, 403, "polis_err_login_unknown_user_or_password", err);
+    return;
+  }
+
+  if (!results || results.length === 0) {
+    fail(res, 403, "polis_err_login_unknown_user_or_password");
+    return;
+  }
+
+  let hashedPassword = results[0].pwhash;
+  try {
+    await bcrypt.compare(password, hashedPassword);
+  } catch (err) {
+    fail(res, 403, "polis_err_login_unknown_user_or_password");
                 return;
-              }
+  }
 
-              startSession(uid).then((token) => {
-                let response_data = {
-                  uid: uid,
-                  email: email,
-                  token: token,
-                };
-                // Argument of type '{ p: { password: any; email: string; lti_user_id: any; lti_user_image: any;
-                // lti_context_id: any; tool_consumer_instance_guid?: any; afterJoinRedirectUrl: any; }; }' is not assignable to parameter of type
-                // '{ cookies: { [x: string]: any; }; }'.
-                //  Property 'cookies' is missing in type '{ p: { password: any; email: string; lti_user_id: any;
-                // lti_user_image: any; lti_context_id: any; tool_consumer_instance_guid?: any; afterJoinRedirectUrl: any; }; }' but required in type
-                // '{ cookies: { [x: string]: any; }; }'.ts(2345)
-                // @ts-ignore
-                addCookies(req, res, token, uid)
-                  .then(function () {
-                    res.json(response_data);
-                  })
-                  .catch(function (err: any) {
-                    fail(res, 500, "polis_err_adding_cookies", err);
-                  });
-              });
-            }
-          ); // compare
-        }
-      ); // pwhash query
-    }
-  ); // users query
+  const token = await startSession(uid);
+  const response_data = {
+    uid: uid,
+    email: email,
+    token: token,
+  };
+
+  try {
+    // @ts-ignore
+    await addCookies(req, res, token, uid)
+  } catch (err) {
+    fail(res, 500, "polis_err_adding_cookies", err);
+    return;
+  }
+  res.json(response_data);
 } // /api/v3/auth/login
 
 function handle_POST_joinWithInvite(
