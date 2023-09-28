@@ -102,7 +102,6 @@ export default {
       pt: "0.7em",
       pb: "0.64em",
       borderRadius: "4px",
-
       backgroundColor: "primary",
       textDecoration: "none",
       color: "#fbf5e9 !important",
@@ -112,6 +111,7 @@ export default {
       bg: "primary",
       fontFamily: "monospace",
       cursor: "pointer",
+      textWrap: "nowrap",
     },
     buttonBlack: {
       px: "1em",
@@ -127,6 +127,7 @@ export default {
       },
       fontFamily: "monospace",
       cursor: "pointer",
+      textWrap: "nowrap",
     },
     nav: {
       fontFamily: "monospace",
