@@ -52,11 +52,8 @@ function getComments(o: CommentType) {
   let commentListPromise = o.moderation
     ? _getCommentsForModerationList(o)
     : _getCommentsList(o);
-  let convPromise = Conversation.getConversationInfo(o.zid);
   let conv: { is_anon: any } | null = null;
-  return Promise.all([convPromise, commentListPromise])
-    .then(function ([conv, rows_]) {
-      let rows = rows_ as Row[];
+  return commentListPromise.then(function (rows: Row[]) {
       let cols = [
         "txt",
         "tid",

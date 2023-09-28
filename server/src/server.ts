@@ -6387,6 +6387,7 @@ function handle_GET_participationInit(
     args: any[]
   ) {
     if (req.p.conversation_id) {
+      // eslint-disable-next-line prefer-spread
       return f.apply(null, args);
     } else {
       return Promise.resolve(null);
