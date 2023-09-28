@@ -27,8 +27,6 @@ import {
 import Config from "./config";
 import fail from "./utils/fail";
 
-import {handleGithubOauthCallback} from "./github_auth";
-
 import {
   Body,
   DetectLanguageResult,
@@ -8963,27 +8961,6 @@ function getSocialParticipantsForMod(
 
 const getSocialInfoForUsers = User.getSocialInfoForUsers;
 
-
-function handle_GET_github_init(
-  req: { p: { dest: string; owner: string } },
-  res: { redirect: (arg0: string) => void }
-){
-  let dest = req.p.dest
-  const clientId = process.env.GH_BASIC_CLIENT_ID;
-  const redirectUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&dest=${dest}`;
-
-  res.redirect(redirectUrl);
-}
-
-function handle_GET_github_oauth_callback(
-  req: { p: { uid?: any; code: any; dest?: any } },
-  res: any // { redirect: (arg0: any) => void }
-) {
-  handleGithubOauthCallback(req, res).catch((err) => {
-    fail(res, 500, err.message);
-  })
-}
-
 function updateVoteCount(zid: any, pid: any) {
   // return queryP("update participants set vote_count = vote_count + 1 where zid = ($1) and pid = ($2);",[zid, pid]);
   return queryP(
@@ -10086,8 +10063,6 @@ export {
   handle_GET_testConnection,
   handle_GET_testDatabase,
   handle_GET_tryCookie,
-  handle_GET_github_init,
-  handle_GET_github_oauth_callback,
   handle_GET_users,
   handle_GET_verification,
   handle_GET_votes,

@@ -73,8 +73,6 @@ import {
   handle_GET_testConnection,
   handle_GET_testDatabase,
   handle_GET_tryCookie,
-  handle_GET_github_init,
-  handle_GET_github_oauth_callback,
   handle_GET_users,
   handle_GET_verification,
   handle_GET_votes,
@@ -123,6 +121,11 @@ import {
   handle_PUT_reports,
   handle_PUT_users,
 } from "./src/server";
+import {
+  handle_GET_github_init,
+  handle_GET_github_oauth_callback
+} from "./src/handlers/github_auth";
+
 import logger from "./src/utils/logger";
 
 import {

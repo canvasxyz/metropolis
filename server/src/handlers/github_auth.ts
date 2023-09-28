@@ -2,15 +2,33 @@ import { Response } from "express";
 import { Octokit } from "@octokit/core";
 import { createOAuthUserAuth } from "@octokit/auth-oauth-user";
 
-import { queryP } from "./db/pg-query";
-import { startSession } from "./session";
-import cookies from "./utils/cookies";
-import fail from "./utils/fail";
+import { queryP } from "../db/pg-query";
+import { startSession } from "../session";
+import cookies from "../utils/cookies";
+import fail from "../utils/fail";
 
-// this is in a separate file to server.ts so that we can use async/await
-// without interfering with the legacy promise code
 
-export async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; dest?: any} }, res: Response) {
+export function handle_GET_github_init(
+  req: { p: { dest: string; owner: string } },
+  res: { redirect: (arg0: string) => void }
+){
+  let dest = req.p.dest
+  const clientId = process.env.GH_BASIC_CLIENT_ID;
+  const redirectUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&dest=${dest}`;
+
+  res.redirect(redirectUrl);
+}
+
+export function handle_GET_github_oauth_callback(
+  req: { p: { uid?: any; code: any; dest?: any } },
+  res: any // { redirect: (arg0: any) => void }
+) {
+  handleGithubOauthCallback(req, res).catch((err) => {
+    fail(res, 500, err.message);
+  })
+}
+
+async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; dest?: any} }, res: Response) {
   const octokit = new Octokit({
     authStrategy: createOAuthUserAuth,
     auth: {
@@ -29,7 +47,6 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
   if(!githubUsername) {
     throw Error("invalid github access token");
   }
-  console.log(`we are now authenticated as ${githubUsername}`);
 
   // TODO: this is a hack, we should have more semantically meaningful columns
   const email = `github: ${githubUsername}`;
@@ -44,7 +61,6 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
     return;
   } else if (getRes.length == 1) {
     uid = getRes[0].uid;
-    console.log(`existing user "${githubUsername}" found with uid: ${uid}`);
   } else {
     // create user
     const createQuery =
@@ -56,7 +72,6 @@ export async function handleGithubOauthCallback(req: { p: {uid?: any; code: stri
 
     const createRes = (await queryP(createQuery, vals)) as {uid: string}[];
     uid = createRes[0].uid;
-    console.log(`created user "${githubUsername}" with uid: ${uid}`);
   }
 
   const token = await startSession(uid);
