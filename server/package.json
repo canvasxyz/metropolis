@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@google-cloud/translate": "~1.0.0",
+    "@octokit/auth-app": "^6.0.1",
     "akismet": "~0.0.11",
     "async": "~0.1.22",
     "aws-sdk": "~2.230.1",
