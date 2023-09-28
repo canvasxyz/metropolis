@@ -15,7 +15,7 @@ import { TbSettings } from "react-icons/tb"
 import { CreateConversationModal } from "./CreateConversationModal"
 
 
-const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
+const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
