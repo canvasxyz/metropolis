@@ -113,6 +113,21 @@ export default {
       fontFamily: "monospace",
       cursor: "pointer",
     },
+    buttonBlack: {
+      px: "1em",
+      pt: "0.7em",
+      pb: "0.64em",
+      borderRadius: "4px",
+      backgroundColor: "#373737",
+      textDecoration: "none",
+      color: "#fff !important",
+      "&:hover": {
+        backgroundColor: "#444 !important",
+        borderBottomColor: "#444",
+      },
+      fontFamily: "monospace",
+      cursor: "pointer",
+    },
     nav: {
       fontFamily: "monospace",
       color: "inherit",
