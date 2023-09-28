@@ -278,9 +278,11 @@ const CreateConversation = ({ dispatch, user }) => {
                 dispatch(handleCreateConversationSubmit(title, description))
               }}
               disabled={!user}
-              sx={user ? {} : { opacity: 0.4, pointerEvents: "none" }}
+              sx={user?.email || user?.xInfo ? {} : { opacity: 0.4, pointerEvents: "none" }}
             >
-              {user ? "Create this conversation" : "Log in to create conversations"}
+              {user?.email || user?.xInfo
+                ? "Create this conversation"
+                : "Log in to create conversations"}
             </Button>
           </Box>
         )}
