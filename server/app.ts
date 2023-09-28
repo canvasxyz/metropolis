@@ -125,6 +125,7 @@ import {
   handle_GET_github_init,
   handle_GET_github_oauth_callback
 } from "./src/handlers/github_auth";
+import { handle_POST_github_sync } from "./src/handlers/github_sync";
 
 import logger from "./src/utils/logger";
 
@@ -1240,6 +1241,12 @@ app.get(
   want("dest", getStringLimitLength(9999), assignToP),
   want("owner", getBool, assignToP, true),
   handle_GET_github_oauth_callback
+);
+
+app.post(
+  "/api/v3/github_sync",
+  // auth(assignToP),
+  handle_POST_github_sync
 );
 
 app.get(
