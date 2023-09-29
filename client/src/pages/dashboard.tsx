@@ -28,7 +28,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
 
   const hist = useHistory()
   const data = useSelector((state: RootState) => state.conversations)
-  const conversations = (data.conversations || []) as Array<Conversation>
+  const conversations: Array<Conversation> = data.conversations || []
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
 
   const [showOpenConversations, setShowOpenConversations] = useState(true)
@@ -40,8 +40,6 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
     console.log(conversationId)
     hist.push(`/dashboard/c/${conversationId}`)
   },[])
-
-  selectedConversationId
 
   const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
 

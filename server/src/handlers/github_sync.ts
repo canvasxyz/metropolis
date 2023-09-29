@@ -76,20 +76,9 @@ async function extractFIPs(branches: string[]) {
   return fips;
 }
 
-
-export async function handle_POST_github_sync(req: Request, res: Response) {
-
-  try {
+function getOctoKitForInstallation() {
     if(!process.env.GH_APP_PRIVATE_KEY_PATH) {
       throw Error("GH_APP_PRIVATE_KEY_PATH not set");
-    }
-
-    if(!process.env.FIP_REPO_OWNER) {
-      throw Error("FIP_REPO_OWNER not set");
-    }
-
-    if(!process.env.FIP_REPO_NAME) {
-      throw Error("FIP_REPO_NAME not set");
     }
 
     if(!process.env.GH_APP_ID) {
@@ -100,11 +89,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       throw Error("GH_APP_INSTALLATION_ID not set");
     }
 
-
     // open pem file
     const privateKey = fs.readFileSync(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
 
-    const installationOctokit = new Octokit({
+    return new Octokit({
       authStrategy: createAppAuth,
       auth: {
         appId: process.env.GH_APP_ID,
@@ -112,6 +100,20 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         installationId: process.env.GH_APP_INSTALLATION_ID,
       },
     });
+}
+
+
+export async function handle_POST_github_sync(req: Request, res: Response) {
+  try {
+    const installationOctokit = getOctoKitForInstallation();
+
+    if(!process.env.FIP_REPO_OWNER) {
+      throw Error("FIP_REPO_OWNER not set");
+    }
+
+    if(!process.env.FIP_REPO_NAME) {
+      throw Error("FIP_REPO_NAME not set");
+    }
 
     const {data: branchData} = await installationOctokit.request("GET /repos/{owner}/{repo}/branches", {
       owner: process.env.FIP_REPO_OWNER,
@@ -121,8 +123,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     });
 
+    // we want the main branch to take precedence over all of the others
     const mainBranchName = "master";
-
     const branches = branchData.map((branch) => branch.name);
     const branchesNoMain = branches.filter((branch) => branch !== mainBranchName);
 
@@ -131,7 +133,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     // the main branch should take precedence over everything else
     const fips = await extractFIPs([mainBranchName, ...branchesNoMain]);
 
-    console.log("clearing conversations table");[]);
+    console.log("clearing conversations table");
 
     // clear conversation table
     await queryP("DELETE FROM conversations CASCADE", []);
