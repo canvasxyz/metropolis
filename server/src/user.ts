@@ -151,20 +151,16 @@ function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
       const f = usePrimary ? pg.queryP : pg.queryP_readOnly;
       f(
         "SELECT pid FROM participants WHERE zid = ($1) AND uid = ($2);",
-        [zid, uid],
-        function (err: any, results: { rows: string | any[] }) {
-          if (err) {
-            return reject(err);
-          }
-          if (!results || !results.rows || !results.rows.length) {
-            resolve(-1);
-            return;
-          }
-          let pid = results.rows[0].pid;
-          pidCache.set(cacheKey, pid);
-          resolve(pid);
+        [zid, uid]
+      ).then((rows) => {
+        if (!rows.length) {
+          resolve(-1);
+          return;
         }
-      );
+        let pid = rows[0].pid;
+        pidCache.set(cacheKey, pid);
+        resolve(pid);
+      }).catch((err) => reject(err));
     }
   ));
 }
