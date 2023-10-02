@@ -12,6 +12,7 @@ extends:
   - prettier
   - eslint:recommended
   - plugin:react/recommended
+  - plugin:@typescript-eslint/recommended
 rules:
   # TODO: Migrate to camelcase.
   # snake_case API params and properties makes this a tangled process.
