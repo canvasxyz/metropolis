@@ -158,6 +158,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                     <Frontmatter source={selectedConversation.description} />
                     <ReactMarkdown
                       children={selectedConversation.description}
+                      skipHtml={true}
                       remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
                       linkTarget="_blank"
                     />
