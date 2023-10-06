@@ -37,6 +37,29 @@ type PullWithFip = {
 
 type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
 
+function execAsync(command: string, options: child_process.ExecOptions) {
+  return new Promise<{stdout: string; stderr: string}>((resolve, reject) => {
+    child_process.exec(command, options, (err, stdout, stderr) => {
+      if(err) {
+        reject(err);
+      } else {
+        resolve({stdout, stderr});
+      }
+    });
+  });
+}
+
+function readFileAsync(path: string, encoding: string) {
+  return new Promise<string>((resolve, reject) => {
+    fs.readFile(path, encoding, (err, data) => {
+      if(err) {
+        reject(err);
+      } else {
+        resolve(data);
+      }
+    });
+  });
+}
 
 function parseFrontmatter(source: string) {
   /**
@@ -119,7 +142,7 @@ async function getFipFilenames(repoDir: string) {
   return fipFilenames;
 }
 
-function getOctoKitForInstallation() {
+async function getOctoKitForInstallation() {
     if(!process.env.GH_APP_PRIVATE_KEY_PATH) {
       throw Error("GH_APP_PRIVATE_KEY_PATH not set");
     }
@@ -133,7 +156,7 @@ function getOctoKitForInstallation() {
     }
 
     // open pem file
-    const privateKey = fs.readFileSync(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
+    const privateKey = await readFileAsync(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
 
     return new Octokit({
       authStrategy: createAppAuth,
@@ -145,50 +168,40 @@ function getOctoKitForInstallation() {
     });
 }
 
-async function getFipFromPR(repoDir: string, pull: PullRequest, existingFipFilenames: Set<string>): Promise<FIP | undefined> {
+async function getFipFromPR(
+  repoDir: string,
+  pull: PullRequest,
+  existingFipFilenames: Set<string>,
+  mainBranchName: string
+): Promise<FIP | undefined> {
   const owner = pull.head.user?.login as string;
   const repo = pull.head.repo?.name as string;
 
   const remote = `pull-${pull.id}`;
 
   // add remote
-  child_process.execSync(
-    `git remote add ${remote} https://github.com/${owner}/${repo}`,
-    { cwd: repoDir }
-  );
+  await execAsync(`git remote add ${remote} https://github.com/${owner}/${repo}`, { cwd: repoDir });
 
   // fetch the branches from the remote
-  child_process.execSync(
-    `git fetch ${remote}`,
-    { cwd: repoDir }
-  );
+  await execAsync(`git fetch ${remote}`, { cwd: repoDir });
 
   // check out the branch locally
-  child_process.execSync(
+
+  await execAsync(
     `git switch -c ${remote}-branch ${remote}/${pull.head.ref}`,
     { cwd: repoDir }
   );
 
-  // merge master
   try {
-    child_process.execSync(
-      `git merge master -m "nothing"`,
-      { cwd: repoDir }
-    );
+    await execAsync(`git merge ${mainBranchName} -m "nothing"`, { cwd: repoDir });
   } catch (err) {
     // an error is thrown here if there was a merge conflict that could not be
     // automatically resolved - we should just ignore these PRs
-    child_process.execSync(
-      `git reset --merge`,
-      { cwd: repoDir }
-    );
+    await execAsync(`git reset --merge`, { cwd: repoDir });
     return;
   }
 
-  child_process.execSync(
-    `git merge --quit`,
-    { cwd: repoDir }
-  );
+  await execAsync(`git merge --quit`, { cwd: repoDir });
 
   // get all of the names of the FIPs in this branch
   const fipFilenames = await getFipFilenames(repoDir);
@@ -207,14 +220,13 @@ async function getFipFromPR(repoDir: string, pull: PullRequest, existingFipFilen
   }
 
   if(newFipFilenames.length > 1) {
-    console.log(`more than one fip for ${owner}/${repo}#${pull.number}, using the first one`);
+    console.error(`more than one fip for ${owner}/${repo}#${pull.number}, using the first one`);
   }
 
   const filename = newFipFilenames[0];
 
   // get the contents of the new FIP
-  console.log(path.join(repoDir,filename));
-  const content = fs.readFileSync(path.join(repoDir,filename), "utf8");
+  const content = await readFileAsync(path.join(repoDir,filename), "utf8");
 
   // try to extract frontmatter
 
@@ -238,7 +250,7 @@ async function getFipFromPR(repoDir: string, pull: PullRequest, existingFipFilen
 
 export async function handle_POST_github_sync(req: Request, res: Response) {
   try {
-    const installationOctokit = getOctoKitForInstallation();
+    const installationOctokit = await getOctoKitForInstallation();
 
     if(!process.env.FIP_REPO_OWNER) {
       throw Error("FIP_REPO_OWNER not set");
@@ -277,7 +289,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     for(const pull of pulls) {
       try {
-        const fip = await getFipFromPR(repoDir, pull, existingFipFilenames);
+        const fip = await getFipFromPR(repoDir, pull, existingFipFilenames, mainBranchName);
         if(fip) pullsWithFips.push({pull, fip});
       } catch (err) {
         console.error(err);
