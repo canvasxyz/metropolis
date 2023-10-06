@@ -928,7 +928,7 @@ app.put(
   want("spam_filter", getBool, assignToP),
   want("strict_moderation", getBool, assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP),
-  want("description", getOptionalStringLimitLength(5000), assignToP),
+  want("description", getOptionalStringLimitLength(500000), assignToP),
   want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
   want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
   want("postsurvey_limit", getInt, assignToP, null),
