@@ -313,6 +313,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_branch_name,
         github_pr_id,
         github_pr_title,
+        github_pr_submitter,
         fip_title,
         fip_author,
         fip_discussions_to,
@@ -335,7 +336,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         $12,
         $13,
         $14,
-        $15
+        $15,
+        $16
       ) RETURNING zid;
       `;
       const description = fip.content;
@@ -346,6 +348,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       const branch = pull.head.ref;
       const prId = pull.number;
       const prTitle = pull.title;
+      const prSubmitter = pull.user?.login;
 
       const rows = await queryP(
         query,
@@ -358,6 +361,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           branch,
           prId,
           prTitle,
+          prSubmitter,
           fip.frontmatterData.title || null,
           fip.frontmatterData.author || null,
           fip.frontmatterData["discussions-to"] || null,

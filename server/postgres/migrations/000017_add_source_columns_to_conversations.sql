@@ -5,6 +5,7 @@ ALTER TABLE conversations ADD COLUMN IF NOT EXISTS github_repo_owner VARCHAR(255
 ALTER TABLE conversations ADD COLUMN IF NOT EXISTS github_branch_name VARCHAR(255);
 ALTER TABLE conversations ADD COLUMN IF NOT EXISTS github_pr_id VARCHAR(255);
 ALTER TABLE conversations ADD COLUMN IF NOT EXISTS github_pr_title VARCHAR(255);
+ALTER TABLE conversations ADD COLUMN IF NOT EXISTS github_pr_submitter VARCHAR(255);
 
 -- fields extracted from the fip frontmatter
 -- these are not guaranteed to be present or formatted in any particular way

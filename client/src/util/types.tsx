@@ -46,6 +46,7 @@ export type Conversation = {
   github_branch_name: string
   github_pr_id: string
   github_pr_title: string
+  github_pr_submitter: string
   fip_title: string
   fip_author: string
   fip_discussions_to: string
