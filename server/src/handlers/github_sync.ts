@@ -4,12 +4,15 @@ import { Octokit } from "@octokit/core";
 import { Endpoints } from "@octokit/types";
 import { createAppAuth } from "@octokit/auth-app";
 import { Request, Response } from "express";
-import git from "isomorphic-git";
-import http from "isomorphic-git/http/node";
-import { Volume, createFsFromVolume, IFs } from "memfs";
 
 import { queryP } from '../db/pg-query';
 import { generateAndRegisterZinvite } from '../auth/create-user';
+
+import os from "os";
+import path from 'path';
+import child_process from "child_process";
+import { v4 as uuidv4 } from 'uuid';
+
 
 type FIPFrontmatterData = {
   title?: string,
@@ -94,7 +97,7 @@ function parseFrontmatter(source: string) {
 }
 
 
-async function getFipFilenames(currentFs: IFs) {
+async function getFipFilenames(repoDir: string) {
   const dirsToVisit = ["/FIPS", "/FRCs"];
 
   const fipFilenames: string[] = [];
@@ -103,7 +106,7 @@ async function getFipFilenames(currentFs: IFs) {
     let dir;
 
     try {
-      dir = await currentFs.promises.readdir(dirName);
+      dir = fs.readdirSync(path.join(repoDir, dirName));
     } catch (err) {
       return;
     }
@@ -142,52 +145,53 @@ function getOctoKitForInstallation() {
     });
 }
 
-async function getFipFromPR(pull: PullRequest, existingFipFilenames: Set<string>): Promise<FIP | undefined> {
-  // create an in-memory filesystem to hold the cloned repo
-  const vol = new Volume();
-  const memfs = createFsFromVolume(vol);
-
+async function getFipFromPR(repoDir: string, pull: PullRequest, existingFipFilenames: Set<string>): Promise<FIP | undefined> {
   const owner = pull.head.user?.login as string;
   const repo = pull.head.repo?.name as string;
 
-  // clone the repo from the pull request
-  await git.clone({
-    fs: memfs,
-    http,
-    dir: '/',
-    url: `https://github.com/${owner}/${repo}`,
-    ref: pull.head.ref,
-    singleBranch: true,
-    depth: 1,
-  });
+  const remote = `pull-${pull.id}`;
 
-  // git remote add filecoin-project/FIPs https://github.com/filecoin-project/FIPs.git
-  await git.addRemote({
-    fs: memfs,
-    dir: '/',
-    remote: 'filecoin-project/FIPs',
-    url: "https://github.com/filecoin-project/FIPs.git"
-  });
+  // add remote
+  child_process.execSync(
+    `git remote add ${remote} https://github.com/${owner}/${repo}`,
+    { cwd: repoDir }
+  );
 
-  // add master as a remote
-  // TODO: this fails for a bunch of cases because isomorphic git doesn't support
-  // resolving merge conflicts. we should just replace this with actual git (and use
-  // temp folders for isolating the repos)
-  await git.pull({
-    fs: memfs,
-    http,
-    dir: '/',
-    // url: `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
-    remote: 'filecoin-project/FIPs',
-    remoteRef: 'master',
-    author: {
-      name: "arbitrary",
-      email: "arbitrary",
-    }
-  });
+  // fetch the branches from the remote
+  child_process.execSync(
+    `git fetch ${remote}`,
+    { cwd: repoDir }
+  );
+
+  // check out the branch locally
+  child_process.execSync(
+    `git switch -c ${remote}-branch ${remote}/${pull.head.ref}`,
+    { cwd: repoDir }
+  );
+
+  // merge master
+  try {
+    child_process.execSync(
+      `git merge master -m "nothing"`,
+      { cwd: repoDir }
+    );
+  } catch (err) {
+    // an error is thrown here if there was a merge conflict that could not be
+    // automatically resolved - we should just ignore these PRs
+    child_process.execSync(
+      `git reset --merge`,
+      { cwd: repoDir }
+    );
+    return;
+  }
+
+  child_process.execSync(
+    `git merge --quit`,
+    { cwd: repoDir }
+  );
 
   // get all of the names of the FIPs in this branch
-  const fipFilenames = await getFipFilenames(memfs);
+  const fipFilenames = await getFipFilenames(repoDir);
   if(fipFilenames === undefined) {
     throw Error("fipFilenames is undefined");
   }
@@ -209,7 +213,8 @@ async function getFipFromPR(pull: PullRequest, existingFipFilenames: Set<string>
   const filename = newFipFilenames[0];
 
   // get the contents of the new FIP
-  const content = (await memfs.promises.readFile(filename, "utf8")).toString();
+  console.log(path.join(repoDir,filename));
+  const content = fs.readFileSync(path.join(repoDir,filename), "utf8");
 
   // try to extract frontmatter
 
@@ -255,26 +260,24 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     });
 
-    // check out the main branch
-    const vol = new Volume();
-    const memfs = createFsFromVolume(vol);
-    await git.clone({
-      fs: memfs,
-      http,
-      dir: '/',
-      url: `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
-      ref: mainBranchName,
-      singleBranch: true,
-      depth: 1,
-    });
+    const workingDir = path.join(os.tmpdir(), uuidv4());
+    fs.mkdirSync(workingDir);
 
-    const existingFipFilenames = new Set(await getFipFilenames(memfs));
+    // clone the repo
+    child_process.execSync(
+      `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
+      { cwd: workingDir }
+    );
+
+    const repoDir = path.join(workingDir, process.env.FIP_REPO_NAME);
+
+    const existingFipFilenames = new Set(await getFipFilenames(repoDir));
 
     const pullsWithFips: PullWithFip[] = [];
 
     for(const pull of pulls) {
       try {
-        const fip = await getFipFromPR(pull, existingFipFilenames);
+        const fip = await getFipFromPR(repoDir, pull, existingFipFilenames);
         if(fip) pullsWithFips.push({pull, fip});
       } catch (err) {
         console.error(err);
