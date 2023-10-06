@@ -11,17 +11,88 @@ import { Volume, createFsFromVolume, IFs } from "memfs";
 import { queryP } from '../db/pg-query';
 import { generateAndRegisterZinvite } from '../auth/create-user';
 
+type FIPFrontmatterData = {
+  title?: string,
+  author?: string,
+  "discussions-to"?: string,
+  status?: string,
+  type?: string,
+  category?: string,
+  created?: string,
+}
+
 type FIP = {
   filename: string,
   content: string,
+  frontmatterData: FIPFrontmatterData
 }
 
 type PullWithFip = {
   pull: PullRequest,
-  fip: FIP | null
+  fip?: FIP
 }
 
 type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
+
+
+function parseFrontmatter(source: string) {
+  /**
+   * this function takes a roughly-yaml frontmatter string and tries to
+   * extract all of the fields
+   * it is more permissive than just using a yaml parser because users often
+   * give invalid yaml (e.g. missing quotes around strings) for the values
+   */
+
+  const lines = source.split('\n');
+
+  const pairs: {key: string, value: string}[] = []
+  for(const line of lines) {
+    const parts = line.split(":");
+
+    if(parts.length == 1) {
+      // this is probably a continuation of the previous line
+      if(pairs.length == 0) {
+        continue;
+      }
+      pairs[pairs.length - 1].value += ("\n" + line);
+    } else if (parts.length == 2) {
+      // this is a new line
+      const [k,v] = parts;
+      pairs.push({key: k, value: v});
+    } else {
+      // the value contains colons, so merge them
+      const [k, ...valueParts] = parts;
+      const v = valueParts.join(':');
+      pairs.push({key: k, value: v});
+    }
+  }
+
+  // reduce into object
+  const frontmatter: FIPFrontmatterData = {
+    title: "",
+    author: "",
+    "discussions-to": "",
+    status: "",
+    type: "",
+    category: "",
+    created: "",
+  };
+  for(const {key,value} of pairs) {
+    const cleanedKey = key.trim().toLowerCase();
+
+    for(const expectedKey of Object.keys(frontmatter)) {
+      if(cleanedKey.startsWith(expectedKey)) {
+        // is there a way to tell the type system that `expectedKey` is one of the keys of `frontmatter`
+        // we need something like `Object.keys` but for objects with known fields
+        // @ts-ignore
+        frontmatter[expectedKey] = value.trim();
+      }
+    }
+  }
+
+  return frontmatter;
+}
+
 
 async function getFipFilenames(currentFs: IFs) {
   const dirsToVisit = ["/FIPS", "/FRCs"];
@@ -71,7 +142,7 @@ function getOctoKitForInstallation() {
     });
 }
 
-async function getFipFromPR(pull: PullRequest, existingFipFilenames: Set<string>) {
+async function getFipFromPR(pull: PullRequest, existingFipFilenames: Set<string>): Promise<FIP | undefined> {
   // create an in-memory filesystem to hold the cloned repo
   const vol = new Volume();
   const memfs = createFsFromVolume(vol);
@@ -140,9 +211,22 @@ async function getFipFromPR(pull: PullRequest, existingFipFilenames: Set<string>
   // get the contents of the new FIP
   const content = (await memfs.promises.readFile(filename, "utf8")).toString();
 
+  // try to extract frontmatter
+
+  const frontmatterSource = content.split("---")[1];
+
+  let frontmatterData;
+  try {
+    frontmatterData = parseFrontmatter(frontmatterSource)
+  } catch (err) {
+    console.error(err);
+    frontmatterData = {};
+  }
+
   return {
     filename,
-    content
+    content,
+    frontmatterData
   };
 }
 
@@ -217,7 +301,14 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_repo_owner,
         github_branch_name,
         github_pr_id,
-        github_pr_title
+        github_pr_title,
+        fip_title,
+        fip_author,
+        fip_discussions_to,
+        fip_status,
+        fip_type,
+        fip_category,
+        fip_created
       ) VALUES (
         $1,
         $2,
@@ -226,7 +317,14 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         $5,
         $6,
         $7,
-        $8
+        $8,
+        $9,
+        $10,
+        $11,
+        $12,
+        $13,
+        $14,
+        $15
       ) RETURNING zid;
       `;
       const description = fip.content;
@@ -248,7 +346,14 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           repoOwner,
           branch,
           prId,
-          prTitle
+          prTitle,
+          fip.frontmatterData.title || null,
+          fip.frontmatterData.author || null,
+          fip.frontmatterData["discussions-to"] || null,
+          fip.frontmatterData.status || null,
+          fip.frontmatterData.type || null,
+          fip.frontmatterData.category || null,
+          fip.frontmatterData.created || null
         ]
       );
       const zid = rows[0].zid;
