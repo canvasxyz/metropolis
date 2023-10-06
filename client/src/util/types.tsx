@@ -41,5 +41,17 @@ export type Conversation = {
   postsurvey_redirect: string
   postsurvey_limit: string
   postsurvey_submissions: string
+  github_repo_name: string
+  github_repo_owner: string
+  github_branch_name: string
+  github_pr_id: string
+  github_pr_title: string
+  fip_title: string
+  fip_author: string
+  fip_discussions_to: string
+  fip_status: string
+  fip_type: string
+  fip_category: string
+  fip_created: string
   // TODO ...
 }

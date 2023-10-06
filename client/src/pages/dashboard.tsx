@@ -97,7 +97,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                 onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
-                <Text sx={{fontWeight: 500}}>{conversation.topic}</Text>
+                <Text sx={{fontWeight: 500}}>{conversation.github_pr_title}</Text>
                 <Text sx={{color: "#84817D"}}>2 conversations · Feedback open</Text>
               </Box>)
             }
@@ -153,16 +153,25 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                       <Text>Edit</Text>
                     </Button>
                   )}
-                  <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
+                  <Flex sx={{ flexDirection: "column", gap: [2], margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
                     <Heading as="h2">{selectedConversation.topic}</Heading>
-                    <Frontmatter source={selectedConversation.description} />
-                    <ReactMarkdown
-                      children={selectedConversation.description}
-                      skipHtml={true}
-                      remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
-                      linkTarget="_blank"
-                    />
-                  </Box>
+                    <Text>
+                      Pull request: #<a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`https://github.com/filecoin-project/FIPs/pull/${selectedConversation.github_pr_id}`}
+                      >{selectedConversation.github_pr_id}</a>
+                    </Text>
+                    <Frontmatter conversation={selectedConversation} />
+                    <Box>
+                      <ReactMarkdown
+                        children={selectedConversation.description}
+                        skipHtml={true}
+                        remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                        linkTarget="_blank"
+                      />
+                    </Box>
+                  </Flex>
                 </Box>
                 <Box sx={{width: "100%", position: "relative"}}>
                   <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
