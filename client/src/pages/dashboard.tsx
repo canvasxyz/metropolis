@@ -97,8 +97,8 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                 onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
-                <Text sx={{fontWeight: 500}}>{conversation.github_pr_title}</Text>
-                <Text sx={{color: "#84817D"}}>2 conversations · Feedback open</Text>
+                <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
+                <Text sx={{color: "#84817D"}}>{conversation.fip_type}</Text>
               </Box>)
             }
             <Box
@@ -154,7 +154,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                     </Button>
                   )}
                   <Flex sx={{ flexDirection: "column", gap: [2], margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
-                    <Heading as="h2">{selectedConversation.topic}</Heading>
+                    <Heading as="h2">{selectedConversation.fip_title || selectedConversation.github_pr_title}</Heading>
                     <Text>
                       Pull request: #<a
                         target="_blank"
