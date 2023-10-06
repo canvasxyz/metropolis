@@ -32,7 +32,7 @@ type FIP = {
 
 type PullWithFip = {
   pull: PullRequest,
-  fip?: FIP
+  fip: FIP
 }
 
 type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
@@ -302,10 +302,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     // write fips to conversation table
     for (const {pull, fip} of pullsWithFips) {
-      if(!fip) {
-        continue;
-      }
-
       // insert fip
       const query = `
       INSERT INTO conversations (
