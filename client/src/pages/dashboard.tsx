@@ -98,7 +98,11 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                 key={conversation.conversation_id}
               >
                 <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
-                <Text sx={{color: "#84817D"}}>{conversation.fip_type}</Text>
+                <Flex sx={{direction: "row"}}>
+                  <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
+                  <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
+                </Flex>
+
               </Box>)
             }
             <Box
