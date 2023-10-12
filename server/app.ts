@@ -9,7 +9,6 @@ import express from "express";
 import mime from "mime";
 import morgan from "morgan";
 
-import Config from "./src/config";
 import {
   addCorsHeader,
   auth,
@@ -125,8 +124,6 @@ import {
   handle_GET_github_init,
   handle_GET_github_oauth_callback
 } from "./src/handlers/github_auth";
-
-import logger from "./src/utils/logger";
 
 import {
   assignToP,
@@ -1466,8 +1463,5 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
 app.get(/^\/embed$/, fetchEmbed);
 app.get(/^\/embed.js$/, fetchEmbed);
 app.get(/^\/embed\/(.*)/, fetchEmbed);
-
-app.listen(Config.serverPort);
-logger.info("started on port " + Config.serverPort);
 
 export default app;
