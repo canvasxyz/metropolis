@@ -14,7 +14,7 @@ import request from "request-promise"; // includes Request, but adds promise met
 import LruCache from "lru-cache";
 import timeout from "connect-timeout";
 import zlib from "zlib";
-import _, { result } from "underscore";
+import _ from "underscore";
 import pg from "pg";
 
 import { addInRamMetric, meteredPromise } from "./utils/metered";
