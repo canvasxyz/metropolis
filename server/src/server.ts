@@ -1129,8 +1129,18 @@ function handle_GET_tryCookie(
   }
   res.status(200).json({});
 }
+type PcaCacheValue = {
+  asPOJO: {
+    zid: any
+    math_tick?: number
+  };
+  asJSON: string;
+  asBufferOfGzippedJson: any;
+  expiration: number;
+}
+
 let pcaCacheSize = Config.cacheMathResults ? 300 : 1;
-let pcaCache = new LruCache({
+let pcaCache = new LruCache<string, PcaCacheValue>({
   max: pcaCacheSize,
 });
 
@@ -1387,24 +1397,24 @@ function processMathObject(o: { [x: string]: any }) {
   return o;
 }
 
-function getPca(zid?: any, math_tick?: number) {
+function getPca(zid?: any, math_tick?: number): Promise<PcaCacheValue|undefined> {
   let cached = pcaCache.get(zid);
   // Object is of type 'unknown'.ts(2571)
   // @ts-ignore
   if (cached && cached.expiration < Date.now()) {
-    cached = null;
+    cached = undefined;
   }
   // Object is of type 'unknown'.ts(2571)
   // @ts-ignore
   let cachedPOJO = cached && cached.asPOJO;
   if (cachedPOJO) {
-    if (cachedPOJO.math_tick <= (math_tick || 0)) {
+    if (cachedPOJO.math_tick && cachedPOJO.math_tick <= (math_tick || 0)) {
       logger.info("math was cached but not new", {
         zid,
         cached_math_tick: cachedPOJO.math_tick,
         query_math_tick: math_tick,
       });
-      return Promise.resolve(null);
+      return Promise.resolve(undefined);
     } else {
       logger.info("math from cache", { zid, math_tick });
       return Promise.resolve(cached);
@@ -1593,10 +1603,7 @@ function handle_GET_math_pca2(
   }
 
   getPca(zid, math_tick)
-    .then(function (data: {
-      asPOJO: { math_tick: string };
-      asBufferOfGzippedJson: any;
-    }) {
+    .then(function (data) {
       if (data) {
         // The buffer is gzipped beforehand to cut down on server effort in re-gzipping the same json string for each response.
         // We can't cache this endpoint on Cloudflare because the response changes too freqently, so it seems like the best way
