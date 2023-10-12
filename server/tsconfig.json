@@ -43,6 +43,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["app.ts", "src/**/*", "types/**/*"],
+  "include": ["index.ts", "src/**/*", "types/**/*"],
   "exclude": ["../node_modules", "node_modules", "../node_modules/**/*", "node_modules/**/*", "**/*.spec.ts", "dist"]
 }
