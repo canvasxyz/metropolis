@@ -1240,11 +1240,12 @@ app.get(
   handle_GET_github_oauth_callback
 );
 
-app.post(
-  "/api/v3/github_sync",
-  // auth(assignToP),
-  handle_POST_github_sync
-);
+// TODO: figure out a way to trigger this periodically - this endpoint is just here for testing
+// app.post(
+//   "/api/v3/github_sync",
+//   // auth(assignToP),
+//   handle_POST_github_sync
+// );
 
 app.get(
   "/api/v3/locations",
