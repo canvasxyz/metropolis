@@ -296,22 +296,18 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     }
 
-    // clear conversation table
-    await queryP("DELETE FROM zinvites CASCADE", []);
-    await queryP("DELETE FROM conversations CASCADE", []);
-
     // write fips to conversation table
     for (const {pull, fip} of pullsWithFips) {
       // insert fip
       const query = `
       INSERT INTO conversations (
+        github_pr_id,
         description,
         topic,
         owner,
         github_repo_name,
         github_repo_owner,
         github_branch_name,
-        github_pr_id,
         github_pr_title,
         github_pr_submitter,
         fip_title,
@@ -338,7 +334,40 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         $14,
         $15,
         $16
-      ) RETURNING zid;
+      ) ON CONFLICT (github_pr_id)
+      DO UPDATE SET (
+        description,
+        topic,
+        owner,
+        github_repo_name,
+        github_repo_owner,
+        github_branch_name,
+        github_pr_title,
+        github_pr_submitter,
+        fip_title,
+        fip_author,
+        fip_discussions_to,
+        fip_status,
+        fip_type,
+        fip_category,
+        fip_created
+      ) = (
+        $2,
+        $3,
+        $4,
+        $5,
+        $6,
+        $7,
+        $8,
+        $9,
+        $10,
+        $11,
+        $12,
+        $13,
+        $14,
+        $15,
+        $16
+        ) RETURNING zid;
       `;
       const description = fip.content;
       const topic = fip.filename.split(".")[0];
@@ -353,13 +382,13 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       const rows = await queryP(
         query,
         [
+          prId,
           description,
           topic,
           owner,
           repo,
           repoOwner,
           branch,
-          prId,
           prTitle,
           prSubmitter,
           fip.frontmatterData.title || null,
