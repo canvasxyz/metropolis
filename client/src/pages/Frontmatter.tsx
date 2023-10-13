@@ -1,35 +1,25 @@
-import React, { useEffect, useState } from "react"
-import {remark} from "remark"
-import remarkFrontMatter from "remark-frontmatter"
-import remarkParseFrontmatter from 'remark-parse-frontmatter'
+import React from "react"
 import { Box } from "theme-ui"
+import { Conversation } from "../util/types"
 
-type FrontmatterProps = {source: string}
+type FrontmatterProps = {conversation: Conversation}
 
-const useParsedFrontmatter = (source: string) => {
-  const [frontmatter, setFrontmatter] = useState<Record<string,any>|null>(null)
-
-  useEffect(() => {
-    const proc = remark().use(remarkFrontMatter, {type: "yaml", marker: "-"}).use(remarkParseFrontmatter as any)
-    const output = proc.processSync(source)
-
-    setFrontmatter(output.data.frontmatter)
-
-  }, [source])
-
-  return {frontmatter}
-}
-
-export const Frontmatter: React.FC<FrontmatterProps> = ({source}) => {
-  const {frontmatter} = useParsedFrontmatter(source)
-
-  if(frontmatter == null) return <></>
+export const Frontmatter: React.FC<FrontmatterProps> = ({conversation}) => {
+  const fields = ["title", "author", "discussions-to", "status", "type", "category", "created"];
+  const valueFieldNames = ["fip_title", "fip_author", "fip_discussions_to", "fip_status", "fip_type", "fip_category", "fip_created"];
 
   return  (
-    <Box sx={{ my: [3], px: [3], py: [3], border: "1px solid #ddd" }}>
-      {Object.entries(frontmatter).map(([key, value]) =>
-        <Box key={key}> {key}: {value}</Box>
-      )}
+    <Box sx={{ overflowX: "scroll", px: [3], py: [3], border: "1px solid #ddd"}}>
+      <table>
+        <thead>
+          <tr>
+            {fields.map((field, i) => <th key={i}>{field}</th>)}
+          </tr>
+        </thead>
+        <tbody className='border'>
+          {valueFieldNames.map((valueFieldName, i) => (<td key={`${i}-value`} className='border'>{conversation[valueFieldName]}</td>))}
+        </tbody>
+      </table>
     </Box>
   )
 }

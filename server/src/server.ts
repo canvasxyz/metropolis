@@ -8185,7 +8185,7 @@ async function getConversations(
             conv.inbox_item_admin_html.replace(/'/g, "\\'");
         }
 
-        if (suurlData) {
+        if (suurlData && suurlData[conv.zid || ""]) {
           conv.url = suurlData[conv.zid || ""].suurl;
         } else {
           conv.url = buildConversationUrl(

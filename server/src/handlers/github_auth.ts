@@ -32,8 +32,8 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
   const octokit = new Octokit({
     authStrategy: createOAuthUserAuth,
     auth: {
-      clientId: process.env.GH_BASIC_CLIENT_ID,
-      clientSecret: process.env.GH_BASIC_SECRET_ID,
+      clientId: process.env.GH_APP_CLIENT_ID,
+      clientSecret: process.env.GH_APP_CLIENT_SECRET,
       code: req.p.code,
     },
   });

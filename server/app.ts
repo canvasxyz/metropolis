@@ -124,6 +124,7 @@ import {
   handle_GET_github_init,
   handle_GET_github_oauth_callback
 } from "./src/handlers/github_auth";
+import { handle_POST_github_sync } from "./src/handlers/github_sync";
 
 import {
   assignToP,
@@ -924,7 +925,7 @@ app.put(
   want("spam_filter", getBool, assignToP),
   want("strict_moderation", getBool, assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP),
-  want("description", getOptionalStringLimitLength(5000), assignToP),
+  want("description", getOptionalStringLimitLength(500000), assignToP),
   want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
   want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
   want("postsurvey_limit", getInt, assignToP, null),
@@ -1238,6 +1239,13 @@ app.get(
   want("owner", getBool, assignToP, true),
   handle_GET_github_oauth_callback
 );
+
+// TODO: figure out a way to trigger this periodically - this endpoint is just here for testing
+// app.post(
+//   "/api/v3/github_sync",
+//   // auth(assignToP),
+//   handle_POST_github_sync
+// );
 
 app.get(
   "/api/v3/locations",

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@google-cloud/translate": "~1.0.0",
+    "@octokit/auth-app": "^6.0.1",
     "akismet": "~0.0.11",
     "async": "~0.1.22",
     "aws-sdk": "~2.230.1",
@@ -48,6 +49,7 @@
     "simple-oauth2": "~0.2.1",
     "sql": "~0.34.0",
     "underscore": "~1.12.1",
+    "uuid": "^3.1.0",
     "valid-url": "~1.0.9",
     "winston": "~3.8.2"
   },
@@ -72,6 +74,7 @@
     "@types/response-time": "~2.3.4",
     "@types/supertest": "^2.0.12",
     "@types/underscore": "~1.11.1",
+    "@types/uuid": "^9.0.4",
     "@types/valid-url": "~1.0.3",
     "@typescript-eslint/eslint-plugin": "^5.50.0",
     "@typescript-eslint/parser": "^5.50.0",

@@ -15,7 +15,7 @@ import { TbSettings } from "react-icons/tb"
 import { CreateConversationModal } from "./CreateConversationModal"
 
 
-const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
+const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
 
   const hist = useHistory()
   const data = useSelector((state: RootState) => state.conversations)
-  const conversations = (data.conversations || []) as Array<Conversation>
+  const conversations: Array<Conversation> = data.conversations || []
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
 
   const [showOpenConversations, setShowOpenConversations] = useState(true)
@@ -40,8 +40,6 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
     console.log(conversationId)
     hist.push(`/dashboard/c/${conversationId}`)
   },[])
-
-  selectedConversationId
 
   const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
 
@@ -99,8 +97,12 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                 onClick={() => navigateToConversation(conversation.conversation_id)}
                 key={conversation.conversation_id}
               >
-                <Text sx={{fontWeight: 500}}>{conversation.topic}</Text>
-                <Text sx={{color: "#84817D"}}>2 conversations · Feedback open</Text>
+                <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
+                <Flex sx={{direction: "row"}}>
+                  <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
+                  <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
+                </Flex>
+
               </Box>)
             }
             <Box
@@ -155,15 +157,25 @@ const Dashboard: React.FC<{ user?; selectedConversationId: string | null }> = ({
                       <Text>Edit</Text>
                     </Button>
                   )}
-                  <Box sx={{ margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
-                    <Heading as="h2">{selectedConversation.topic}</Heading>
-                    <Frontmatter source={selectedConversation.description} />
-                    <ReactMarkdown
-                      children={selectedConversation.description}
-                      remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
-                      linkTarget="_blank"
-                    />
-                  </Box>
+                  <Flex sx={{ flexDirection: "column", gap: [2], margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
+                    <Heading as="h2">{selectedConversation.fip_title || selectedConversation.github_pr_title}</Heading>
+                    <Text>
+                      Pull request: #<a
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href={`https://github.com/filecoin-project/FIPs/pull/${selectedConversation.github_pr_id}`}
+                      >{selectedConversation.github_pr_id}</a>
+                    </Text>
+                    <Frontmatter conversation={selectedConversation} />
+                    <Box>
+                      <ReactMarkdown
+                        children={selectedConversation.description}
+                        skipHtml={true}
+                        remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                        linkTarget="_blank"
+                      />
+                    </Box>
+                  </Flex>
                 </Box>
                 <Box sx={{width: "100%", position: "relative"}}>
                   <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
