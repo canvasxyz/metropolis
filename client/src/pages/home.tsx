@@ -73,7 +73,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             </Text>
             {!!user?.email || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
+                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/dashboard">
                   Go to conversations
                 </RouterLink>
               </Box>
