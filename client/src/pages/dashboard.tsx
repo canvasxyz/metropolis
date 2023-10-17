@@ -179,18 +179,22 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                 </Box>
                 <Box sx={{width: "100%", position: "relative"}}>
                   <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
+                  {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                   <Button
                     variant="outlineSecondary"
                     onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
                   >
                     Moderate
                   </Button>
+                  )}
+                  {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                   <Button
                     variant="outlineSecondary"
                     onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
                   >
                     Results
                   </Button>
+                  )}
 
                   </Box>
                 <Box
