@@ -17,7 +17,9 @@ export const Frontmatter: React.FC<FrontmatterProps> = ({conversation}) => {
           </tr>
         </thead>
         <tbody className='border'>
-          {valueFieldNames.map((valueFieldName, i) => (<td key={`${i}-value`} className='border'>{conversation[valueFieldName]}</td>))}
+          <tr>
+            {valueFieldNames.map((valueFieldName, i) => (<td key={`${i}-value`} className='border'>{conversation[valueFieldName]}</td>))}
+          </tr>
         </tbody>
       </table>
     </Box>
