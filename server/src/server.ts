@@ -557,11 +557,9 @@ function votesPost(
                 "select * from xids where owner = ($1) and uid = ($2);",
                 [conv.owner, uid]
               ),
-              getSocialInfoForUsers([uid], zid),
-            ]).then(([xids, info]) => {
-              const socialAccountIsLinked = info.length > 0;
+            ]).then((xids) => {
               const hasXid = xids.length > 0;
-              if (socialAccountIsLinked || hasXid) {
+              if (hasXid) {
                 return conv;
               } else {
                 throw "polis_err_post_votes_social_needed";
@@ -8965,8 +8963,6 @@ function getSocialParticipantsForMod(
     ";";
   return queryP(q, params);
 }
-
-const getSocialInfoForUsers = User.getSocialInfoForUsers;
 
 function updateVoteCount(zid: any, pid: any) {
   // return queryP("update participants set vote_count = vote_count + 1 where zid = ($1) and pid = ($2);",[zid, pid]);

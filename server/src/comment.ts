@@ -86,58 +86,6 @@ function getComments(o: CommentType) {
       });
     })
     .then(function (comments) {
-      let include_social = !conv?.is_anon && o.include_social;
-
-      if (include_social) {
-        // TODO: missing fields in Row type?
-        // @ts-ignore
-        let nonAnonComments = comments.filter(function (c: {
-          anon: any;
-          is_seed: any;
-        }) {
-          return !c.anon && !c.is_seed;
-        });
-        let uids = _.pluck(nonAnonComments, "uid");
-        return User.getSocialInfoForUsers(uids, o.zid).then(function (
-          socialInfos: any[]
-        ) {
-          let uidToSocialInfo: UidToSocialInfo = {};
-          socialInfos.forEach(function (info: {
-            verified: any;
-            followers_count: any;
-            uid: string | number;
-          }) {
-            // whitelist properties to send
-            const infoToReturn = {
-              // @ts-ignore
-              x_profile_image_url: info.x_profile_image_url,
-              // @ts-ignore
-              x_name: info.x_name
-            };
-
-            uidToSocialInfo[info.uid] = infoToReturn;
-          });
-          // @ts-ignore
-          return comments.map(function (c: {
-            uid: string | number;
-            anon: any;
-            social: any;
-          }) {
-            let s = uidToSocialInfo[c.uid];
-            if (s) {
-              if (!c.anon) {
-                // s should be undefined in this case, but adding a double-check here in case.
-                c.social = s;
-              }
-            }
-            return c;
-          });
-        });
-      } else {
-        return comments;
-      }
-    })
-    .then(function (comments) {
       // @ts-ignore
       comments.forEach(function (c: { uid: any; anon: any }) {
         delete c.uid;

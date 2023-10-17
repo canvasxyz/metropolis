@@ -202,27 +202,6 @@ function getPidForParticipant(
   };
 }
 
-function getSocialInfoForUsers(uids: any[], zid: any) {
-  uids = _.uniq(uids);
-  uids.forEach(function (uid: string) {
-    if (!_.isNumber(uid)) {
-      throw "polis_err_123123_invalid_uid got:" + uid;
-    }
-  });
-  if (!uids.length) {
-    return Promise.resolve([]);
-  }
-  let uidString = uids.join(",");
-  return pg.queryP_metered_readOnly(
-    "getSocialInfoForUsers",
-    "with " +
-      "x as (select * from xids where uid in (" +
-      uidString +
-      ") and owner  in (select org_id from conversations where zid = ($1))), " +
-      "select *, coalesce(foo.foouid, x.uid) as uid from foo full outer join x on x.uid = foo.foouid;",
-    [zid]
-  );
-}
 
 function getXidRecordByXidOwnerId(
   xid: any,
@@ -315,7 +294,6 @@ export {
   getPid,
   getPidPromise,
   getPidForParticipant,
-  getSocialInfoForUsers,
 };
 
 export default {
@@ -329,5 +307,4 @@ export default {
   getPid,
   getPidPromise,
   getPidForParticipant,
-  getSocialInfoForUsers,
 };
