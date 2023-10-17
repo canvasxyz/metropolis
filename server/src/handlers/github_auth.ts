@@ -13,7 +13,7 @@ export function handle_GET_github_init(
   res: { redirect: (arg0: string) => void }
 ){
   let dest = req.p.dest
-  const clientId = process.env.GH_BASIC_CLIENT_ID;
+  const clientId = process.env.GH_APP_CLIENT_ID;
   const redirectUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&dest=${dest}`;
 
   res.redirect(redirectUrl);
