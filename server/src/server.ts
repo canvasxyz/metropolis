@@ -7984,28 +7984,6 @@ async function getConversations(
 
   // include conversations started by people with the same site_id as me
   // 1's indicate that the conversations are there for that reason
-  let zidListQuery =
-    "select zid, 1 as type from conversations where owner in (select uid from users where site_id = (select site_id from users where uid = ($1)))";
-  if (include_all_conversations_i_am_in) {
-    zidListQuery +=
-      " UNION ALL select zid, 2 as type from participants where uid = ($1)"; // using UNION ALL instead of UNION to ensure we get all the 1's and 2's (I'm not sure if we can guarantee the 2's won't clobber some 1's if we use UNION)
-  }
-  zidListQuery += ";";
-  let zidResults;
-  try {
-    zidResults = await queryP_readOnly(zidListQuery, [uid]);
-  } catch (err) {
-    fail(res, 500, "polis_err_get_conversations_participated_in", err);
-    return;
-  }
-
-  let siteAdminOf = _.filter(
-    zidResults,
-    function (row: { type: number }) {
-      return row.type === 1;
-    }
-  );
-  let isSiteAdmin = _.indexBy(siteAdminOf, "zid");
 
   let query = sql_conversations.select(sql_conversations.star());
 
@@ -8043,7 +8021,7 @@ async function getConversations(
     return;
   }
 
-  // TODO: what does this actually do?
+  // TODO: can this just be a join on the initial query?
   let conversationsWithConversationsIdsResult: any[];
   try {
     conversationsWithConversationsIdsResult = await addConversationIds(conversationsResult);
@@ -8051,7 +8029,6 @@ async function getConversations(
     fail(res, 500, "polis_err_get_conversations_misc", err);
     return;
   }
-
 
   let suurlsPromise;
   if (xid) {
@@ -8106,7 +8083,7 @@ async function getConversations(
         zid?: string | number;
         context?: string;
       }) {
-        conv.is_owner = conv.owner === uid;
+        conv.is_owner = uid && conv.owner === uid;
         let root = getServerNameWithProtocol(req);
 
         if (want_mod_url) {
@@ -8174,8 +8151,7 @@ async function getConversations(
           conv.topic = new Date(conv.created).toUTCString();
         }
 
-        conv.is_mod =
-          conv.is_owner || isSiteAdmin[conv.zid || ""];
+        conv.is_mod = uid && isPolisDev(uid);
 
         // Make sure zid is not exposed
         delete conv.zid;
@@ -8412,10 +8388,8 @@ function handle_GET_conversations(
         .catch(function (err: any) {
           fail(res, 500, "polis_err_get_conversations_1", err);
         });
-    } else if (req.p.uid || req.p.context) {
-      getConversations(req, res);
     } else {
-      fail(res, 403, "polis_err_need_auth");
+      getConversations(req, res);
     }
   });
 }
