@@ -5,8 +5,8 @@ import { Endpoints } from "@octokit/types";
 import { createAppAuth } from "@octokit/auth-app";
 import { Request, Response } from "express";
 
-import { queryP } from '../db/pg-query';
 import { generateAndRegisterZinvite } from '../auth/create-user';
+import { FipFields, PrFields, getConversationByPrId, getOrCreateUserWithGithubUsername, insertConversationPrAndFip, updateConversationPr, updateConversationPrAndFip } from './queries';
 
 import os from "os";
 import path from 'path';
@@ -24,17 +24,6 @@ type FIPFrontmatterData = {
   created?: string,
 }
 
-type FIP = {
-  filename: string,
-  content: string,
-  frontmatterData: FIPFrontmatterData
-}
-
-type PullWithFip = {
-  pull: PullRequest,
-  fip: FIP
-}
-
 type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
 
 function execAsync(command: string, options: child_process.ExecOptions) {
@@ -48,8 +37,6 @@ function execAsync(command: string, options: child_process.ExecOptions) {
     });
   });
 }
-
-
 
 function parseFrontmatter(source: string) {
   /**
@@ -109,7 +96,6 @@ function parseFrontmatter(source: string) {
   return frontmatter;
 }
 
-
 async function getFipFilenames(repoDir: string) {
   const dirsToVisit = ["/FIPS", "/FRCs"];
 
@@ -163,7 +149,7 @@ async function getFipFromPR(
   pull: PullRequest,
   existingFipFilenames: Set<string>,
   mainBranchName: string
-): Promise<FIP | undefined> {
+): Promise<FipFields> {
   const owner = pull.head.user?.login as string;
   const repo = pull.head.repo?.name as string;
 
@@ -188,7 +174,7 @@ async function getFipFromPR(
     // an error is thrown here if there was a merge conflict that could not be
     // automatically resolved - we should just ignore these PRs
     await execAsync(`git reset --merge`, { cwd: repoDir });
-    return;
+    throw Error("merge conflict could not be resolved");
   }
 
   await execAsync(`git merge --quit`, { cwd: repoDir });
@@ -204,9 +190,8 @@ async function getFipFromPR(
 
   if(newFipFilenames.length == 0) {
     // the pull request is not creating a new FIP, ignore this
-    // throw Error("no new fips");
     console.error(`no new fips for ${owner}/${repo}#${pull.number}`);
-    return;
+    throw Error("no new fips");
   }
 
   if(newFipFilenames.length > 1) {
@@ -231,10 +216,16 @@ async function getFipFromPR(
   }
 
   return {
-    filename,
-    content,
-    frontmatterData
-  };
+    description: content,
+    topic: filename.split(".")[0],
+    fip_title: frontmatterData.title,
+    fip_author: frontmatterData.author,
+    fip_discussions_to: frontmatterData["discussions-to"],
+    fip_status: frontmatterData.status,
+    fip_type: frontmatterData.type,
+    fip_category: frontmatterData.category,
+    fip_created: frontmatterData.created
+  }
 }
 
 
@@ -254,7 +245,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     const mainBranchName = "master";
 
     // get existing fips on master
-    const {data: pulls} = await installationOctokit.request("GET /repos/{owner}/{repo}/pulls", {
+    const {data: pulls} = await installationOctokit.request("GET /repos/{owner}/{repo}/pulls?state=all", {
       repo: process.env.FIP_REPO_NAME,
       owner: process.env.FIP_REPO_OWNER,
       headers: {
@@ -275,127 +266,74 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     const existingFipFilenames = new Set(await getFipFilenames(repoDir));
 
-    const pullsWithFips: PullWithFip[] = [];
-
     for(const pull of pulls) {
-      try {
-        const fip = await getFipFromPR(repoDir, pull, existingFipFilenames, mainBranchName);
-        if(fip) pullsWithFips.push({pull, fip});
-      } catch (err) {
-        console.error(err);
+      const githubUsername = pull.user?.login as string;
+      const {uid} = await getOrCreateUserWithGithubUsername(githubUsername);
+
+      const prFields: PrFields = {
+        owner: uid,
+        is_active: pull.state == "open",
+        github_repo_name: pull.head.repo?.name,
+        github_repo_owner: pull.head.repo?.owner?.login,
+        github_branch_name: pull.head.ref,
+        github_pr_id: pull.number,
+        github_pr_title: pull.title,
+        github_pr_submitter: pull.user?.login
       }
-    }
 
-    // write fips to conversation table
-    for (const {pull, fip} of pullsWithFips) {
-      // insert fip
-      const query = `
-      INSERT INTO conversations (
-        github_pr_id,
-        description,
-        topic,
-        owner,
-        is_active,
-        github_repo_name,
-        github_repo_owner,
-        github_branch_name,
-        github_pr_title,
-        github_pr_submitter,
-        fip_title,
-        fip_author,
-        fip_discussions_to,
-        fip_status,
-        fip_type,
-        fip_category,
-        fip_created
-      ) VALUES (
-        $1,
-        $2,
-        $3,
-        $4,
-        true,
-        $5,
-        $6,
-        $7,
-        $8,
-        $9,
-        $10,
-        $11,
-        $12,
-        $13,
-        $14,
-        $15,
-        $16
-      ) ON CONFLICT (github_pr_id)
-      DO UPDATE SET (
-        description,
-        topic,
-        owner,
-        is_active,
-        github_repo_name,
-        github_repo_owner,
-        github_branch_name,
-        github_pr_title,
-        github_pr_submitter,
-        fip_title,
-        fip_author,
-        fip_discussions_to,
-        fip_status,
-        fip_type,
-        fip_category,
-        fip_created
-      ) = (
-        $2,
-        $3,
-        $4,
-        true,
-        $5,
-        $6,
-        $7,
-        $8,
-        $9,
-        $10,
-        $11,
-        $12,
-        $13,
-        $14,
-        $15,
-        $16
-        ) RETURNING zid;
-      `;
-      const description = fip.content;
-      const topic = fip.filename.split(".")[0];
-      const owner = 33;
-      const repo = pull.head.repo?.name;
-      const repoOwner = pull.head.repo?.owner?.login;
-      const branch = pull.head.ref;
-      const prId = pull.number;
-      const prTitle = pull.title;
-      const prSubmitter = pull.user?.login;
+      // check if there is a conversation with this PR id already
+      const existingConversation = await getConversationByPrId(pull.number);
+      if(existingConversation) {
+        console.log(`conversation with PR ${pull.number} already exists, updating`);
 
-      const rows = await queryP(
-        query,
-        [
-          prId,
-          description,
-          topic,
-          owner,
-          repo,
-          repoOwner,
-          branch,
-          prTitle,
-          prSubmitter,
-          fip.frontmatterData.title || null,
-          fip.frontmatterData.author || null,
-          fip.frontmatterData["discussions-to"] || null,
-          fip.frontmatterData.status || null,
-          fip.frontmatterData.type || null,
-          fip.frontmatterData.category || null,
-          fip.frontmatterData.created || null
-        ]
-      );
-      const zid = rows[0].zid;
-      await generateAndRegisterZinvite(zid, false);
+        // update
+        if(pull.status == "open") {
+          console.log(`conversation with PR id ${pull.number} is open, updating`);
+          // get fip
+          let fipFields;
+          try {
+            fipFields = await getFipFromPR(repoDir, pull, existingFipFilenames, mainBranchName);
+          } catch (err) {
+            console.log(`could not get fip for PR ${pull.number}, skipping`);
+            console.log(err);
+            continue;
+          }
+
+
+          // update conversation
+          await updateConversationPrAndFip({...prFields, ...fipFields});
+        } else {
+          console.log(`conversation with PR id ${pull.number} is closed, updating`);
+          // if the PR is closed, don't bother getting the fip
+          if(existingConversation.is_active) {
+            // the conversation has just been closed, trigger some kind of event
+          }
+
+          // we don't care about getting the FIP since it's no longer being discussed
+          // but we want to update the PR status to closed
+          await updateConversationPr(prFields);
+        }
+      } else {
+        if(pull.status == "open") {
+          // we only care about inserting conversations that are open
+          console.log(`conversation with new PR id ${pull.number} does not exist, inserting`);
+          console.log(`trigger some sort of welcome event here`);
+          // this PR has just been opened, we should trigger something here, e.g. post a comment/notification
+
+          let fipFields;
+          try {
+            fipFields = await getFipFromPR(repoDir, pull, existingFipFilenames, mainBranchName);
+          } catch (err) {
+            console.log(`could not get fip for PR ${pull.number}, skipping`);
+            console.log(err);
+            continue;
+          }
+
+          const insertedRows = await insertConversationPrAndFip({...prFields, ...fipFields} )
+          const zid = insertedRows[0].zid;
+          await generateAndRegisterZinvite(zid, false);
+        }
+      }
     }
 
     res.send("ok");

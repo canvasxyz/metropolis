@@ -2,10 +2,10 @@ import { Response } from "express";
 import { Octokit } from "@octokit/core";
 import { createOAuthUserAuth } from "@octokit/auth-oauth-user";
 
-import { queryP } from "../db/pg-query";
 import { startSession } from "../session";
 import cookies from "../utils/cookies";
 import fail from "../utils/fail";
+import { getOrCreateUserWithGithubUsername } from "./queries";
 
 
 export function handle_GET_github_init(
@@ -48,31 +48,7 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
     throw Error("invalid github access token");
   }
 
-  // TODO: this is a hack, we should have more semantically meaningful columns
-  const email = `github: ${githubUsername}`;
-
-  // get or create the user with this github username
-  const getQuery = "select uid from users where email = $1;";
-  const getRes = (await queryP(getQuery, [email])) as {uid: string}[];
-
-  let uid: string;
-  if(getRes.length > 1) {
-    fail(res, 500, "polis_more_than_one_user_with_same_email");
-    return;
-  } else if (getRes.length == 1) {
-    uid = getRes[0].uid;
-  } else {
-    // create user
-    const createQuery =
-    "insert into users " +
-    "(email, hname, zinvite, is_owner) VALUES " +
-    "($1, $2, $3, $4) " +
-    "returning uid;";
-    const vals = [email, githubUsername, null, true];
-
-    const createRes = (await queryP(createQuery, vals)) as {uid: string}[];
-    uid = createRes[0].uid;
-  }
+  const {uid} = await getOrCreateUserWithGithubUsername(githubUsername);
 
   const token = await startSession(uid);
 
