@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'fs/promises';
 
 import { Octokit } from "@octokit/core";
 import { Endpoints } from "@octokit/types";
@@ -49,17 +49,7 @@ function execAsync(command: string, options: child_process.ExecOptions) {
   });
 }
 
-function readFileAsync(path: string, encoding: string) {
-  return new Promise<string>((resolve, reject) => {
-    fs.readFile(path, encoding, (err, data) => {
-      if(err) {
-        reject(err);
-      } else {
-        resolve(data);
-      }
-    });
-  });
-}
+
 
 function parseFrontmatter(source: string) {
   /**
@@ -129,7 +119,7 @@ async function getFipFilenames(repoDir: string) {
     let dir;
 
     try {
-      dir = fs.readdirSync(path.join(repoDir, dirName));
+      dir = await fs.readdir(path.join(repoDir, dirName))
     } catch (err) {
       return;
     }
@@ -156,7 +146,7 @@ async function getOctoKitForInstallation() {
     }
 
     // open pem file
-    const privateKey = await readFileAsync(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
+    const privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
 
     return new Octokit({
       authStrategy: createAppAuth,
@@ -226,7 +216,7 @@ async function getFipFromPR(
   const filename = newFipFilenames[0];
 
   // get the contents of the new FIP
-  const content = await readFileAsync(path.join(repoDir,filename), "utf8");
+  const content = await fs.readFile(path.join(repoDir,filename), "utf8");
 
   // try to extract frontmatter
 
@@ -273,7 +263,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     });
 
     const workingDir = path.join(os.tmpdir(), uuidv4());
-    fs.mkdirSync(workingDir);
+    await fs.mkdir(workingDir);
 
     // clone the repo
     child_process.execSync(
