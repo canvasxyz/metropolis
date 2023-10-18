@@ -7999,8 +7999,6 @@ async function getConversations(
     return;
   }
 
-  let participantInOrSiteAdminOf: string[] =
-    (zidResults && _.pluck(zidResults, "zid")) || null;
   let siteAdminOf = _.filter(
     zidResults,
     function (row: { type: number }) {
@@ -8011,34 +8009,11 @@ async function getConversations(
 
   let query = sql_conversations.select(sql_conversations.star());
 
-  let isRootsQuery = false;
-  let orClauses;
-  if (!_.isUndefined(req.p.context)) {
-    if (req.p.context === "/") {
-      // root of roots returns all public conversations
-      // TODO lots of work to decide what's relevant
-      // There is a bit of mess here, because we're returning both public 'roots' conversations, and potentially private conversations that you are already in.
-      orClauses = sql_conversations.is_public.equals(true);
-      isRootsQuery = true; // more conditions follow in the ANDs below
-    } else {
-      // knowing a context grants access to those conversations (for now at least)
-      orClauses = sql_conversations.context.equals(req.p.context);
-    }
-  } else {
-    orClauses = sql_conversations.owner.equals(uid);
-    if (participantInOrSiteAdminOf.length) {
-      orClauses = orClauses.or(
-        sql_conversations.zid.in(participantInOrSiteAdminOf)
-      );
-    }
-  }
-  query = query.where(orClauses);
   if (!_.isUndefined(req.p.course_invite)) {
     query = query.and(
       sql_conversations.course_id.equals(req.p.course_id)
     );
   }
-  // query = query.where("("+ or_clauses.join(" OR ") + ")");
   if (!_.isUndefined(req.p.is_active)) {
     query = query.and(
       sql_conversations.is_active.equals(req.p.is_active)
@@ -8049,9 +8024,6 @@ async function getConversations(
   }
   if (!_.isUndefined(req.p.zid)) {
     query = query.and(sql_conversations.zid.equals(zid));
-  }
-  if (isRootsQuery) {
-    query = query.and(sql_conversations.context.isNotNull());
   }
 
   //query = whereOptional(query, req.p, 'owner');

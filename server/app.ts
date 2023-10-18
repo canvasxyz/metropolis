@@ -1089,7 +1089,6 @@ app.get(
   want("want_inbox_item_admin_html", getBool, assignToP), // NOTE - use this for API only!
   want("want_inbox_item_participant_html", getBool, assignToP), // NOTE - use this for API only!
   want("limit", getIntInRange(1, 9999), assignToP), // not allowing a super high limit to prevent DOS attacks
-  want("context", getStringLimitLength(1, 999), assignToP),
   want("xid", getStringLimitLength(1, 999), assignToP),
   handle_GET_conversations
 );
