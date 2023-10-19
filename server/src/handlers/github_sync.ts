@@ -229,6 +229,12 @@ async function getFipFromPR(
   }
 }
 
+function getWelcomeMessage(serverNameWithProtocol: string, zinvite: string) {
+  const url = `${serverNameWithProtocol}/dashboard/c/${zinvite}`;
+
+  return `Thank you for contributing a proposal! A discussion ` +
+    `on Metropolis has been automatically opened [here](${url}) where users can give feedback.`;
+}
 
 export async function handle_POST_github_sync(req: Request, res: Response) {
   try {
@@ -332,7 +338,14 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
           const insertedRows = await insertConversationPrAndFip({...prFields, ...fipFields} )
           const zid = insertedRows[0].zid;
-          await generateAndRegisterZinvite(zid, false);
+          const zinvite = await generateAndRegisterZinvite(zid, false);
+          // post comment to PR
+          await installationOctokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
+            owner: process.env.FIP_REPO_OWNER,
+            repo: process.env.FIP_REPO_NAME,
+            issue_number: pull.number,
+            body: getWelcomeMessage(getServerNameWithProtocol(req), zinvite)
+          });
         }
       }
     }
