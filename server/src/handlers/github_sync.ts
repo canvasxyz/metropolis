@@ -12,7 +12,9 @@ import os from "os";
 import path from 'path';
 import child_process from "child_process";
 import { v4 as uuidv4 } from 'uuid';
+import Config from "../config";
 
+const getServerNameWithProtocol = Config.getServerNameWithProtocol;
 
 type FIPFrontmatterData = {
   title?: string,
@@ -174,7 +176,6 @@ async function getFipFromPR(
     // an error is thrown here if there was a merge conflict that could not be
     // automatically resolved - we should just ignore these PRs
     await execAsync(`git reset --merge`, { cwd: repoDir });
-    throw Error("merge conflict could not be resolved");
   }
 
   await execAsync(`git merge --quit`, { cwd: repoDir });
@@ -287,7 +288,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         console.log(`conversation with PR ${pull.number} already exists, updating`);
 
         // update
-        if(pull.status == "open") {
+        if(pull.state == "open") {
           console.log(`conversation with PR id ${pull.number} is open, updating`);
           // get fip
           let fipFields;
@@ -314,7 +315,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPr(prFields);
         }
       } else {
-        if(pull.status == "open") {
+        if(pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(`conversation with new PR id ${pull.number} does not exist, inserting`);
           console.log(`trigger some sort of welcome event here`);
