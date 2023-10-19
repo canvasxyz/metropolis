@@ -199,21 +199,17 @@ function decodeParams(encodedStringifiedJson: string | string[]) {
   return o;
 }
 
-function generateAndRegisterZinvite(zid: any, generateShort: any) {
+async function generateAndRegisterZinvite(zid: any, generateShort: any) {
   let len = 10;
   if (generateShort) {
     len = 6;
   }
-  return Password.generateTokenP(len, false).then(function (zinvite: any) {
-    return pg
-      .queryP(
-        "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
-        [zid, zinvite]
-      )
-      .then(function () {
-        return zinvite;
-      });
-  });
+  const zinvite = await Password.generateTokenP(len, false);
+  await pg.queryP(
+    "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
+    [zid, zinvite]
+  );
+  return zinvite;
 }
 
 export { createUser, doSendVerification, generateAndRegisterZinvite };
