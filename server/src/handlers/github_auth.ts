@@ -7,6 +7,7 @@ import cookies from "../utils/cookies";
 import fail from "../utils/fail";
 import { getOrCreateUserWithGithubUsername } from "./queries";
 
+/** api handlers for performing a github authentication flow */
 
 export function handle_GET_github_init(
   req: { p: { dest: string; owner: string } },
@@ -38,15 +39,16 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
     },
   });
 
-  // get the github user that is associated with the token
+  // get the github username that is associated with the token
   const {
-    data: { login },
+    data: { login: githubUsername },
   } = await octokit.request("GET /user");
 
-  const githubUsername = login;
   if(!githubUsername) {
     throw Error("invalid github access token");
   }
+
+  // the user is now authenticated
 
   const {uid} = await getOrCreateUserWithGithubUsername(githubUsername);
 

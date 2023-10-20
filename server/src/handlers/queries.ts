@@ -1,5 +1,7 @@
 import { queryP } from "../db/pg-query";
 
+/** database queries used by the github integrations */
+
 // fields that come from the PR
 export type PrFields = {
   owner: number

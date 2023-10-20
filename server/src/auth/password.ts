@@ -56,7 +56,7 @@ function generateToken(
   len: any,
   pseudoRandomOk: any,
   callback: {
-    (err: any, token: any): void;
+    (err: any, token: string): void;
     (arg0: number, longStringOfTokens?: string): void;
   }
 ) {
@@ -104,12 +104,12 @@ function generateToken(
 }
 
 function generateTokenP(len: any, pseudoRandomOk: any) {
-  return new Promise(function (resolve, reject) {
-    generateToken(len, pseudoRandomOk, function (err: any, token: unknown) {
+  return new Promise<string>(function (resolve, reject) {
+    generateToken(len, pseudoRandomOk, function (err, token) {
       if (err) {
         reject(err);
       } else {
-        resolve(token);
+        resolve(token as string);
       }
     });
   });

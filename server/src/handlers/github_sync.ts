@@ -1,18 +1,18 @@
 import fs from 'fs/promises';
-
-import { Octokit } from "@octokit/core";
-import { Endpoints } from "@octokit/types";
-import { createAppAuth } from "@octokit/auth-app";
-import { Request, Response } from "express";
-
-import { generateAndRegisterZinvite } from '../auth/create-user';
-import { FipFields, PrFields, getConversationByPrId, getOrCreateUserWithGithubUsername, insertConversationPrAndFip, updateConversationPr, updateConversationPrAndFip } from './queries';
-
 import os from "os";
 import path from 'path';
 import child_process from "child_process";
+
+import { Endpoints } from "@octokit/types";
+import { Request, Response } from "express";
 import { v4 as uuidv4 } from 'uuid';
 
+import { generateAndRegisterZinvite } from '../auth/create-user';
+import Config from "../config";
+import { getGraphqlForInstallation, getOctoKitForInstallation } from './api_wrappers';
+import { FipFields, PrFields, getConversationByPrId, getOrCreateUserWithGithubUsername, insertConversationPrAndFip, updateConversationPr, updateConversationPrAndFip } from './queries';
+
+const getServerNameWithProtocol = Config.getServerNameWithProtocol;
 
 type FIPFrontmatterData = {
   title?: string,
@@ -25,6 +25,10 @@ type FIPFrontmatterData = {
 }
 
 type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
+
+const DISCUSSION_REGEX = new RegExp(
+  `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/discussions/(\\d+)`
+);
 
 function execAsync(command: string, options: child_process.ExecOptions) {
   return new Promise<{stdout: string; stderr: string}>((resolve, reject) => {
@@ -118,32 +122,6 @@ async function getFipFilenames(repoDir: string) {
   return fipFilenames;
 }
 
-async function getOctoKitForInstallation() {
-    if(!process.env.GH_APP_PRIVATE_KEY_PATH) {
-      throw Error("GH_APP_PRIVATE_KEY_PATH not set");
-    }
-
-    if(!process.env.GH_APP_ID) {
-      throw Error("GH_APP_ID not set");
-    }
-
-    if(!process.env.GH_APP_INSTALLATION_ID) {
-      throw Error("GH_APP_INSTALLATION_ID not set");
-    }
-
-    // open pem file
-    const privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
-
-    return new Octokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: process.env.GH_APP_ID,
-        privateKey,
-        installationId: process.env.GH_APP_INSTALLATION_ID,
-      },
-    });
-}
-
 async function getFipFromPR(
   repoDir: string,
   pull: PullRequest,
@@ -174,7 +152,6 @@ async function getFipFromPR(
     // an error is thrown here if there was a merge conflict that could not be
     // automatically resolved - we should just ignore these PRs
     await execAsync(`git reset --merge`, { cwd: repoDir });
-    throw Error("merge conflict could not be resolved");
   }
 
   await execAsync(`git merge --quit`, { cwd: repoDir });
@@ -226,6 +203,36 @@ async function getFipFromPR(
     fip_category: frontmatterData.category,
     fip_created: frontmatterData.created
   }
+}
+
+function getWelcomeMessage(serverNameWithProtocol: string, zinvite: string) {
+  const url = `${serverNameWithProtocol}/dashboard/c/${zinvite}`;
+
+  return `Thank you for contributing a proposal! A discussion ` +
+    `on Metropolis has been automatically opened [here](${url}) where users can give feedback.`;
+}
+
+async function addDiscussionComment(message: string, target: {repoOwner: string, repoName: string, discussionNumber: number}) {
+  const graphqlWithAuth = await getGraphqlForInstallation();
+
+  // @ts-ignore
+  const {repository: {discussion: {id: discussionId}}} = await graphqlWithAuth(
+    `query {
+      repository(owner: "${target.repoOwner}", name: "${target.repoName}") {
+        discussion(number: ${target.discussionNumber}) {
+          id
+        }
+      }
+    }`
+  );
+
+  await graphqlWithAuth(
+    `mutation {
+      addDiscussionComment(input: {discussionId: "${discussionId}", body: "${message}"}) {
+        clientMutationId
+      }
+    }`
+  )
 }
 
 
@@ -287,7 +294,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         console.log(`conversation with PR ${pull.number} already exists, updating`);
 
         // update
-        if(pull.status == "open") {
+        if(pull.state == "open") {
           console.log(`conversation with PR id ${pull.number} is open, updating`);
           // get fip
           let fipFields;
@@ -298,7 +305,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             console.log(err);
             continue;
           }
-
 
           // update conversation
           await updateConversationPrAndFip({...prFields, ...fipFields});
@@ -314,7 +320,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPr(prFields);
         }
       } else {
-        if(pull.status == "open") {
+        if(pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(`conversation with new PR id ${pull.number} does not exist, inserting`);
           console.log(`trigger some sort of welcome event here`);
@@ -331,7 +337,35 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
           const insertedRows = await insertConversationPrAndFip({...prFields, ...fipFields} )
           const zid = insertedRows[0].zid;
-          await generateAndRegisterZinvite(zid, false);
+          const zinvite = await generateAndRegisterZinvite(zid, false);
+          const welcomeMessage = getWelcomeMessage(getServerNameWithProtocol(req), zinvite)
+          // post comment to PR
+          await installationOctokit.request("POST /repos/{owner}/{repo}/issues/{issue_number}/comments", {
+            owner: process.env.FIP_REPO_OWNER,
+            repo: process.env.FIP_REPO_NAME,
+            issue_number: pull.number,
+            body: welcomeMessage
+          });
+
+          // this will only work if the discussions_to field contains a single link to a discussion
+          // so it's kind of brittle
+          if(fipFields.fip_discussions_to) {
+            try {
+              // post the welcome message to the discussion as well
+              const match = fipFields.fip_discussions_to.match(DISCUSSION_REGEX)
+              if(match !== null) {
+                const discussionNumber = match[1];
+                // post to the discussion
+                await addDiscussionComment(welcomeMessage, {
+                  repoOwner: process.env.FIP_REPO_OWNER as string,
+                  repoName: process.env.FIP_REPO_NAME as string,
+                  discussionNumber: parseInt(discussionNumber)
+                });
+              }
+            } catch (err) {
+              console.log(`could not post welcome message to discussion for PR ${pull.number}`);
+            }
+          }
         }
       }
     }
