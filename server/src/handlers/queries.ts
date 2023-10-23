@@ -73,7 +73,7 @@ export async function insertConversationPrAndFip(data: PrFields & FipFields): Pr
   const fields = [...PR_FIELDS, ...FIP_FIELDS];
   const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ");
   const query = `INSERT INTO conversations (${fields.join(", ")}) VALUES (${fieldPlaceholders}) RETURNING zid;`;
-  const values = fields.map(field => data[field] || null);
+  const values = fields.map(field => data[field] ?? null);
   return await queryP(query, values);
 }
 
@@ -81,7 +81,7 @@ export async function updateConversationPrAndFip(data: PrFields & FipFields) {
   const fields = [...PR_FIELDS, ...FIP_FIELDS];
   const fieldAssignments = fields.map((field, i) => `${field} = $${i + 1}`).join(", ");
   const query = `UPDATE conversations SET ${fieldAssignments} WHERE github_pr_id = $${fields.length + 1};`;
-  const values = [...fields.map(field => data[field] || null), data.github_pr_id];
+  const values = [...fields.map(field => data[field] ?? null), data.github_pr_id];
   return await queryP(query, values);
 }
 
@@ -89,6 +89,6 @@ export async function updateConversationPr(data: PrFields) {
   const fields = PR_FIELDS;
   const fieldAssignments = fields.map((field, i) => `${field} = $${i + 1}`).join(", ");
   const query = `UPDATE conversations SET ${fieldAssignments} WHERE github_pr_id = $${fields.length + 1};`;
-  const values = [...fields.map(field => data[field] || null), data.github_pr_id];
+  const values = [...fields.map(field => data[field] ?? null), data.github_pr_id];
   return await queryP(query, values);
 }
