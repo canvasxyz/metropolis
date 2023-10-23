@@ -1240,11 +1240,13 @@ app.get(
 );
 
 // TODO: figure out a way to trigger this periodically - this endpoint is just here for testing
-// app.post(
-//   "/api/v3/github_sync",
-//   // auth(assignToP),
-//   handle_POST_github_sync
-// );
+if(process.env.ENABLE_GITHUB_SYNC_TEST_ENDPOINT) {
+  app.post(
+    "/api/v3/github_sync",
+    // auth(assignToP),
+    handle_POST_github_sync
+  );
+}
 
 app.get(
   "/api/v3/locations",
