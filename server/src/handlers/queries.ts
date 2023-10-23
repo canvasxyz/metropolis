@@ -63,8 +63,8 @@ export async function getUserUidByGithubUsername(githubUsername: string): Promis
   return rows[0];
 }
 
-export async function getConversationByPrId(prId: number): Promise<PrFields | undefined> {
-  const query = `SELECT ${PR_FIELDS.join(", ")} FROM conversations WHERE github_pr_id = $1;`;
+export async function getConversationByPrId(prId: number): Promise<PrFields & {github_sync_enabled: boolean} | undefined> {
+  const query = `SELECT ${[...PR_FIELDS, "github_sync_enabled"].join(", ")} FROM conversations WHERE github_pr_id = $1;`;
   const rows = await queryP(query, [prId]);
   return rows[0]
 }

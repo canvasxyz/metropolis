@@ -126,6 +126,19 @@ const ConversationConfig: React.FC<{
         )}
       </Box>
 
+      <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+        GitHub Synced Data
+      </Heading>
+
+      <Box sx={{ mb: [4], fontStyle: "italic" }}>
+        The fields in this section are automatically synced from GitHub. To change them, please
+        modify the source pull request, or disable syncing by unchecking the box below.
+      </Box>
+
+      <CheckboxField field="github_sync_enabled" label="Enable GitHub sync">
+        Uncheck in order to disable syncing
+      </CheckboxField>
+
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Title</Text>
         <input

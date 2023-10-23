@@ -291,6 +291,11 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       // check if there is a conversation with this PR id already
       const existingConversation = await getConversationByPrId(pull.number);
       if(existingConversation) {
+        if(!existingConversation.github_sync_enabled) {
+          console.log(`github sync is disabled for PR ${pull.number}, skipping`);
+          continue;
+        }
+
         console.log(`conversation with PR ${pull.number} already exists, updating`);
 
         // update
