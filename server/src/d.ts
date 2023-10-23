@@ -124,6 +124,7 @@ export type ConversationType = {
   is_anon?: any;
   is_draft?: any;
   is_data_open?: any;
+  github_sync_enabled?: any;
   profanity_filter?: any;
   spam_filter?: any;
   strict_moderation?: any;

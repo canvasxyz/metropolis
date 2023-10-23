@@ -919,6 +919,7 @@ app.put(
   want("is_anon", getBool, assignToP),
   want("is_draft", getBool, assignToP, false),
   want("is_data_open", getBool, assignToP, false),
+  want("github_sync_enabled", getBool, assignToP, true),
   want("owner_sees_participation_stats", getBool, assignToP, false),
   want("profanity_filter", getBool, assignToP),
   want("short_url", getBool, assignToP, false),

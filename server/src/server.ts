@@ -7096,6 +7096,7 @@ function handle_PUT_conversations(
       is_anon: any;
       is_draft: any;
       is_data_open: any;
+      github_sync_enabled: any;
       profanity_filter: any;
       spam_filter: any;
       strict_moderation: any;
@@ -7153,6 +7154,9 @@ function handle_PUT_conversations(
       }
       if (!_.isUndefined(req.p.is_data_open)) {
         fields.is_data_open = req.p.is_data_open;
+      }
+      if (!_.isUndefined(req.p.github_sync_enabled)) {
+        fields.github_sync_enabled = req.p.github_sync_enabled;
       }
       if (!_.isUndefined(req.p.profanity_filter)) {
         fields.profanity_filter = req.p.profanity_filter;

@@ -17,6 +17,7 @@ const sql_conversations: any = sql.define({
     "is_draft",
     "is_public", // TODO remove this column
     "is_data_open",
+    "github_sync_enabled",
     "profanity_filter",
     "spam_filter",
     "strict_moderation",
