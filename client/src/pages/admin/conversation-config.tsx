@@ -17,21 +17,21 @@ import ComponentHelpers from "../../util/component-helpers"
 import { RootState } from "../../util/types"
 
 const ConversationConfig: React.FC<{
-  dispatch: Function
+  dispatch: Function;
   zid_metadata: {
-    conversation_id: string
-    topic: string // actually: title
-    description: string // actually: intro text
-    survey_caption: string
-    postsurvey: string
-    postsurvey_limit: string
-    postsurvey_submissions: string
-    postsurvey_redirect: string
-    is_owner: boolean
-    is_mod: boolean
-  }
-  error: string
-  loading: boolean
+    conversation_id: string;
+    topic: string; // actually: title
+    description: string; // actually: intro text
+    survey_caption: string;
+    postsurvey: string;
+    postsurvey_limit: string;
+    postsurvey_submissions: string;
+    postsurvey_redirect: string;
+    is_owner: boolean;
+    is_mod: boolean;
+  };
+  error: string;
+  loading: boolean;
 }> = ({ dispatch, zid_metadata, error, loading }) => {
   // {
   //    const reportsPromise = api.get("/api/v3/reports", {
@@ -108,9 +108,11 @@ const ConversationConfig: React.FC<{
       </Heading>
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
-      <CheckboxField field="is_active" label="Conversation is open">
-        Uncheck to disable voting
-      </CheckboxField>
+      <CheckboxField
+        field="is_active"
+        label="Conversation is open"
+        subtitle="Uncheck to disable voting"
+      />
 
       <Box sx={{ mt: [4], mb: [4] }}>
         <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
@@ -135,9 +137,11 @@ const ConversationConfig: React.FC<{
         modify the source pull request, or disable syncing by unchecking the box below.
       </Box>
 
-      <CheckboxField field="github_sync_enabled" label="Enable GitHub sync">
-        Uncheck in order to disable syncing
-      </CheckboxField>
+      <CheckboxField
+        field="github_sync_enabled"
+        label="Enable GitHub sync"
+        subtitle="Uncheck in order to disable syncing"
+      />
 
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Title</Text>
@@ -292,17 +296,25 @@ const ConversationConfig: React.FC<{
         Permissions
       </Heading>
 
-      <CheckboxField field="write_type" label="Enable comments" isIntegerBool>
-        Participants can write their own cards (Recommended: ON)
-      </CheckboxField>
+      <CheckboxField
+        field="write_type"
+        label="Enable comments"
+        subtitle="Participants can write their own cards (Recommended: ON)"
+        isIntegerBool
+      />
 
-      <CheckboxField field="auth_needed_to_write" label="Email required for responses">
-        Require an email to submit comments (Recommended: OFF)
-      </CheckboxField>
+      <CheckboxField
+        field="auth_needed_to_write"
+        label="Email required for responses"
+        subtitle="Require an email to submit comments (Recommended: OFF)"
+      />
 
-      <CheckboxField field="strict_moderation" label="Moderation required for responses">
-        Require moderators to approve submitted comments before voters can see them
-      </CheckboxField>
+
+      <CheckboxField
+        field="strict_moderation"
+        label="Moderation required for responses"
+        subtitle="Require moderators to approve submitted comments before voters can see them"
+      />
 
       {/*
         <CheckboxField
@@ -324,7 +336,7 @@ const ConversationConfig: React.FC<{
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
           Participants cannot vote without first connecting either Facebook or Twitter
         </CheckboxField>
-         */}
+          */}
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Embed
@@ -350,9 +362,11 @@ const ConversationConfig: React.FC<{
           </pre>
         </Box>
 
-        <CheckboxField field="importance_enabled" label="Show importance on embeds">
-          Show "This comment is important" checkbox on the embed interface
-        </CheckboxField>
+        <CheckboxField
+          field="importance_enabled"
+          label="Show importance on embeds"
+          subtitle={`Show "This comment is important" checkbox on the embed interface`}
+        />
       </Box>
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
