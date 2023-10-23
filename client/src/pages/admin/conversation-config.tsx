@@ -46,14 +46,6 @@ const ConversationConfig: React.FC<{
 
   //                document.location = `/r/${conversation_id}/${this.state.reports[0].report_id}`
 
-  const topicRef = useRef<HTMLInputElement>()
-  const descriptionRef = useRef<HTMLTextAreaElement>()
-  const survey_captionRef = useRef<HTMLTextAreaElement>()
-  const postsurveyRef = useRef<HTMLTextAreaElement>()
-  const postsurveyLimitRef = useRef<HTMLInputElement>()
-  const postsurveySubmissionsRef = useRef<HTMLInputElement>()
-  const postsurveyRedirectRef = useRef<HTMLInputElement>()
-
   const [updatedZidMetadata, setUpdatedZidMetadata] = useState(zid_metadata)
 
   const handleStringValueChange = useCallback(
@@ -146,7 +138,6 @@ const ConversationConfig: React.FC<{
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Title</Text>
         <input
-          ref={topicRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -157,7 +148,7 @@ const ConversationConfig: React.FC<{
             border: "1px solid",
             borderColor: "mediumGray",
           }}
-          onBlur={(e) => handleStringValueChange("topic", topicRef.current)}
+          onBlur={(e) => handleStringValueChange("topic", e.target.value)}
           defaultValue={zid_metadata.topic}
         />
       </Box>
@@ -165,7 +156,6 @@ const ConversationConfig: React.FC<{
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Instructions</Text>
         <textarea
-          ref={descriptionRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -179,7 +169,7 @@ const ConversationConfig: React.FC<{
             borderColor: "mediumGray",
           }}
           data-test-id="description"
-          onBlur={(e) => handleStringValueChange("description", descriptionRef.current)}
+          onBlur={(e) => handleStringValueChange("description", e.target.value)}
           defaultValue={zid_metadata.description}
         />
       </Box>
@@ -199,7 +189,6 @@ const ConversationConfig: React.FC<{
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
         <input
-          ref={postsurveyLimitRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -210,7 +199,7 @@ const ConversationConfig: React.FC<{
             border: "1px solid",
             borderColor: "mediumGray",
           }}
-          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", postsurveyLimitRef.current)}
+          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", e.target.value)}
           defaultValue={zid_metadata.postsurvey_limit || ""}
         />
       </Box>
@@ -221,7 +210,6 @@ const ConversationConfig: React.FC<{
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
         <input
-          ref={postsurveySubmissionsRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -233,7 +221,7 @@ const ConversationConfig: React.FC<{
             borderColor: "mediumGray",
           }}
           onBlur={(e) =>
-            handleIntegerValueChange("postsurvey_submission", postsurveySubmissionsRef.current)
+            handleIntegerValueChange("postsurvey_submission", e.target.value)
           }
           defaultValue={zid_metadata.postsurvey_submissions || ""}
         />
@@ -246,7 +234,6 @@ const ConversationConfig: React.FC<{
         </Text>
         <textarea
           placeholder="You’re all done! Thanks for contributing your input. You can expect to hear back from us after..."
-          ref={postsurveyRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -260,7 +247,7 @@ const ConversationConfig: React.FC<{
             borderColor: "mediumGray",
           }}
           data-test-id="postsurvey"
-          onBlur={(e) => handleStringValueChange("postsurvey", postsurveyRef.current)}
+          onBlur={(e) => handleStringValueChange("postsurvey", e.target.value)}
           defaultValue={zid_metadata.postsurvey}
         />
       </Box>
@@ -274,7 +261,6 @@ const ConversationConfig: React.FC<{
         </Text>
         <input
           placeholder="https://"
-          ref={postsurveyRedirectRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -286,7 +272,7 @@ const ConversationConfig: React.FC<{
             borderColor: "mediumGray",
           }}
           onBlur={(e) =>
-            handleStringValueChange("postsurveyRedirect", postsurveyRedirectRef.current)
+            handleStringValueChange("postsurveyRedirect", e.target.value)
           }
           defaultValue={zid_metadata.postsurvey_redirect || ""}
         />
