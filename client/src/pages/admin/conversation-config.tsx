@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import React, { useRef, useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect } from "react"
+import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
@@ -13,26 +14,9 @@ import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
 import Url from "../../util/url"
-import ComponentHelpers from "../../util/component-helpers"
 import { RootState } from "../../util/types"
 
-const ConversationConfig: React.FC<{
-  dispatch: Function;
-  zid_metadata: {
-    conversation_id: string;
-    topic: string; // actually: title
-    description: string; // actually: intro text
-    survey_caption: string;
-    postsurvey: string;
-    postsurvey_limit: string;
-    postsurvey_submissions: string;
-    postsurvey_redirect: string;
-    is_owner: boolean;
-    is_mod: boolean;
-  };
-  error: string;
-  loading: boolean;
-}> = ({ dispatch, zid_metadata, error, loading }) => {
+const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
   // {
   //    const reportsPromise = api.get("/api/v3/reports", {
   //      conversation_id: this.props.conversation_id,
@@ -46,7 +30,6 @@ const ConversationConfig: React.FC<{
 
   //                document.location = `/r/${conversation_id}/${this.state.reports[0].report_id}`
 
-  const [updatedZidMetadata, setUpdatedZidMetadata] = useState(zid_metadata)
 
   const handleStringValueChange = useCallback(
     (field: string, element) => {
@@ -60,7 +43,6 @@ const ConversationConfig: React.FC<{
       if (element.value === "") {
         dispatch(handleZidMetadataUpdate(zid_metadata, field, 0))
       } else {
-        const val = parseInt(element.value, 10)
         if (isNaN(element.value) || element.value.toString() !== element.value) {
           toast.error("Invalid value")
           return
@@ -113,7 +95,7 @@ const ConversationConfig: React.FC<{
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report
           </Link>
@@ -368,7 +350,7 @@ const ConversationConfig: React.FC<{
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report
           </Link>
@@ -376,6 +358,24 @@ const ConversationConfig: React.FC<{
       </Box>
     </Box>
   )
+}
+
+ConversationConfig.propTypes = {
+  dispatch: PropTypes.func,
+  zid_metadata: {
+    conversation_id: PropTypes.string,
+    topic: PropTypes.string, // actually: title
+    description: PropTypes.string, // actually: intro text
+    survey_caption: PropTypes.string,
+    postsurvey: PropTypes.string,
+    postsurvey_limit: PropTypes.string,
+    postsurvey_submissions: PropTypes.string,
+    postsurvey_redirect: PropTypes.string,
+    is_owner: PropTypes.bool,
+    is_mod: PropTypes.bool
+  },
+  error: PropTypes.string,
+  loading: PropTypes.bool
 }
 
 export default connect((state: RootState) => state.user)(
