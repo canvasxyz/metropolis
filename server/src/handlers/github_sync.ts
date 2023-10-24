@@ -182,7 +182,9 @@ async function getFipFromPR(
 
   // try to extract frontmatter
 
-  const frontmatterSource = content.split("---")[1];
+  const contentParts = content.split("---");
+  const frontmatterSource = contentParts[1];
+  const description = contentParts[2];
 
   let frontmatterData;
   try {
@@ -193,7 +195,7 @@ async function getFipFromPR(
   }
 
   return {
-    description: content,
+    description,
     topic: filename.split(".")[0],
     fip_title: frontmatterData.title,
     fip_author: frontmatterData.author,
