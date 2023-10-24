@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, ComponentProps } from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
@@ -15,6 +15,39 @@ import SeedComment from "./seed-comment"
 import api from "../../util/api"
 import Url from "../../util/url"
 import { RootState } from "../../util/types"
+
+
+const Input = (props: ComponentProps<"input">) =>
+  <input
+    sx={{
+      fontFamily: "body",
+      fontSize: [2],
+      width: "100%",
+      maxWidth: "35em",
+      borderRadius: 2,
+      padding: [2],
+      border: "1px solid",
+      borderColor: "mediumGray",
+    }}
+    {...props}
+  />
+
+const Textarea = (props: ComponentProps<"textarea">) =>
+  <textarea
+    sx={{
+      fontFamily: "body",
+      fontSize: [2],
+      width: "100%",
+      maxWidth: "35em",
+      height: "7em",
+      resize: "none",
+      padding: [2],
+      borderRadius: 2,
+      border: "1px solid",
+      borderColor: "mediumGray",
+    }}
+    {...props}
+  />
 
 const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
   // {
@@ -119,39 +152,17 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
 
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Title</Text>
-        <input
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
-          onBlur={(e) => handleStringValueChange("topic", e.target.value)}
+        <Input
+          onBlur={(e) => handleStringValueChange("topic", e.target)}
           defaultValue={zid_metadata.topic}
         />
       </Box>
 
       <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Instructions</Text>
-        <textarea
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            height: "7em",
-            resize: "none",
-            padding: [2],
-            borderRadius: 2,
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
+        <Text sx={{ mb: [2] }}>Description</Text>
+        <Textarea
           data-test-id="description"
-          onBlur={(e) => handleStringValueChange("description", e.target.value)}
+          onBlur={(e) => handleStringValueChange("description", e.target)}
           defaultValue={zid_metadata.description}
         />
       </Box>
@@ -170,18 +181,8 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
           Votes Expected
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
-        <input
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
-          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", e.target.value)}
+        <Input
+          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", e.target)}
           defaultValue={zid_metadata.postsurvey_limit || ""}
         />
       </Box>
@@ -191,19 +192,9 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
           Statements Expected
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
-        <input
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
+        <Input
           onBlur={(e) =>
-            handleIntegerValueChange("postsurvey_submission", e.target.value)
+            handleIntegerValueChange("postsurvey_submission", e.target)
           }
           defaultValue={zid_metadata.postsurvey_submissions || ""}
         />
@@ -229,7 +220,7 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
             borderColor: "mediumGray",
           }}
           data-test-id="postsurvey"
-          onBlur={(e) => handleStringValueChange("postsurvey", e.target.value)}
+          onBlur={(e) => handleStringValueChange("postsurvey", e.target)}
           defaultValue={zid_metadata.postsurvey}
         />
       </Box>
@@ -241,20 +232,10 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
             Optional. Shown as a button after the survey
           </Text>
         </Text>
-        <input
+        <Input
           placeholder="https://"
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
           onBlur={(e) =>
-            handleStringValueChange("postsurveyRedirect", e.target.value)
+            handleStringValueChange("postsurveyRedirect", e.target)
           }
           defaultValue={zid_metadata.postsurvey_redirect || ""}
         />
@@ -362,7 +343,7 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
 
 ConversationConfig.propTypes = {
   dispatch: PropTypes.func,
-  zid_metadata: {
+  zid_metadata: PropTypes.shape({
     conversation_id: PropTypes.string,
     topic: PropTypes.string, // actually: title
     description: PropTypes.string, // actually: intro text
@@ -373,7 +354,7 @@ ConversationConfig.propTypes = {
     postsurvey_redirect: PropTypes.string,
     is_owner: PropTypes.bool,
     is_mod: PropTypes.bool
-  },
+  }),
   error: PropTypes.string,
   loading: PropTypes.bool
 }
