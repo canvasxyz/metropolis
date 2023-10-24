@@ -16,6 +16,8 @@ import api from "../../util/api"
 import Url from "../../util/url"
 import { RootState } from "../../util/types"
 
+const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER;
+const FIP_REPO_NAME = process.env.FIP_REPO_NAME;
 
 const Input = (props: ComponentProps<"input">) =>
   <input
@@ -113,6 +115,9 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
       >
         Configure
       </Heading>
+
+      Conversation for PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
+
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
       <CheckboxField
