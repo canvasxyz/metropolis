@@ -7097,6 +7097,13 @@ function handle_PUT_conversations(
       is_draft: any;
       is_data_open: any;
       github_sync_enabled: any;
+      fip_author: any;
+      fip_discussions_to: any;
+      fip_status: any;
+      fip_type: any;
+      fip_category: any;
+      fip_created: any;
+      fip_title: any;
       profanity_filter: any;
       spam_filter: any;
       strict_moderation: any;
@@ -7158,6 +7165,34 @@ function handle_PUT_conversations(
       if (!_.isUndefined(req.p.github_sync_enabled)) {
         fields.github_sync_enabled = req.p.github_sync_enabled;
       }
+
+      // FIP fields
+      // we only want to update these if github_sync_enabled is false
+      // this is because if github sync was to be enabled, then the FIP fields would be overwritten
+      if(req.p.github_sync_enabled == false) {
+        if (!_.isUndefined(req.p.fip_title)) {
+          fields.fip_title = req.p.fip_title;
+        }
+        if (!_.isUndefined(req.p.fip_author)) {
+          fields.fip_author = req.p.fip_author;
+        }
+        if (!_.isUndefined(req.p.fip_discussions_to)) {
+          fields.fip_discussions_to = req.p.fip_discussions_to;
+        }
+        if (!_.isUndefined(req.p.fip_status)) {
+          fields.fip_status = req.p.fip_status;
+        }
+        if (!_.isUndefined(req.p.fip_type)) {
+          fields.fip_type = req.p.fip_type;
+        }
+        if (!_.isUndefined(req.p.fip_category)) {
+          fields.fip_category = req.p.fip_category;
+        }
+        if (!_.isUndefined(req.p.fip_created)) {
+          fields.fip_created = req.p.fip_created;
+        }
+      }
+
       if (!_.isUndefined(req.p.profanity_filter)) {
         fields.profanity_filter = req.p.profanity_filter;
       }

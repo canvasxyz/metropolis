@@ -116,7 +116,17 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
         Configure
       </Heading>
 
-      Conversation for PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
+      <Box sx={{ mb: [3] }}>
+        PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        Branch <strong>{zid_metadata.github_branch_name}</strong> on <strong>{zid_metadata.github_repo_owner}/{zid_metadata.github_repo_name}</strong>
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        Submitted by <strong>{zid_metadata.github_pr_submitter}</strong>
+      </Box>
 
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
@@ -156,10 +166,11 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
       />
 
       <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Title</Text>
+        <Text sx={{ mb: [2] }}>FIP title</Text>
         <Input
-          onBlur={(e) => handleStringValueChange("topic", e.target)}
-          defaultValue={zid_metadata.topic}
+          onBlur={(e) => handleStringValueChange("fip_title", e.target)}
+          defaultValue={zid_metadata.fip_title}
+          disabled={zid_metadata.github_sync_enabled}
         />
       </Box>
 
@@ -169,6 +180,62 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
           data-test-id="description"
           onBlur={(e) => handleStringValueChange("description", e.target)}
           defaultValue={zid_metadata.description}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP author</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_author", e.target)}
+          defaultValue={zid_metadata.fip_author}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP discussions link</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
+          defaultValue={zid_metadata.fip_discussions_to}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP status</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_status", e.target)}
+          defaultValue={zid_metadata.fip_status}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP type</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_type", e.target)}
+          defaultValue={zid_metadata.fip_type}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP category</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_category", e.target)}
+          defaultValue={zid_metadata.fip_category}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP created</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_created", e.target)}
+          defaultValue={zid_metadata.fip_created}
+          disabled={zid_metadata.github_sync_enabled}
         />
       </Box>
 

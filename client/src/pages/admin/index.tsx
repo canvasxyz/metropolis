@@ -20,7 +20,7 @@ class ConversationAdminContainer extends React.Component<
   {
     dispatch: Function
     match: { url: string; path: string; params: { conversation_id: string } }
-    zid_metadata: { is_mod: boolean }
+    zid_metadata: any
     location: UrlObject
   },
   {}

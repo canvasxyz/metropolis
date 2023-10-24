@@ -18,6 +18,13 @@ const sql_conversations: any = sql.define({
     "is_public", // TODO remove this column
     "is_data_open",
     "github_sync_enabled",
+    "fip_author",
+    "fip_discussions_to",
+    "fip_status",
+    "fip_type",
+    "fip_category",
+    "fip_created",
+    "fip_title",
     "profanity_filter",
     "spam_filter",
     "strict_moderation",
