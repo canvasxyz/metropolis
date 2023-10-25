@@ -150,7 +150,6 @@ export type ConversationType = {
   style_btn?: any;
   write_type?: any;
   importance_enabled?: any;
-  owner_sees_participation_stats?: any;
   link_url?: any;
   course_invite?: any;
   course_id?: any;

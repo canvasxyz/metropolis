@@ -30,7 +30,6 @@ const sql_conversations: any = sql.define({
     "email_domain",
     "owner",
     "org_id",
-    "owner_sees_participation_stats",
     "context",
     "course_id",
     "modified",

@@ -4301,18 +4301,6 @@ function joinWithZidOrSuzinvite(o: {
           return o;
         });
       })
-      // Commenting out for now until we have proper workflow for user.
-      // .then(function(o) {
-      //   logger.info("joinWithZidOrSuzinvite check email");
-      // if (o.conv.owner_sees_participation_stats) {
-      //   // User stats can be provided either by having the users sign in with polis
-      //   // or by having them join via suurls.
-      //   if (!(o.user && o.user.email) && !o.suzinvite) { // may want to inspect the contenst of the suzinvite info object instead of just the suzinvite
-      //     throw new Error("polis_err_need_full_user_for_zid_" + o.conv.zid + "_and_uid_" + (o.user&&o.user.uid));
-      //   }
-      // }
-      // return o;
-      // })
       // @ts-ignore
       .then(function (o: { uid?: any }) {
         if (o.uid) {
@@ -7121,7 +7109,6 @@ function handle_PUT_conversations(
       help_bgcolor: string;
       style_btn: any;
       write_type: any;
-      owner_sees_participation_stats: any;
       launch_presentation_return_url_hex: any;
       link_url: any;
       send_created_email: any;
@@ -7261,10 +7248,6 @@ function handle_PUT_conversations(
       ifDefinedSet("auth_opt_tw", req.p, fields);
       ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields);
 
-      if (!_.isUndefined(req.p.owner_sees_participation_stats)) {
-        fields.owner_sees_participation_stats =
-          !!req.p.owner_sees_participation_stats;
-      }
       if (!_.isUndefined(req.p.link_url)) {
         fields.link_url = req.p.link_url;
       }
@@ -8554,7 +8537,6 @@ function handle_POST_conversations(
       profanity_filter: any;
       spam_filter: any;
       strict_moderation: any;
-      owner_sees_participation_stats: any;
       auth_needed_to_vote: any;
       auth_needed_to_write: any;
       auth_opt_allow_3rdparty: any;
@@ -8611,8 +8593,6 @@ function handle_POST_conversations(
               spam_filter: req.p.spam_filter,
               strict_moderation: req.p.strict_moderation,
               context: req.p.context || null,
-              owner_sees_participation_stats:
-                !!req.p.owner_sees_participation_stats,
               // Set defaults for fields that aren't set at postgres level.
               auth_needed_to_vote:
                 req.p.auth_needed_to_vote || DEFAULTS.auth_needed_to_vote,
