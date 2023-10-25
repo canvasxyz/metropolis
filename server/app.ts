@@ -917,7 +917,6 @@ app.put(
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   want("is_active", getBool, assignToP),
   want("is_anon", getBool, assignToP),
-  want("is_draft", getBool, assignToP, false),
   want("is_data_open", getBool, assignToP, false),
   want("github_sync_enabled", getBool, assignToP, true),
   want("owner_sees_participation_stats", getBool, assignToP, false),
@@ -1086,7 +1085,6 @@ app.get(
   authOptional(assignToP),
   want("include_all_conversations_i_am_in", getBool, assignToP),
   want("is_active", getBool, assignToP),
-  want("is_draft", getBool, assignToP),
   want("course_invite", getStringLimitLength(1, 32), assignToP),
   want(
     "conversation_id",
@@ -1181,7 +1179,6 @@ app.post(
   "/api/v3/conversations",
   auth(assignToP),
   want("is_active", getBool, assignToP, true),
-  want("is_draft", getBool, assignToP, false),
   want("is_anon", getBool, assignToP, false),
   want("owner_sees_participation_stats", getBool, assignToP, false),
   want("profanity_filter", getBool, assignToP, true),

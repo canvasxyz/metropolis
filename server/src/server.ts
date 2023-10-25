@@ -7094,7 +7094,6 @@ function handle_PUT_conversations(
       verifyMeta: any;
       is_active: any;
       is_anon: any;
-      is_draft: any;
       is_data_open: any;
       github_sync_enabled: any;
       fip_author: any;
@@ -7155,9 +7154,6 @@ function handle_PUT_conversations(
       }
       if (!_.isUndefined(req.p.is_anon)) {
         fields.is_anon = req.p.is_anon;
-      }
-      if (!_.isUndefined(req.p.is_draft)) {
-        fields.is_draft = req.p.is_draft;
       }
       if (!_.isUndefined(req.p.is_data_open)) {
         fields.is_data_open = req.p.is_data_open;
@@ -8036,9 +8032,6 @@ async function getConversations(
       sql_conversations.is_active.equals(req.p.is_active)
     );
   }
-  if (!_.isUndefined(req.p.is_draft)) {
-    query = query.and(sql_conversations.is_draft.equals(req.p.is_draft));
-  }
   if (!_.isUndefined(req.p.zid)) {
     query = query.and(sql_conversations.zid.equals(zid));
   }
@@ -8117,7 +8110,6 @@ async function getConversations(
         is_mod: any;
         is_anon: any;
         is_active: any;
-        is_draft: any;
         is_public: any;
         zid?: string | number;
         context?: string;
@@ -8196,7 +8188,6 @@ async function getConversations(
         delete conv.zid;
 
         delete conv.is_anon;
-        delete conv.is_draft;
         delete conv.is_public;
         if (conv.context === "") {
           delete conv.context;
@@ -8559,7 +8550,6 @@ function handle_POST_conversations(
       postsurvey_redirect: any;
       is_active: any;
       is_data_open: any;
-      is_draft: any;
       is_anon: any;
       profanity_filter: any;
       spam_filter: any;
@@ -8615,7 +8605,6 @@ function handle_POST_conversations(
               // postsurvey_redirect: req.p.postsurvey_redirect,
               is_active: req.p.is_active,
               is_data_open: req.p.is_data_open,
-              is_draft: req.p.is_draft,
               is_public: true, // req.p.short_url,
               is_anon: req.p.is_anon,
               profanity_filter: req.p.profanity_filter,

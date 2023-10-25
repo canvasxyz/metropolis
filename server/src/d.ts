@@ -122,7 +122,6 @@ export type UserType = {
 export type ConversationType = {
   is_active?: any;
   is_anon?: any;
-  is_draft?: any;
   is_data_open?: any;
   github_sync_enabled?: any;
   fip_title?: any;

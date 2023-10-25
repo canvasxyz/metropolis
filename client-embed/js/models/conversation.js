@@ -57,7 +57,6 @@ module.exports = Model.extend({
       return "https://pol.is" + this.url_name();
     },
     is_anon: false,
-    is_draft: false,
     is_active: false,
     // is_public: false, // if false, must validate and have account.
     // if no domain specified, sms validation.

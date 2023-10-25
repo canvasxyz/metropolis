@@ -42,6 +42,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
 
   const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
 
+  console.log(conversations)
   const openConversations = conversations.filter((conversation) => !conversation.is_archived)
   const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
 

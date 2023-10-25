@@ -912,7 +912,6 @@ const postCreateConversation = (topic, description) => {
   return api.post("/api/v3/conversations", {
     topic,
     description,
-    is_draft: true,
     is_active: true,
   })
 }
