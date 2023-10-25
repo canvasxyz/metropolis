@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import React, { useRef, useCallback, useState, useEffect } from "react"
+import { useCallback, useState, useEffect, ComponentProps } from "react"
+import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
@@ -13,26 +14,44 @@ import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
 import Url from "../../util/url"
-import ComponentHelpers from "../../util/component-helpers"
 import { RootState } from "../../util/types"
 
-const ConversationConfig: React.FC<{
-  dispatch: Function
-  zid_metadata: {
-    conversation_id: string
-    topic: string // actually: title
-    description: string // actually: intro text
-    survey_caption: string
-    postsurvey: string
-    postsurvey_limit: string
-    postsurvey_submissions: string
-    postsurvey_redirect: string
-    is_owner: boolean
-    is_mod: boolean
-  }
-  error: string
-  loading: boolean
-}> = ({ dispatch, zid_metadata, error, loading }) => {
+const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER;
+const FIP_REPO_NAME = process.env.FIP_REPO_NAME;
+
+const Input = (props: ComponentProps<"input">) =>
+  <input
+    sx={{
+      fontFamily: "body",
+      fontSize: [2],
+      width: "100%",
+      maxWidth: "35em",
+      borderRadius: 2,
+      padding: [2],
+      border: "1px solid",
+      borderColor: "mediumGray",
+    }}
+    {...props}
+  />
+
+const Textarea = (props: ComponentProps<"textarea">) =>
+  <textarea
+    sx={{
+      fontFamily: "body",
+      fontSize: [2],
+      width: "100%",
+      maxWidth: "35em",
+      height: "7em",
+      resize: "none",
+      padding: [2],
+      borderRadius: 2,
+      border: "1px solid",
+      borderColor: "mediumGray",
+    }}
+    {...props}
+  />
+
+const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
   // {
   //    const reportsPromise = api.get("/api/v3/reports", {
   //      conversation_id: this.props.conversation_id,
@@ -46,15 +65,6 @@ const ConversationConfig: React.FC<{
 
   //                document.location = `/r/${conversation_id}/${this.state.reports[0].report_id}`
 
-  const topicRef = useRef<HTMLInputElement>()
-  const descriptionRef = useRef<HTMLTextAreaElement>()
-  const survey_captionRef = useRef<HTMLTextAreaElement>()
-  const postsurveyRef = useRef<HTMLTextAreaElement>()
-  const postsurveyLimitRef = useRef<HTMLInputElement>()
-  const postsurveySubmissionsRef = useRef<HTMLInputElement>()
-  const postsurveyRedirectRef = useRef<HTMLInputElement>()
-
-  const [updatedZidMetadata, setUpdatedZidMetadata] = useState(zid_metadata)
 
   const handleStringValueChange = useCallback(
     (field: string, element) => {
@@ -68,7 +78,6 @@ const ConversationConfig: React.FC<{
       if (element.value === "") {
         dispatch(handleZidMetadataUpdate(zid_metadata, field, 0))
       } else {
-        const val = parseInt(element.value, 10)
         if (isNaN(element.value) || element.value.toString() !== element.value) {
           toast.error("Invalid value")
           return
@@ -106,11 +115,26 @@ const ConversationConfig: React.FC<{
       >
         Configure
       </Heading>
+
+      <Box sx={{ mb: [3] }}>
+        PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        Branch <strong>{zid_metadata.github_branch_name}</strong> on <strong>{zid_metadata.github_repo_owner}/{zid_metadata.github_repo_name}</strong>
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        Submitted by <strong>{zid_metadata.github_pr_submitter}</strong>
+      </Box>
+
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
-      <CheckboxField field="is_active" label="Conversation is open">
-        Uncheck to disable voting
-      </CheckboxField>
+      <CheckboxField
+        field="is_active"
+        label="Conversation is open"
+        subtitle="Uncheck to disable voting"
+      />
 
       <Box sx={{ mt: [4], mb: [4] }}>
         <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
@@ -119,51 +143,99 @@ const ConversationConfig: React.FC<{
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report
           </Link>
         )}
       </Box>
 
+      <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+        GitHub Synced Data
+      </Heading>
+
+      <Box sx={{ mb: [4], fontStyle: "italic" }}>
+        The fields in this section are automatically synced from GitHub. To change them, please
+        modify the source pull request, or disable syncing by unchecking the box below.
+      </Box>
+
+      <CheckboxField
+        field="github_sync_enabled"
+        label="Enable GitHub sync"
+        subtitle="Uncheck in order to disable syncing"
+      />
+
       <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Title</Text>
-        <input
-          ref={topicRef}
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
-          onBlur={(e) => handleStringValueChange("topic", topicRef.current)}
-          defaultValue={zid_metadata.topic}
+        <Text sx={{ mb: [2] }}>FIP title</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_title", e.target)}
+          defaultValue={zid_metadata.fip_title}
+          disabled={zid_metadata.github_sync_enabled}
         />
       </Box>
 
       <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Instructions</Text>
-        <textarea
-          ref={descriptionRef}
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            height: "7em",
-            resize: "none",
-            padding: [2],
-            borderRadius: 2,
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
+        <Text sx={{ mb: [2] }}>Description</Text>
+        <Textarea
           data-test-id="description"
-          onBlur={(e) => handleStringValueChange("description", descriptionRef.current)}
+          onBlur={(e) => handleStringValueChange("description", e.target)}
           defaultValue={zid_metadata.description}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP author</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_author", e.target)}
+          defaultValue={zid_metadata.fip_author}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP discussions link</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
+          defaultValue={zid_metadata.fip_discussions_to}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP status</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_status", e.target)}
+          defaultValue={zid_metadata.fip_status}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP type</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_type", e.target)}
+          defaultValue={zid_metadata.fip_type}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP category</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_category", e.target)}
+          defaultValue={zid_metadata.fip_category}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>FIP created</Text>
+        <Input
+          onBlur={(e) => handleStringValueChange("fip_created", e.target)}
+          defaultValue={zid_metadata.fip_created}
+          disabled={zid_metadata.github_sync_enabled}
         />
       </Box>
 
@@ -181,19 +253,8 @@ const ConversationConfig: React.FC<{
           Votes Expected
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
-        <input
-          ref={postsurveyLimitRef}
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
-          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", postsurveyLimitRef.current)}
+        <Input
+          onBlur={(e) => handleIntegerValueChange("postsurvey_limit", e.target)}
           defaultValue={zid_metadata.postsurvey_limit || ""}
         />
       </Box>
@@ -203,20 +264,9 @@ const ConversationConfig: React.FC<{
           Statements Expected
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
         </Text>
-        <input
-          ref={postsurveySubmissionsRef}
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
+        <Input
           onBlur={(e) =>
-            handleIntegerValueChange("postsurvey_submission", postsurveySubmissionsRef.current)
+            handleIntegerValueChange("postsurvey_submission", e.target)
           }
           defaultValue={zid_metadata.postsurvey_submissions || ""}
         />
@@ -229,7 +279,6 @@ const ConversationConfig: React.FC<{
         </Text>
         <textarea
           placeholder="You’re all done! Thanks for contributing your input. You can expect to hear back from us after..."
-          ref={postsurveyRef}
           sx={{
             fontFamily: "body",
             fontSize: [2],
@@ -243,7 +292,7 @@ const ConversationConfig: React.FC<{
             borderColor: "mediumGray",
           }}
           data-test-id="postsurvey"
-          onBlur={(e) => handleStringValueChange("postsurvey", postsurveyRef.current)}
+          onBlur={(e) => handleStringValueChange("postsurvey", e.target)}
           defaultValue={zid_metadata.postsurvey}
         />
       </Box>
@@ -255,21 +304,10 @@ const ConversationConfig: React.FC<{
             Optional. Shown as a button after the survey
           </Text>
         </Text>
-        <input
+        <Input
           placeholder="https://"
-          ref={postsurveyRedirectRef}
-          sx={{
-            fontFamily: "body",
-            fontSize: [2],
-            width: "100%",
-            maxWidth: "35em",
-            borderRadius: 2,
-            padding: [2],
-            border: "1px solid",
-            borderColor: "mediumGray",
-          }}
           onBlur={(e) =>
-            handleStringValueChange("postsurveyRedirect", postsurveyRedirectRef.current)
+            handleStringValueChange("postsurveyRedirect", e.target)
           }
           defaultValue={zid_metadata.postsurvey_redirect || ""}
         />
@@ -279,17 +317,25 @@ const ConversationConfig: React.FC<{
         Permissions
       </Heading>
 
-      <CheckboxField field="write_type" label="Enable comments" isIntegerBool>
-        Participants can write their own cards (Recommended: ON)
-      </CheckboxField>
+      <CheckboxField
+        field="write_type"
+        label="Enable comments"
+        subtitle="Participants can write their own cards (Recommended: ON)"
+        isIntegerBool
+      />
 
-      <CheckboxField field="auth_needed_to_write" label="Email required for responses">
-        Require an email to submit comments (Recommended: OFF)
-      </CheckboxField>
+      <CheckboxField
+        field="auth_needed_to_write"
+        label="Email required for responses"
+        subtitle="Require an email to submit comments (Recommended: OFF)"
+      />
 
-      <CheckboxField field="strict_moderation" label="Moderation required for responses">
-        Require moderators to approve submitted comments before voters can see them
-      </CheckboxField>
+
+      <CheckboxField
+        field="strict_moderation"
+        label="Moderation required for responses"
+        subtitle="Require moderators to approve submitted comments before voters can see them"
+      />
 
       {/*
         <CheckboxField
@@ -311,7 +357,7 @@ const ConversationConfig: React.FC<{
         <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
           Participants cannot vote without first connecting either Facebook or Twitter
         </CheckboxField>
-         */}
+          */}
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Embed
@@ -337,9 +383,11 @@ const ConversationConfig: React.FC<{
           </pre>
         </Box>
 
-        <CheckboxField field="importance_enabled" label="Show importance on embeds">
-          Show "This comment is important" checkbox on the embed interface
-        </CheckboxField>
+        <CheckboxField
+          field="importance_enabled"
+          label="Show importance on embeds"
+          subtitle={`Show "This comment is important" checkbox on the embed interface`}
+        />
       </Box>
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
@@ -355,7 +403,7 @@ const ConversationConfig: React.FC<{
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any)?.report_id}
+            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report
           </Link>
@@ -363,6 +411,24 @@ const ConversationConfig: React.FC<{
       </Box>
     </Box>
   )
+}
+
+ConversationConfig.propTypes = {
+  dispatch: PropTypes.func,
+  zid_metadata: PropTypes.shape({
+    conversation_id: PropTypes.string,
+    topic: PropTypes.string, // actually: title
+    description: PropTypes.string, // actually: intro text
+    survey_caption: PropTypes.string,
+    postsurvey: PropTypes.string,
+    postsurvey_limit: PropTypes.string,
+    postsurvey_submissions: PropTypes.string,
+    postsurvey_redirect: PropTypes.string,
+    is_owner: PropTypes.bool,
+    is_mod: PropTypes.bool
+  }),
+  error: PropTypes.string,
+  loading: PropTypes.bool
 }
 
 export default connect((state: RootState) => state.user)(

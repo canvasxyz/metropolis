@@ -1,12 +1,12 @@
 import React, { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Box, Flex, Text } from "theme-ui"
+import { Box, Text } from "theme-ui"
 import PropTypes from "prop-types"
 
 import { handleZidMetadataUpdate } from "../../actions"
 import { RootState } from "../../util/types"
 
-export const CheckboxField = ({ field, label = "", children = "", isIntegerBool = false }) => {
+export const CheckboxField = ({ field, label = "", subtitle = "", isIntegerBool = false }) => {
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
   const [state, setState] = useState(zid_metadata[field])
   const dispatch = useDispatch()
@@ -42,7 +42,7 @@ export const CheckboxField = ({ field, label = "", children = "", isIntegerBool 
         />
         &nbsp;<strong>{label}</strong>
       </label>
-      <Text sx={{ display: "inline", ml: [2], color: "lightGray" }}>{children}</Text>
+      {subtitle && <Text sx={{ display: "inline", ml: [2], color: "lightGray" }}>{subtitle}</Text>}
     </Box>
   )
 }
@@ -50,6 +50,6 @@ export const CheckboxField = ({ field, label = "", children = "", isIntegerBool 
 CheckboxField.propTypes = {
   field: PropTypes.string.isRequired,
   label: PropTypes.string,
-  children: PropTypes.oneOfType([PropTypes.element, PropTypes.string]),
+  subtitle: PropTypes.string,
   isIntegerBool: PropTypes.bool,
 }

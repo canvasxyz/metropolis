@@ -7,7 +7,6 @@ import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Conversation, RootState } from "../util/types"
 import { populateConversationsStore } from "../actions"
 import remarkGfm from "remark-gfm"
-import remarkFrontMatter from "remark-frontmatter"
 import ReactMarkdown from "react-markdown"
 import { Frontmatter } from "./Frontmatter"
 import Survey from "./survey"
@@ -171,7 +170,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                       <ReactMarkdown
                         children={selectedConversation.description}
                         skipHtml={true}
-                        remarkPlugins={[remarkGfm, [remarkFrontMatter, {type: "yaml", marker: "-"}]]}
+                        remarkPlugins={[remarkGfm]}
                         linkTarget="_blank"
                       />
                     </Box>

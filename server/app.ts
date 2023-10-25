@@ -919,6 +919,7 @@ app.put(
   want("is_anon", getBool, assignToP),
   want("is_draft", getBool, assignToP, false),
   want("is_data_open", getBool, assignToP, false),
+  want("github_sync_enabled", getBool, assignToP, true),
   want("owner_sees_participation_stats", getBool, assignToP, false),
   want("profanity_filter", getBool, assignToP),
   want("short_url", getBool, assignToP, false),
@@ -926,6 +927,16 @@ app.put(
   want("strict_moderation", getBool, assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP),
   want("description", getOptionalStringLimitLength(500000), assignToP),
+
+  // FIP fields
+  want("fip_title", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_author", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_discussions_to", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_status", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_type", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_category", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_created", getOptionalStringLimitLength(500000), assignToP),
+
   want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
   want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
   want("postsurvey_limit", getInt, assignToP, null),
