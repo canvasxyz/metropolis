@@ -13,7 +13,13 @@ import Survey from "./survey"
 import { TbSettings } from "react-icons/tb"
 import { CreateConversationModal } from "./CreateConversationModal"
 
-const ConversationListItem = ({ conversation, selectedConversationId, navigateToConversation }) => (
+type ConversationListItemProps = {
+  conversation: Conversation,
+  selectedConversationId: string | null,
+  navigateToConversation: (conversationId: string) => void
+}
+
+const ConversationListItem = ({ conversation, selectedConversationId, navigateToConversation }: ConversationListItemProps) => (
   <Box
     sx={{
       p: [3],
