@@ -282,6 +282,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       const prFields: PrFields = {
         owner: uid,
         is_active: pull.state == "open",
+        is_archived: pull.state == "closed",
         github_repo_name: pull.head.repo?.name,
         github_repo_owner: pull.head.repo?.owner?.login,
         github_branch_name: pull.head.ref,
@@ -317,11 +318,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPrAndFip({...prFields, ...fipFields});
         } else {
           console.log(`conversation with PR id ${pull.number} is closed, updating`);
-          // if the PR is closed, don't bother getting the fip
-          if(existingConversation.is_active) {
-            // the conversation has just been closed, trigger some kind of event
-          }
-
           // we don't care about getting the FIP since it's no longer being discussed
           // but we want to update the PR status to closed
           await updateConversationPr(prFields);

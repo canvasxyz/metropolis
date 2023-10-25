@@ -7,6 +7,7 @@ export type PrFields = {
   owner: number
   github_pr_id: number
   is_active: boolean
+  is_archived: boolean
   github_repo_name: string
   github_repo_owner: string
   github_branch_name: string
