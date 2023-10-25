@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import React, { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, Link as RouterLink, useHistory } from "react-router-dom"
+import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
-import { Conversation, RootState } from "../util/types"
+import { Conversation, RootState, User } from "../util/types"
 import { populateConversationsStore } from "../actions"
 import remarkGfm from "remark-gfm"
 import ReactMarkdown from "react-markdown"
@@ -13,8 +13,12 @@ import Survey from "./survey"
 import { TbSettings } from "react-icons/tb"
 import { CreateConversationModal } from "./CreateConversationModal"
 
+type DashboardProps = {
+  user: User
+  selectedConversationId: string | null
+}
 
-const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }> = ({ user, selectedConversationId }) => {
+const Dashboard = ({ selectedConversationId }: DashboardProps) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -40,7 +44,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
     hist.push(`/dashboard/c/${conversationId}`)
   },[])
 
-  const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id == selectedConversationId)[0] : null
+  const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id === selectedConversationId)[0] : null
 
   console.log(conversations)
   const openConversations = conversations.filter((conversation) => !conversation.is_archived)
@@ -89,9 +93,9 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                   pl: [6],
                   cursor: "pointer",
                   userSelect: "none",
-                  backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB": "#FBF5E9",
+                  backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB": "#FBF5E9",
                   "&:hover": {
-                    backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
+                    backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2"
                   }
                 }}
                 onClick={() => navigateToConversation(conversation.conversation_id)}
@@ -129,9 +133,9 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                   pl: [6],
                   cursor: "pointer",
                   userSelect: "none",
-                  backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB": "#FBF5E9",
+                  backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB": "#FBF5E9",
                   "&:hover": {
-                    backgroundColor: conversation.conversation_id == selectedConversationId ? "#F5EEDB" : "#F8F2E2"
+                    backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2"
                   }
                 }}
                 onClick={() => navigateToConversation(conversation.conversation_id)}
@@ -143,7 +147,7 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
           </Box>
         </Box>
         <Box sx={{ overflowY:"scroll", flex: 1 }}>
-          {!!selectedConversation
+          {selectedConversation
             ? <Box>
                 <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
                   {(zid_metadata.is_mod || zid_metadata.is_owner) && (
@@ -167,14 +171,13 @@ const Dashboard: React.FC<{ user?: any; selectedConversationId: string | null }>
                       >{selectedConversation.github_pr_id}</a>
                     </Text>
                     <Frontmatter conversation={selectedConversation} />
-                    <Box>
-                      <ReactMarkdown
-                        children={selectedConversation.description}
-                        skipHtml={true}
-                        remarkPlugins={[remarkGfm]}
-                        linkTarget="_blank"
-                      />
-                    </Box>
+                    <ReactMarkdown
+                      skipHtml={true}
+                      remarkPlugins={[remarkGfm]}
+                      linkTarget="_blank"
+                    >
+                      {selectedConversation.description}
+                    </ReactMarkdown>
                   </Flex>
                 </Box>
                 <Box sx={{width: "100%", position: "relative"}}>
