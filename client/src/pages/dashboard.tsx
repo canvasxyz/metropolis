@@ -13,6 +13,31 @@ import Survey from "./survey"
 import { TbSettings } from "react-icons/tb"
 import { CreateConversationModal } from "./CreateConversationModal"
 
+const ConversationListItem = ({ conversation, selectedConversationId, navigateToConversation }) => (
+  <Box
+    sx={{
+      p: [3],
+      pl: [6],
+      cursor: "pointer",
+      userSelect: "none",
+      backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB": "#FBF5E9",
+      "&:hover": {
+        backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2"
+      }
+    }}
+    onClick={() => navigateToConversation(conversation.conversation_id)}
+    key={conversation.conversation_id}
+  >
+    <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
+    <Flex sx={{direction: "row"}}>
+      <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
+      <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
+    </Flex>
+
+  </Box>
+);
+
+
 type DashboardProps = {
   user: User
   selectedConversationId: string | null
@@ -87,27 +112,12 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             {showOpenConversations && openConversations.map(
               (conversation) =>
-              <Box
-                sx={{
-                  p: [3],
-                  pl: [6],
-                  cursor: "pointer",
-                  userSelect: "none",
-                  backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB": "#FBF5E9",
-                  "&:hover": {
-                    backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2"
-                  }
-                }}
-                onClick={() => navigateToConversation(conversation.conversation_id)}
-                key={conversation.conversation_id}
-              >
-                <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
-                <Flex sx={{direction: "row"}}>
-                  <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
-                  <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
-                </Flex>
-
-              </Box>)
+                <ConversationListItem
+                  conversation={conversation}
+                  selectedConversationId={selectedConversationId}
+                  navigateToConversation={navigateToConversation} key={conversation.conversation_id}
+                />
+              )
             }
             <Box
               sx={{
@@ -126,23 +136,12 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             {showArchivedConversations && archivedConversations.map(
               (conversation) =>
-              <Box
-                sx={{
-                  fontWeight: 500,
-                  p: [3],
-                  pl: [6],
-                  cursor: "pointer",
-                  userSelect: "none",
-                  backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB": "#FBF5E9",
-                  "&:hover": {
-                    backgroundColor: conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2"
-                  }
-                }}
-                onClick={() => navigateToConversation(conversation.conversation_id)}
-                key={conversation.conversation_id}
-              >
-                {conversation.topic}
-              </Box>)
+                <ConversationListItem
+                  conversation={conversation}
+                  selectedConversationId={selectedConversationId}
+                  navigateToConversation={navigateToConversation} key={conversation.conversation_id}
+                />
+              )
             }
           </Box>
         </Box>
