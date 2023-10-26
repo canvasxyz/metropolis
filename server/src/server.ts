@@ -50,7 +50,6 @@ import {
 import {
   createDummyUser,
   getPidPromise,
-  getPid,
   getUserInfoForUid,
   getUserInfoForUid2,
   getUser,
@@ -59,7 +58,8 @@ import {
   pidCache,
   getXidRecordByXidOwnerId,
   isAdministrator,
-  isOwner
+  isOwner,
+  isOwnerOrParticipant
 } from "./user"
 
 AWS.config.update({ region: Config.awsRegion });
@@ -3057,24 +3057,6 @@ function joinConversation(
   }, doJoin);
 }
 
-function isOwnerOrParticipant(
-  zid: any,
-  uid?: any,
-  callback?: { (): void; (arg0: null): void }
-) {
-  // TODO should be parallel.
-  // look into bluebird, use 'some' https://github.com/petkaantonov/bluebird
-  getPid(zid, uid, function (err: any, pid: number) {
-    if (err || pid < 0) {
-      isConversationOwner(zid, uid, function (err: any) {
-        callback?.(err);
-      });
-    } else {
-      callback?.(null);
-    }
-  });
-}
-
 function isConversationOwner(
   zid: any,
   uid?: any,
@@ -5920,30 +5902,37 @@ function handle_POST_comments(
   );
 } // end POST /api/v3/comments
 
-function handle_GET_votes_me(
+async function handle_GET_votes_me(
   req: { p: { zid: any; uid?: any; pid: any } },
   res: any
 ) {
-  getPid(req.p.zid, req.p.uid, function (err: any, pid: number) {
-    if (err || pid < 0) {
-      fail(res, 500, "polis_err_getting_pid", err);
-      return;
-    }
-    query_readOnly(
-      "SELECT * FROM votes WHERE zid = ($1) AND pid = ($2);",
-      [req.p.zid, req.p.pid],
-      function (err: any, docs: { rows: string | any[] }) {
-        if (err) {
-          fail(res, 500, "polis_err_get_votes_by_me", err);
-          return;
-        }
-        for (let i = 0; i < docs.rows.length; i++) {
-          docs.rows[i].weight = docs.rows[i].weight / 32767;
-        }
-        finishArray(res, docs.rows);
-      }
-    );
-  });
+  let pid;
+
+  try {
+    pid = await getPidPromise(req.p.zid, req.p.uid)
+  } catch (err) {
+    fail(res, 500, "polis_err_getting_pid", err);
+    return;
+  }
+
+  if(pid < 0 ) {
+    fail(res, 500, "polis_err_getting_pid");
+    return;
+  }
+
+  let rows;
+  try {
+    rows = await queryP_readOnly(
+        "SELECT * FROM votes WHERE zid = ($1) AND pid = ($2);",
+        [req.p.zid, req.p.pid]);
+  } catch (err) {
+    fail(res, 500, "polis_err_get_votes_by_me", err);
+    return;
+  }
+  for (let i = 0; i < rows.length; i++) {
+    rows[i].weight = rows[i].weight / 32767;
+  }
+  finishArray(res, rows);
 }
 
 function handle_GET_votes(req: { p: any }, res: any) {
@@ -8639,15 +8628,9 @@ function handle_POST_conversations(
     }); // end xidStuffReady
 } // end post conversations
 
-function handle_POST_query_participants_by_metadata(
+async function handle_POST_query_participants_by_metadata(
   req: { p: { uid?: any; zid: any; pmaids: any } },
-  res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: never[]): void; new (): any };
-    };
-  }
+  res: Response
 ) {
   let uid = req.p.uid;
   let zid = req.p.zid;
@@ -8658,9 +8641,15 @@ function handle_POST_query_participants_by_metadata(
     return res.status(200).json([]);
   }
 
-  function doneChecking() {
-    // find list of participants who are not eliminated by the list of excluded choices.
-    query_readOnly(
+  const canPost = await isOwnerOrParticipant(zid, uid);
+  if (!canPost) {
+    return fail(res, 403, "polis_err_permissions");
+  }
+
+  // find list of participants who are not eliminated by the list of excluded choices.
+  let rows
+  try {
+    rows = await queryP_readOnly(
       // 3. invert the selection of participants, so we get those who passed the filter.
       "select pid from participants where zid = ($1) and pid not in " +
         // 2. find the people who chose those answers
@@ -8671,20 +8660,14 @@ function handle_POST_query_participants_by_metadata(
         "))" +
         ")" +
         ";",
-      [zid, zid],
-      function (err: any, results: { rows: any }) {
-        if (err) {
-          fail(res, 500, "polis_err_metadata_query", err);
-          return;
-        }
-        // Argument of type 'any[]' is not assignable to parameter of type 'never[]'.ts(2345)
-        // @ts-ignore
-        res.status(200).json(_.pluck(results.rows, "pid"));
-      }
+      [zid, zid]
     );
+  } catch (err) {
+    fail(res, 500, "polis_err_metadata_query", err);
+    return;
   }
-
-  isOwnerOrParticipant(zid, uid, doneChecking);
+  res.status(200);
+  res.json(rows.map((row) => row.pid));
 }
 function handle_POST_sendCreatedLinkToEmail(
   req: { p: { uid?: any; zid: string } },

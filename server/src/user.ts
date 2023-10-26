@@ -116,32 +116,6 @@ let pidCache: LRUCache<string, number> = new LruCache({
 });
 
 // returns a pid of -1 if it's missing
-function getPid(
-  zid: string,
-  uid: string,
-  callback: (arg0: null, arg1: number) => void
-) {
-  let cacheKey = zid + "_" + uid;
-  let cachedPid = pidCache.get(cacheKey);
-  if (!_.isUndefined(cachedPid)) {
-    callback(null, cachedPid);
-    return;
-  }
-  pg.query_readOnly(
-    "SELECT pid FROM participants WHERE zid = ($1) AND uid = ($2);",
-    [zid, uid],
-    function (err: any, docs: { rows: { pid: number }[] }) {
-      let pid = -1;
-      if (docs && docs.rows && docs.rows[0]) {
-        pid = docs.rows[0].pid;
-        pidCache.set(cacheKey, pid);
-      }
-      callback(err, pid);
-    }
-  );
-}
-
-// returns a pid of -1 if it's missing
 function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
   let cacheKey = zid + "_" + uid;
   let cachedPid = pidCache.get(cacheKey);
@@ -303,6 +277,22 @@ async function isOwner(zid: any, uid: string) {
   return (await getConversationInfo(zid)).owner === uid;
 }
 
+async function isOwnerOrParticipant(
+  zid: any,
+  uid?: any,
+) {
+  let pid;
+  try {
+    pid = await getPidPromise(zid, uid);
+  } catch (err) {
+    return false;
+  }
+  if(pid < 0) {
+    return false;
+  }
+  return await isOwner(zid, uid);
+}
+
 export {
   pidCache,
   getXidRecordByXidOwnerId,
@@ -311,9 +301,9 @@ export {
   getUserInfoForUid2,
   getUser,
   createDummyUser,
-  getPid,
   getPidPromise,
   getPidForParticipant,
   isAdministrator,
   isOwner,
+  isOwnerOrParticipant
 };
