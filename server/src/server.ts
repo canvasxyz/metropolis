@@ -7108,6 +7108,7 @@ function handle_PUT_conversations(
             let conv = result && result.rows && result.rows[0];
             // The first check with isOwner implictly tells us this can be returned in HTTP response.
             conv.is_mod = true;
+            conv.is_owner = true;
 
             let promise = generateShortUrl
               ? generateAndReplaceZinvite(req.p.zid, generateShortUrl)
