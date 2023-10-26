@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { useCallback, useState, useEffect, ComponentProps } from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
@@ -14,7 +13,7 @@ import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
 import Url from "../../util/url"
-import { RootState } from "../../util/types"
+import { Conversation, RootState } from "../../util/types"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER;
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME;
@@ -51,7 +50,14 @@ const Textarea = (props: ComponentProps<"textarea">) =>
     {...props}
   />
 
-const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
+type ConversationConfigProps = {
+  dispatch: (arg0: any) => void,
+  zid_metadata: Conversation,
+  error: string,
+  loading: boolean
+}
+
+const ConversationConfig = ({ dispatch, zid_metadata, error }: ConversationConfigProps) => {
   // {
   //    const reportsPromise = api.get("/api/v3/reports", {
   //      conversation_id: this.props.conversation_id,
@@ -411,24 +417,6 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }) => {
       </Box>
     </Box>
   )
-}
-
-ConversationConfig.propTypes = {
-  dispatch: PropTypes.func,
-  zid_metadata: PropTypes.shape({
-    conversation_id: PropTypes.string,
-    topic: PropTypes.string, // actually: title
-    description: PropTypes.string, // actually: intro text
-    survey_caption: PropTypes.string,
-    postsurvey: PropTypes.string,
-    postsurvey_limit: PropTypes.string,
-    postsurvey_submissions: PropTypes.string,
-    postsurvey_redirect: PropTypes.string,
-    is_owner: PropTypes.bool,
-    is_mod: PropTypes.bool
-  }),
-  error: PropTypes.string,
-  loading: PropTypes.bool
 }
 
 export default connect((state: RootState) => state.user)(
