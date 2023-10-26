@@ -7751,13 +7751,11 @@ function getOneConversation(zid: any, uid?: any, lang?: null) {
       [zid]
     ),
     getConversationHasMetadata(zid),
-    _.isUndefined(uid) ? Promise.resolve({}) : getUserInfoForUid2(uid),
     getConversationTranslationsMinimal(zid, lang),
   ]).then(function (results: any[]) {
     let conv = results[0] && results[0][0];
     let convHasMetadata = results[1];
-    let requestingUserInfo = results[2];
-    let translations = results[3];
+    let translations = results[2];
 
     conv.auth_opt_allow_3rdparty = ifDefinedFirstElseSecond(
       conv.auth_opt_allow_3rdparty,
@@ -7780,8 +7778,8 @@ function getOneConversation(zid: any, uid?: any, lang?: null) {
       if (!_.isUndefined(ownername) && conv.context !== "hongkong2014") {
         conv.ownername = ownername;
       }
-      conv.is_mod = conv.site_id === requestingUserInfo.site_id;
-      conv.is_owner = conv.owner === uid;
+      conv.is_mod = isAdministrator(uid);
+      conv.is_owner = isOwner(zid, uid);
       delete conv.uid; // conv.owner is what you want, uid shouldn't be returned.
       return conv;
     });
@@ -7914,7 +7912,6 @@ async function getConversations(
         zid?: string | number;
         context?: string;
       }) {
-        conv.is_owner = uid && conv.owner === uid;
         let root = getServerNameWithProtocol(req);
 
         if (want_mod_url) {
@@ -7992,6 +7989,7 @@ async function getConversations(
         if (conv.context === "") {
           delete conv.context;
         }
+        return conv;
       });
 
       res.status(200).json(conversationsWithConversationsIdsResult);
