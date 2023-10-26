@@ -47,6 +47,8 @@ import {
   Vote,
 } from "./d";
 
+import { isModerator, isPolisDev } from "./user"
+
 AWS.config.update({ region: Config.awsRegion });
 const devMode = Config.isDevMode;
 
@@ -80,12 +82,6 @@ import { Request, Response } from "express";
 const sendTextEmail = emailSenders.sendTextEmail;
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
-
-const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
-
-function isPolisDev(uid?: any) {
-  return polisDevs.indexOf(uid) >= 0;
-}
 
 const polisFromAddress = Config.polisFromAddress;
 
@@ -3105,18 +3101,6 @@ function isConversationOwner(
 function isOwner(zid: any, uid: string) {
   return getConversationInfo(zid).then(function (info: any) {
     return info.owner === uid;
-  });
-}
-
-function isModerator(zid: any, uid?: any) {
-  if (isPolisDev(uid)) {
-    return Promise.resolve(true);
-  }
-  return queryP_readOnly(
-    "select count(*) from conversations where owner in (select uid from users where site_id = (select site_id from users where uid = ($2))) and zid = ($1);",
-    [zid, uid]
-  ).then(function (rows: { count: number }[]) {
-    return rows[0].count >= 1;
   });
 }
 

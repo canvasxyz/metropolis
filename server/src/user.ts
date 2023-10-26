@@ -7,6 +7,9 @@ import { meteredPromise } from "./utils/metered";
 import Conversation from "./conversation";
 import LRUCache from "lru-cache";
 import logger from "./utils/logger";
+import Config from "./config";
+
+const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
 
 async function getUserInfoForUid(
   uid: any,
@@ -73,6 +76,7 @@ async function getUser(
     delete xInfo[0].created;
     delete xInfo[0].uid;
   }
+
   return {
     uid: uid,
     email: info.email,
@@ -285,6 +289,23 @@ function getXidStuff(xid: any, zid: any) {
   });
 }
 
+function isPolisDev(uid?: any) {
+  return polisDevs.indexOf(uid) >= 0;
+}
+
+function isModerator(zid: any, uid?: any) {
+  if (isPolisDev(uid)) {
+    return Promise.resolve(true);
+  }
+  return pg.queryP_readOnly(
+    "select count(*) from conversations where owner in (select uid from users where site_id = (select site_id from users where uid = ($2))) and zid = ($1);",
+    [zid, uid]
+  ).then(function (rows: { count: number }[]) {
+    return rows[0].count >= 1;
+  });
+}
+
+
 export {
   pidCache,
   getUserInfoForUid,
@@ -294,6 +315,8 @@ export {
   getPid,
   getPidPromise,
   getPidForParticipant,
+  isPolisDev,
+  isModerator,
 };
 
 export default {
@@ -307,4 +330,6 @@ export default {
   getPid,
   getPidPromise,
   getPidForParticipant,
+  isPolisDev,
+  isModerator,
 };
