@@ -13,7 +13,8 @@ type PropTypes = {
 }
 
 
-const CreateConversationInner = ({ dispatch }) => {
+const CreateConversationInner = () => {
+  const dispatch = useDispatch()
   const descriptionRef = useRef()
 
   const [title, setTitle] = useState<string>()
@@ -26,7 +27,6 @@ const CreateConversationInner = ({ dispatch }) => {
       window.removeEventListener("onpopstate", onpopstate, false)
     }
   }, [])
-
 
   return (
     <Box>
@@ -86,8 +86,6 @@ const CreateConversationInner = ({ dispatch }) => {
 }
 
 export const CreateConversationModal: React.FC<PropTypes> = ({isOpen, setIsOpen}) => {
-  const dispatch = useDispatch()
-
   return <Modal
     isOpen={isOpen}
     onRequestClose={() => setIsOpen(false)}
@@ -115,6 +113,6 @@ export const CreateConversationModal: React.FC<PropTypes> = ({isOpen, setIsOpen}
     }}
     contentLabel="Add new statement"
   >
-    <CreateConversationInner dispatch={dispatch} />
+    <CreateConversationInner />
   </Modal>
 }
