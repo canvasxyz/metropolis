@@ -8,6 +8,7 @@ import Conversation from "./conversation";
 import LRUCache from "lru-cache";
 import logger from "./utils/logger";
 import Config from "./config";
+import { getConversationInfo } from "./conversation"
 
 const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
 
@@ -289,22 +290,18 @@ function getXidStuff(xid: any, zid: any) {
   });
 }
 
-function isPolisDev(uid?: any) {
+function isAdministrator(uid?: any) {
   return polisDevs.indexOf(uid) >= 0;
 }
 
-function isModerator(zid: any, uid?: any) {
-  if (isPolisDev(uid)) {
-    return Promise.resolve(true);
+async function isOwner(zid: any, uid: string) {
+  if(isAdministrator(uid)) {
+    // admins are owners of everything
+    return true;
   }
-  return pg.queryP_readOnly(
-    "select count(*) from conversations where owner in (select uid from users where site_id = (select site_id from users where uid = ($2))) and zid = ($1);",
-    [zid, uid]
-  ).then(function (rows: { count: number }[]) {
-    return rows[0].count >= 1;
-  });
-}
 
+  return (await getConversationInfo(zid)).owner === uid;
+}
 
 export {
   pidCache,
@@ -317,6 +314,6 @@ export {
   getPid,
   getPidPromise,
   getPidForParticipant,
-  isPolisDev,
-  isModerator,
+  isAdministrator,
+  isOwner,
 };

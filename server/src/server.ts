@@ -58,8 +58,8 @@ import {
   getPidForParticipant,
   pidCache,
   getXidRecordByXidOwnerId,
-  isModerator,
-  isPolisDev
+  isAdministrator,
+  isOwner
 } from "./user"
 
 AWS.config.update({ region: Config.awsRegion });
@@ -549,7 +549,7 @@ function votesPost(
           throw "polis_err_conversation_is_closed";
         }
         if (conv.auth_needed_to_vote) {
-          return isModerator(zid, uid).then((is_mod: any) => {
+          return isOwner(zid, uid).then((is_mod: any) => {
             if (is_mod) {
               return conv;
             }
@@ -3103,12 +3103,6 @@ function isConversationOwner(
   );
 }
 
-function isOwner(zid: any, uid: string) {
-  return getConversationInfo(zid).then(function (info: any) {
-    return info.owner === uid;
-  });
-}
-
 // returns null if it's missing
 function getParticipant(zid: any, uid?: any) {
   return meteredPromise("getParticipant", new Promise(function (
@@ -3420,7 +3414,7 @@ function doGetConversationsRecent(
   res: { json: (arg0: any) => void },
   field: string
 ) {
-  if (!isPolisDev(req.p.uid)) {
+  if (!isAdministrator(req.p.uid)) {
     fail(res, 403, "polis_err_no_access_for_this_user");
     return;
   }
@@ -3732,7 +3726,7 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
                 }
 
                 if (devMode) {
-                  needs = needs && isPolisDev(ptpt.uid);
+                  needs = needs && isAdministrator(ptpt.uid);
                 }
                 return needs;
               }
@@ -4672,7 +4666,7 @@ function handle_GET_conversationStats(
 
   let hasPermission = req.p.rid
     ? Promise.resolve(!!req.p.rid)
-    : isModerator(zid, uid);
+    : isOwner(zid, uid);
 
   hasPermission
     .then(function (ok: any) {
@@ -4847,7 +4841,7 @@ function handle_GET_snapshot(
       "TODO Needs to clone participants_extended and any other new tables as well."
     );
   }
-  if (isPolisDev(uid)) {
+  if (isAdministrator(uid)) {
     // is polis developer
   } else {
     fail(res, 403, "polis_err_permissions");
@@ -5309,7 +5303,7 @@ function handle_GET_comments(
     })
     .then(function (comments: any[]) {
       if (req.p.include_demographics) {
-        isModerator(req.p.zid, req.p.uid)
+        isOwner(req.p.zid, req.p.uid)
           .then((owner: any) => {
             if (owner || isReportQuery) {
               return getDemographicsForVotersOnComments(req.p.zid, comments)
@@ -5663,7 +5657,7 @@ function handle_POST_comments(
   isSpamPromise.catch(function (err: any) {
     logger.error("isSpam failed", err);
   });
-  let isModeratorPromise = isModerator(zid, uid);
+  let isOwnerPromise = isOwner(zid, uid);
 
   let conversationInfoPromise = getConversationInfo(zid);
 
@@ -5702,7 +5696,7 @@ function handle_POST_comments(
   return Promise.all([
     pidPromise,
     conversationInfoPromise,
-    isModeratorPromise,
+    isOwnerPromise,
     commentExistsPromise,
   ]).then(
     function (results: any[]) {
@@ -6866,9 +6860,9 @@ function handle_PUT_comments(
   let mod = req.p.mod;
   let is_meta = req.p.is_meta;
 
-  isModerator(zid, uid)
-    .then(function (isModerator: any) {
-      if (isModerator) {
+  isOwner(zid, uid)
+    .then(function (isOwner: any) {
+      if (isOwner) {
         moderateComment(zid, tid, active, mod, is_meta).then(
           function () {
             res.status(200).json({});
@@ -6895,7 +6889,7 @@ function handle_POST_reportCommentSelections(
   let rid = req.p.rid;
   let tid = req.p.tid;
   let selection = req.p.include ? 1 : -1;
-  isModerator(zid, uid)
+  isOwner(zid, uid)
     .then((isMod: any) => {
       if (!isMod) {
         return fail(res, 403, "polis_err_POST_reportCommentSelections_auth");
@@ -6963,7 +6957,7 @@ function handle_POST_conversation_close(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isPolisDev(req.p.uid)) {
+  if (!isAdministrator(req.p.uid)) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
@@ -7002,7 +6996,7 @@ function handle_POST_conversation_reopen(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isPolisDev(req.p.uid)) {
+  if (!isAdministrator(req.p.uid)) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
@@ -7034,7 +7028,7 @@ function handle_PUT_users(
   res: { json: (arg0: any) => void }
 ) {
   let uid = req.p.uid;
-  if (isPolisDev(uid) && req.p.uid_of_user) {
+  if (isAdministrator(uid) && req.p.uid_of_user) {
     uid = req.p.uid_of_user;
   }
 
@@ -7103,7 +7097,7 @@ function handle_PUT_conversations(
   res: any
 ) {
   let generateShortUrl = req.p.short_url;
-  isModerator(req.p.zid, req.p.uid)
+  isOwner(req.p.zid, req.p.uid)
     .then(function (ok: any) {
       if (!ok) {
         fail(res, 403, "polis_err_update_conversation_permission");
@@ -7251,7 +7245,7 @@ function handle_PUT_conversations(
               return;
             }
             let conv = result && result.rows && result.rows[0];
-            // The first check with isModerator implictly tells us this can be returned in HTTP response.
+            // The first check with isOwner implictly tells us this can be returned in HTTP response.
             conv.is_mod = true;
 
             let promise = generateShortUrl
@@ -8149,7 +8143,7 @@ async function getConversations(
           conv.topic = new Date(conv.created).toUTCString();
         }
 
-        conv.is_mod = uid && isPolisDev(uid);
+        conv.is_mod = uid && isAdministrator(uid);
 
         // Make sure zid is not exposed
         delete conv.zid;
@@ -8190,7 +8184,7 @@ function handle_POST_reports(
   let uid = req.p.uid;
 
   return (
-    isModerator(zid, uid)
+    isOwner(zid, uid)
       // Argument of type '(isMod: any, err: string) => void | globalThis.Promise<void>' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.ts(2345)
       // @ts-ignore
       .then((isMod: any, err: string) => {
@@ -8217,7 +8211,7 @@ function handle_PUT_reports(
   let zid = req.p.zid;
 
   return (
-    isModerator(zid, uid)
+    isOwner(zid, uid)
       // Argument of type '(isMod: any, err: string) => void | globalThis.Promise<void>' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.ts(2345)
       // @ts-ignore
       .then((isMod: any, err: string) => {
@@ -8282,7 +8276,7 @@ function handle_GET_reports(
       ]);
     }
   } else if (zid) {
-    reportsPromise = isModerator(zid, uid).then(
+    reportsPromise = isOwner(zid, uid).then(
       (doesOwnConversation: any) => {
         if (!doesOwnConversation) {
           throw "polis_err_permissions";
@@ -9010,7 +9004,7 @@ function handle_GET_groupDemographics(
     getPidsForGid(zid, 4, -1),
     getParticipantDemographicsForConversation(zid),
     getParticipantVotesForCommentsFlaggedWith_is_meta(zid),
-    isModerator(req.p.zid, req.p.uid),
+    isOwner(req.p.zid, req.p.uid),
   ])
     .then((o: any[]) => {
       let groupPids = [];
@@ -9192,7 +9186,7 @@ function handle_GET_logMaxmindResponse(
   req: { p: { uid?: any; zid: any; user_uid?: any } },
   res: { json: (arg0: any) => void }
 ) {
-  if (!isPolisDev(req.p.uid) || !devMode) {
+  if (!isAdministrator(req.p.uid) || !devMode) {
     // TODO fix this by piping the error from the usage of this in ./app
     // Cannot find name 'err'.ts(2304)
     // @ts-ignore
@@ -9299,7 +9293,7 @@ function handle_PUT_ptptois(
   let uid = req.p.uid;
   let pid = req.p.pid;
   let mod = req.p.mod;
-  isModerator(zid, uid)
+  isOwner(zid, uid)
     .then(function (isMod: any) {
       if (!isMod) {
         fail(res, 403, "polis_err_ptptoi_permissions_123");
@@ -9341,7 +9335,7 @@ function handle_GET_ptptois(
       let ptptois = a[0];
       let conv = a[1];
       let isOwner = uid === conv.owner;
-      let isAllowed = isOwner || isPolisDev(req.p.uid) || conv.is_data_open;
+      let isAllowed = isOwner || isAdministrator(req.p.uid) || conv.is_data_open;
       if (isAllowed) {
         ptptois = ptptois.map(pullXInfoIntoSubObjects);
         ptptois = ptptois.map(removeNullOrUndefinedProperties);
