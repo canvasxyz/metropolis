@@ -4802,102 +4802,6 @@ function handle_GET_conversationStats(
       fail(res, 500, "polis_err_conversationStats_misc", err);
     });
 }
-function handle_GET_snapshot(
-  req: { p: { uid?: any; zid: any } },
-  res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: {
-        (arg0: { zid: any; zinvite: any; url: string }): void;
-        new (): any;
-      };
-    };
-  }
-) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-
-  if (true) {
-    throw new Error(
-      "TODO Needs to clone participants_extended and any other new tables as well."
-    );
-  }
-  if (isAdministrator(uid)) {
-    // is polis developer
-  } else {
-    fail(res, 403, "polis_err_permissions");
-    return;
-  }
-
-  query(
-    "insert into conversations (topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, owner, modified, created, participant_count) " +
-      "(select '(SNAPSHOT) ' || topic, description, survey_caption, postsurvey, postsurvey_limit, postsurvey_submissions, postsurvey_redirect, link_url, $2, now_as_millis(), created, participant_count from conversations where zid = $1) returning *;",
-    [zid, uid],
-    function (err: any, result: { rows: any[] }) {
-      if (err) {
-        fail(res, 500, "polis_err_cloning_conversation", err);
-        return;
-      }
-      let conv = result.rows[0];
-
-      let newZid = conv.zid;
-      return queryP(
-        "insert into participants (pid, zid, uid, created, mod, subscribed) " +
-          "select pid, ($2), uid, created, mod, 0 from participants where zid = ($1);",
-        [zid, newZid]
-      )
-        .then(function () {
-          return queryP(
-            "insert into comments (pid, tid, zid, txt, velocity, mod, uid, active, lang, lang_confidence, created) " +
-              "select pid, tid, ($2), txt, velocity, mod, uid, active, lang, lang_confidence, created from comments where zid = ($1);",
-            [zid, newZid]
-          ).then(function () {
-            return queryP("select * from votes where zid = ($1);", [
-              zid,
-              //               Argument of type '(votes: any[]) => Promise<void>' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.
-              // Types of parameters 'votes' and 'value' are incompatible.
-              //                 Type 'unknown' is not assignable to type 'any[]'.ts(2345)
-              // @ts-ignore
-            ]).then((votes: any[]) => {
-              // insert votes one at a time.
-              return Promise.all(
-                votes.map(function (v: {
-                  pid: any;
-                  tid: any;
-                  vote: any;
-                  created: any;
-                }) {
-                  let q =
-                    "insert into votes (zid, pid, tid, vote, created) values ($1, $2, $3, $4, $5);";
-                  return queryP(q, [
-                    newZid,
-                    v.pid,
-                    v.tid,
-                    v.vote,
-                    v.created,
-                  ]);
-                })
-              ).then(function () {
-                return generateAndRegisterZinvite(newZid, true).then(
-                  function (zinvite: string) {
-                    res.status(200).json({
-                      zid: newZid,
-                      zinvite: zinvite,
-                      url: getServerNameWithProtocol(req) + "/" + zinvite,
-                    });
-                  }
-                );
-              });
-            });
-          });
-        })
-        .catch(function (err: any) {
-          fail(res, 500, "polis_err_cloning_conversation_misc", err);
-        });
-    }
-  );
-}
 
 function handle_POST_auth_new(req: any, res: any) {
   CreateUser.createUser(req, res);
@@ -9977,7 +9881,6 @@ export {
   handle_GET_participationInit,
   handle_GET_ptptois,
   handle_GET_reports,
-  handle_GET_snapshot,
   handle_GET_testConnection,
   handle_GET_testDatabase,
   handle_GET_tryCookie,

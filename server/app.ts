@@ -67,7 +67,6 @@ import {
   handle_GET_participationInit,
   handle_GET_ptptois,
   handle_GET_reports,
-  handle_GET_snapshot,
 
   handle_GET_testConnection,
   handle_GET_testDatabase,
@@ -525,18 +524,6 @@ app.get(
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("until", getInt, assignToP),
   handle_GET_conversationStats as any
-);
-
-app.get(
-  "/api/v3/snapshot",
-  moveToBody,
-  auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_snapshot as any
 );
 
 app.post(
