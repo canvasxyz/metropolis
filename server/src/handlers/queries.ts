@@ -19,7 +19,6 @@ const PR_FIELDS: (keyof PrFields)[] = ["github_pr_id", "owner", "is_active", "gi
 
 // fields that come from the FIP
 export type FipFields = {
-  topic: string
   description: string
   fip_title?: string
   fip_author?: string
@@ -30,7 +29,7 @@ export type FipFields = {
   fip_created?: string
 };
 
-const FIP_FIELDS: (keyof FipFields)[] = ["topic", "description", "fip_title", "fip_author", "fip_discussions_to", "fip_status", "fip_type", "fip_category", "fip_created"];
+const FIP_FIELDS: (keyof FipFields)[] = ["description", "fip_title", "fip_author", "fip_discussions_to", "fip_status", "fip_type", "fip_category", "fip_created"];
 
 
 export async function getOrCreateUserWithGithubUsername(githubUsername: string): Promise<{uid: number}> {

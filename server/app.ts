@@ -1163,32 +1163,12 @@ app.post(
   handle_POST_reserve_conversation_id
 );
 
-// TODO check to see if ptpt has answered necessary metadata questions.
+// This is used by the "Add survey" modal in the dashboard
 app.post(
   "/api/v3/conversations",
   auth(assignToP),
-  want("is_active", getBool, assignToP, true),
-  want("is_anon", getBool, assignToP, false),
-  want("profanity_filter", getBool, assignToP, true),
-  want("short_url", getBool, assignToP, false),
-  want("spam_filter", getBool, assignToP, true),
-  want("strict_moderation", getBool, assignToP, false),
-  want("context", getOptionalStringLimitLength(999), assignToP, ""),
-  want("topic", getOptionalStringLimitLength(400), assignToP, ""),
-  want("description", getOptionalStringLimitLength(5000), assignToP, ""),
-  want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
-  want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
-  want("postsurvey_limit", getInt, assignToP, null),
-  want("postsurvey_submissions", getInt, assignToP, null),
-  want(
-    "postsurvey_redirect",
-    getOptionalStringLimitLength(1024),
-    assignToP,
-    ""
-  ),
-  want("conversation_id", getStringLimitLength(6, 300), assignToP, ""),
-  want("is_data_open", getBool, assignToP, false),
-  want("ownerXid", getStringLimitLength(1, 999), assignToP),
+  want("fip_title", getOptionalStringLimitLength(400), assignToP, ""),
+  want("description", getOptionalStringLimitLength(500000), assignToP, ""),
   handle_POST_conversations
 );
 

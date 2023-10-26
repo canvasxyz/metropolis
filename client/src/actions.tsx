@@ -908,18 +908,17 @@ const createConversationPostError = (err) => {
   }
 }
 
-const postCreateConversation = (topic, description) => {
+const postCreateConversation = (fip_title, description) => {
   return api.post("/api/v3/conversations", {
-    topic,
+    fip_title,
     description,
-    is_active: true,
   })
 }
 
-export const handleCreateConversationSubmit = (topic, description) => {
+export const handleCreateConversationSubmit = (fip_title, description) => {
   return (dispatch) => {
     dispatch(createConversationStart())
-    return postCreateConversation(topic, description)
+    return postCreateConversation(fip_title, description)
       .then(
         (res) => {
           dispatch(createConversationPostSuccess(res))

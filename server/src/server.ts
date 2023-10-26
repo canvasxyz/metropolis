@@ -92,6 +92,7 @@ import logger from "./utils/logger";
 import emailSenders from "./email/senders";
 import { Request, Response } from "express";
 import { getConversationIdFetchZid } from "./utils/parameter";
+import { insertConversationPrAndFip } from "./handlers/queries";
 const sendTextEmail = emailSenders.sendTextEmail;
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
@@ -8270,23 +8271,6 @@ function handle_POST_contexts(
       fail(res, 500, "polis_err_post_contexts_check_misc", err);
     });
 }
-function isUserAllowedToCreateConversations(
-  uid?: any,
-  callback?: {
-    (err: any, isAllowed: any): void;
-    (err: any, isAllowed: any): void;
-    (arg0: null, arg1: boolean): void;
-  }
-) {
-  callback?.(null, true);
-  // query("select is_owner from users where uid = ($1);", [uid], function(err, results) {
-  //     if (err) { return callback(err); }
-  //     if (!results || !results.rows || !results.rows.length) {
-  //         return callback(1);
-  //     }
-  //     callback(null, results.rows[0].is_owner);
-  // });
-}
 
 function handle_POST_reserve_conversation_id(
   req: any,
@@ -8305,149 +8289,44 @@ function handle_POST_reserve_conversation_id(
       fail(res, 500, "polis_err_reserve_conversation_id", err);
     });
 }
-function handle_POST_conversations(
+async function handle_POST_conversations(
   req: {
     p: {
-      context: any;
-      short_url: any;
-      uid?: any;
-      org_id: any;
-      topic: any;
-      description: any;
-      survey_caption: any;
-      postsurvey: any;
-      postsurvey_limit: any;
-      postsurvey_submissions: any;
-      postsurvey_redirect: any;
-      is_active: any;
-      is_data_open: any;
-      is_anon: any;
-      profanity_filter: any;
-      spam_filter: any;
-      strict_moderation: any;
-      auth_needed_to_vote: any;
-      auth_needed_to_write: any;
-      auth_opt_allow_3rdparty: any;
-      auth_opt_fb: any;
-      auth_opt_tw: any;
-      conversation_id: any;
+      uid: number,
+      fip_title: string;
+      description: string;
     };
   },
   res: any
 ) {
-  let xidStuffReady = Promise.resolve();
+  try {
+    const insertObject = {
+      "owner": req.p.uid,
+      "fip_title": req.p.fip_title,
+      "description": req.p.description,
+      "github_sync_enabled": false,
+      "is_active": true,
+    };
+    const insertData = Object.entries(insertObject);
+    const fields = insertData.map(([field, _]) => field);
+    const values = insertData.map(([_, value]) => value);
 
-  xidStuffReady
-    .then(() => {
-      let generateShortUrl = req.p.short_url;
+    const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+    const query = `INSERT INTO conversations (${fields.join(", ")}) VALUES (${fieldPlaceholders}) RETURNING zid;`;
+    const insertResult = await queryP(query, values);
 
-      isUserAllowedToCreateConversations(
-        req.p.uid,
-        function (err: any, isAllowed: any) {
-          if (err) {
-            fail(
-              res,
-              403,
-              "polis_err_add_conversation_failed_user_check",
-              err
-            );
-            return;
-          }
-          if (!isAllowed) {
-            fail(
-              res,
-              403,
-              "polis_err_add_conversation_not_enabled",
-              new Error("polis_err_add_conversation_not_enabled")
-            );
-            return;
-          }
-          let q = sql_conversations
-            .insert({
-              owner: req.p.uid, // creator
-              org_id: req.p.org_id || req.p.uid, // assume the owner is the creator if there's no separate owner specified (
-              topic: req.p.topic,
-              description: req.p.description,
-              survey_caption: req.p.survey_caption,
-              postsurvey: req.p.postsurvey,
-              // postsurvey_limit: req.p.postsurvey_limit,
-              // postsurvey_submissions: req.p.postsurvey_submissions,
-              // postsurvey_redirect: req.p.postsurvey_redirect,
-              is_active: req.p.is_active,
-              is_data_open: req.p.is_data_open,
-              is_public: true, // req.p.short_url,
-              is_anon: req.p.is_anon,
-              profanity_filter: req.p.profanity_filter,
-              spam_filter: req.p.spam_filter,
-              strict_moderation: req.p.strict_moderation,
-              context: req.p.context || null,
-              // Set defaults for fields that aren't set at postgres level.
-              auth_needed_to_vote:
-                req.p.auth_needed_to_vote || DEFAULTS.auth_needed_to_vote,
-              auth_needed_to_write:
-                req.p.auth_needed_to_write || DEFAULTS.auth_needed_to_write,
-              auth_opt_allow_3rdparty:
-                req.p.auth_opt_allow_3rdparty ||
-                DEFAULTS.auth_opt_allow_3rdparty,
-              auth_opt_tw: req.p.auth_opt_tw || DEFAULTS.auth_opt_tw,
-            })
-            .returning("*")
-            .toString();
+    // @ts-ignore
+    const zid = insertResult[0].zid as number;
 
-          query(
-            q,
-            [],
-            function (err: any, result: { rows: { zid: any }[] }) {
-              if (err) {
-                if (isDuplicateKey(err)) {
-                  logger.error("polis_err_add_conversation", err);
-                  failWithRetryRequest(res);
-                } else {
-                  fail(res, 500, "polis_err_add_conversation", err);
-                }
-                return;
-              }
-
-              let zid =
-                result && result.rows && result.rows[0] && result.rows[0].zid;
-
-              const zinvitePromise = req.p.conversation_id
-                ? Conversation.getZidFromConversationId(
-                    req.p.conversation_id
-                  ).then((zid: number) => {
-                    return zid === 0 ? req.p.conversation_id : null;
-                  })
-                : generateAndRegisterZinvite(zid, generateShortUrl);
-
-              zinvitePromise
-                .then(function (zinvite: null) {
-                  if (zinvite === null) {
-                    fail(
-                      res,
-                      400,
-                      "polis_err_conversation_id_already_in_use",
-                      err
-                    );
-                    return;
-                  }
-                  // NOTE: OK to return conversation_id, because this conversation was just created by this user.
-                  finishOne(res, {
-                    url: buildConversationUrl(req, zinvite),
-                    zid: zid,
-                  });
-                })
-                .catch(function (err: any) {
-                  fail(res, 500, "polis_err_zinvite_create", err);
-                });
-            }
-          ); // end insert
-        }
-      ); // end isUserAllowedToCreateConversations
-    })
-    .catch((err: any) => {
-      fail(res, 500, "polis_err_conversation_create", err);
-    }); // end xidStuffReady
-} // end post conversations
+    const zinvite = await generateAndRegisterZinvite(zid, undefined);
+    finishOne(res, {
+      url: buildConversationUrl(req, zinvite),
+      zid: zid,
+    });
+  } catch (err) {
+    fail(res, 500, "polis_err_post_conversations", err);
+  }
+}
 
 async function handle_POST_query_participants_by_metadata(
   req: { p: { uid?: any; zid: any; pmaids: any } },

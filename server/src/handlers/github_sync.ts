@@ -196,7 +196,6 @@ async function getFipFromPR(
 
   return {
     description,
-    topic: filename.split(".")[0],
     fip_title: frontmatterData.title,
     fip_author: frontmatterData.author,
     fip_discussions_to: frontmatterData["discussions-to"],
