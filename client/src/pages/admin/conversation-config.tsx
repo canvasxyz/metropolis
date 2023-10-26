@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { useCallback, useState, useEffect, ComponentProps } from "react"
-import { connect } from "react-redux"
+import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
 import toast from "react-hot-toast"
@@ -13,7 +13,7 @@ import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
 import Url from "../../util/url"
-import { Conversation, RootState } from "../../util/types"
+import { RootState } from "../../util/types"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER;
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME;
@@ -52,12 +52,12 @@ const Textarea = (props: ComponentProps<"textarea">) =>
 
 type ConversationConfigProps = {
   dispatch: (arg0: any) => void,
-  zid_metadata: Conversation,
+
   error: string,
   loading: boolean
 }
 
-const ConversationConfig = ({ dispatch, zid_metadata, error }: ConversationConfigProps) => {
+const ConversationConfig = ({ dispatch, error }: ConversationConfigProps) => {
   // {
   //    const reportsPromise = api.get("/api/v3/reports", {
   //      conversation_id: this.props.conversation_id,
@@ -70,7 +70,7 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }: ConversationConfi
   //    })
 
   //                document.location = `/r/${conversation_id}/${this.state.reports[0].report_id}`
-
+  const {zid_metadata} = useSelector((state: RootState) => state.zid_metadata);
 
   const handleStringValueChange = useCallback(
     (field: string, element) => {
@@ -419,6 +419,4 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }: ConversationConfi
   )
 }
 
-export default connect((state: RootState) => state.user)(
-  connect((state: RootState) => state.zid_metadata)(ConversationConfig)
-)
+export default ConversationConfig
