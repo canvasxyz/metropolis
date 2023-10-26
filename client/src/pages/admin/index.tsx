@@ -112,7 +112,7 @@ class ConversationAdminContainer extends React.Component<
             </Link>
           </Box>
         </Box>
-        {this.props.zid_metadata?.is_mod && (
+        {this.props.zid_metadata?.is_owner && (
           <Box sx={{ p: [4], flex: "0 0 auto", maxWidth: "35em", mx: [4] }}>
             <Switch>
               <Route exact path={`${match.path}/`} component={ConversationConfig} />

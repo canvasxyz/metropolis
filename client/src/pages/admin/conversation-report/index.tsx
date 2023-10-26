@@ -20,7 +20,7 @@ class ConversationStats extends React.Component<
   {
     dispatch: Function
     match: { params: { conversation_id: string }; location: UrlObject }
-    zid_metadata: { is_mod: boolean }
+    zid_metadata: { is_mod: boolean; is_owner: boolean }
     conversation_stats: Record<
       string,
       {
@@ -83,7 +83,7 @@ class ConversationStats extends React.Component<
   componentDidMount() {
     const { zid_metadata } = this.props
 
-    if (zid_metadata.is_mod) {
+    if (zid_metadata.is_owner) {
       this.loadStats()
       this.getStatsRepeatedly = setInterval(() => {
         this.loadStats()
@@ -94,7 +94,7 @@ class ConversationStats extends React.Component<
   componentWillUnmount() {
     const { zid_metadata } = this.props
 
-    if (zid_metadata.is_mod) {
+    if (zid_metadata.is_owner) {
       clearInterval(this.getStatsRepeatedly)
     }
   }

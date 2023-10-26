@@ -105,7 +105,7 @@ const ConversationConfig = ({ dispatch, zid_metadata, error }: ConversationConfi
       })
   }, [])
 
-  if (zid_metadata && !zid_metadata.is_owner && !zid_metadata.is_mod) {
+  if (zid_metadata && !zid_metadata.is_owner) {
     return <NoPermission />
   }
 

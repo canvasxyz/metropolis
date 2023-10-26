@@ -264,11 +264,11 @@ function getXidStuff(xid: any, zid: any) {
   });
 }
 
-function isAdministrator(uid?: any) {
+function isAdministrator(uid: number) {
   return polisDevs.indexOf(uid) >= 0;
 }
 
-async function isOwner(zid: any, uid: string) {
+async function isOwner(zid: number, uid: number) {
   if(isAdministrator(uid)) {
     // admins are owners of everything
     return true;

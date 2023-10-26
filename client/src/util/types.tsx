@@ -35,12 +35,15 @@ export type RootState = {
 export type Conversation = {
   conversation_id: string
   is_archived: boolean
+  is_owner: boolean
+  is_mod: boolean
   topic: string
   description: string
   postsurvey: string
   postsurvey_redirect: string
   postsurvey_limit: string
   postsurvey_submissions: string
+  github_sync_enabled: boolean
   github_repo_name: string
   github_repo_owner: string
   github_branch_name: string
