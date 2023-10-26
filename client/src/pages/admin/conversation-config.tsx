@@ -148,7 +148,7 @@ const ConversationConfig = ({ dispatch, error }: ConversationConfigProps) => {
       />
 
       <Box sx={{ mt: [4], mb: [4] }}>
-        <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
+        <Link sx={{ variant: "styles.a" }} to={"/dashboard/c/" + zid_metadata.conversation_id}>
           Go to survey
         </Link>
         {reports && reports[0] && (
