@@ -701,7 +701,7 @@ export const resetMetadataStore = () => {
 }
 
 const fetchZidMetadata = (conversation_id) => {
-  return $.get("/api/v3/conversations?conversation_id=" + conversation_id)
+  return $.get("/api/v3/conversation/" + conversation_id)
 }
 
 export const populateZidMetadataStore = (conversation_id) => {

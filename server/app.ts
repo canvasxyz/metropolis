@@ -39,6 +39,7 @@ import {
   handle_GET_comments_translations,
   handle_GET_contexts,
   handle_GET_conversationPreloadInfo,
+  handle_GET_conversation,
   handle_GET_conversations,
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
@@ -1066,17 +1067,19 @@ app.get(
 );
 
 app.get(
+  "/api/v3/conversation/:conversation_id",
+  moveToBody,
+  authOptional(assignToP),
+  handle_GET_conversation as any
+);
+
+app.get(
   "/api/v3/conversations",
   moveToBody,
   authOptional(assignToP),
   want("include_all_conversations_i_am_in", getBool, assignToP),
   want("is_active", getBool, assignToP),
   want("course_invite", getStringLimitLength(1, 32), assignToP),
-  want(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
   want("want_upvoted", getBool, assignToP),
   want("want_mod_url", getBool, assignToP), // NOTE - use this for API only!
   want("want_inbox_item_admin_url", getBool, assignToP), // NOTE - use this for API only!

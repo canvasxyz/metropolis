@@ -91,6 +91,7 @@ import logger from "./utils/logger";
 // # notifications
 import emailSenders from "./email/senders";
 import { Request, Response } from "express";
+import { getConversationIdFetchZid } from "./utils/parameter";
 const sendTextEmail = emailSenders.sendTextEmail;
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
@@ -2698,13 +2699,7 @@ function addConversationIds(a: any[]) {
 }
 
 function finishOne(
-  res: {
-    status: (arg0: any) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
-  },
+  res: any,
   o: { url?: string; zid?: any; currentPid?: any },
   dontUseCache?: boolean | undefined,
   altStatusCode?: number | undefined
@@ -7744,46 +7739,41 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
   });
 }
 
-function getOneConversation(zid: any, uid?: any, lang?: null) {
-  return Promise.all([
-    queryP_readOnly(
-      "select * from conversations left join  (select uid, site_id from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
-      [zid]
-    ),
-    getConversationHasMetadata(zid),
-    getConversationTranslationsMinimal(zid, lang),
-  ]).then(function (results: any[]) {
-    let conv = results[0] && results[0][0];
-    let convHasMetadata = results[1];
-    let translations = results[2];
+async function getOneConversation(zid: any, uid?: number, lang?: null) {
+  const conversationRows = await queryP_readOnly(
+    "select * from conversations left join (select uid, site_id from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
+    [zid]
+  );
+  const conv = conversationRows[0];
 
-    conv.auth_opt_allow_3rdparty = ifDefinedFirstElseSecond(
-      conv.auth_opt_allow_3rdparty,
-      true
-    );
-    conv.auth_opt_fb_computed =
-      conv.auth_opt_allow_3rdparty &&
-      ifDefinedFirstElseSecond(conv.auth_opt_fb, true);
-    conv.auth_opt_tw_computed =
-      conv.auth_opt_allow_3rdparty &&
-      ifDefinedFirstElseSecond(conv.auth_opt_tw, true);
+  const convHasMetadata = await getConversationHasMetadata(zid);
+  const translations = await getConversationTranslationsMinimal(zid, lang);
 
-    conv.translations = translations;
+  conv.auth_opt_allow_3rdparty = ifDefinedFirstElseSecond(
+    conv.auth_opt_allow_3rdparty,
+    true
+  );
+  conv.auth_opt_fb_computed =
+    conv.auth_opt_allow_3rdparty &&
+    ifDefinedFirstElseSecond(conv.auth_opt_fb, true);
+  conv.auth_opt_tw_computed =
+    conv.auth_opt_allow_3rdparty &&
+    ifDefinedFirstElseSecond(conv.auth_opt_tw, true);
 
-    return getUserInfoForUid2(conv.owner).then(function (ownerInfo: any) {
-      let ownername = ownerInfo.hname;
-      if (convHasMetadata) {
-        conv.hasMetadata = true;
-      }
-      if (!_.isUndefined(ownername) && conv.context !== "hongkong2014") {
-        conv.ownername = ownername;
-      }
-      conv.is_mod = isAdministrator(uid);
-      conv.is_owner = isOwner(zid, uid);
-      delete conv.uid; // conv.owner is what you want, uid shouldn't be returned.
-      return conv;
-    });
-  });
+  conv.translations = translations;
+  const ownerInfo = await getUserInfoForUid2(conv.owner);
+
+  let ownername = ownerInfo.hname;
+  if (convHasMetadata) {
+    conv.hasMetadata = true;
+  }
+  if (!_.isUndefined(ownername) && conv.context !== "hongkong2014") {
+    conv.ownername = ownername;
+  }
+  conv.is_mod = uid && isAdministrator(uid);
+  conv.is_owner = uid && (await isOwner(zid, uid));
+  delete conv.uid; // conv.owner is what you want, uid shouldn't be returned.
+  return conv;
 }
 
 async function getConversations(
@@ -8177,49 +8167,31 @@ function handle_GET_reports(
     });
 }
 
-function handle_GET_conversations(
+async function handle_GET_conversation(req: Request & {p: {uid: string}}, res: Response) {
+  if(!req.body.conversation_id) {
+    fail(res, 400, "polis_err_get_conversation_no_conversation_id");
+  }
+  const zid = await getConversationIdFetchZid(req.body.conversation_id);
+  const lang = null; // for now just return the default
+  console.log(typeof req.p.uid)
+  const data = await getOneConversation(zid, req.p.uid, lang)
+  finishOne(res, data);
+}
+
+async function handle_GET_conversations(
   req: {
     p: ConversationType;
   },
   res: any
 ) {
-  let courseIdPromise = Promise.resolve();
   if (req.p.course_invite) {
-    // Type 'Promise<void>' is missing the following properties from type 'Bluebird<void>': caught, error, lastly, bind, and 38 more.ts(2740)
-    // @ts-ignore
-    courseIdPromise = queryP_readOnly(
+    const rows = await queryP_readOnly(
       "select course_id from courses where course_invite = ($1);",
       [req.p.course_invite]
-      //       Argument of type '(rows: { course_id: any; }[]) => any' is not assignable to parameter of type '(value: unknown) => any'.
-      // Types of parameters 'rows' and 'value' are incompatible.
-      //   Type 'unknown' is not assignable to type '{ course_id: any; }[]'.ts(2345)
-      // @ts-ignore
-    ).then(function (rows: { course_id: any }[]) {
-      return rows[0].course_id;
-    });
+    );
+    req.p.course_id = rows[0].course_id;
   }
-  courseIdPromise.then(function (course_id: any) {
-    if (course_id) {
-      req.p.course_id = course_id;
-    }
-    let lang = null; // for now just return the default
-    if (req.p.zid) {
-      getOneConversation(req.p.zid, req.p.uid, lang)
-        .then(
-          function (data: any) {
-            finishOne(res, data);
-          },
-          function (err: any) {
-            fail(res, 500, "polis_err_get_conversations_2", err);
-          }
-        )
-        .catch(function (err: any) {
-          fail(res, 500, "polis_err_get_conversations_1", err);
-        });
-    } else {
-      getConversations(req, res);
-    }
-  });
+  await getConversations(req, res);
 }
 
 function handle_GET_contexts(
@@ -9797,6 +9769,7 @@ export {
   handle_GET_comments_translations,
   handle_GET_contexts,
   handle_GET_conversationPreloadInfo,
+  handle_GET_conversation,
   handle_GET_conversations,
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
