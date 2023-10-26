@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { useCallback, useEffect, useState } from "react"
+import { Fragment, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
@@ -49,7 +49,7 @@ type DashboardProps = {
   selectedConversationId: string | null
 }
 
-const Dashboard = ({ selectedConversationId }: DashboardProps) => {
+const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -77,7 +77,6 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
 
   const selectedConversation = selectedConversationId !== null ? conversations.filter((conversation) => conversation.conversation_id === selectedConversationId)[0] : null
 
-  console.log(conversations)
   const openConversations = conversations.filter((conversation) => !conversation.is_archived)
   const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
 
@@ -154,7 +153,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
         <Box sx={{ overflowY:"scroll", flex: 1 }}>
           {selectedConversation
             ? <Box>
-                <Box sx={{width: "100%", borderBottom: "1px solid #ddd" }}>
+                <Box sx={{width: "100%" }}>
                   {(zid_metadata.is_mod || zid_metadata.is_owner) && (
                     <Button
                       variant="outlineSecondary"
@@ -185,44 +184,51 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                     </ReactMarkdown>
                   </Flex>
                 </Box>
-                <Box sx={{width: "100%", position: "relative"}}>
-                  <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
-                  {(zid_metadata.is_mod || zid_metadata.is_owner) && (
-                  <Button
-                    variant="outlineSecondary"
-                    onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
-                  >
-                    Moderate
-                  </Button>
-                  )}
-                  {(zid_metadata.is_mod || zid_metadata.is_owner) && (
-                  <Button
-                    variant="outlineSecondary"
-                    onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
-                  >
-                    Results
-                  </Button>
-                  )}
+                {/* only display survey if logged in */}
+                {user && (
+                  <Fragment>
+                    {/* divider line */}
+                    <Box sx={{width: "100%", borderBottom: "1px solid #ddd"}}></Box>
+                    <Box sx={{width: "100%", position: "relative"}}>
+                      <Box sx={{ position: "absolute", top: [4], right: [4], px: [2], pt: "4px", pb: "3px", display:"flex", flex:"1", flexDirection: "row", gap:[2] }}>
+                      {(zid_metadata.is_mod || zid_metadata.is_owner) && (
+                      <Button
+                        variant="outlineSecondary"
+                        onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
+                      >
+                        Moderate
+                      </Button>
+                      )}
+                      {(zid_metadata.is_mod || zid_metadata.is_owner) && (
+                      <Button
+                        variant="outlineSecondary"
+                        onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
+                      >
+                        Results
+                      </Button>
+                      )}
 
-                  </Box>
-                <Box
-                  sx={{
-                    margin: "0 auto",
-                    maxWidth: "720px",
-                    px: [4],
-                    py: [2],
-                    lineHeight: 1.45,
-                  }}
-                >
-                  <Text sx={{
-                    color: "primary", textTransform: "uppercase", fontFamily: "heading",
-                    fontWeight: 400
-                  }}>
-                  Community Response
-                  </Text>
-                  <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
-                </Box>
-                </Box>
+                      </Box>
+                      <Box
+                        sx={{
+                          margin: "0 auto",
+                          maxWidth: "720px",
+                          px: [4],
+                          py: [2],
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        <Text sx={{
+                          color: "primary", textTransform: "uppercase", fontFamily: "heading",
+                          fontWeight: 400
+                        }}>
+                        Community Response
+                        </Text>
+                        <Survey match={{params: {conversation_id: selectedConversation.conversation_id}}}/>
+                      </Box>
+                    </Box>
+                  </Fragment>
+                )}
               </Box>
             :
               <Flex sx={{  justifyContent: "center", alignItems:"center", height: "100%"
