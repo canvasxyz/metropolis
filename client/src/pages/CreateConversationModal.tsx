@@ -51,13 +51,6 @@ const CreateConversationInner = () => {
             </Box>
           </Label>
           <form>
-            <Flex sx={{flexDirection: "row", alignItems: "center"}}>
-              <Text sx={{ flexGrow: "1", mb: [1] }}>
-                <label htmlFor="new_conversation_description">Body</label>
-              </Text>
-              {/* TODO: implement FIP search */}
-              <Button>Search FIPs...</Button>
-            </Flex>
             <Box>
               <Textarea
                 id="new_conversation_description"
