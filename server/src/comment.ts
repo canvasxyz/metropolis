@@ -8,7 +8,6 @@ import Utils from "./utils/common";
 
 import Config from "./config";
 import Conversation from "./conversation";
-import User from "./user";
 import { CommentType } from "./d";
 
 // TODO should this be a number instead?

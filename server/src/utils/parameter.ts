@@ -6,7 +6,7 @@ import pg from "../db/pg-query";
 import fail from "./fail";
 import logger from "./logger";
 import Conversation from "../conversation";
-import User from "../user";
+import { getPidPromise } from "../user"
 
 import { meteredPromise } from "./metered";
 
@@ -496,7 +496,7 @@ function resolve_pidThing(
       extractFromCookie(req, pidThingStringName);
 
     if (existingValue === "mypid" && req?.p?.zid && req.p.uid) {
-      User.getPidPromise(req.p.zid, req.p.uid)
+      getPidPromise(req.p.zid, req.p.uid)
         .then(function (pid: number) {
           if (pid >= 0) {
             assigner(req, pidThingStringName, pid);

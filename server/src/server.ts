@@ -47,7 +47,20 @@ import {
   Vote,
 } from "./d";
 
-import { isModerator, isPolisDev } from "./user"
+import {
+  createDummyUser,
+  getPidPromise,
+  getPid,
+  getUserInfoForUid,
+  getUserInfoForUid2,
+  getUser,
+  getXidStuff,
+  getPidForParticipant,
+  pidCache,
+  getXidRecordByXidOwnerId,
+  isModerator,
+  isPolisDev
+} from "./user"
 
 AWS.config.update({ region: Config.awsRegion });
 const devMode = Config.isDevMode;
@@ -67,7 +80,6 @@ const COOKIES_TO_CLEAR = cookies.COOKIES_TO_CLEAR;
 import constants from "./utils/constants";
 const DEFAULTS = constants.DEFAULTS;
 
-import User from "./user";
 import Conversation from "./conversation";
 import Session from "./session";
 import Comment from "./comment";
@@ -267,12 +279,10 @@ function doApiKeyAuth(
 //   return queryP("select * from xids where xid = ($2) and owner = (select org_id from conversations where zid = (select zid from zinvites where zinvite = ($1)))", [zinvite, xid]);
 // }
 
-const createDummyUser = User.createDummyUser;
 const getConversationInfo = Conversation.getConversationInfo;
 const getConversationInfoByConversationId =
   Conversation.getConversationInfoByConversationId;
 const isXidWhitelisted = Conversation.isXidWhitelisted;
-const getXidRecordByXidOwnerId = User.getXidRecordByXidOwnerId;
 
 // function doXidOwnerConversationIdAuth(assigner, xid, conversation_id, req, res, next) {
 //   getXidRecordByXidConversationId(xid, conversation_id).then(function(rows) {
@@ -430,11 +440,6 @@ const setCookieTestCookie = cookies.setCookieTestCookie;
 const addCookies = cookies.addCookies;
 const getPermanentCookieAndEnsureItIsSet =
   cookies.getPermanentCookieAndEnsureItIsSet;
-
-const pidCache = User.pidCache;
-const getPid = User.getPid;
-const getPidPromise = User.getPidPromise;
-const getPidForParticipant = User.getPidForParticipant;
 
 function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
   function doInsert() {
@@ -3168,9 +3173,6 @@ function getChoicesForConversation(zid: any) {
   });
 }
 
-const getUserInfoForUid = User.getUserInfoForUid;
-const getUserInfoForUid2 = User.getUserInfoForUid2;
-
 function emailTeam(subject: string, body: string) {
   return sendMultipleTextEmails(
     polisFromAddress,
@@ -4977,7 +4979,6 @@ function handle_GET_users(
     });
 }
 
-const getUser = User.getUser;
 const getComments = Comment.getComments;
 const getNumberOfCommentsRemaining = Comment.getNumberOfCommentsRemaining;
 
@@ -6387,7 +6388,6 @@ function updateConversationModifiedTime(zid: any, t?: undefined) {
 }
 
 const createXidRecordByZid = Conversation.createXidRecordByZid;
-const getXidStuff = User.getXidStuff;
 
 function handle_PUT_participants_extended(
   req: { p: { zid: any; uid?: any; show_translation_activated: any } },

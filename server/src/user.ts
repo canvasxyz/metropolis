@@ -308,19 +308,6 @@ function isModerator(zid: any, uid?: any) {
 
 export {
   pidCache,
-  getUserInfoForUid,
-  getUserInfoForUid2,
-  getUser,
-  createDummyUser,
-  getPid,
-  getPidPromise,
-  getPidForParticipant,
-  isPolisDev,
-  isModerator,
-};
-
-export default {
-  pidCache,
   getXidRecordByXidOwnerId,
   getXidStuff,
   getUserInfoForUid,

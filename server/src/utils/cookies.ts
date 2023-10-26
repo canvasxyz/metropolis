@@ -2,8 +2,8 @@ import _ from "underscore";
 import url from "url";
 
 import Config from "../config";
-import User from "../user";
 import Session from "../session";
+import { getUserInfoForUid2 } from "../user"
 
 type Options = {
   maxAge?: number;
@@ -135,7 +135,7 @@ async function addCookies(
   token: any,
   uid: any
 ) {
-  const opts = await User.getUserInfoForUid2(uid);
+  const opts = await getUserInfoForUid2(uid);
   let email = opts.email;
   let created = opts.created;
 
