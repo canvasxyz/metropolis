@@ -3057,33 +3057,6 @@ function joinConversation(
   }, doJoin);
 }
 
-function isConversationOwner(
-  zid: any,
-  uid?: any,
-  callback?: {
-    (err: any): void;
-    (err: any): void;
-    (err: any): void;
-    (err: any, foo: any): void;
-    (err: any, foo: any): void;
-    (arg0: any): void;
-  }
-) {
-  // if (true) {
-  //     callback(null); // TODO remove!
-  //     return;
-  // }
-  query_readOnly(
-    "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
-    [zid, uid],
-    function (err: number, docs: { rows: string | any[] }) {
-      if (!docs || !docs.rows || docs.rows.length === 0) {
-        err = err || 1;
-      }
-      callback?.(err);
-    }
-  );
-}
 
 // returns null if it's missing
 function getParticipant(zid: any, uid?: any) {
@@ -7206,191 +7179,160 @@ function handle_PUT_conversations(
     });
 }
 
-function handle_DELETE_metadata_questions(
+async function handle_DELETE_metadata_questions(
   req: { p: { uid?: any; pmqid: any } },
   res: { send: (arg0: number) => void }
 ) {
   let uid = req.p.uid;
   let pmqid = req.p.pmqid;
 
-  getZidForQuestion(pmqid, function (err: any, zid: any) {
-    if (err) {
-      fail(
-        res,
-        500,
-        "polis_err_delete_participant_metadata_questions_zid",
-        err
-      );
-      return;
-    }
-    isConversationOwner(zid, uid, function (err: any) {
-      if (err) {
-        fail(
-          res,
-          403,
-          "polis_err_delete_participant_metadata_questions_auth",
-          err
-        );
-        return;
-      }
+  let zid;
+  try {
+    zid = await getZidForQuestion(pmqid)
+  } catch (err) {
+    return fail(
+      res,
+      500,
+      "polis_err_delete_participant_metadata_questions_zid",
+      err
+    );
+  }
 
-      deleteMetadataQuestionAndAnswers(pmqid, function (err?: string | null) {
-        if (err) {
-          fail(
-            res,
-            500,
-            "polis_err_delete_participant_metadata_question",
-            new Error(err)
-          );
-          return;
-        }
-        res.send(200);
-      });
-    });
-  });
+  let canDelete;
+  try {
+    canDelete = await isOwner(zid, uid)
+  } catch (err) {
+    return fail(
+      res,
+      403,
+      "polis_err_delete_participant_metadata_questions_auth",
+      err
+    );
+  }
+
+  if(!canDelete) {
+    return fail(
+      res,
+      403,
+      "polis_err_delete_participant_metadata_questions_auth",
+      undefined
+    );
+  }
+
+  try {
+    await deleteMetadataQuestionAndAnswers(pmqid)
+  } catch (err) {
+    fail(
+      res,
+      500,
+      "polis_err_delete_participant_metadata_question",
+      err
+    );
+  }
+
+  res.send(200);
 }
 
-function handle_DELETE_metadata_answers(
+async function handle_DELETE_metadata_answers(
   req: { p: { uid?: any; pmaid: any } },
   res: { send: (arg0: number) => void }
 ) {
   let uid = req.p.uid;
   let pmaid = req.p.pmaid;
 
-  getZidForAnswer(pmaid, function (err: any, zid: any) {
-    if (err) {
-      fail(
-        res,
-        500,
-        "polis_err_delete_participant_metadata_answers_zid",
-        err
-      );
-      return;
-    }
-    isConversationOwner(zid, uid, function (err: any) {
-      if (err) {
-        fail(
-          res,
-          403,
-          "polis_err_delete_participant_metadata_answers_auth",
-          err
-        );
-        return;
-      }
+  let zid;
+  try {
+    zid = await getZidForAnswer(pmaid)
+  } catch (err) {
+    return fail(
+      res,
+      500,
+      "polis_err_delete_participant_metadata_answers_zid",
+      err
+    );
+  }
 
-      deleteMetadataAnswer(pmaid, function (err: any) {
-        if (err) {
-          fail(
-            res,
-            500,
-            "polis_err_delete_participant_metadata_answers",
-            err
-          );
-          return;
-        }
-        res.send(200);
-      });
-    });
-  });
+  let canDelete;
+  try {
+    canDelete = await isOwner(zid, uid);
+  } catch (err) {
+    return fail(
+      res,
+      403,
+      "polis_err_delete_participant_metadata_answers_auth",
+      err
+    );
+  }
+
+  if(!canDelete) {
+    return fail(
+      res,
+      403,
+      "polis_err_delete_participant_metadata_answers_auth"
+    );
+  }
+
+  try {
+    await deleteMetadataAnswer(pmaid);
+  } catch (err) {
+    return fail(
+      res,
+      500,
+      "polis_err_delete_participant_metadata_answers",
+      err
+    );
+  }
+  res.send(200);
 }
 
-function getZidForAnswer(
-  pmaid: any,
-  callback: {
-    (err: any, zid: any): void;
-    (arg0: string | null, arg1?: undefined): void;
-  }
+async function getZidForAnswer(
+  pmaid: any
 ) {
-  query(
+  const rows = await queryP(
     "SELECT zid FROM participant_metadata_answers WHERE pmaid = ($1);",
-    [pmaid],
-    function (err: any, result: { rows: string | any[] }) {
-      if (err) {
-        callback(err);
-        return;
-      }
-      if (!result.rows || !result.rows.length) {
-        callback("polis_err_zid_missing_for_answer");
-        return;
-      }
-      callback(null, result.rows[0].zid);
-    }
-  );
-}
+    [pmaid]);
 
-function getZidForQuestion(
-  pmqid: any,
-  callback: {
-    (err: any, zid?: any): void;
-    (arg0: string | null, arg1: undefined): void;
+  if (!rows || !rows.length) {
+    throw new Error("polis_err_zid_missing_for_answer");
+
   }
-) {
-  query(
-    "SELECT zid FROM participant_metadata_questions WHERE pmqid = ($1);",
-    [pmqid],
-    function (err: any, result: { rows: string | any[] }) {
-      if (err) {
-        logger.error("polis_err_zid_missing_for_question", err);
-        callback(err);
-        return;
-      }
-      if (!result.rows || !result.rows.length) {
-        callback("polis_err_zid_missing_for_question");
-        return;
-      }
-      callback(null, result.rows[0].zid);
-    }
-  );
+
+  return rows[0].zid;
 }
 
-function deleteMetadataAnswer(
-  pmaid: any,
-  callback: { (err: any): void; (arg0: null): void }
-) {
-  // query("update participant_metadata_choices set alive = FALSE where pmaid = ($1);", [pmaid], function(err) {
-  //     if (err) {callback(34534545); return;}
-  query(
+async function getZidForQuestion(pmqid: any) {
+  let rows;
+  try {
+    rows = await queryP(
+      "SELECT zid FROM participant_metadata_questions WHERE pmqid = ($1);",
+      [pmqid]);
+  } catch (err) {
+    throw new Error("polis_err_zid_missing_for_question");
+  }
+
+  if (!rows || !rows.length) {
+    throw new Error("polis_err_zid_missing_for_question");
+  }
+
+  return rows[0].zid;
+}
+
+async function deleteMetadataAnswer(pmaid: any) {
+  await queryP(
     "update participant_metadata_answers set alive = FALSE where pmaid = ($1);",
-    [pmaid],
-    function (err: any) {
-      if (err) {
-        callback(err);
-        return;
-      }
-      callback(null);
-    }
+    [pmaid]
   );
-  // });
 }
 
-function deleteMetadataQuestionAndAnswers(
-  pmqid: any,
-  callback: { (err: any): void; (arg0: null): void }
-) {
-  // query("update participant_metadata_choices set alive = FALSE where pmqid = ($1);", [pmqid], function(err) {
-  //     if (err) {callback(93847834); return;}
-  query(
+async function deleteMetadataQuestionAndAnswers(pmqid: any) {
+  await queryP(
     "update participant_metadata_answers set alive = FALSE where pmqid = ($1);",
-    [pmqid],
-    function (err: any) {
-      if (err) {
-        callback(err);
-        return;
-      }
-      query(
-        "update participant_metadata_questions set alive = FALSE where pmqid = ($1);",
-        [pmqid],
-        function (err: any) {
-          if (err) {
-            callback(err);
-            return;
-          }
-          callback(null);
-        }
-      );
-    }
+    [pmqid]
   );
-  // });
+  await queryP(
+    "update participant_metadata_questions set alive = FALSE where pmqid = ($1);",
+    [pmqid]
+  );
 }
 
 function handle_GET_metadata_questions(
@@ -7469,7 +7411,7 @@ function handle_GET_metadata_questions(
   }
 }
 
-function handle_POST_metadata_questions(
+async function handle_POST_metadata_questions(
   req: { p: { zid: any; key: any; uid?: any } },
   res: any
 ) {
@@ -7477,29 +7419,27 @@ function handle_POST_metadata_questions(
   let key = req.p.key;
   let uid = req.p.uid;
 
-  function doneChecking(err: any) {
-    if (err) {
-      fail(res, 403, "polis_err_post_participant_metadata_auth", err);
-      return;
-    }
-    query(
-      "INSERT INTO participant_metadata_questions (pmqid, zid, key) VALUES (default, $1, $2) RETURNING *;",
-      [zid, key],
-      function (err: any, results: { rows: string | any[] }) {
-        if (err || !results || !results.rows || !results.rows.length) {
-          fail(res, 500, "polis_err_post_participant_metadata_key", err);
-          return;
-        }
+  let canPost;
+  try {
+    canPost = await isOwner(zid, uid);
+  } catch (err) {
+    return fail(res, 403, "polis_err_post_participant_metadata_auth", err);
+  }
+  if(!canPost) return fail(res, 403, "polis_err_post_participant_metadata_auth");
 
-        finishOne(res, results.rows[0]);
-      }
-    );
+  let rows;
+  try {
+    rows = await await queryP(
+      "INSERT INTO participant_metadata_questions (pmqid, zid, key) VALUES (default, $1, $2) RETURNING *;",
+      [zid, key]);
+  } catch (err) {
+    return fail(res, 500, "polis_err_post_participant_metadata_key", err);
   }
 
-  isConversationOwner(zid, uid, doneChecking);
+  finishOne(res, rows[0]);
 }
 
-function handle_POST_metadata_answers(
+async function handle_POST_metadata_answers(
   req: { p: { zid: any; uid?: any; pmqid: any; value: any } },
   res: any
 ) {
@@ -7508,40 +7448,46 @@ function handle_POST_metadata_answers(
   let pmqid = req.p.pmqid;
   let value = req.p.value;
 
-  function doneChecking(err: any) {
-    if (err) {
-      fail(res, 403, "polis_err_post_participant_metadata_auth", err);
-      return;
-    }
-    query(
-      "INSERT INTO participant_metadata_answers (pmqid, zid, value, pmaid) VALUES ($1, $2, $3, default) RETURNING *;",
-      [pmqid, zid, value],
-      function (err: any, results: { rows: string | any[] }) {
-        if (err || !results || !results.rows || !results.rows.length) {
-          query(
-            "UPDATE participant_metadata_answers set alive = TRUE where pmqid = ($1) AND zid = ($2) AND value = ($3) RETURNING *;",
-            [pmqid, zid, value],
-            function (err: any, results: { rows: any[] }) {
-              if (err) {
-                fail(
-                  res,
-                  500,
-                  "polis_err_post_participant_metadata_value",
-                  err
-                );
-                return;
-              }
-              finishOne(res, results.rows[0]);
-            }
-          );
-        } else {
-          finishOne(res, results.rows[0]);
-        }
-      }
-    );
+  let canPost;
+  try {
+    canPost = await isOwnerOrParticipant(zid, uid);
+  } catch (err) {
+    return fail(res, 403, "polis_err_permissions");
+  }
+  if (!canPost) {
+    return fail(res, 403, "polis_err_permissions");
   }
 
-  isConversationOwner(zid, uid, doneChecking);
+  // try to do an insert
+  let insertRows;
+  try {
+    insertRows = await queryP(
+      "INSERT INTO participant_metadata_answers (pmqid, zid, value, pmaid) VALUES ($1, $2, $3, default) RETURNING *;",
+      [pmqid, zid, value]);
+  } catch(err) {
+    // if the insert fails, just try to update the existing row
+  }
+
+  if(!insertRows || !insertRows.length) {
+    let updateRows;
+    try {
+      updateRows = await queryP(
+        "UPDATE participant_metadata_answers set alive = TRUE where pmqid = ($1) AND zid = ($2) AND value = ($3) RETURNING *;",
+        [pmqid, zid, value]);
+    } catch (err) {
+      return fail(
+        res,
+        500,
+        "polis_err_post_participant_metadata_value",
+        err
+      );
+    }
+    finishOne(res, updateRows[0]);
+  } else {
+    finishOne(res, insertRows[0]);
+  }
+
+
 }
 
 function handle_GET_metadata_choices(req: { p: { zid: any } }, res: any) {
