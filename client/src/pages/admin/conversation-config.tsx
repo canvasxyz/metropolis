@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { useCallback, useState, useEffect, ComponentProps } from "react"
+import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
 import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, jsx } from "theme-ui"
@@ -109,6 +109,8 @@ const ConversationConfig = ({ dispatch, error }: ConversationConfigProps) => {
     return <NoPermission />
   }
 
+  const hasGithubPr = zid_metadata.github_pr_id !== null && zid_metadata.github_pr_id !== undefined;
+
   return (
     <Box>
       <Heading
@@ -122,18 +124,21 @@ const ConversationConfig = ({ dispatch, error }: ConversationConfigProps) => {
         Configure
       </Heading>
 
-      <Box sx={{ mb: [3] }}>
-        PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
-      </Box>
+      {hasGithubPr &&
+        <Fragment>
+          <Box sx={{ mb: [3] }}>
+            PR <a href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}>#{zid_metadata.github_pr_id}</a>
+          </Box>
 
-      <Box sx={{ mb: [3] }}>
-        Branch <strong>{zid_metadata.github_branch_name}</strong> on <strong>{zid_metadata.github_repo_owner}/{zid_metadata.github_repo_name}</strong>
-      </Box>
+          <Box sx={{ mb: [3] }}>
+            Branch <strong>{zid_metadata.github_branch_name}</strong> on <strong>{zid_metadata.github_repo_owner}/{zid_metadata.github_repo_name}</strong>
+          </Box>
 
-      <Box sx={{ mb: [3] }}>
-        Submitted by <strong>{zid_metadata.github_pr_submitter}</strong>
-      </Box>
-
+          <Box sx={{ mb: [3] }}>
+            Submitted by <strong>{zid_metadata.github_pr_submitter}</strong>
+          </Box>
+        </Fragment>
+      }
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
       <CheckboxField
@@ -156,20 +161,24 @@ const ConversationConfig = ({ dispatch, error }: ConversationConfigProps) => {
         )}
       </Box>
 
-      <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
-        GitHub Synced Data
-      </Heading>
+      {hasGithubPr &&
+        <Fragment>
+          <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+            GitHub Synced Data
+          </Heading>
 
-      <Box sx={{ mb: [4], fontStyle: "italic" }}>
-        The fields in this section are automatically synced from GitHub. To change them, please
-        modify the source pull request, or disable syncing by unchecking the box below.
-      </Box>
+          <Box sx={{ mb: [4], fontStyle: "italic" }}>
+            The fields in this section are automatically synced from GitHub. To change them, please
+            modify the source pull request, or disable syncing by unchecking the box below.
+          </Box>
 
-      <CheckboxField
-        field="github_sync_enabled"
-        label="Enable GitHub sync"
-        subtitle="Uncheck in order to disable syncing"
-      />
+          <CheckboxField
+            field="github_sync_enabled"
+            label="Enable GitHub sync"
+            subtitle="Uncheck in order to disable syncing"
+          />
+        </Fragment>
+      }
 
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>FIP title</Text>

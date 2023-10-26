@@ -34,7 +34,10 @@ const ConversationListItem = ({ conversation, selectedConversationId, navigateTo
     onClick={() => navigateToConversation(conversation.conversation_id)}
     key={conversation.conversation_id}
   >
-    <Text sx={{fontWeight: 500}}>#{conversation.github_pr_id} - {conversation.fip_title || conversation.github_pr_title}</Text>
+    <Text sx={{fontWeight: 500}}>
+      {conversation.github_pr_id && `#${conversation.github_pr_id} - ` }
+      {conversation.fip_title || conversation.github_pr_title || "Untitled"}
+    </Text>
     <Flex sx={{direction: "row"}}>
       <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
       <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
