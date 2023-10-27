@@ -170,13 +170,16 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
                   )}
                   <Flex sx={{ flexDirection: "column", gap: [2], margin: "0 auto", pt: [6, 7], px:[4], maxWidth: "720px"}}>
                     <Heading as="h2">{selectedConversation.fip_title || selectedConversation.github_pr_title}</Heading>
-                    <Text>
-                      Pull request: #<a
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`https://github.com/filecoin-project/FIPs/pull/${selectedConversation.github_pr_id}`}
-                      >{selectedConversation.github_pr_id}</a>
-                    </Text>
+                    {
+                      selectedConversation.github_pr_id &&
+                      <Text>
+                        Pull request: #<a
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={`https://github.com/filecoin-project/FIPs/pull/${selectedConversation.github_pr_id}`}
+                        >{selectedConversation.github_pr_id}</a>
+                      </Text>
+                    }
                     <Frontmatter conversation={selectedConversation} />
                     <ReactMarkdown
                       skipHtml={true}

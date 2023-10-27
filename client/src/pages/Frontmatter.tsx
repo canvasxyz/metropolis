@@ -1,10 +1,11 @@
+// eslint-disable-next-line no-use-before-define
 import React from "react"
 import { Box } from "theme-ui"
 import { Conversation } from "../util/types"
 
 type FrontmatterProps = {conversation: Conversation}
 
-export const Frontmatter: React.FC<FrontmatterProps> = ({conversation}) => {
+export const Frontmatter = ({conversation}: FrontmatterProps) => {
   const fields = ["title", "author", "discussions-to", "status", "type", "category", "created"];
   const valueFieldNames = ["fip_title", "fip_author", "fip_discussions_to", "fip_status", "fip_type", "fip_category", "fip_created"];
 
