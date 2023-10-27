@@ -31,7 +31,6 @@ const sql_conversations: any = sql.define({
     "owner",
     "org_id",
     "context",
-    "course_id",
     "modified",
     "created",
     "link_url",

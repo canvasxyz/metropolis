@@ -151,8 +151,6 @@ export type ConversationType = {
   write_type?: any;
   importance_enabled?: any;
   link_url?: any;
-  course_invite?: any;
-  course_id?: any;
   zid?: any;
   uid?: any;
   context?: any;

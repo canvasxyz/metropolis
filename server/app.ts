@@ -1079,7 +1079,6 @@ app.get(
   authOptional(assignToP),
   want("include_all_conversations_i_am_in", getBool, assignToP),
   want("is_active", getBool, assignToP),
-  want("course_invite", getStringLimitLength(1, 32), assignToP),
   want("want_upvoted", getBool, assignToP),
   want("want_mod_url", getBool, assignToP), // NOTE - use this for API only!
   want("want_inbox_item_admin_url", getBool, assignToP), // NOTE - use this for API only!

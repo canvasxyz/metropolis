@@ -7793,7 +7793,6 @@ async function getConversations(
   let uid = req.p.uid;
   let zid = req.p.zid;
   let xid = req.p.xid;
-  // let course_invite = req.p.course_invite;
   let include_all_conversations_i_am_in =
     req.p.include_all_conversations_i_am_in;
   let want_mod_url = req.p.want_mod_url;
@@ -7812,11 +7811,6 @@ async function getConversations(
 
   let query = sql_conversations.select(sql_conversations.star());
 
-  if (!_.isUndefined(req.p.course_invite)) {
-    query = query.and(
-      sql_conversations.course_id.equals(req.p.course_id)
-    );
-  }
   if (!_.isUndefined(req.p.is_active)) {
     query = query.and(
       sql_conversations.is_active.equals(req.p.is_active)
@@ -8186,13 +8180,6 @@ async function handle_GET_conversations(
   },
   res: any
 ) {
-  if (req.p.course_invite) {
-    const rows = await queryP_readOnly(
-      "select course_id from courses where course_invite = ($1);",
-      [req.p.course_invite]
-    );
-    req.p.course_id = rows[0].course_id;
-  }
   await getConversations(req, res);
 }
 
