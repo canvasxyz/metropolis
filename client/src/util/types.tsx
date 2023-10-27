@@ -57,5 +57,6 @@ export type Conversation = {
   fip_type: string
   fip_category: string
   fip_created: string
+  hname: string
   // TODO ...
 }

@@ -40,7 +40,7 @@ const ConversationListItem = ({ conversation, selectedConversationId, navigateTo
     </Text>
     <Flex sx={{direction: "row"}}>
       <Text sx={{color: "#84817D", flexGrow:"1"}}>{conversation.fip_type}</Text>
-      <Text sx={{color: "#84817D"}}>{conversation.github_pr_submitter}</Text>
+      <Text sx={{color: "#84817D"}}>{conversation.hname}</Text>
     </Flex>
 
   </Box>
