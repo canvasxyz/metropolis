@@ -7781,204 +7781,50 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
 
 async function handle_GET_conversations(
   req: {
-    p: ConversationType;
+    p: {
+      uid: number;
+      limit?: number
+    };
   },
   res: any
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-  let xid = req.p.xid;
-  let include_all_conversations_i_am_in =
-    req.p.include_all_conversations_i_am_in;
-  let want_mod_url = req.p.want_mod_url;
-  let want_upvoted = req.p.want_upvoted;
-  let want_inbox_item_admin_url = req.p.want_inbox_item_admin_url;
-  let want_inbox_item_participant_url = req.p.want_inbox_item_participant_url;
-  let want_inbox_item_admin_html = req.p.want_inbox_item_admin_html;
-  let want_inbox_item_participant_html =
-    req.p.want_inbox_item_participant_html;
+  const uid = req.p.uid;
 
-  // this statement is currently a subset of the next one
-  // let zidListQuery = "select zid from page_ids where site_id = (select site_id from users where uid = ($1))";
-
-  // include conversations started by people with the same site_id as me
-  // 1's indicate that the conversations are there for that reason
-
-  let query = sql_conversations.select(sql_conversations.star());
-
-  if (!_.isUndefined(req.p.is_active)) {
-    query = query.and(
-      sql_conversations.is_active.equals(req.p.is_active)
-    );
-  }
-  if (!_.isUndefined(req.p.zid)) {
-    query = query.and(sql_conversations.zid.equals(zid));
-  }
-
-  //query = whereOptional(query, req.p, 'owner');
-  query = query.order(sql_conversations.created.descending);
-
-  if (!_.isUndefined(req.p.limit)) {
-    query = query.limit(req.p.limit);
-  } else {
-    query = query.limit(999); // TODO paginate
-  }
+  const query = "SELECT conversations.*, users.hname, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;";
+  // TODO paginate
+  const limit = req.p.limit || 999;
 
   let conversationsResult;
   try {
-    conversationsResult = await queryP_readOnly(query.toString());
+    conversationsResult = await queryP_readOnly(query.toString(), [limit]);
   } catch (err) {
     fail(res, 500, "polis_err_get_conversations", err);
     return;
   }
 
-  // TODO: can this just be a join on the initial query?
-  let conversationsWithConversationsIdsResult: any[];
-  try {
-    conversationsWithConversationsIdsResult = await addConversationIds(conversationsResult);
-  } catch (err) {
-    fail(res, 500, "polis_err_get_conversations_misc", err);
-    return;
-  }
+  conversationsResult.forEach(function (conv) {
+    conv.created = Number(conv.created);
+    conv.modified = Number(conv.modified);
 
-  let suurlsPromise;
-  if (xid) {
-    suurlsPromise = Promise.all(
-      conversationsWithConversationsIdsResult.map(function (conv: { zid: any; owner: any }) {
-        return createOneSuzinvite(
-          xid,
-          conv.zid,
-          conv.owner, // TODO think: conv.owner or uid?
-          _.partial(generateSingleUseUrl, req)
-        );
-      })
-    );
-  } else {
-    suurlsPromise = Promise.resolve([]);
-  }
-  let upvotesPromise =
-    uid && want_upvoted
-      ? queryP_readOnly(
-          "select zid from upvotes where uid = ($1);",
-          [uid]
-        )
-      : Promise.resolve([]);
-
-  return Promise.all([suurlsPromise, upvotesPromise]).then(
-    function ([suurlData_, upvotes_]) {
-      const suurlData = _.indexBy(suurlData_, "zid");
-      const upvotes = _.indexBy(upvotes_, "zid");
-
-      conversationsWithConversationsIdsResult.forEach(function (conv: {
-        is_owner: boolean;
-        is_archived: boolean;
-        owner: any;
-        mod_url: string;
-        conversation_id: string;
-        inbox_item_admin_url: string;
-        inbox_item_participant_url: string;
-        inbox_item_admin_html: string;
-        topic: string;
-        created: string | number | Date;
-        inbox_item_admin_html_escaped: any;
-        inbox_item_participant_html: string;
-        inbox_item_participant_html_escaped: any;
-        url: string;
-        upvoted: boolean;
-        modified: number;
-        is_mod: any;
-        is_anon: any;
-        is_active: any;
-        is_public: any;
-        zid?: string | number;
-        context?: string;
-      }) {
-        let root = getServerNameWithProtocol(req);
-
-        if (want_mod_url) {
-          // TODO make this into a moderation invite URL so others can join Issue #618
-          conv.mod_url = createModerationUrl(
-            req,
-            conv.conversation_id
-          );
-        }
-        if (want_inbox_item_admin_url) {
-          conv.inbox_item_admin_url =
-            root + "/iim/" + conv.conversation_id;
-        }
-        if (want_inbox_item_participant_url) {
-          conv.inbox_item_participant_url =
-            root + "/iip/" + conv.conversation_id;
-        }
-        if (want_inbox_item_admin_html) {
-          conv.inbox_item_admin_html =
-            "<a href='" +
-            root +
-            "/" +
-            conv.conversation_id +
-            "'>" +
-            (conv.topic || conv.created) +
-            "</a>" +
-            " <a href='" +
-            root +
-            "/m/" +
-            conv.conversation_id +
-            "'>moderate</a>";
-
-          conv.inbox_item_admin_html_escaped =
-            conv.inbox_item_admin_html.replace(/'/g, "\\'");
-        }
-        if (want_inbox_item_participant_html) {
-          conv.inbox_item_participant_html =
-            "<a href='" +
-            root +
-            "/" +
-            conv.conversation_id +
-            "'>" +
-            (conv.topic || conv.created) +
-            "</a>";
-          conv.inbox_item_participant_html_escaped =
-            conv.inbox_item_admin_html.replace(/'/g, "\\'");
-        }
-
-        if (suurlData && suurlData[conv.zid || ""]) {
-          conv.url = suurlData[conv.zid || ""].suurl;
-        } else {
-          conv.url = buildConversationUrl(
-            req,
-            conv.conversation_id
-          );
-        }
-        if (upvotes && upvotes[conv.zid || ""]) {
-          conv.upvoted = true;
-        }
-        conv.created = Number(conv.created);
-        conv.modified = Number(conv.modified);
-
-        // if there is no topic, provide a UTC timstamp instead
-        if (_.isUndefined(conv.topic) || conv.topic === "") {
-          conv.topic = new Date(conv.created).toUTCString();
-        }
-
-        conv.is_mod = uid && isAdministrator(uid);
-
-        // Make sure zid is not exposed
-        delete conv.zid;
-
-        delete conv.is_anon;
-        delete conv.is_public;
-        if (conv.context === "") {
-          delete conv.context;
-        }
-        return conv;
-      });
-
-      res.status(200).json(conversationsWithConversationsIdsResult);
-    },
-    function (err: any) {
-      fail(res, 500, "polis_err_get_conversations_surls", err);
+    // if there is no topic, provide a UTC timstamp instead
+    if (_.isUndefined(conv.topic) || conv.topic === "") {
+      conv.topic = new Date(conv.created).toUTCString();
     }
-  );
+
+    conv.is_mod = uid && isAdministrator(uid);
+
+    // Make sure zid is not exposed
+    delete conv.zid;
+
+    delete conv.is_anon;
+    delete conv.is_public;
+    if (conv.context === "") {
+      delete conv.context;
+    }
+    return conv;
+  });
+
+  res.status(200).json(conversationsResult);
 }
 
 function createReport(zid: any) {

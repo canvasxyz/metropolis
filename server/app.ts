@@ -1077,16 +1077,7 @@ app.get(
   "/api/v3/conversations",
   moveToBody,
   authOptional(assignToP),
-  want("include_all_conversations_i_am_in", getBool, assignToP),
-  want("is_active", getBool, assignToP),
-  want("want_upvoted", getBool, assignToP),
-  want("want_mod_url", getBool, assignToP), // NOTE - use this for API only!
-  want("want_inbox_item_admin_url", getBool, assignToP), // NOTE - use this for API only!
-  want("want_inbox_item_participant_url", getBool, assignToP), // NOTE - use this for API only!
-  want("want_inbox_item_admin_html", getBool, assignToP), // NOTE - use this for API only!
-  want("want_inbox_item_participant_html", getBool, assignToP), // NOTE - use this for API only!
   want("limit", getIntInRange(1, 9999), assignToP), // not allowing a super high limit to prevent DOS attacks
-  want("xid", getStringLimitLength(1, 999), assignToP),
   handle_GET_conversations
 );
 
