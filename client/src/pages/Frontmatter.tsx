@@ -9,8 +9,10 @@ export const Frontmatter = ({conversation}: FrontmatterProps) => {
   const fields = ["title", "author", "discussions-to", "status", "type", "category", "created"];
   const valueFieldNames = ["fip_title", "fip_author", "fip_discussions_to", "fip_status", "fip_type", "fip_category", "fip_created"];
 
-  return  (
-    <Box sx={{ overflowX: "scroll", px: [3], py: [3], border: "1px solid #ddd"}}>
+  const valuesExist = valueFieldNames.filter((valueFieldName) => conversation[valueFieldName]).length > 0;
+
+  return valuesExist ?
+    (<Box sx={{ overflowX: "scroll", px: [3], py: [3], border: "1px solid #ddd"}}>
       <table>
         <thead>
           <tr>
@@ -23,6 +25,6 @@ export const Frontmatter = ({conversation}: FrontmatterProps) => {
           </tr>
         </tbody>
       </table>
-    </Box>
-  )
+    </Box>) :
+    null
 }
