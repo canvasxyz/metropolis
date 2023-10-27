@@ -7778,17 +7778,12 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
   return conv;
 }
 
-async function getConversations(
+
+async function handle_GET_conversations(
   req: {
     p: ConversationType;
   },
-  res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
-  }
+  res: any
 ) {
   let uid = req.p.uid;
   let zid = req.p.zid;
@@ -8163,24 +8158,14 @@ function handle_GET_reports(
     });
 }
 
-async function handle_GET_conversation(req: Request & {p: {uid: string}}, res: Response) {
+async function handle_GET_conversation(req: Request & {p: {uid: number}}, res: Response) {
   if(!req.body.conversation_id) {
     fail(res, 400, "polis_err_get_conversation_no_conversation_id");
   }
   const zid = await getConversationIdFetchZid(req.body.conversation_id);
   const lang = null; // for now just return the default
-  console.log(typeof req.p.uid)
   const data = await getOneConversation(zid, req.p.uid, lang)
   finishOne(res, data);
-}
-
-async function handle_GET_conversations(
-  req: {
-    p: ConversationType;
-  },
-  res: any
-) {
-  await getConversations(req, res);
 }
 
 function handle_GET_contexts(
