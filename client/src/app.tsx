@@ -31,6 +31,7 @@ import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
 import CreateConversation from "./pages/create_conversation"
+import ManageConversations from "./pages/manage_conversations"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import Survey from "./pages/survey"
@@ -215,6 +216,13 @@ class App extends React.Component<
                     return (
                       <Box>
                         <Route exact path="/create" component={CreateConversation} />
+                        <PrivateRoute
+                          isLoading={this.isLoading()}
+                          authed={this.isAuthed()}
+                          exact
+                          path="/conversations"
+                          component={ManageConversations}
+                        />
                         <PrivateRoute
                           isLoading={this.isLoading()}
                           authed={this.isAuthed()}

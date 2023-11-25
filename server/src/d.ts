@@ -124,6 +124,7 @@ export type ConversationType = {
   is_anon?: any;
   is_data_open?: any;
   github_sync_enabled?: any;
+  fip_number?: any;
   fip_title?: any;
   fip_author?: any;
   fip_discussions_to?: any;

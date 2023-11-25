@@ -20,7 +20,7 @@ const computeVoteTotal = (users) => {
 
 const Number = ({ number, label }) => (
   <div style={{ marginLeft: "10px", marginRight: "10px" }}>
-    <p style={globals.overviewNumber}>{number.toLocaleString()}</p>
+    <p style={globals.overviewNumber}>{number?.toLocaleString() ?? "--"}</p>
     <p style={globals.overviewLabel}>{label}</p>
   </div>
 )
@@ -64,7 +64,9 @@ const Overview = ({
         <Number number={computeVoteTotal(math["user-vote-counts"])} label={"votes were cast"} />
         <Number number={math["n-cmts"]} label={"statements were submitted"} />
         <Number
-          number={computedStats.votesPerVoterAvg.toFixed(2)}
+          number={
+            isNaN(computedStats.votesPerVoterAvg) ? "--" : computedStats.votesPerVoterAvg.toFixed(2)
+          }
           label={"votes per voter on average"}
         />
         <Number

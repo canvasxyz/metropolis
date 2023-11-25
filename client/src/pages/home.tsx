@@ -29,7 +29,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
 
   const samples = [
     "The level of conflict we have right now is okay. We shouldn't expect total agreement among everyone.",
-    "I really like the iOS widgets. We should explore more projects like that - avatars, digital pets, and toys could reach lots of people.",
+    "I really like our iOS widgets. We should explore more projects like that - avatars, collectibles, and toys are fun and approachable for lots of people.",
     "It can be hard to understand why the organization works the way it does. Since governance is an important part of our legitimacy, it would help to have a writer come in and do a profile to tell our story.",
   ]
 
@@ -37,14 +37,14 @@ const Index: React.FC<{ user? }> = ({ user }) => {
     <React.Fragment>
       <Flex sx={{ mb: [4, null, 5] }}>
         <Box sx={{ flex: 3 }}>
-          <Box sx={{ flex: 1, maxWidth: ["none", "22em"], pr: [3] }}>
+          <Box sx={{ flex: 1, maxWidth: ["none", "26em"], pr: [3] }}>
             <Box sx={{ mt: [6, 9], pb: [1] }}>
               <img
                 src="/foundation.png"
                 width="20"
                 style={{ position: "relative", top: 2, opacity: 0.81 }}
               />
-              <Text sx={{ display: "inline", ml: "9px", fontWeight: "500" }}>Metropolis</Text>
+              <Text sx={{ display: "inline", ml: "9px", fontWeight: "700" }}>Metropolis</Text>
             </Box>
             <Heading
               as="h1"
@@ -53,28 +53,19 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 lineHeight: 1.2,
                 mt: [4],
                 mb: [4],
-                maxWidth: "18em",
-                fontWeight: "500",
+                maxWidth: "26em",
+                fontWeight: "700",
               }}
             >
-              Self-organizing surveys
+              The self-organizing collective survey
             </Heading>
             <Text sx={{ my: 3 }}>
-              Metropolis is a collaborative survey and discovery engine for digital communities.
-            </Text>
-            <Text>
-              Use it to{" "}
-              <Text sx={{ display: "inline", color: "#cf5555" }}>build member profiles</Text>,{" "}
-              <Text sx={{ display: "inline", color: "#6579d4" }}>match voters with delegates</Text>,{" "}
-              <Text sx={{ display: "inline", color: "#5ba143" }}>
-                identify new ideas to explore
-              </Text>
-              , and more.
+              Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas.
             </Text>
             {!!user?.email || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/dashboard">
-                  Go to conversations
+                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
+                  Go to app
                 </RouterLink>
               </Box>
             ) : (
@@ -168,7 +159,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
       >
         Metropolis is in alpha. Your data is safe, but our interfaces are still evolving rapidly.
       </Box>
-      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9] }}>
+      <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
         </Heading>
@@ -192,7 +183,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           </Box>
         </Grid>
       </Box>
-      <Box sx={{ maxWidth: "36em", margin: "auto", mt: [9] }}>
+      <Box sx={{ maxWidth: "34em", margin: "auto", mt: [9] }}>
         <Heading as="h3">How it works</Heading>
         <p>1. The survey creator asks a question, seeding it with 10-15 suggested responses.</p>
         <p>
@@ -204,7 +195,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           areas of consensus, and points of further exploration.
         </p>
       </Box>
-      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9] }}>
+      <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ mb: [4] }}>
           Coming soon
         </Heading>
@@ -215,7 +206,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           <Box sx={comingSoon}>Token gating</Box>
         </Grid>
       </Box>
-      <Box sx={{ maxWidth: "36em", margin: "0 auto", mt: [9], mb: [8] }}>
+      <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>
         <p>
           Metropolis is an extended version of{" "}
@@ -227,12 +218,12 @@ const Index: React.FC<{ user? }> = ({ user }) => {
           >
             Polis
           </Link>
-          , an academically validated collective-response survey used with groups of up to 200,000
-          by governments and independent media.
+          , an academically validated collective-response survey used with groups of 200,000+ by
+          governments and independent media.
         </p>
         <p>
           Polis is typically used as a large-scale opinion poll. Metropolis is for small communities
-          with a shared mission.
+          that align around a shared mission.
         </p>
         <Box sx={{ mt: [5, 6], textAlign: "center" }}>
           <Link

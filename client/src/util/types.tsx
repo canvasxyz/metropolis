@@ -50,6 +50,7 @@ export type Conversation = {
   github_pr_id: string
   github_pr_title: string
   github_pr_submitter: string
+  fip_number: number
   fip_title: string
   fip_author: string
   fip_discussions_to: string

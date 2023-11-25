@@ -53,7 +53,7 @@ const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, 
         {!inSurvey && (
           <Link
             sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }}
-            to={isLoggedIn ? "/dashboard" : "/"}
+            to={isLoggedIn ? "/conversations" : "/"}
           >
             Metropolis
           </Link>

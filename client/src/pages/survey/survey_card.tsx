@@ -34,29 +34,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
     })
 
   // returns promise {nextComment: {tid:...}} or {} if no further comments
-  const agreeBoost = (commentId: string, target: HTMLElement) => {
-    // ;(event.currentTarget as any).blur() // for editing past votes
-    setVoting(true)
-    api
-      .post("api/v3/votes", {
-        pid: "mypid",
-        conversation_id: conversationId,
-        agid: 1,
-        weight: 1,
-        vote: -1,
-        tid: commentId,
-        // starred: boolean
-      })
-      .then(() => {
-        toast.success("Vote recorded")
-        animateOut(target).then(() => {
-          onVoted(commentId)
-          setEditingVote(false)
-        })
-      })
-      .always(() => setVoting(false))
-  }
-
   const agree = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
     setVoting(true)
@@ -162,7 +139,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
               options={
                 editingVote
                   ? [
-                      { name: "Agree & Boost", onClick: (e) => agreeBoost(commentId, e.target) },
                       { name: "Agree", onClick: (e) => agree(commentId, e.target) },
                       { name: "Disagree", onClick: (e) => disagree(commentId, e.target) },
                       { name: "Skip", onClick: (e) => skip(commentId, e.target) },
@@ -179,11 +155,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         <Box
           sx={{ position: "absolute", bottom: ["10px", "14px"], marginLeft: "-15px", pb: [2, 0] }}
         >
-          <Button variant="text" onClick={(e) => agreeBoost(commentId, e.target)}>
-            <img src="/boost.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
-            {/*<TbArrowBigUpLine style={{ position: "relative", top: "4px" }} />*/}
-            <Text sx={{ display: ["none", "inline"] }}>Agree & </Text>Boost
-          </Button>
           <Button variant="text" onClick={(e) => agree(commentId, e.target)}>
             <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
             {/*<TbCheck style={{ position: "relative", top: "4px" }} />*/}

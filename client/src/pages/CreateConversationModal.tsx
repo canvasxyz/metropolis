@@ -1,17 +1,14 @@
 import React, { useEffect, useState, useRef } from "react"
 
 import Modal from "react-modal"
-import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux"
 import { Box, Input, Textarea, Label, Heading, Button, Text, Flex } from "theme-ui"
-import {
-  handleCreateConversationSubmit,
-} from "../actions"
+import { handleCreateConversationSubmit } from "../actions"
 
 type PropTypes = {
-  isOpen: boolean;
+  isOpen: boolean
   setIsOpen: (value: boolean) => void
 }
-
 
 const CreateConversationInner = () => {
   const dispatch = useDispatch()
@@ -31,7 +28,7 @@ const CreateConversationInner = () => {
   return (
     <Box>
       <Flex>
-        <Heading as="h1" sx={{ flex: 1, position: "relative", top: "4px" }}>
+        <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
           Add a survey
         </Heading>
       </Flex>
@@ -78,34 +75,36 @@ const CreateConversationInner = () => {
   )
 }
 
-export const CreateConversationModal: React.FC<PropTypes> = ({isOpen, setIsOpen}) => {
-  return <Modal
-    isOpen={isOpen}
-    onRequestClose={() => setIsOpen(false)}
-    style={{
-      overlay: {
-        backgroundColor: "#FBF5E9A0",
-      },
-      content: {
-        backgroundColor: "#FAF5EA",
-        border: "1px #EDEBE3",
-        boxShadow: "4px 4px 8px 2px #E6E0D4",
-        borderRadius: "8px",
-        top: "50%",
-        left: "50%",
-        right: "auto",
-        bottom: "auto",
-        marginRight: "-50%",
-        transform: "translate(-50%, -50%)",
-        // minHeight: "200px",
-        width: "96vw", // for mobile
-        maxWidth: "540px",
-        overflow: "visible",
-        padding: "32px 48px 28px",
-      },
-    }}
-    contentLabel="Add new statement"
-  >
-    <CreateConversationInner />
-  </Modal>
+export const CreateConversationModal: React.FC<PropTypes> = ({ isOpen, setIsOpen }) => {
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={() => setIsOpen(false)}
+      style={{
+        overlay: {
+          backgroundColor: "#FBF5E9A0",
+        },
+        content: {
+          backgroundColor: "#FAF5EA",
+          border: "1px #EDEBE3",
+          boxShadow: "4px 4px 8px 2px #E6E0D4",
+          borderRadius: "8px",
+          top: "50%",
+          left: "50%",
+          right: "auto",
+          bottom: "auto",
+          marginRight: "-50%",
+          transform: "translate(-50%, -50%)",
+          // minHeight: "200px",
+          width: "96vw", // for mobile
+          maxWidth: "540px",
+          overflow: "visible",
+          padding: "32px 48px 28px",
+        },
+      }}
+      contentLabel="Add new statement"
+    >
+      <CreateConversationInner />
+    </Modal>
+  )
 }

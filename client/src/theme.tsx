@@ -1,17 +1,14 @@
 export default {
   space: [0, 4, 8, 16, 24, 32, 42, 56, 72, 96, 128, 256, 512],
   fonts: {
-    heading: "Rubik, sans-serif",
-    body: "Rubik, sans-serif",
-    survey: "Rubik, sans-serif",
-    monospace: "Rubik, monospace",
+    heading: "'Instrument Sans', sans-serif",
+    body: "'Instrument Sans', sans-serif",
+    monospace: "monospace",
   },
   fontSizes: [12, 14, 16, 20, 24, 36, 40, 64, 96],
   fontWeights: {
     body: 400,
-    survey: 400,
-    heading: 600,
-    bold: 700,
+    heading: 700,
   },
   lineHeights: {
     body: 1.45,
@@ -109,7 +106,7 @@ export default {
         bg: "#4e65bd !important",
       },
       bg: "primary",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       textWrap: "nowrap",
     },
@@ -125,12 +122,12 @@ export default {
         backgroundColor: "#444 !important",
         borderBottomColor: "#444",
       },
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       textWrap: "nowrap",
     },
     nav: {
-      fontFamily: "monospace",
+      fontFamily: "body",
       color: "inherit",
       "&.active": {
         color: "primary",
@@ -147,7 +144,7 @@ export default {
       borderBottomColor: "transparent",
     },
     activeNav: {
-      fontFamily: "monospace",
+      fontFamily: "body",
       color: "inherit",
       "&.active": {
         color: "primary",
@@ -159,7 +156,7 @@ export default {
       textDecoration: "none",
       mr: [4],
       fontSize: "0.96em",
-      fontWeight: "bold",
+      fontWeight: "heading",
       cursor: "pointer",
       borderBottom: "1.5px solid",
       borderBottomColor: "mediumGray",
@@ -170,7 +167,7 @@ export default {
       bg: "transparent",
       color: "text",
       cursor: "pointer",
-      fontFamily: "monospace",
+      fontFamily: "body",
       fontSize: "0.96em",
       "&:hover": {
         backgroundColor: "bgGray",
@@ -186,7 +183,7 @@ export default {
       "&:hover": {
         bg: "primaryActive",
       },
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
     },
     secondary: {
@@ -195,13 +192,13 @@ export default {
       "&:hover": {
         bg: "lightGrayActive",
       },
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
     },
     outline: {
       color: "primary",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "primary",
@@ -211,26 +208,26 @@ export default {
       },
     },
     outlineSecondary: {
-      color: "#84817D",
+      color: "#6b6762",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "secondary",
-      boxShadow: "2px 2px 2px #E6E0D4",
+      boxShadow: "2px 2px 2px #E6E0D433",
       py: [1],
       px: [2],
       borderRadius: [8],
       "&:hover": {
         boxShadow: "none",
-        // color: "mediumGrayActive",
-        // borderColor: "mediumGrayActive",
+        color: "mediumGrayActive",
+        borderColor: "lightGrayActive",
       },
     },
     outlineRed: {
       color: "mediumRed",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "lightGray",
@@ -242,7 +239,7 @@ export default {
     outlineGreen: {
       color: "mediumGreen",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "lightGray",
@@ -254,7 +251,7 @@ export default {
     outlineLightGray: {
       color: "mediumGray",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "lightGray",
@@ -266,7 +263,7 @@ export default {
     outlineGray: {
       color: "mediumGray",
       bg: "background",
-      fontFamily: "monospace",
+      fontFamily: "body",
       cursor: "pointer",
       border: "1px solid",
       borderColor: "lightGray",

@@ -12,7 +12,7 @@ const blueGrey700 = "#455A64"
 const grey900 = "#212121"
 
 // Typography
-const sansSerif = "Rubik, sans-serif"
+const sansSerif = "Instrument Sans, sans-serif"
 const letterSpacing = "normal"
 const fontSize = 12
 
@@ -53,7 +53,7 @@ const theme = {
         labels: centeredLabelStyles,
       },
     },
-    baseProps
+    baseProps,
   ),
   axis: Object.assign(
     {
@@ -90,7 +90,7 @@ const theme = {
         }),
       },
     },
-    baseProps
+    baseProps,
   ),
   bar: Object.assign(
     {
@@ -103,7 +103,7 @@ const theme = {
         labels: baseLabelStyles,
       },
     },
-    baseProps
+    baseProps,
   ),
   boxplot: Object.assign(
     {
@@ -139,7 +139,7 @@ const theme = {
       },
       boxWidth: 20,
     },
-    baseProps
+    baseProps,
   ),
   candlestick: Object.assign(
     {
@@ -154,7 +154,7 @@ const theme = {
         negative: blueGrey700,
       },
     },
-    baseProps
+    baseProps,
   ),
   chart: baseProps,
   errorbar: Object.assign(
@@ -170,13 +170,13 @@ const theme = {
         labels: centeredLabelStyles,
       },
     },
-    baseProps
+    baseProps,
   ),
   group: Object.assign(
     {
       colorScale: colors,
     },
-    baseProps
+    baseProps,
   ),
   legend: {
     colorScale: colors,
@@ -203,7 +203,7 @@ const theme = {
         labels: centeredLabelStyles,
       },
     },
-    baseProps
+    baseProps,
   ),
   pie: Object.assign(
     {
@@ -217,7 +217,7 @@ const theme = {
         labels: Object.assign({}, baseLabelStyles, { padding: 20 }),
       },
     },
-    baseProps
+    baseProps,
   ),
   scatter: Object.assign(
     {
@@ -231,13 +231,13 @@ const theme = {
         labels: centeredLabelStyles,
       },
     },
-    baseProps
+    baseProps,
   ),
   stack: Object.assign(
     {
       colorScale: colors,
     },
-    baseProps
+    baseProps,
   ),
   tooltip: {
     style: Object.assign({}, centeredLabelStyles, {
@@ -273,7 +273,7 @@ const theme = {
         },
       },
     },
-    baseProps
+    baseProps,
   ),
 }
 

@@ -25,12 +25,10 @@ import {
   timeout,
   writeDefaultHead,
   doGetConversationPreloadInfo,
-
   middleware_log_request_body,
   middleware_log_middleware_errors,
   middleware_check_if_options,
   middleware_responseTime_start,
-
   handle_DELETE_metadata_answers,
   handle_DELETE_metadata_questions,
   handle_GET_bid,
@@ -68,7 +66,6 @@ import {
   handle_GET_participationInit,
   handle_GET_ptptois,
   handle_GET_reports,
-
   handle_GET_testConnection,
   handle_GET_testDatabase,
   handle_GET_tryCookie,
@@ -78,7 +75,6 @@ import {
   handle_GET_votes_me,
   handle_GET_xids,
   handle_GET_zinvites,
-
   handle_POST_auth_deregister,
   handle_POST_auth_login,
   handle_POST_auth_new,
@@ -122,7 +118,7 @@ import {
 } from "./src/server";
 import {
   handle_GET_github_init,
-  handle_GET_github_oauth_callback
+  handle_GET_github_oauth_callback,
 } from "./src/handlers/github_auth";
 import { handle_POST_github_sync } from "./src/handlers/github_sync";
 
@@ -163,9 +159,6 @@ app.use(morgan("dev"));
 // See: https://github.com/pol-is/polis/issues/546
 // See: https://expressjs.com/en/guide/behind-proxies.html
 app.set("trust proxy", "uniquelocal");
-
-
-
 
 app.disable("x-powered-by");
 // app.disable('etag'); // seems to be eating CPU, and we're not using etags yet. https://www.dropbox.com/s/hgfd5dm0e29728w/Screenshot%202015-06-01%2023.42.47.png?dl=0
@@ -231,18 +224,14 @@ app.get(
   "/api/v3/math/pca2",
   moveToBody,
   redirectIfHasZidButNoConversationId, // TODO remove once
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP),
   wantHeader(
     "If-None-Match",
     getStringLimitLength(1000),
-    assignToPCustom("ifNoneMatch")
+    assignToPCustom("ifNoneMatch"),
   ),
-  handle_GET_math_pca2 as any
+  handle_GET_math_pca2 as any,
 );
 
 app.get(
@@ -251,20 +240,16 @@ app.get(
   // need('conversation_id', getConversationIdFetchZid, assignToPCustom('zid')),
   need("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("math_tick", getInt, assignToP, -1),
-  handle_GET_math_correlationMatrix as any
+  handle_GET_math_correlationMatrix as any,
 );
 
 app.get(
   "/api/v3/dataExport/:export",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP),
-  handle_GET_dataExport
+  handle_GET_dataExport,
 );
 
 // TODO doesn't scale, stop sending entire mapping.
@@ -272,25 +257,17 @@ app.get(
   "/api/v3/bidToPid",
   authOptional(assignToP),
   moveToBody,
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP, 0),
-  handle_GET_bidToPid as any
+  handle_GET_bidToPid as any,
 );
 
 app.get(
   "/api/v3/xids",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_xids as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_xids as any,
 );
 
 // TODO cache
@@ -298,44 +275,36 @@ app.get(
   "/api/v3/bid",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP, 0),
-  handle_GET_bid as any
+  handle_GET_bid as any,
 );
 
 app.post(
   "/api/v3/auth/password",
   need("pwresettoken", getOptionalStringLimitLength(1000), assignToP),
   need("newPassword", getPasswordWithCreatePasswordRules, assignToP),
-  handle_POST_auth_password as any
+  handle_POST_auth_password as any,
 );
 
 app.post(
   "/api/v3/auth/pwresettoken",
   need("email", getEmail, assignToP),
-  handle_POST_auth_pwresettoken as any
+  handle_POST_auth_pwresettoken as any,
 );
 
 app.post(
   "/api/v3/auth/deregister",
   want("showPage", getStringLimitLength(1, 99), assignToP),
-  handle_POST_auth_deregister as any
+  handle_POST_auth_deregister as any,
 );
 
 app.get(
   "/api/v3/zinvites/:zid",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_zinvites as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_zinvites as any,
 );
 
 app.post(
@@ -343,12 +312,8 @@ app.post(
   moveToBody,
   auth(assignToP),
   want("short_url", getBool, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_zinvites as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_zinvites as any,
 );
 
 // // tags: ANON_RELATED
@@ -356,19 +321,15 @@ app.get(
   "/api/v3/participants",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_participants as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_participants as any,
 );
 
 app.get(
   "/api/v3/conversations/preload",
   moveToBody,
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
-  handle_GET_conversationPreloadInfo as any
+  handle_GET_conversationPreloadInfo as any,
 );
 
 app.get(
@@ -376,7 +337,7 @@ app.get(
   auth(assignToP),
   moveToBody,
   want("sinceUnixTimestamp", getStringLimitLength(99), assignToP),
-  handle_GET_conversationsRecentlyStarted
+  handle_GET_conversationsRecentlyStarted,
 );
 
 app.get(
@@ -384,89 +345,69 @@ app.get(
   auth(assignToP),
   moveToBody,
   want("sinceUnixTimestamp", getStringLimitLength(99), assignToP),
-  handle_GET_conversationsRecentActivity
+  handle_GET_conversationsRecentActivity,
 );
 
 app.post(
   "/api/v3/participants",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("answers", getArrayOfInt, assignToP, []), // {pmqid: [pmaid, pmaid], ...} where the pmaids are checked choices
   want("parent_url", getStringLimitLength(9999), assignToP),
   want("referrer", getStringLimitLength(9999), assignToP),
-  handle_POST_participants as any
+  handle_POST_participants as any,
 );
 
 app.get(
   "/api/v3/notifications/subscribe",
   moveToBody,
   need(HMAC_SIGNATURE_PARAM_NAME, getStringLimitLength(10, 999), assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("email", getEmail, assignToP),
-  handle_GET_notifications_subscribe as any
+  handle_GET_notifications_subscribe as any,
 );
 
 app.get(
   "/api/v3/notifications/unsubscribe",
   moveToBody,
   need(HMAC_SIGNATURE_PARAM_NAME, getStringLimitLength(10, 999), assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("email", getEmail, assignToP),
-  handle_GET_notifications_unsubscribe as any
+  handle_GET_notifications_unsubscribe as any,
 );
 
 app.post(
   "/api/v3/convSubscriptions",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("type", getInt, assignToP),
   need("email", getEmail, assignToP),
-  handle_POST_convSubscriptions as any
+  handle_POST_convSubscriptions as any,
 );
 
 app.post(
   "/api/v3/auth/login",
   need("password", getPassword, assignToP),
   want("email", getEmail, assignToP),
-  handle_POST_auth_login as any
+  handle_POST_auth_login as any,
 );
 
 app.post(
   "/api/v3/joinWithInvite",
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   wantCookie(
     COOKIES.PERMANENT_COOKIE,
     getOptionalStringLimitLength(32),
-    assignToPCustom("permanentCookieToken")
+    assignToPCustom("permanentCookieToken"),
   ),
   want("suzinvite", getOptionalStringLimitLength(32), assignToP),
   want("answers", getArrayOfInt, assignToP, []), // {pmqid: [pmaid, pmaid], ...} where the pmaids are checked choices
   want("referrer", getStringLimitLength(9999), assignToP),
   want("parent_url", getStringLimitLength(9999), assignToP),
-  handle_POST_joinWithInvite as any
+  handle_POST_joinWithInvite as any,
 );
 
 app.post(
@@ -476,7 +417,7 @@ app.post(
   need("email", getEmail, assignToP),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("filename", getStringLimitLength(9999), assignToP),
-  handle_POST_sendEmailExportReady as any
+  handle_POST_sendEmailExportReady as any,
 );
 
 app.post(
@@ -485,21 +426,21 @@ app.post(
   need("webserver_pass", getStringLimitLength(1, 999), assignToP),
   need("subject", getStringLimitLength(9999), assignToP),
   need("body", getStringLimitLength(99999), assignToP),
-  handle_POST_notifyTeam as any
+  handle_POST_notifyTeam as any,
 );
 
 app.get(
   "/api/v3/domainWhitelist",
   moveToBody,
   auth(assignToP),
-  handle_GET_domainWhitelist as any
+  handle_GET_domainWhitelist as any,
 );
 
 app.post(
   "/api/v3/domainWhitelist",
   auth(assignToP),
   need("domain_whitelist", getOptionalStringLimitLength(999), assignToP),
-  handle_POST_domainWhitelist as any
+  handle_POST_domainWhitelist as any,
 );
 
 app.post(
@@ -508,23 +449,19 @@ app.post(
   need(
     "xid_whitelist",
     getArrayOfStringNonEmptyLimitLength(9999, 999),
-    assignToP
+    assignToP,
   ),
-  handle_POST_xidWhitelist as any
+  handle_POST_xidWhitelist as any,
 );
 
 app.get(
   "/api/v3/conversationStats",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("until", getInt, assignToP),
-  handle_GET_conversationStats as any
+  handle_GET_conversationStats as any,
 );
 
 app.post(
@@ -539,14 +476,14 @@ app.post(
   want("organization", getOptionalStringLimitLength(999), assignToP),
   want("gatekeeperTosPrivacy", getBool, assignToP),
   want("owner", getBool, assignToP, true),
-  handle_POST_auth_new
+  handle_POST_auth_new,
 );
 
 app.post(
   "/api/v3/tutorial",
   auth(assignToP),
   need("step", getInt, assignToP),
-  handle_POST_tutorial as any
+  handle_POST_tutorial as any,
 );
 
 app.get(
@@ -554,44 +491,32 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   want("errIfNoAuth", getBool, assignToP),
-  handle_GET_users as any
+  handle_GET_users as any,
 );
 
 app.get(
   "/api/v3/participation",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("strict", getBool, assignToP),
-  handle_GET_participation as any
+  handle_GET_participation as any,
 );
 
 app.get(
   "/api/v3/group_demographics",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
-  handle_GET_groupDemographics as any
+  handle_GET_groupDemographics as any,
 );
 
 app.get(
   "/api/v3/comments",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")), // if you want to get report-specific info
   want("tids", getArrayOfInt, assignToP),
   want("moderation", getBool, assignToP),
@@ -605,26 +530,22 @@ app.get(
   resolve_pidThing(
     "not_voted_by_pid",
     assignToP,
-    "get:comments:not_voted_by_pid"
+    "get:comments:not_voted_by_pid",
   ),
   resolve_pidThing(
     "submitted_by_pid",
     assignToP,
-    "get:comments:submitted_by_pid"
+    "get:comments:submitted_by_pid",
   ),
   resolve_pidThing("pid", assignToP, "get:comments:pid"),
-  handle_GET_comments
+  handle_GET_comments,
 );
 
 // TODO probably need to add a retry mechanism like on joinConversation to handle possibility of duplicate tid race-condition exception
 app.post(
   "/api/v3/comments",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("txt", getOptionalStringLimitLength(997), assignToP),
   want("vote", getIntInRange(-1, 1), assignToP),
   want("quote_txt", getStringLimitLength(999), assignToP),
@@ -633,46 +554,34 @@ app.post(
   want("is_seed", getBool, assignToP),
   want("xid", getStringLimitLength(1, 999), assignToP),
   resolve_pidThing("pid", assignToP, "post:comments"),
-  handle_POST_comments as any
+  handle_POST_comments as any,
 );
 
 app.get(
   "/api/v3/comments/translations",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("tid", getInt, assignToP),
   want("lang", getStringLimitLength(1, 10), assignToP),
-  handle_GET_comments_translations as any
+  handle_GET_comments_translations as any,
 );
 
 app.get(
   "/api/v3/votes/me",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_votes_me
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_votes_me,
 );
 
 app.get(
   "/api/v3/votes",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("tid", getInt, assignToP),
   resolve_pidThing("pid", assignToP, "get:votes"),
-  handle_GET_votes
+  handle_GET_votes,
 );
 
 app.get(
@@ -680,17 +589,13 @@ app.get(
   timeout(15000),
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   resolve_pidThing("not_voted_by_pid", assignToP, "get:nextComment"),
   want("without", getArrayOfInt, assignToP),
   want("include_social", getBool, assignToP),
   want("lang", getStringLimitLength(1, 10), assignToP), // preferred language of nextComment
   haltOnTimeout,
-  handle_GET_nextComment as any
+  handle_GET_nextComment as any,
 );
 
 app.get("/api/v3/testConnection", moveToBody, handle_GET_testConnection as any);
@@ -702,35 +607,27 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   want("ptptoiLimit", getInt, assignToP),
-  want(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   want("lang", getStringLimitLength(1, 10), assignToP), // preferred language of nextComment
 
   want(
     "domain_whitelist_override_key",
     getStringLimitLength(1, 1000),
-    assignToP
+    assignToP,
   ),
   denyIfNotFromWhitelistedDomain as any, // this seems like the easiest place to enforce the domain whitelist. The index.html is cached on cloudflare, so that's not the right place.
 
   want("xid", getStringLimitLength(1, 999), assignToP),
   resolve_pidThing("pid", assignToP, "get:votes"), // must be after zid getter
-  handle_GET_participationInit as any
+  handle_GET_participationInit as any,
 );
 
 app.post(
   "/api/v3/votes",
   auth(assignToP),
   need("tid", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("vote", getIntInRange(-1, 1), assignToP),
   want("starred", getBool, assignToP),
   want("high_priority", getBool, assignToP, false),
@@ -738,53 +635,37 @@ app.post(
   resolve_pidThing("pid", assignToP, "post:votes"),
   want("xid", getStringLimitLength(1, 999), assignToP),
   want("lang", getStringLimitLength(1, 10), assignToP), // language of the next comment to be returned
-  handle_POST_votes
+  handle_POST_votes,
 );
 
 app.get(
   "/api/v3/participants",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_participants as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_participants as any,
 );
 
 app.put(
   "/api/v3/participants_extended",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("show_translation_activated", getBool, assignToP),
-  handle_PUT_participants_extended as any
+  handle_PUT_participants_extended as any,
 );
 
 app.get(
   "/api/v3/logMaxmindResponse",
   auth(assignToP),
   need("user_uid", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_logMaxmindResponse as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_logMaxmindResponse as any,
 );
 
 app.post(
   "/api/v3/ptptCommentMod",
   auth(assignToP),
   need("tid", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("as_abusive", getBool, assignToP, null),
   want("as_factual", getBool, assignToP, null),
   want("as_feeling", getBool, assignToP, null),
@@ -796,112 +677,80 @@ app.post(
   want("as_spam", getBool, assignToP, null),
   want("as_unsure", getBool, assignToP, null),
   getPidForParticipant(assignToP) as any,
-  handle_POST_ptptCommentMod
+  handle_POST_ptptCommentMod,
 );
 
 app.post(
   "/api/v3/upvotes",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_upvotes as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_upvotes as any,
 );
 
 app.post(
   "/api/v3/stars",
   auth(assignToP),
   need("tid", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("starred", getIntInRange(0, 1), assignToP),
   getPidForParticipant(assignToP) as any,
-  handle_POST_stars as any
+  handle_POST_stars as any,
 );
 
 app.post(
   "/api/v3/trashes",
   auth(assignToP),
   need("tid", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("trashed", getIntInRange(0, 1), assignToP),
   getPidForParticipant(assignToP) as any,
-  handle_POST_trashes as any
+  handle_POST_trashes as any,
 );
 
 app.put(
   "/api/v3/comments",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("tid", getInt, assignToP),
   need("active", getBool, assignToP),
   need("mod", getInt, assignToP),
   need("is_meta", getBool, assignToP),
   need("velocity", getNumberInRange(0, 1), assignToP),
-  handle_PUT_comments as any
+  handle_PUT_comments as any,
 );
 
 app.post(
   "/api/v3/reportCommentSelections",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   need("tid", getInt, assignToP),
   need("include", getBool, assignToP),
-  handle_POST_reportCommentSelections as any
+  handle_POST_reportCommentSelections as any,
 );
 
 app.post(
   "/api/v3/conversation/close",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_conversation_close as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_conversation_close as any,
 );
 
 app.post(
   "/api/v3/conversation/reopen",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_conversation_reopen as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_conversation_reopen as any,
 );
 
 app.put(
   "/api/v3/conversations",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   want("is_active", getBool, assignToP),
   want("is_anon", getBool, assignToP),
@@ -915,6 +764,7 @@ app.put(
   want("description", getOptionalStringLimitLength(500000), assignToP),
 
   // FIP fields
+  want("fip_number", getInt, assignToP),
   want("fip_title", getOptionalStringLimitLength(500000), assignToP),
   want("fip_author", getOptionalStringLimitLength(500000), assignToP),
   want("fip_discussions_to", getOptionalStringLimitLength(500000), assignToP),
@@ -931,7 +781,7 @@ app.put(
     "postsurvey_redirect",
     getOptionalStringLimitLength(1024),
     assignToP,
-    ""
+    "",
   ),
   want("vis_type", getInt, assignToP),
   want("help_type", getInt, assignToP),
@@ -952,7 +802,7 @@ app.put(
   want("context", getOptionalStringLimitLength(999), assignToP),
   want("link_url", getStringLimitLength(1, 9999), assignToP),
   want("subscribe_type", getInt, assignToP),
-  handle_PUT_conversations
+  handle_PUT_conversations,
 );
 
 app.put(
@@ -962,7 +812,7 @@ app.put(
   want("email", getEmail, assignToP),
   want("hname", getOptionalStringLimitLength(9999), assignToP),
   want("uid_of_user", getInt, assignToP),
-  handle_PUT_users as any
+  handle_PUT_users as any,
 );
 
 app.delete(
@@ -970,7 +820,7 @@ app.delete(
   moveToBody,
   auth(assignToP),
   need("pmqid", getInt, assignToP),
-  handle_DELETE_metadata_questions as any
+  handle_DELETE_metadata_questions as any,
 );
 
 app.delete(
@@ -978,22 +828,18 @@ app.delete(
   moveToBody,
   auth(assignToP),
   need("pmaid", getInt, assignToP),
-  handle_DELETE_metadata_answers as any
+  handle_DELETE_metadata_answers as any,
 );
 
 app.get(
   "/api/v3/metadata/questions",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("suzinvite", getOptionalStringLimitLength(32), assignToP),
   want("zinvite", getOptionalStringLimitLength(300), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
-  handle_GET_metadata_questions
+  handle_GET_metadata_questions,
 );
 
 app.post(
@@ -1001,76 +847,56 @@ app.post(
   moveToBody,
   auth(assignToP),
   need("key", getOptionalStringLimitLength(999), assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_metadata_questions
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_metadata_questions,
 );
 
 app.post(
   "/api/v3/metadata/answers",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("pmqid", getInt, assignToP),
   need("value", getOptionalStringLimitLength(999), assignToP),
-  handle_POST_metadata_answers
+  handle_POST_metadata_answers,
 );
 
 app.get(
   "/api/v3/metadata/choices",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_metadata_choices
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_metadata_choices,
 );
 
 app.get(
   "/api/v3/metadata/answers",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("pmqid", getInt, assignToP),
   want("suzinvite", getOptionalStringLimitLength(32), assignToP),
   want("zinvite", getOptionalStringLimitLength(300), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
-  handle_GET_metadata_answers
+  handle_GET_metadata_answers,
 );
 
 app.get(
   "/api/v3/metadata",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("zinvite", getOptionalStringLimitLength(300), assignToP),
   want("suzinvite", getOptionalStringLimitLength(32), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
-  handle_GET_metadata as any
+  handle_GET_metadata as any,
 );
 
 app.get(
   "/api/v3/conversation/:conversation_id",
   moveToBody,
   authOptional(assignToP),
-  handle_GET_conversation as any
+  handle_GET_conversation as any,
 );
 
 app.get(
@@ -1078,42 +904,30 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   want("limit", getIntInRange(1, 9999), assignToP), // not allowing a super high limit to prevent DOS attacks
-  handle_GET_conversations
+  handle_GET_conversations,
 );
 
 app.get(
   "/api/v3/reports",
   moveToBody,
   authOptional(assignToP),
-  want(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")), // Knowing the report_id grants the user permission to view the report
-  handle_GET_reports as any
+  handle_GET_reports as any,
 );
 
 app.post(
   "/api/v3/reports",
   auth(assignToP),
-  want(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_reports as any
+  want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_reports as any,
 );
 
 app.put(
   "/api/v3/reports",
   moveToBody,
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("report_name", getStringLimitLength(999), assignToP),
   want("label_x_neg", getStringLimitLength(999), assignToP),
@@ -1130,27 +944,27 @@ app.put(
   want("label_group_7", getStringLimitLength(999), assignToP),
   want("label_group_8", getStringLimitLength(999), assignToP),
   want("label_group_9", getStringLimitLength(999), assignToP),
-  handle_PUT_reports as any
+  handle_PUT_reports as any,
 );
 
 app.get(
   "/api/v3/contexts",
   moveToBody,
   authOptional(assignToP),
-  handle_GET_contexts as any
+  handle_GET_contexts as any,
 );
 
 app.post(
   "/api/v3/contexts",
   auth(assignToP),
   need("name", getStringLimitLength(1, 300), assignToP),
-  handle_POST_contexts as any
+  handle_POST_contexts as any,
 );
 
 app.post(
   "/api/v3/reserve_conversation_id",
   auth(assignToP),
-  handle_POST_reserve_conversation_id
+  handle_POST_reserve_conversation_id,
 );
 
 // This is used by the "Add survey" modal in the dashboard
@@ -1159,30 +973,22 @@ app.post(
   auth(assignToP),
   want("fip_title", getOptionalStringLimitLength(400), assignToP, ""),
   want("description", getOptionalStringLimitLength(500000), assignToP, ""),
-  handle_POST_conversations
+  handle_POST_conversations,
 );
 
 app.post(
   "/api/v3/query_participants_by_metadata",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("pmaids", getArrayOfInt, assignToP),
-  handle_POST_query_participants_by_metadata as any
+  handle_POST_query_participants_by_metadata as any,
 );
 
 app.post(
   "/api/v3/sendCreatedLinkToEmail",
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_POST_sendCreatedLinkToEmail as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_sendCreatedLinkToEmail as any,
 );
 
 app.get(
@@ -1191,7 +997,7 @@ app.get(
   authOptional(assignToP),
   want("dest", getStringLimitLength(9999), assignToP),
   want("owner", getBool, assignToP, true),
-  handle_GET_github_init as any
+  handle_GET_github_init as any,
 );
 
 app.get(
@@ -1202,29 +1008,22 @@ app.get(
   need("code", getStringLimitLength(9999), assignToP), // TODO verify
   want("dest", getStringLimitLength(9999), assignToP),
   want("owner", getBool, assignToP, true),
-  handle_GET_github_oauth_callback
+  handle_GET_github_oauth_callback,
 );
 
-// TODO: figure out a way to trigger this periodically - this endpoint is just here for testing
-if(process.env.ENABLE_GITHUB_SYNC_TEST_ENDPOINT) {
-  app.post(
-    "/api/v3/github_sync",
-    // auth(assignToP),
-    handle_POST_github_sync
-  );
-}
+app.post(
+  "/api/v3/github_sync",
+  // auth(assignToP),
+  handle_POST_github_sync,
+);
 
 app.get(
   "/api/v3/locations",
   moveToBody,
   authOptional(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("gid", getInt, assignToP),
-  handle_GET_locations as any
+  handle_GET_locations as any,
 );
 
 app.put(
@@ -1232,13 +1031,9 @@ app.put(
   moveToBody,
   auth(assignToP),
   need("mod", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   resolve_pidThing("pid", assignToP),
-  handle_PUT_ptptois as any
+  handle_PUT_ptptois as any,
 );
 
 app.get(
@@ -1246,41 +1041,33 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   want("mod", getInt, assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP),
-  handle_GET_ptptois as any
+  handle_GET_ptptois as any,
 );
 
 app.post(
   "/api/v3/einvites",
   need("email", getEmail, assignToP),
-  handle_POST_einvites as any
+  handle_POST_einvites as any,
 );
 
 app.get(
   "/api/v3/einvites",
   moveToBody,
   need("einvite", getStringLimitLength(1, 100), assignToP),
-  handle_GET_einvites as any
+  handle_GET_einvites as any,
 );
 
 app.post(
   "/api/v3/users/invite",
   // authWithApiKey(assignToP),
   auth(assignToP),
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   // need('single_use_tokens', getBool, assignToP),
   need("emails", getArrayOfStringNonEmpty, assignToP),
-  handle_POST_users_invite as any
+  handle_POST_users_invite as any,
 );
 
 // TODO this should probably be exempt from the CORS restrictions
@@ -1288,7 +1075,7 @@ app.get(
   "/api/v3/launchPrep",
   moveToBody,
   need("dest", getStringLimitLength(1, 10000), assignToP),
-  handle_GET_launchPrep as any
+  handle_GET_launchPrep as any,
 );
 
 app.get("/api/v3/tryCookie", moveToBody, handle_GET_tryCookie as any);
@@ -1297,7 +1084,7 @@ app.get(
   "/api/v3/verify",
   moveToBody,
   need("e", getStringLimitLength(1, 1000), assignToP),
-  handle_GET_verification as any
+  handle_GET_verification as any,
 );
 
 app.post(
@@ -1307,7 +1094,7 @@ app.post(
   need("times", getArrayOfInt, assignToP),
   need("durs", getArrayOfInt, assignToP),
   need("clientTimestamp", getInt, assignToP),
-  handle_POST_metrics as any
+  handle_POST_metrics as any,
 );
 
 ////////////////////////////////////////////
@@ -1326,24 +1113,16 @@ app.post(
 app.get(
   "/iip/:conversation_id",
   moveToBody,
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_iip_conversation
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_iip_conversation,
 );
 
 // inbox item admin
 app.get(
   "/iim/:conversation_id",
   moveToBody,
-  need(
-    "conversation_id",
-    getConversationIdFetchZid,
-    assignToPCustom("zid")
-  ),
-  handle_GET_iim_conversation as any
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_iim_conversation as any,
 );
 
 app.get("/robots.txt", (req: express.Request, res: express.Response) => {
@@ -1352,7 +1131,7 @@ app.get("/robots.txt", (req: express.Request, res: express.Response) => {
 
 const fetchIndexForAdminPage = (
   req: express.Request,
-  res: express.Response
+  res: express.Response,
 ) => {
   res.setHeader("Content-Type", "text/html");
   res.sendfile(__dirname + "/client/index.html");
@@ -1391,7 +1170,7 @@ app.use(
   express.static(path.join(__dirname, "client"), {
     maxAge: "1d",
     setHeaders: setCustomHeaders,
-  })
+  }),
 );
 
 const fetchEmbed = (req: express.Request, res: express.Response) => {
@@ -1401,12 +1180,9 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
 
   // embed.js is on a different root path
   if (isEmbedJs) {
-    const headers = fs.readFileSync(
-      __dirname + "/embed/embed.js.headersJson",
-      {
-        encoding: "utf8",
-      }
-    );
+    const headers = fs.readFileSync(__dirname + "/embed/embed.js.headersJson", {
+      encoding: "utf8",
+    });
     res.set(JSON.parse(headers));
     res.sendfile(__dirname + "/embed/embed.js");
     return;
@@ -1426,7 +1202,7 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
       res.send(
         file
           .toString()
-          .replace('"REPLACE_THIS_WITH_PRELOAD_DATA"', preloadData)
+          .replace('"REPLACE_THIS_WITH_PRELOAD_DATA"', preloadData),
       );
     });
     return;

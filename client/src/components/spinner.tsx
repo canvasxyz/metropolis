@@ -2,15 +2,15 @@
 
 import React from "react"
 
-class Spinner extends React.Component {
-  getSpinner() {
+class Spinner extends React.Component<{ size?: number }> {
+  getSpinner(size: number) {
     return {
       __html: `
         <svg
-          style="display: inline"
+          style="display: inline; position: relative; top: 0.2em"
           xmlns="http://www.w3.org/2000/svg"
-          width="30px"
-          height="30px"
+          width="1em"
+          height="1em"
           viewBox="0 0 100 100"
           preserveAspectRatio="xMidYMid">
           <rect
@@ -27,7 +27,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(0 50 50) translate(0 -30)">
+            transform="rotate(0 50 50) translate(0 -${size})">
             <animate
               attributeName="opacity"
               from="1"
@@ -44,7 +44,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(30 50 50) translate(0 -30)">
+            transform="rotate(30 50 50) translate(0 -${size})">
             <animate
               attributeName="opacity"
               from="1"
@@ -61,7 +61,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(60 50 50) translate(0 -30)">
+            transform="rotate(60 50 50) translate(0 -${size})">
             <animate
               attributeName="opacity"
               from="1"
@@ -78,7 +78,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(90 50 50) translate(0 -30)">
+            transform="rotate(90 50 50) translate(0 -${size})">
             <animate
               attributeName="opacity"
               from="1"
@@ -95,7 +95,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(120 50 50) translate(0 -30)">
+            transform="rotate(120 50 50) translate(0 -${size})">
             <animate
               attributeName="opacity"
               from="1"
@@ -112,7 +112,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(150 50 50) translate(0 -30)">
+            transform="rotate(150 50 50) translate(0 -${size})">
               <animate
                 attributeName="opacity"
                 from="1"
@@ -129,7 +129,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(180 50 50) translate(0 -30)">
+            transform="rotate(180 50 50) translate(0 -${size})">
               <animate
                 attributeName="opacity"
                 from="1"
@@ -146,7 +146,7 @@ class Spinner extends React.Component {
               rx="5"
               ry="5"
               fill="rgba(140,140,140,1)"
-              transform="rotate(210 50 50) translate(0 -30)">
+              transform="rotate(210 50 50) translate(0 -${size})">
             <animate
             attributeName="opacity"
             from="1"
@@ -163,7 +163,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(240 50 50) translate(0 -30)">
+            transform="rotate(240 50 50) translate(0 -${size})">
           <animate
             attributeName="opacity"
             from="1"
@@ -180,7 +180,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(270 50 50) translate(0 -30)">
+            transform="rotate(270 50 50) translate(0 -${size})">
           <animate
             attributeName="opacity"
             from="1"
@@ -197,7 +197,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(300 50 50) translate(0 -30)">
+            transform="rotate(300 50 50) translate(0 -${size})">
           <animate
             attributeName="opacity"
             from="1"
@@ -214,7 +214,7 @@ class Spinner extends React.Component {
             rx="5"
             ry="5"
             fill="rgba(140,140,140,1)"
-            transform="rotate(330 50 50) translate(0 -30)">
+            transform="rotate(330 50 50) translate(0 -${size})">
           <animate
             attributeName="opacity"
             from="1"
@@ -225,7 +225,10 @@ class Spinner extends React.Component {
   }
 
   render() {
-    return <div dangerouslySetInnerHTML={this.getSpinner()} />
+    const size = this.props.size || 30
+    return (
+      <div style={{ display: "inline-block" }} dangerouslySetInnerHTML={this.getSpinner(size)} />
+    )
   }
 }
 

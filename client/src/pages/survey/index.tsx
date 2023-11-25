@@ -14,7 +14,6 @@ import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
-import SurveyFloatingPromptBox from "./survey_floating_prompt"
 import PostSurvey from "./survey_post"
 
 // TODO: enforce comment too long on backend
@@ -64,7 +63,7 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
       setUnvotedComments(
         trimmedUnvotedComments.length === unvotedComments.length - 1
           ? [trimmedUnvotedComments[0], nextComment, ...trimmedUnvotedComments.slice(1)]
-          : [...unvotedComments]
+          : [...unvotedComments],
       )
     })
 }
@@ -142,7 +141,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             newUnvotedComments,
             setUnvotedComments,
             zid_metadata.conversation_id,
-            newUnvotedComments[0]?.tid
+            newUnvotedComments[0]?.tid,
           )
         }, 0)
       }
@@ -173,14 +172,6 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
 
   return (
     <Box>
-      <SurveyFloatingPromptBox
-        zid_metadata={zid_metadata}
-        votedComments={votedComments}
-        unvotedComments={unvotedComments}
-        submittedComments={submittedComments}
-        state={state}
-        goTo={goTo}
-      />
       {state === "voting" && (
         <React.Fragment>
           <SurveyCards
@@ -210,7 +201,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
                   newUnvotedComments,
                   setUnvotedComments,
                   zid_metadata.conversation_id,
-                  newUnvotedComments[0]?.tid
+                  newUnvotedComments[0]?.tid,
                 )
               }
             }}
@@ -237,10 +228,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
         <Box sx={{ mb: [5] }}>
           {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
             <Box>
-              <Box sx={{ mt: [4], mb: [3] }}>
-                Do you have suggestions to add, or are your perspectives or experiences missing? If
-                so, add them here:
-              </Box>
+              <Box sx={{ mt: [4], mb: [3] }}>Do you have remarks to add? If so, add them here:</Box>
               <SurveyCompose
                 zid_metadata={zid_metadata}
                 votedComments={votedComments}
@@ -259,7 +247,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
                 sx={{ width: "100%" }}
                 onClick={() =>
                   (document.location = `/createuser?from=${encodeURIComponent(
-                    document.location.pathname
+                    document.location.pathname,
                   )}`)
                 }
               >

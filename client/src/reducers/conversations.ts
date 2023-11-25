@@ -8,7 +8,7 @@ const conversations = (
     error: false,
     conversations: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_CONVERSATIONS:
@@ -30,14 +30,14 @@ const conversations = (
       })
     case types.CLOSE_CONVERSATION_SUCCESS:
       return Object.assign({}, state, {
-        conversations: state.conversations.map((c) =>
-          c.conversation_id === action.data ? { ...c, is_archived: true } : c
+        conversations: state.conversations?.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_archived: true } : c,
         ),
       })
     case types.REOPEN_CONVERSATION_SUCCESS:
       return Object.assign({}, state, {
-        conversations: state.conversations.map((c) =>
-          c.conversation_id === action.data ? { ...c, is_archived: false } : c
+        conversations: state.conversations?.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_archived: false } : c,
         ),
       })
     default:

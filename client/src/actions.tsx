@@ -201,7 +201,7 @@ export const populateUserStore = () => {
     dispatch(requestUser())
     return fetchUser().then(
       (res) => dispatch(receiveUser(res)),
-      (err) => dispatch(userFetchError(err))
+      (err) => dispatch(userFetchError(err)),
     )
   }
 }
@@ -239,7 +239,7 @@ export const doSignin = (attrs) => {
           window.location.assign("/conversations")
         }, 3000)
       },
-      (err) => dispatch(signinError(err))
+      (err) => dispatch(signinError(err)),
     )
   }
 }
@@ -276,7 +276,7 @@ export const doCreateUser = (attrs, dest) => {
           window.location = dest || ""
         }, 3000)
       },
-      (err) => dispatch(createUserError(err))
+      (err) => dispatch(createUserError(err)),
     )
   }
 }
@@ -319,7 +319,7 @@ export const doPasswordResetInit = (attrs) => {
 
         return dispatch(passwordResetInitSuccess())
       },
-      (err) => dispatch(passwordResetInitError(err))
+      (err) => dispatch(passwordResetInitError(err)),
     )
   }
 }
@@ -362,7 +362,7 @@ export const doPasswordReset = (attrs) => {
 
         return dispatch(passwordResetSuccess())
       },
-      (err) => dispatch(passwordResetError(err))
+      (err) => dispatch(passwordResetError(err)),
     )
   }
 }
@@ -504,7 +504,7 @@ const saveFacebookFriendsData = (data, dest, dispatch) => {
       } else {
         alert("error logging in with Facebook")
       }
-    }
+    },
   )
 }
 
@@ -559,7 +559,7 @@ const onFbLoginOk = (response, dest, dispatch, optionalPassword) => {
     processFacebookFriendsData(response, dest, dispatch, optionalPassword),
     (err) => {
       console.error(err)
-    }
+    },
   )
 }
 
@@ -579,7 +579,7 @@ const callFacebookLoginAPI = (dest, dispatch, optionalPassword) => {
         "user_friends",
         "email",
       ].join(","),
-    }
+    },
   )
 }
 
@@ -628,7 +628,7 @@ export const doSignout = (dest) => {
           window.location = dest || "/"
         }, 1000)
       },
-      (err) => dispatch(signoutError(err))
+      (err) => dispatch(signoutError(err)),
     )
   }
 }
@@ -664,7 +664,7 @@ export const populateConversationsStore = () => {
     dispatch(requestConversations())
     return fetchConversations().then(
       (res) => dispatch(receiveConversations(res)),
-      (err) => dispatch(conversationsError(err))
+      (err) => dispatch(conversationsError(err)),
     )
   }
 }
@@ -704,7 +704,7 @@ const fetchZidMetadata = (conversation_id) => {
   return $.get("/api/v3/conversation/" + conversation_id)
 }
 
-export const populateZidMetadataStore = (conversation_id) => {
+export const populateZidMetadataStore = (conversation_id, reload?: boolean) => {
   return (dispatch, getState) => {
     const state = getState()
     const hasConversationId =
@@ -722,14 +722,18 @@ export const populateZidMetadataStore = (conversation_id) => {
     }
 
     // don"t fetch again if we already have data loaded for that conversation.
-    if (hasConversationId && state.zid_metadata.zid_metadata.conversation_id === conversation_id) {
+    if (
+      hasConversationId &&
+      state.zid_metadata.zid_metadata.conversation_id === conversation_id &&
+      !reload
+    ) {
       return
     }
 
     dispatch(requestZidMetadata(conversation_id))
     return fetchZidMetadata(conversation_id).then(
       (res) => dispatch(receiveZidMetadata(res)),
-      (err) => dispatch(zidMetadataFetchError(err))
+      (err) => dispatch(zidMetadataFetchError(err)),
     )
   }
 }
@@ -844,7 +848,7 @@ export const handleSeedCommentTweetSubmit = (o) => {
     return postSeedCommentTweet(o)
       .then(
         (res) => dispatch(submitSeedCommentPostTweetSuccess()),
-        (err) => dispatch(submitSeedCommentPostTweetError(err))
+        (err) => dispatch(submitSeedCommentPostTweetError(err)),
       )
       .then(dispatch(populateAllCommentStores(o.conversation_id)))
   }
@@ -924,7 +928,7 @@ export const handleCreateConversationSubmit = (fip_title, description) => {
           dispatch(createConversationPostSuccess(res))
           return res
         },
-        (err) => dispatch(createConversationPostError(err))
+        (err) => dispatch(createConversationPostError(err)),
       )
       .then((res) => {
         window.location.assign("/m/" + res.conversation_id)
@@ -943,9 +947,10 @@ export const handleCloseConversation = (conversation_id) => {
     return postCloseConversation(conversation_id).then(
       (res) => {
         dispatch({ type: CLOSE_CONVERSATION_SUCCESS, data: conversation_id })
+        dispatch(populateZidMetadataStore(conversation_id, true))
         return res
       },
-      (err) => dispatch({ type: CLOSE_CONVERSATION_ERROR, data: err })
+      (err) => dispatch({ type: CLOSE_CONVERSATION_ERROR, data: err }),
     )
   }
 }
@@ -961,9 +966,10 @@ export const handleReopenConversation = (conversation_id) => {
     return postReopenConversation(conversation_id).then(
       (res) => {
         dispatch({ type: REOPEN_CONVERSATION_SUCCESS, data: conversation_id })
+        dispatch(populateZidMetadataStore(conversation_id, true))
         return res
       },
-      (err) => dispatch({ type: REOPEN_CONVERSATION_ERROR, data: err })
+      (err) => dispatch({ type: REOPEN_CONVERSATION_ERROR, data: err }),
     )
   }
 }
@@ -997,7 +1003,7 @@ const fetchAllComments = (conversation_id) => {
     "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
       "conversation_id=" +
-      conversation_id
+      conversation_id,
   )
 }
 
@@ -1006,7 +1012,7 @@ export const populateCommentsStore = (conversation_id) => {
     dispatch(requestComments())
     return fetchAllComments(conversation_id).then(
       (res) => dispatch(receiveComments(res)),
-      (err) => dispatch(commentsFetchError(err))
+      (err) => dispatch(commentsFetchError(err)),
     )
   }
 }
@@ -1043,7 +1049,7 @@ export const populateMathStore = (conversation_id) => {
     const math_tick = getState().math.math_tick
     return fetchMath(conversation_id, math_tick).then(
       (res) => dispatch(receiveMath(res)),
-      (err) => dispatch(mathFetchError(err))
+      (err) => dispatch(mathFetchError(err)),
     )
   }
 }
@@ -1077,7 +1083,7 @@ const fetchUnmoderatedComments = (conversation_id) => {
     "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
       "mod=0&conversation_id=" +
-      conversation_id
+      conversation_id,
   )
 }
 
@@ -1086,7 +1092,7 @@ export const populateUnmoderatedCommentsStore = (conversation_id) => {
     dispatch(requestUnmoderatedComments())
     return fetchUnmoderatedComments(conversation_id).then(
       (res) => dispatch(receiveUnmoderatedComments(res)),
-      (err) => dispatch(unmoderatedCommentsFetchError(err))
+      (err) => dispatch(unmoderatedCommentsFetchError(err)),
     )
   }
 }
@@ -1120,7 +1126,7 @@ const fetchAcceptedComments = (conversation_id) => {
     "/api/v3/comments?moderation=true&include_voting_patterns=false&mod=1&" +
       includeSocial +
       "conversation_id=" +
-      conversation_id
+      conversation_id,
   )
 }
 
@@ -1129,7 +1135,7 @@ export const populateAcceptedCommentsStore = (conversation_id) => {
     dispatch(requestAcceptedComments())
     return fetchAcceptedComments(conversation_id).then(
       (res) => dispatch(receiveAcceptedComments(res)),
-      (err) => dispatch(acceptedCommentsFetchError(err))
+      (err) => dispatch(acceptedCommentsFetchError(err)),
     )
   }
 }
@@ -1163,7 +1169,7 @@ const fetchRejectedComments = (conversation_id) => {
     "/api/v3/comments?moderation=true&include_voting_patterns=false&" +
       includeSocial +
       "mod=-1&conversation_id=" +
-      conversation_id
+      conversation_id,
   )
 }
 
@@ -1172,7 +1178,7 @@ export const populateRejectedCommentsStore = (conversation_id) => {
     dispatch(requestRejectedComments())
     return fetchRejectedComments(conversation_id).then(
       (res) => dispatch(receiveRejectedComments(res)),
-      (err) => dispatch(rejectedCommentsFetchError(err))
+      (err) => dispatch(rejectedCommentsFetchError(err)),
     )
   }
 }
@@ -1184,7 +1190,7 @@ export const populateAllCommentStores = (conversation_id) => {
     return $.when(
       dispatch(populateUnmoderatedCommentsStore(conversation_id)),
       dispatch(populateAcceptedCommentsStore(conversation_id)),
-      dispatch(populateRejectedCommentsStore(conversation_id))
+      dispatch(populateRejectedCommentsStore(conversation_id)),
     )
   }
 }
@@ -1220,7 +1226,7 @@ export const populateVoterStores = (conversation_id) => {
     dispatch(requestConversationVoters())
     return fetchConversationVoters(conversation_id).then(
       (res) => dispatch(receiveConversationVoters({ conversation_id, conversation_voters: res })),
-      (err) => dispatch(votersFetchError(err))
+      (err) => dispatch(votersFetchError(err)),
     )
   }
 }
@@ -1265,7 +1271,7 @@ export const changeCommentStatusToAccepted = (comment) => {
         dispatch(acceptCommentSuccess(res))
         dispatch(populateAllCommentStores(comment.conversation_id))
       },
-      (err) => dispatch(acceptCommentError(err))
+      (err) => dispatch(acceptCommentError(err)),
     )
   }
 }
@@ -1309,7 +1315,7 @@ export const changeCommentStatusToRejected = (comment) => {
         dispatch(rejectCommentSuccess(res))
         dispatch(populateAllCommentStores(comment.conversation_id))
       },
-      (err) => dispatch(rejectCommentError(err))
+      (err) => dispatch(rejectCommentError(err)),
     )
   }
 }
@@ -1353,7 +1359,7 @@ export const changeCommentCommentIsMeta = (comment, is_meta) => {
         dispatch(commentIsMetaChangeSuccess(res))
         dispatch(populateAllCommentStores(comment.conversation_id))
       },
-      (err) => dispatch(commentIsMetaChangeError(err))
+      (err) => dispatch(commentIsMetaChangeError(err)),
     )
   }
 }
@@ -1389,7 +1395,7 @@ export const populateParticipantsStore = (conversation_id) => {
     dispatch(requestParticipants())
     return fetchParticipants(conversation_id).then(
       (res) => dispatch(receiveParticipants(res)),
-      (err) => dispatch(participantsFetchError(err))
+      (err) => dispatch(participantsFetchError(err)),
     )
   }
 }
@@ -1425,7 +1431,7 @@ export const populateDefaultParticipantStore = (conversation_id) => {
     dispatch(requestDefaultParticipants())
     return fetchDefaultParticipants(conversation_id).then(
       (res) => dispatch(receiveDefaultParticipants(res)),
-      (err) => dispatch(defaultParticipantFetchError(err))
+      (err) => dispatch(defaultParticipantFetchError(err)),
     )
   }
 }
@@ -1461,7 +1467,7 @@ export const populateFeaturedParticipantStore = (conversation_id) => {
     dispatch(requestFeaturedParticipants())
     return fetchFeaturedParticipants(conversation_id).then(
       (res) => dispatch(receiveFeaturedParticipants(res)),
-      (err) => dispatch(featuredParticipantFetchError(err))
+      (err) => dispatch(featuredParticipantFetchError(err)),
     )
   }
 }
@@ -1497,7 +1503,7 @@ export const populateHiddenParticipantStore = (conversation_id) => {
     dispatch(requestHiddenParticipants())
     return fetchHiddenParticipants(conversation_id).then(
       (res) => dispatch(receiveHiddenParticipants(res)),
-      (err) => dispatch(hiddenParticipantFetchError(err))
+      (err) => dispatch(hiddenParticipantFetchError(err)),
     )
   }
 }
@@ -1509,7 +1515,7 @@ export const populateAllParticipantStores = (conversation_id) => {
     return $.when(
       dispatch(populateDefaultParticipantStore(conversation_id)),
       dispatch(populateFeaturedParticipantStore(conversation_id)),
-      dispatch(populateHiddenParticipantStore(conversation_id))
+      dispatch(populateHiddenParticipantStore(conversation_id)),
     )
   }
 }
@@ -1550,7 +1556,7 @@ export const changeParticipantStatusToFeatured = (participant) => {
     dispatch(optimisticFeatureParticipant(participant))
     return putFeatureParticipant(participant).then(
       (res) => dispatch(featureParticipantSuccess(res)),
-      (err) => dispatch(featureParticipantError(err))
+      (err) => dispatch(featureParticipantError(err)),
     )
   }
 }
@@ -1590,7 +1596,7 @@ export const changeParticipantStatusToHidden = (participant) => {
     dispatch(optimisticHideParticipant(participant))
     return putHideParticipant(participant).then(
       (res) => dispatch(hideParticipantSuccess(res)),
-      (err) => dispatch(hideParticipantError(err))
+      (err) => dispatch(hideParticipantError(err)),
     )
   }
 }
@@ -1634,7 +1640,7 @@ export const changeParticipantStatusToUnmoderated = (participant) => {
     dispatch(optimisticUnmoderateParticipant(participant))
     return putUnmoderateParticipant(participant).then(
       (res) => dispatch(hideParticipantSuccess(res)),
-      (err) => dispatch(hideParticipantError(err))
+      (err) => dispatch(hideParticipantError(err)),
     )
   }
 }
@@ -1666,7 +1672,7 @@ const fetchConversationStats = (conversation_id, until) => {
   return $.get(
     "/api/v3/conversationStats?conversation_id=" +
       conversation_id +
-      (until ? "&until=" + until : "")
+      (until ? "&until=" + until : ""),
   )
 }
 
@@ -1675,7 +1681,7 @@ export const populateConversationStatsStore = (conversation_id, until) => {
     dispatch(requestConversationStats())
     return fetchConversationStats(conversation_id, until).then(
       (res) => dispatch(receiveConversationStats(res, conversation_id)),
-      (err) => dispatch(conversationStatsFetchError(err))
+      (err) => dispatch(conversationStatsFetchError(err)),
     )
   }
 }

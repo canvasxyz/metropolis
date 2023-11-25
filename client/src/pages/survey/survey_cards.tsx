@@ -28,14 +28,25 @@ const SurveyCards = ({
     const maxh =
       Math.max(
         cardsBoxRef.current.children[0].scrollHeight,
-        cardsBoxRef.current.children[0].clientHeight
+        cardsBoxRef.current.children[0].clientHeight,
       ) + 4
     setMaxHeight(maxh)
   }, [votedComments.length])
 
   return (
-    <Box>
-      <Box sx={{ fontSize: "0.94em", color: "mediumGray", mb: [3], textAlign: "right" }}>
+    <Box sx={{ position: "relative" }}>
+      <Box
+        sx={{
+          position: "absolute",
+          fontSize: "0.9em",
+          color: "mediumGray",
+          textAlign: "right",
+          zIndex: 9999,
+          mt: [1],
+          right: [3],
+          top: [2],
+        }}
+      >
         {unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining
       </Box>
       {unvotedComments.length > 0 && (
@@ -97,7 +108,7 @@ const SurveyCards = ({
         </Box>
       )}
 
-      {unvotedComments.length === 0 && (
+      {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
           <Box sx={{ ...surveyBox, pt: [5] }}>
             <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
