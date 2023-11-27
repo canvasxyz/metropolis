@@ -148,6 +148,16 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
+      <Box sx={{ mb: [3] }}>
+        <Text sx={{ mb: [2] }}>Description</Text>
+        <Textarea
+          data-test-id="description"
+          onBlur={(e) => handleStringValueChange("description", e.target)}
+          defaultValue={zid_metadata.description}
+          disabled={zid_metadata.github_sync_enabled}
+        />
+      </Box>
+
       <a
         href="#"
         onClick={(e) => {
@@ -210,16 +220,6 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             </Box>
           </Fragment>
         )}
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>Description</Text>
-          <Textarea
-            data-test-id="description"
-            onBlur={(e) => handleStringValueChange("description", e.target)}
-            defaultValue={zid_metadata.description}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
 
         <Box sx={{ mb: [3] }}>
           <Text sx={{ mb: [2] }}>FIP title</Text>

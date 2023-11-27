@@ -912,17 +912,17 @@ const createConversationPostError = (err) => {
   }
 }
 
-const postCreateConversation = (fip_title, description) => {
+const postCreateConversation = (topic, description) => {
   return api.post("/api/v3/conversations", {
-    fip_title,
+    topic,
     description,
   })
 }
 
-export const handleCreateConversationSubmit = (fip_title, description) => {
+export const handleCreateConversationSubmit = (topic, description) => {
   return (dispatch) => {
     dispatch(createConversationStart())
-    return postCreateConversation(fip_title, description)
+    return postCreateConversation(topic, description)
       .then(
         (res) => {
           dispatch(createConversationPostSuccess(res))

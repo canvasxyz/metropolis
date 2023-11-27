@@ -971,7 +971,7 @@ app.post(
 app.post(
   "/api/v3/conversations",
   auth(assignToP),
-  want("fip_title", getOptionalStringLimitLength(400), assignToP, ""),
+  want("topic", getOptionalStringLimitLength(400), assignToP, ""),
   want("description", getOptionalStringLimitLength(500000), assignToP, ""),
   handle_POST_conversations,
 );

@@ -8022,7 +8022,7 @@ async function handle_POST_conversations(
   req: {
     p: {
       uid: number;
-      fip_title: string;
+      topic: string;
       description: string;
     };
   },
@@ -8031,7 +8031,7 @@ async function handle_POST_conversations(
   try {
     const insertObject = {
       owner: req.p.uid,
-      fip_title: req.p.fip_title,
+      topic: req.p.topic,
       description: req.p.description,
       github_sync_enabled: false,
       is_active: true,
