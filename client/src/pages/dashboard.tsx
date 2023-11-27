@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
 import { Fragment, useCallback, useEffect, useState } from "react"
+import { useLocalStorage } from "usehooks-ts"
 import { useDispatch, useSelector } from "react-redux"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
@@ -59,15 +60,20 @@ const ConversationListItem = ({
           conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2",
       },
     }}
-    onClick={() => navigateToConversation(conversation.conversation_id)}
+    onClick={(e) => {
+      e.preventDefault()
+      navigateToConversation(conversation.conversation_id)
+    }}
     key={conversation.conversation_id}
   >
     <Text sx={{ fontWeight: 500 }}>
       {conversation.fip_number && `FIP-${conversation.fip_number}: `}
-      {conversation.fip_title || conversation.github_pr_title || conversation.topic}
+      {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
+        <Text sx={{ color: "#84817D" }}>Untitled</Text>
+      )}
     </Text>
     <Flex sx={{ direction: "row" }}>
-      <Text sx={{ color: "#84817D" }}>{conversation.hname}</Text>
+      <Text sx={{ color: "#84817D" }}>{conversation.participant_count} voted</Text>
     </Flex>
   </Box>
 )
@@ -95,9 +101,12 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
 
   const [syncInProgress, setSyncInProgress] = useState(false)
 
-  const [showNonFIPConversations, setShowNonFIPConversations] = useState(false)
-  const [showOpenFIPConversations, setShowOpenFIPConversations] = useState(true)
-  const [showArchivedConversations, setShowArchivedConversations] = useState(false)
+  const [showNonFIPConversations, setShowNonFIPConversations] = useLocalStorage("showNonFIP", false)
+  const [showOpenFIPConversations, setShowOpenFIPConversations] = useLocalStorage("showOpen", true)
+  const [showArchivedConversations, setShowArchivedConversations] = useLocalStorage(
+    "showArchived",
+    false,
+  )
 
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
