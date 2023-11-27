@@ -67,7 +67,7 @@ const ConversationListItem = ({
     key={conversation.conversation_id}
   >
     <Text sx={{ fontWeight: 500 }}>
-      {conversation.fip_number && `FIP-${conversation.fip_number}: `}
+      {conversation.fip_number ? `FIP-${conversation.fip_number}: ` : ""}
       {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
@@ -111,7 +111,6 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const navigateToConversation = useCallback((conversationId) => {
-    console.log(conversationId)
     hist.push(`/dashboard/c/${conversationId}`)
   }, [])
 

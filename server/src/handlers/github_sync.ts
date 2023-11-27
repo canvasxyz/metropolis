@@ -341,10 +341,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           continue;
         }
 
-        console.log(
-          `conversation with PR ${pull.number} already exists, updating`,
-        );
-
         // update
         if (pull.state == "open") {
           console.log(
@@ -379,10 +375,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `conversation with new PR id ${pull.number} does not exist, inserting`,
+            `conversation with PR id ${pull.number} does not exist, inserting`,
           );
-          console.log(`trigger some sort of welcome event here`);
-          // this PR has just been opened, we should trigger something here, e.g. post a comment/notification
+
+          // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
 
           let fipFields;
           try {
@@ -398,12 +394,13 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             continue;
           }
 
-          // const insertedRows = await insertConversationPrAndFip({
-          //   ...prFields,
-          //   ...fipFields,
-          // });
-          // const zid = insertedRows[0].zid;
-          // const zinvite = await generateAndRegisterZinvite(zid, false);
+          const insertedRows = await insertConversationPrAndFip({
+            ...prFields,
+            ...fipFields,
+          });
+          const zid = insertedRows[0].zid;
+          const zinvite = await generateAndRegisterZinvite(zid, false);
+
           // const welcomeMessage = getWelcomeMessage(
           //   getServerNameWithProtocol(req),
           //   zinvite,
