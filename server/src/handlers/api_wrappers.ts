@@ -1,6 +1,6 @@
-import fs from 'fs/promises';
+import fs from "fs/promises";
 import { Octokit } from "@octokit/core";
-import { graphql } from "@octokit/graphql"
+import { graphql } from "@octokit/graphql";
 import { createAppAuth } from "@octokit/auth-app";
 
 /**
@@ -8,51 +8,58 @@ import { createAppAuth } from "@octokit/auth-app";
  */
 
 export async function getGraphqlForInstallation() {
-	if (!process.env.GH_APP_PRIVATE_KEY_PATH) {
-		throw Error("GH_APP_PRIVATE_KEY_PATH not set")
-	}
-
-	if (!process.env.GH_APP_ID) {
-		throw Error("GH_APP_ID not set")
-	}
-
-	if (!process.env.GH_APP_INSTALLATION_ID) {
-		throw Error("GH_APP_INSTALLATION_ID not set")
-	}
-
-	// open pem file
-	const privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8")
-
-	const auth = createAppAuth({
-		appId: process.env.GH_APP_ID,
-		privateKey,
-		installationId: process.env.GH_APP_INSTALLATION_ID,
-	})
-
-	const graphqlWithAuth = graphql.defaults({
-		request: {
-			hook: auth.hook,
-		},
-	})
-
-	return graphqlWithAuth
-}
-
-export async function getOctoKitForInstallation() {
-  if(!process.env.GH_APP_PRIVATE_KEY_PATH) {
-    throw Error("GH_APP_PRIVATE_KEY_PATH not set");
-  }
-
-  if(!process.env.GH_APP_ID) {
+  if (!process.env.GH_APP_ID) {
     throw Error("GH_APP_ID not set");
   }
 
-  if(!process.env.GH_APP_INSTALLATION_ID) {
+  if (!process.env.GH_APP_INSTALLATION_ID) {
+    throw Error("GH_APP_INSTALLATION_ID not set");
+  }
+
+  let privateKey;
+  if (process.env.GH_APP_PRIVATE_KEY) {
+    // use private key in environment variables
+    privateKey = process.env.GH_APP_PRIVATE_KEY;
+  } else if (process.env.GH_APP_PRIVATE_KEY_PATH) {
+    // open pem file
+    privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
+  } else {
+    throw Error("GH_APP_PRIVATE_KEY and GH_APP_PRIVATE_KEY_PATH not set");
+  }
+
+  const auth = createAppAuth({
+    appId: process.env.GH_APP_ID,
+    privateKey,
+    installationId: process.env.GH_APP_INSTALLATION_ID,
+  });
+
+  const graphqlWithAuth = graphql.defaults({
+    request: {
+      hook: auth.hook,
+    },
+  });
+
+  return graphqlWithAuth;
+}
+
+export async function getOctoKitForInstallation() {
+  if (!process.env.GH_APP_PRIVATE_KEY_PATH) {
+    throw Error("GH_APP_PRIVATE_KEY_PATH not set");
+  }
+
+  if (!process.env.GH_APP_ID) {
+    throw Error("GH_APP_ID not set");
+  }
+
+  if (!process.env.GH_APP_INSTALLATION_ID) {
     throw Error("GH_APP_INSTALLATION_ID not set");
   }
 
   // open pem file
-  const privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
+  const privateKey = await fs.readFile(
+    process.env.GH_APP_PRIVATE_KEY_PATH,
+    "utf8",
+  );
 
   return new Octokit({
     authStrategy: createAppAuth,
