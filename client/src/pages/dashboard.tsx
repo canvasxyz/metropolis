@@ -332,65 +332,59 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
                   </Box>
                 </Flex>
               </Box>
-              {/* only display survey if logged in */}
-              {user && (
-                <Fragment>
-                  {/* divider line */}
-                  <Box sx={{ width: "100%", borderBottom: "1px solid #ddd" }}></Box>
-                  <Box sx={{ width: "100%", position: "relative" }}>
-                    <Box
-                      sx={{
-                        position: "absolute",
-                        top: [4],
-                        right: [4],
-                        px: [2],
-                        pt: "4px",
-                        pb: "3px",
-                        display: "flex",
-                        flex: "1",
-                        flexDirection: "row",
-                        gap: [2],
-                      }}
+              <Box sx={{ width: "100%", borderBottom: "1px solid #ddd" }}></Box>
+              <Box sx={{ width: "100%", position: "relative" }}>
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: [4],
+                    right: [4],
+                    px: [2],
+                    pt: "4px",
+                    pb: "3px",
+                    display: "flex",
+                    flex: "1",
+                    flexDirection: "row",
+                    gap: [2],
+                  }}
+                >
+                  {zid_metadata.is_owner && (
+                    <Button
+                      variant="outlineSecondary"
+                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
                     >
-                      {zid_metadata.is_owner && (
-                        <Button
-                          variant="outlineSecondary"
-                          onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
-                        >
-                          Moderate
-                        </Button>
-                      )}
-                      {zid_metadata.is_owner && (
-                        <Button
-                          variant="outlineSecondary"
-                          onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
-                        >
-                          Results
-                        </Button>
-                      )}
-                    </Box>
-                    <Box
-                      sx={{
-                        margin: "0 auto",
-                        maxWidth: "620px",
-                        px: [4],
-                        py: [2],
-                        lineHeight: 1.45,
-                      }}
+                      Moderate
+                    </Button>
+                  )}
+                  {zid_metadata.is_owner && (
+                    <Button
+                      variant="outlineSecondary"
+                      onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
                     >
-                      <h2>Tell us what you think</h2>
-                      <Text as="p" sx={{ mb: [3], pb: [1] }}>
-                        Vote on remarks on this FIP by other community members, or add your own:
-                      </Text>
-                      <Survey
-                        match={{
-                          params: { conversation_id: selectedConversation.conversation_id },
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                </Fragment>
-              )}
+                      Results
+                    </Button>
+                  )}
+                </Box>
+                <Box
+                  sx={{
+                    margin: "0 auto",
+                    maxWidth: "620px",
+                    px: [4],
+                    py: [2],
+                    lineHeight: 1.45,
+                  }}
+                >
+                  <h2>Tell us what you think</h2>
+                  <Text as="p" sx={{ mb: [3], pb: [1] }}>
+                    Vote on remarks on this FIP by other community members, or add your own:
+                  </Text>
+                  <Survey
+                    match={{
+                      params: { conversation_id: selectedConversation.conversation_id },
+                    }}
+                  />
+                </Box>
+              </Box>
             </Box>
           ) : (
             <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
