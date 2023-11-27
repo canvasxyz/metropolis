@@ -191,6 +191,9 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
                   .post("api/v3/github_sync", {})
                   .then(() => {
                     toast.success("Sync complete")
+                    setTimeout(() => {
+                      location.reload()
+                    }, 1000)
                   })
                   .fail((error) => {
                     toast.error("Sync error")

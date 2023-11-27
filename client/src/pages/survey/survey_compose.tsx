@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react"
+import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
@@ -32,6 +33,10 @@ const SurveyComposeBox: React.FC<{
   setState,
 }) => {
   const inputRef = useRef<HTMLInputElement>()
+  const [cachedComment, setCachedComment] = useLocalStorage(
+    "cachedComment-" + zid_metadata.conversation_id,
+    "",
+  )
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -90,7 +95,7 @@ const SurveyComposeBox: React.FC<{
           }
 
           resolve()
-        })
+        }),
     )
   }
 
@@ -112,9 +117,14 @@ const SurveyComposeBox: React.FC<{
         rows={4}
         ref={inputRef}
         placeholder="Write a new statement..."
+        defaultValue={cachedComment}
+        onBlur={(e) => {
+          setCachedComment(inputRef.current.value)
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" && e.metaKey) {
             e.preventDefault()
+            setCachedComment("")
             submitComment(inputRef.current.value, 1)
               .then(() => {
                 inputRef.current.value = ""
@@ -124,6 +134,8 @@ const SurveyComposeBox: React.FC<{
                 setLoading(false)
                 inputRef.current.focus()
               })
+          } else {
+            setCachedComment(inputRef.current.value)
           }
         }}
       />

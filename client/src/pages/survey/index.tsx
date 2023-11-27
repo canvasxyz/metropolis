@@ -230,6 +230,7 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
             <Box>
               <Box sx={{ mt: [4], mb: [3] }}>Do you have remarks to add? If so, add them here:</Box>
               <SurveyCompose
+                key={zid_metadata.conversation_id}
                 zid_metadata={zid_metadata}
                 votedComments={votedComments}
                 unvotedComments={unvotedComments}
