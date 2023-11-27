@@ -398,26 +398,26 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             continue;
           }
 
-          const insertedRows = await insertConversationPrAndFip({
-            ...prFields,
-            ...fipFields,
-          });
-          const zid = insertedRows[0].zid;
-          const zinvite = await generateAndRegisterZinvite(zid, false);
-          const welcomeMessage = getWelcomeMessage(
-            getServerNameWithProtocol(req),
-            zinvite,
-          );
+          // const insertedRows = await insertConversationPrAndFip({
+          //   ...prFields,
+          //   ...fipFields,
+          // });
+          // const zid = insertedRows[0].zid;
+          // const zinvite = await generateAndRegisterZinvite(zid, false);
+          // const welcomeMessage = getWelcomeMessage(
+          //   getServerNameWithProtocol(req),
+          //   zinvite,
+          // );
           // post comment to PR
-          await installationOctokit.request(
-            "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-            {
-              owner: process.env.FIP_REPO_OWNER,
-              repo: process.env.FIP_REPO_NAME,
-              issue_number: pull.number,
-              body: welcomeMessage,
-            },
-          );
+          // await installationOctokit.request(
+          //   "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+          //   {
+          //     owner: process.env.FIP_REPO_OWNER,
+          //     repo: process.env.FIP_REPO_NAME,
+          //     issue_number: pull.number,
+          //     body: welcomeMessage,
+          //   },
+          // );
 
           // // this will only work if the discussions_to field contains a single link to a discussion
           // // so it's kind of brittle
