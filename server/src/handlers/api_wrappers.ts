@@ -19,7 +19,10 @@ export async function getGraphqlForInstallation() {
   let privateKey;
   if (process.env.GH_APP_PRIVATE_KEY) {
     // use private key in environment variables
-    privateKey = process.env.GH_APP_PRIVATE_KEY;
+    privateKey =
+      "-----BEGIN RSA PRIVATE KEY-----\n" +
+      process.env.GH_APP_PRIVATE_KEY +
+      "\n-----END RSA PRIVATE KEY-----";
   } else if (process.env.GH_APP_PRIVATE_KEY_PATH) {
     // open pem file
     privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
@@ -43,10 +46,6 @@ export async function getGraphqlForInstallation() {
 }
 
 export async function getOctoKitForInstallation() {
-  if (!process.env.GH_APP_PRIVATE_KEY_PATH) {
-    throw Error("GH_APP_PRIVATE_KEY_PATH not set");
-  }
-
   if (!process.env.GH_APP_ID) {
     throw Error("GH_APP_ID not set");
   }
@@ -55,11 +54,19 @@ export async function getOctoKitForInstallation() {
     throw Error("GH_APP_INSTALLATION_ID not set");
   }
 
-  // open pem file
-  const privateKey = await fs.readFile(
-    process.env.GH_APP_PRIVATE_KEY_PATH,
-    "utf8",
-  );
+  let privateKey;
+  if (process.env.GH_APP_PRIVATE_KEY) {
+    // use private key in environment variables
+    privateKey =
+      "-----BEGIN RSA PRIVATE KEY-----\n" +
+      process.env.GH_APP_PRIVATE_KEY +
+      "\n-----END RSA PRIVATE KEY-----";
+  } else if (process.env.GH_APP_PRIVATE_KEY_PATH) {
+    // open pem file
+    privateKey = await fs.readFile(process.env.GH_APP_PRIVATE_KEY_PATH, "utf8");
+  } else {
+    throw Error("GH_APP_PRIVATE_KEY and GH_APP_PRIVATE_KEY_PATH not set");
+  }
 
   return new Octokit({
     authStrategy: createAppAuth,
