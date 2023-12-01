@@ -7,11 +7,23 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbSettings } from "react-icons/tb"
 
+import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
 
 export const DashboardConversation = ({ conversation, zid_metadata }) => {
   const hist = useHistory()
+  const [report, setReport] = useState<{ report_id: string }>()
+
+  useEffect(() => {
+    api
+      .get("/api/v3/reports", {
+        conversation_id: zid_metadata.conversation_id,
+      })
+      .then((reports) => {
+        setReport(reports[0])
+      })
+  }, [zid_metadata.conversation_id])
 
   return (
     <Box>
@@ -81,13 +93,12 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
               Moderate
             </Button>
           )}
-          {console.log(zid_metadata)}
-          {zid_metadata.is_owner && (
+          {report && (
             <Button
               variant="outlineSecondary"
-              onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/report`)}
+              onClick={() => hist.push(`/r/${zid_metadata.conversation_id}/${report.report_id}`)}
             >
-              Results
+              Report
             </Button>
           )}
         </Box>
