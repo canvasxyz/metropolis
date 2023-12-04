@@ -77,3 +77,28 @@ export async function getOctoKitForInstallation() {
     },
   });
 }
+
+export async function getRepoCollaborators() {
+  const installationOctokit = await getOctoKitForInstallation();
+
+  if (!process.env.FIP_REPO_OWNER) {
+    throw Error("FIP_REPO_OWNER not set");
+  }
+
+  if (!process.env.FIP_REPO_NAME) {
+    throw Error("FIP_REPO_NAME not set");
+  }
+
+  const { data } = await installationOctokit.request(
+    "GET /repos/{owner}/{repo}/collaborators",
+    {
+      repo: process.env.FIP_REPO_NAME,
+      owner: process.env.FIP_REPO_OWNER,
+      headers: {
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    },
+  );
+
+  return data;
+}

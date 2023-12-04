@@ -12,6 +12,7 @@ import Config from "../config";
 import {
   getGraphqlForInstallation,
   getOctoKitForInstallation,
+  getRepoCollaborators,
 } from "./api_wrappers";
 import {
   FipFields,
@@ -315,6 +316,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       `Found ${existingFipFilenames.size} FIPs in master, ${pulls.length} open PRs`,
     );
 
+    const repoCollaborators = await getRepoCollaborators();
+    const repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id))
+
     for (const pull of pulls) {
       if(!pull.user) {
         continue;
@@ -335,7 +339,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       const { uid } = await updateOrCreateGitHubUser({
         id: pull.user.id,
         email,
-        username: pull.user.login
+        username: pull.user.login,
+        isRepoCollaborator: repoCollaboratorIds.has(pull.user.id) || pull.user.login === process.env.FIP_REPO_OWNER,
       });
 
       const prFields: PrFields = {
