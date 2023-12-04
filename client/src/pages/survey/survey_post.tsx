@@ -1,18 +1,14 @@
 /** @jsx jsx */
 
-import React, { useState } from "react"
+import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbExternalLink } from "react-icons/tb"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, jsx } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
-import SurveyCard from "./survey_card"
-import SurveyCompose from "./survey_compose"
 
 const PostSurvey = ({
-  user,
-  conversation_id,
   submittedComments,
   votedComments,
   unvotedComments,
@@ -28,7 +24,7 @@ const PostSurvey = ({
             Nice work!
           </Heading>
           <Text className="react-markdown">
-            <ReactMarkdown children={zid_metadata.postsurvey} remarkPlugins={[remarkGfm]} />
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{zid_metadata.postsurvey}</ReactMarkdown>
           </Text>
         </Box>
       ) : (

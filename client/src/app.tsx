@@ -8,8 +8,8 @@ import type { User } from "./util/types"
 import { RootState } from "./util/types"
 
 import { Toaster } from "react-hot-toast"
-import { Switch, Route, Link, Redirect } from "react-router-dom"
-import { Flex, Box, jsx } from "theme-ui"
+import { Switch, Route, Redirect } from "react-router-dom"
+import { Box, jsx } from "theme-ui"
 
 import Header from "./components/header"
 import Footer from "./components/footer"

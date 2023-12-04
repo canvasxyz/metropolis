@@ -1,24 +1,14 @@
 /** @jsx jsx */
 
-import { RouteComponentProps, Link } from "react-router-dom"
 import React, { useEffect, useState, useRef } from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Box, Grid, Input, Textarea, Label, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
 import {
-  populateConversationsStore,
   handleCreateConversationSubmit,
-  handleCloseConversation,
-  handleReopenConversation,
-  populateConversationStatsStore,
 } from "../actions"
-import { DropdownMenu } from "../components/dropdown"
 
-import Url from "../util/url"
-import { RootState, Conversation } from "../util/types"
-import ConversationRow from "../components/conversation_row"
+import { RootState } from "../util/types"
 
 const CreateConversation = ({ dispatch, user }) => {
   const [step, setStep] = useState<number>(0)

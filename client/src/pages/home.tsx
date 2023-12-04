@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { Heading, Box, Grid, Flex, Text, Table, Button, Link, jsx } from "theme-ui"
+import { Heading, Box, Grid, Flex, Text, Link, jsx } from "theme-ui"
 
 const Index: React.FC<{ user? }> = ({ user }) => {
   useEffect(() => {

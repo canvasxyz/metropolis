@@ -37,6 +37,7 @@ export type Conversation = {
   is_archived: boolean
   is_owner: boolean
   is_mod: boolean
+  is_active: boolean
   topic: string
   description: string
   postsurvey: string

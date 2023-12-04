@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Fragment, useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { useDispatch, useSelector } from "react-redux"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Box, Flex, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"

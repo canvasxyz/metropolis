@@ -2,7 +2,7 @@
 
 import _ from "lodash"
 import React, { useState, useRef, useLayoutEffect } from "react"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 
 import { surveyBox, surveyHeadingMini } from "./index"

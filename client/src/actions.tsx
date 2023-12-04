@@ -3,6 +3,7 @@
 import $ from "jquery"
 import api from "./util/api"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Action = any
 
 /* ======= Types ======= */
@@ -375,13 +376,6 @@ const facebookSigninInitiated = () => {
   }
 }
 
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const facebookSigninSuccessful = () => {
-  return {
-    type: FACEBOOK_SIGNIN_SUCCESSFUL,
-  }
-}
 
 const facebookSigninFailed = (errorCode) => {
   return {
@@ -409,6 +403,7 @@ const getFriends = () => {
     })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   FB.api("/me/friends", (response: any) => {
     if (response && !response.error) {
       const friendsSoFar = response.data
@@ -428,6 +423,7 @@ const getFriends = () => {
 const getInfo = () => {
   const dfd = $.Deferred()
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   FB.api("/me", (response: any) => {
     // {"id":"10152802017421079"
     //   "email":"michael@bjorkegren.com"
@@ -447,6 +443,7 @@ const getInfo = () => {
 
     if (response && !response.error) {
       if (response.location && response.location.id) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         FB.api("/" + response.location.id, (locationResponse: any) => {
           if (locationResponse) {
             response.locationInfo = locationResponse
@@ -607,7 +604,7 @@ const signoutError = (err) => {
   }
 }
 
-const signoutPost = (dest?) => {
+const signoutPost = () => {
   // relying on server to clear cookies
   return $.ajax({
     type: "POST",
@@ -621,7 +618,7 @@ export const doSignout = (dest) => {
   return (dispatch) => {
     dispatch(signoutInitiated())
     return signoutPost().then(
-      (res) => {
+      () => {
         setTimeout(() => {
           // Force page to load so we can be sure the old user"s state is cleared from memory
           // delay a bit so the cookies have time to clear too.
@@ -783,34 +780,6 @@ export const handleZidMetadataUpdate = (zm, field, value) => {
   }
 }
 
-/* seed comments submit */
-
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const makeStandardStart = (type) => {
-  return {
-    type: type,
-  }
-}
-
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const makeStandardError = (type, err) => {
-  return {
-    type: type,
-    data: err,
-  }
-}
-
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const makeStandardSuccess = (type, data) => {
-  return {
-    type: type,
-    data: data,
-  }
-}
-
 /* seed tweets submit */
 
 export const seedCommentTweetChanged = (text) => {
@@ -847,9 +816,10 @@ export const handleSeedCommentTweetSubmit = (o) => {
     dispatch(submitSeedCommentTweetStart())
     return postSeedCommentTweet(o)
       .then(
-        (res) => dispatch(submitSeedCommentPostTweetSuccess()),
+        () => dispatch(submitSeedCommentPostTweetSuccess()),
         (err) => dispatch(submitSeedCommentPostTweetError(err)),
       )
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       .then(dispatch(populateAllCommentStores(o.conversation_id)))
   }
 }
@@ -1609,24 +1579,6 @@ const optimisticUnmoderateParticipant = (participant) => {
   }
 }
 
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const unmoderateParticipantSuccess = (data) => {
-  return {
-    type: FEATURE_PARTICIPANT_SUCCESS,
-    data: data,
-  }
-}
-
-// FIXME
-// eslint-disable-next-line no-unused-vars
-const unmoderateParticipantError = (err) => {
-  return {
-    type: FEATURE_PARTICIPANT_ERROR,
-    data: err,
-  }
-}
-
 const putUnmoderateParticipant = (participant) => {
   return $.ajax({
     method: "PUT",
@@ -1684,11 +1636,6 @@ export const populateConversationStatsStore = (conversation_id, until) => {
       (err) => dispatch(conversationStatsFetchError(err)),
     )
   }
-}
-
-const dataExportGet = (conversation_id, format, unixTimestamp, untilEnabled) => {
-  const url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
-  return $.get(url)
 }
 
 // // poll for new comments, since others might be creating comments?

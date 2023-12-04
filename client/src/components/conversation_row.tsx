@@ -1,6 +1,6 @@
 import { Link as RouterLink } from "react-router-dom"
 import React, { useEffect } from "react"
-import { Box, Text, Flex, Link } from "theme-ui"
+import { Box, Text, Flex } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 
 import {
@@ -9,8 +9,16 @@ import {
   populateConversationStatsStore,
 } from "../actions"
 import { DropdownMenu } from "../components/dropdown"
+import { Conversation } from "../util/types"
 
-function ConversationRow({ c, i, stats, dispatch }) {
+type ConversationRowPropTypes = {
+  c: Conversation;
+  i: number;
+  stats: any;
+  dispatch: Function;
+}
+
+function ConversationRow({ c, i, stats, dispatch }: ConversationRowPropTypes) {
   useEffect(() => {
     if (!stats && !c.is_archived) {
       const until = null

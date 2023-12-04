@@ -1,8 +1,7 @@
 /** @jsx jsx */
 
-import { Fragment, useCallback, useEffect, useState } from "react"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
-import { Link as RouterLink, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbSettings } from "react-icons/tb"

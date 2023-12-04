@@ -2,15 +2,13 @@
 
 import React from "react"
 import { connect } from "react-redux"
-import { doSignin, doFacebookSignin, Action } from "../../actions"
+import { doSignin, doFacebookSignin } from "../../actions"
 import { Link, Redirect } from "react-router-dom"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 import strings from "../../intl"
 import { RootState } from "../../util/types"
-import { UrlObject, UrlWithStringQuery } from "url"
-
-const fbAppId = process.env.FB_APP_ID
+import { UrlObject } from "url"
 
 class SignIn extends React.Component<{
   dispatch: Function
@@ -26,7 +24,7 @@ class SignIn extends React.Component<{
   facebook_password: HTMLInputElement
 
   // eslint-disable-next-line node/handle-callback-err
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
     return { hasError: true }
   }

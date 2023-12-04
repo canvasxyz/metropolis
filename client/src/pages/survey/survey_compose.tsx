@@ -1,15 +1,14 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useRef, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, Textarea } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 
 import type { Comment } from "../../util/types"
 import { DropdownButton } from "../../components/dropdown"
-import SurveyCard from "./survey_card"
 import api from "../../util/api"
-import { surveyBox, surveyHeadingMini } from "./index"
+import { surveyHeadingMini } from "./index"
 
 Modal.setAppElement("#root")
 

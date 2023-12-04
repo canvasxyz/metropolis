@@ -1,17 +1,15 @@
 /** @jsx jsx */
 
 import $ from "jquery"
-import React, { useEffect, useState, useRef } from "react"
+import { useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { connect } from "react-redux"
 import { toast } from "react-hot-toast"
-import { Box, Heading, Button, Text, Input, jsx } from "theme-ui"
+import { Box, Button, Text, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
 import { DropdownMenu } from "../../components/dropdown"
-import { TbHeart, TbArrowBigUpLine, TbCheck, TbEdit, TbX } from "react-icons/tb"
 
 type SurveyCardProps = {
   comment: Comment
@@ -22,13 +20,13 @@ type SurveyCardProps = {
 }
 
 const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: SurveyCardProps) => {
-  const { tid: commentId, txt, created, pid } = comment
+  const { tid: commentId, txt } = comment
 
   const [voting, setVoting] = useState(false)
   const [editingVote, setEditingVote] = useState(false)
 
   const animateOut = (target) =>
-    new Promise<void>((resolve, reject) => {
+    new Promise<void>((resolve) => {
       $(target).closest(".survey-card").addClass("animation-exit")
       setTimeout(() => resolve(), 300)
     })
