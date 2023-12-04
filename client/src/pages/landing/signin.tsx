@@ -9,9 +9,10 @@ import { Heading, Box, Text, Button, jsx } from "theme-ui"
 import strings from "../../intl"
 import { RootState } from "../../util/types"
 import { UrlObject } from "url"
+import { AppDispatch } from "../../store"
 
 class SignIn extends React.Component<{
-  dispatch: Function
+  dispatch: AppDispatch
   error: XMLHttpRequest
   authed: boolean
   pending?: boolean

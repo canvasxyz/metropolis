@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react"
 
 import Modal from "react-modal"
 import { useDispatch } from "react-redux"
-import { Box, Input, Textarea, Label, Heading, Button, Text, Flex } from "theme-ui"
+import { Box, Input, Textarea, Label, Heading, Button, Flex } from "theme-ui"
 import { handleCreateConversationSubmit } from "../actions"
 
 type PropTypes = {
@@ -75,7 +75,7 @@ const CreateConversationInner = () => {
   )
 }
 
-export const CreateConversationModal: React.FC<PropTypes> = ({ isOpen, setIsOpen }) => {
+export const CreateConversationModal = ({ isOpen, setIsOpen }: PropTypes) => {
   return (
     <Modal
       isOpen={isOpen}

@@ -1,10 +1,15 @@
 /** @jsx jsx */
-import React, { Component } from "react"
+import React from "react"
 import { Flex, Box, jsx } from "theme-ui"
 
 import { Link } from "react-router-dom"
 
-const Header: React.FC<{ isLoggedIn; user?; inSurvey? }> = ({ isLoggedIn, user, inSurvey }) => {
+type HeaderPropTypes = {
+  isLoggedIn: boolean
+  inSurvey: boolean
+}
+
+const Header = ({ isLoggedIn, inSurvey }: HeaderPropTypes) => {
   return (
     <Flex
       sx={{

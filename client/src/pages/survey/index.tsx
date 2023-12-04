@@ -1,16 +1,13 @@
 /** @jsx jsx */
 
-import React, { useCallback, useEffect, useState, useRef } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import React, { useCallback, useEffect, useState } from "react"
 import { connect, useDispatch, useSelector } from "react-redux"
-import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
+import { Box, Button,  jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
 
 import api from "../../util/api"
-import type { RootState, Comment, Conversation } from "../../util/types"
+import type { RootState, Comment } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
-import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
@@ -216,10 +213,8 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
           votedComments={votedComments}
           unvotedComments={unvotedComments}
           submittedComments={submittedComments}
-          user={user}
           goTo={goTo}
           setVotingAfterPostSurvey={setVotingAfterPostSurvey}
-          conversation_id={conversation_id}
           zid_metadata={zid_metadata}
         />
       )}

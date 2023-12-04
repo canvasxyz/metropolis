@@ -11,6 +11,8 @@ import { Toaster } from "react-hot-toast"
 import { Switch, Route, Redirect } from "react-router-dom"
 import { Box, jsx } from "theme-ui"
 
+import { AppDispatch } from "./store"
+
 import Header from "./components/header"
 import Footer from "./components/footer"
 
@@ -66,7 +68,7 @@ PrivateRoute.propTypes = {
 
 class App extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     isLoggedIn: boolean
     location: { pathname: string }
     user: User
@@ -77,12 +79,6 @@ class App extends React.Component<
     sidebarOpen: boolean
   }
 > {
-  static propTypes: {
-    dispatch: Function
-    isLoggedIn: unknown
-    location: object
-    user: object
-  }
 
   constructor(props) {
     super(props)
@@ -155,7 +151,6 @@ class App extends React.Component<
                 !document.location.pathname.startsWith("/dashboard") && (
                   <Header
                     isLoggedIn={this.props.isLoggedIn}
-                    user={this.props.user}
                     inSurvey={inSurvey}
                   />
                 )}
@@ -265,20 +260,6 @@ class App extends React.Component<
       </React.Fragment>
     )
   }
-}
-
-App.propTypes = {
-  dispatch: PropTypes.func,
-  isLoggedIn: PropTypes.bool,
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }),
-  user: PropTypes.shape({
-    uid: PropTypes.number,
-    email: PropTypes.string,
-    created: PropTypes.number,
-    hname: PropTypes.string,
-  }),
 }
 
 export default connect((state: RootState) => state.user)(App)

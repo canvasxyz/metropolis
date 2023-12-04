@@ -7,7 +7,7 @@ import { User , RootState } from "../util/types"
 
 import Spinner from "../components/spinner"
 
-class Account extends React.Component<{ user: User }, {}> {
+class Account extends React.Component<{ user: User }> {
   static propTypes: {
     user: object
   }

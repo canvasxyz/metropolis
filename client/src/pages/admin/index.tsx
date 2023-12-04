@@ -18,7 +18,7 @@ import { UrlObject } from "url"
 
 class ConversationAdminContainer extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     match: { url: string; path: string; params: { conversation_id: string } }
     zid_metadata: any
     location: UrlObject

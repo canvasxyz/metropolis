@@ -1,12 +1,12 @@
-import React, { useEffect, useState, useRef } from "react"
-import { connect, useDispatch, useSelector } from "react-redux"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import React, { useState } from "react"
+import { Box, Button } from "theme-ui"
 
 import { TbChevronDown } from "react-icons/tb"
+import { AppDispatch } from "../store"
 
 type DropdownMenuOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick: () => void
   sx?
 }>
 
@@ -101,7 +101,7 @@ const DropdownMenu = ({
 
 type DropdownButtonOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick: AppDispatch
   default?: boolean
 }>
 

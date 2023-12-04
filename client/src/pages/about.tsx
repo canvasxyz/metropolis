@@ -1,10 +1,9 @@
 /** @jsx jsx */
 
 import React, { useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Flex, Text, jsx } from "theme-ui"
 
-const About: React.FC<{ user? }> = ({ user }) => {
+const About = () => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -30,7 +29,7 @@ const About: React.FC<{ user? }> = ({ user }) => {
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>
             Development happens on{" "}
-            <a sx={{ variant: "styles.a" }} href="https://github.com/raykyri/polis" target="_blank">
+            <a sx={{ variant: "styles.a" }} href="https://github.com/raykyri/polis" rel="noreferrer" target="_blank">
               Github
             </a>{" "}
             and the project is open source, under the AGPL.

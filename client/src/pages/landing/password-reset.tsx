@@ -3,11 +3,12 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { doPasswordReset } from "../../actions"
 import { UrlObject } from "url"
+import { AppDispatch } from "../../store"
 
-class PasswordReset extends React.Component<{ dispatch: Function; location: UrlObject }, {}> {
+class PasswordReset extends React.Component<{ dispatch: AppDispatch; location: UrlObject }, {}> {
   passwordRepeat: HTMLInputElement
   password: HTMLInputElement
-  static propTypes: { dispatch: Function; location: object }
+  static propTypes: { dispatch: AppDispatch; location: object }
 
   handleClick(e) {
     e.preventDefault()

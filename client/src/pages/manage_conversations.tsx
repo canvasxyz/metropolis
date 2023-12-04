@@ -10,10 +10,11 @@ import { populateConversationsStore } from "../actions"
 
 import { RootState, Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
+import { AppDispatch } from "../store"
 
 class ManageConversations extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     error: Response
     loading: boolean
     conversations: Array<Conversation>
@@ -27,7 +28,7 @@ class ManageConversations extends React.Component<
   }
 > {
   static propTypes: {
-    dispatch: Function
+    dispatch: AppDispatch
     error: object
     loading: unknown
     conversations: unknown

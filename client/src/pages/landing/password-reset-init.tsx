@@ -5,12 +5,13 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { doPasswordResetInit } from "../../actions"
 import { Button, jsx } from "theme-ui"
+import { AppDispatch } from "../../store"
 
-class PasswordResetInit extends React.Component<{ dispatch: Function }, {}> {
+class PasswordResetInit extends React.Component<{ dispatch: AppDispatch }, {}> {
   email: HTMLInputElement
 
   static propTypes: {
-    dispatch: Function
+    dispatch: AppDispatch
   }
 
   handleClick(e) {

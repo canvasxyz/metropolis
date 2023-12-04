@@ -6,17 +6,13 @@ import React from "react"
 import ReactDOM from "react-dom"
 import { Provider } from "react-redux"
 import { BrowserRouter as Router, Route } from "react-router-dom"
-import { createStore, applyMiddleware, compose } from "redux"
-import thunk from "redux-thunk"
 import { IconContext } from "react-icons"
 
 import { ThemeProvider } from "theme-ui"
 import theme from "./theme"
 import App from "./app"
-import rootReducer from "./reducers"
+import { store } from "./store"
 
-const middleware = [thunk]
-const store = compose(applyMiddleware(...middleware))(createStore)(rootReducer)
 
 class Root extends React.Component {
   render() {
@@ -34,6 +30,7 @@ class Root extends React.Component {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 window.$ = $
 

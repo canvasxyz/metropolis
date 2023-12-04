@@ -1,19 +1,17 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../../../actions"
 import Comment from "./comment"
 import { RootState } from "../../../util/types"
 import { Text } from "theme-ui"
+import { AppDispatch } from "../../../store"
 
 class ModerateCommentsAccepted extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     accepted_comments: object[]
-  },
-  {}
+  }
 > {
-  static propTypes: {}
 
   onCommentRejected(comment) {
     this.props.dispatch(changeCommentStatusToRejected(comment))
@@ -35,7 +33,7 @@ class ModerateCommentsAccepted extends React.Component<
             return (
               <Comment
                 key={i}
-                rejectButton
+                rejectButton={true}
                 rejectClickHandler={this.onCommentRejected.bind(this)}
                 rejectButtonText="reject"
                 isMetaCheckbox
@@ -50,9 +48,5 @@ class ModerateCommentsAccepted extends React.Component<
   }
 }
 
-ModerateCommentsAccepted.propTypes = {
-  dispatch: PropTypes.func,
-  accepted_comments: PropTypes.arrayOf(PropTypes.object),
-}
 
 export default connect((state: RootState) => state.mod_comments_accepted)(ModerateCommentsAccepted)

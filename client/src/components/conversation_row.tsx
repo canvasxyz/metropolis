@@ -10,12 +10,14 @@ import {
 } from "../actions"
 import { DropdownMenu } from "../components/dropdown"
 import { Conversation } from "../util/types"
+import { AppDispatch } from "../store"
 
 type ConversationRowPropTypes = {
   c: Conversation;
   i: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   stats: any;
-  dispatch: Function;
+  dispatch: AppDispatch;
 }
 
 function ConversationRow({ c, i, stats, dispatch }: ConversationRowPropTypes) {

@@ -3,7 +3,7 @@
 import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
-import { Heading, Box, Text, Link as ThemeLink, Button, jsx } from "theme-ui"
+import { Heading, Box, Text, Button, jsx } from "theme-ui"
 import toast from "react-hot-toast"
 
 import {
@@ -133,6 +133,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report
@@ -449,7 +450,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       {zid_metadata.is_archived ? (
         <Button
           variant="outlineRed"
-          onClick={(e) => {
+          onClick={() => {
             if (!confirm("Reopen this conversation?")) return
             dispatch(handleReopenConversation(zid_metadata.conversation_id))
           }}
@@ -459,7 +460,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       ) : (
         <Button
           variant="outlineRed"
-          onClick={(e) => {
+          onClick={() => {
             if (!confirm("Archive this conversation?")) return
             dispatch(handleCloseConversation(zid_metadata.conversation_id))
           }}
@@ -475,6 +476,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         {reports && reports[0] && (
           <Link
             sx={{ variant: "styles.a", ml: [3] }}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
           >
             Go to report

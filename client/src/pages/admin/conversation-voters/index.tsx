@@ -11,9 +11,10 @@ import { formatTime } from "../../../util/misc"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
+import { AppDispatch } from "../../../store"
 
 class ConversationVoters extends React.Component<{
-  dispatch: Function
+  dispatch: AppDispatch
   match: { params: { conversation_id: string }; url: string; path: string }
   conversation_voters: { voters: object[] }
   location: UrlObject

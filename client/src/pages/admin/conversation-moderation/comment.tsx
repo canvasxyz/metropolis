@@ -1,27 +1,24 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Flex, Box, Text, Button, Card } from "theme-ui"
 import { RootState } from "../../../util/types"
+import { AppDispatch } from "../../../store"
 
-class Comment extends React.Component<
-  {
-    dispatch: Function
-    acceptClickHandler: Function
-    rejectClickHandler: Function
-    toggleIsMetaHandler: Function
-    acceptButton: boolean
-    acceptButtonText: string
-    rejectButton: boolean
-    rejectButtonText: string
-    isMetaCheckbox: boolean
-    comment: { txt: string; is_meta: boolean }
-  },
-  {}
-> {
+type CommentPropTypes = {
+  dispatch: AppDispatch
+  acceptClickHandler: (comment) => void
+  rejectClickHandler: (comment) => void
+  toggleIsMetaHandler: (comment, isChecked: boolean) => void
+  acceptButton: boolean
+  acceptButtonText: string
+  rejectButton: boolean
+  rejectButtonText: string
+  isMetaCheckbox: boolean
+  comment: { txt: string; is_meta: boolean }
+}
+
+class Comment extends React.Component<CommentPropTypes> {
   is_meta: HTMLInputElement
-
-  static propTypes: any
 
   onAcceptClicked() {
     this.props.acceptClickHandler(this.props.comment)
@@ -79,22 +76,7 @@ class Comment extends React.Component<
   }
 }
 
-Comment.propTypes = {
-  dispatch: PropTypes.func,
-  acceptClickHandler: PropTypes.func,
-  rejectClickHandler: PropTypes.func,
-  toggleIsMetaHandler: PropTypes.func,
-  acceptButton: PropTypes.bool,
-  acceptButtonText: PropTypes.string,
-  rejectButton: PropTypes.bool,
-  rejectButtonText: PropTypes.string,
-  isMetaCheckbox: PropTypes.bool,
-  comment: PropTypes.shape({
-    txt: PropTypes.string,
-    is_meta: PropTypes.bool,
-  }),
-}
 
-export default connect((state: RootState) => {
+export default connect((state: RootState) =>
   state.zid_metadata.zid_metadata
-})(Comment)
+)(Comment)
