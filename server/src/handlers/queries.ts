@@ -1,5 +1,11 @@
 import { queryP } from "../db/pg-query";
 
+export type GitHubUserData = {
+  id: number;
+  username: string;
+  email: string | null;
+}
+
 /** database queries used by the github integrations */
 
 // fields that come from the PR
@@ -51,38 +57,48 @@ const FIP_FIELDS: (keyof FipFields)[] = [
   "fip_created",
 ];
 
-export async function getOrCreateUserWithGithubUsername(
-  githubUsername: string,
+export async function updateOrCreateGitHubUser(
+  githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
-  const existingUser = await getUserUidByGithubUsername(githubUsername);
+  const existingUser = await updateGitHubUserData(githubUserData);
   if (existingUser) {
     return existingUser;
   } else {
-    return await createUserWithGithubUsername(githubUsername);
+    return await createGitHubUser(githubUserData);
   }
 }
 
-export async function createUserWithGithubUsername(
-  githubUsername: string,
+export async function createGitHubUser(
+  githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
   const createQuery =
     "insert into users " +
-    "(github_username, hname, zinvite, is_owner) VALUES " +
+    "(github_user_id, github_username, github_email, is_owner) VALUES " +
     "($1, $2, $3, $4) " +
     "returning uid;";
-  const vals = [githubUsername, githubUsername, null, true];
+  const vals = [githubUserData.id, githubUserData.username, githubUserData.email, true];
   const createRes = await queryP(createQuery, vals);
   return createRes[0];
 }
 
-export async function getUserUidByGithubUsername(
-  githubUsername: string,
+export async function updateGitHubUserData(
+  githubUserData: GitHubUserData,
+): Promise<{ uid: number }> {
+  const createQuery =
+    "UPDATE users SET github_username = $1, github_email = $2 WHERE github_user_id = $3" +
+    "returning uid;";
+  const vals = [githubUserData.username, githubUserData.email, githubUserData.id];
+  const updateRes = await queryP(createQuery, vals);
+  return updateRes[0];
+}
+
+export async function getUserUidByGithubUserId(
+  githubUserId: number,
 ): Promise<{ uid: number } | undefined> {
-  const query = "SELECT uid FROM users WHERE github_username = $1";
-  // TODO: this is a hack, we should have more semantically meaningful columns
-  const rows = await queryP(query, [githubUsername]);
+  const query = "SELECT uid FROM users WHERE github_user_id = $1";
+  const rows = await queryP(query, [githubUserId]);
   if (rows.length > 1) {
-    throw Error("polis_more_than_one_user_with_same_github_username");
+    throw Error("polis_more_than_one_user_with_same_github_user_id");
   }
   return rows[0];
 }
