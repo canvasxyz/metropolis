@@ -67,11 +67,10 @@ export async function createUserWithGithubUsername(
 ): Promise<{ uid: number }> {
   const createQuery =
     "insert into users " +
-    "(email, hname, zinvite, is_owner) VALUES " +
+    "(github_username, hname, zinvite, is_owner) VALUES " +
     "($1, $2, $3, $4) " +
     "returning uid;";
-  const email = `github: ${githubUsername}`;
-  const vals = [email, githubUsername, null, true];
+  const vals = [githubUsername, githubUsername, null, true];
   const createRes = await queryP(createQuery, vals);
   return createRes[0];
 }
@@ -79,11 +78,11 @@ export async function createUserWithGithubUsername(
 export async function getUserUidByGithubUsername(
   githubUsername: string,
 ): Promise<{ uid: number } | undefined> {
-  const query = "SELECT uid FROM users WHERE email = $1";
+  const query = "SELECT uid FROM users WHERE github_username = $1";
   // TODO: this is a hack, we should have more semantically meaningful columns
-  const rows = await queryP(query, [`github: ${githubUsername}`]);
+  const rows = await queryP(query, [githubUsername]);
   if (rows.length > 1) {
-    throw Error("polis_more_than_one_user_with_same_email");
+    throw Error("polis_more_than_one_user_with_same_github_username");
   }
   return rows[0];
 }
