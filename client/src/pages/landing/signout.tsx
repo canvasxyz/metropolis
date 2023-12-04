@@ -1,13 +1,13 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Heading } from "theme-ui"
 
 import { doSignout } from "../../actions"
 import { RootState } from "../../util/types"
+import { AppDispatch } from "../../store"
 
-class SignOut extends React.Component<{ dispatch: Function }, {}> {
-  static propTypes: { dispatch: Function }
+class SignOut extends React.Component<{ dispatch: AppDispatch }, {}> {
+  static propTypes: { dispatch: AppDispatch }
 
   componentDidMount() {
     this.props.dispatch(doSignout("/"))
@@ -25,8 +25,5 @@ class SignOut extends React.Component<{ dispatch: Function }, {}> {
   }
 }
 
-SignOut.propTypes = {
-  dispatch: PropTypes.func,
-}
 
 export default connect((state: RootState) => state.signout)(SignOut)

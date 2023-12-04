@@ -2,7 +2,6 @@
 
 import { RouteComponentProps, Link } from "react-router-dom"
 import React, { useEffect } from "react"
-import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Box, Grid, Heading, Button, Text, Flex, jsx } from "theme-ui"
 import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
@@ -19,10 +18,11 @@ import { DropdownMenu } from "../components/dropdown"
 import Url from "../util/url"
 import { RootState, Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
+import { AppDispatch } from "../store"
 
 class ManageConversations extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     error: Response
     loading: boolean
     conversations: Array<Conversation>
@@ -36,7 +36,7 @@ class ManageConversations extends React.Component<
   }
 > {
   static propTypes: {
-    dispatch: Function
+    dispatch: AppDispatch
     error: object
     loading: unknown
     conversations: unknown
@@ -135,26 +135,6 @@ class ManageConversations extends React.Component<
   }
 }
 
-ManageConversations.propTypes = {
-  dispatch: PropTypes.func,
-  error: PropTypes.oneOfType([
-    PropTypes.bool,
-    PropTypes.shape({
-      status: PropTypes.number,
-      statusText: PropTypes.string,
-    }),
-  ]),
-  loading: PropTypes.bool,
-  conversations: PropTypes.arrayOf(
-    PropTypes.shape({
-      conversation_id: PropTypes.string,
-    }),
-  ),
-  history: PropTypes.shape({
-    pathname: PropTypes.string,
-    push: PropTypes.func,
-  }),
-}
 
 export default connect((state: RootState) => state.stats)(
   connect((state: RootState) => state.conversations)(ManageConversations),

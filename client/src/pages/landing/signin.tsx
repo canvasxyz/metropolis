@@ -9,11 +9,12 @@ import { Heading, Box, Text, Button, jsx } from "theme-ui"
 import strings from "../../intl"
 import { RootState } from "../../util/types"
 import { UrlObject, UrlWithStringQuery } from "url"
+import { AppDispatch } from "../../store"
 
 const fbAppId = process.env.FB_APP_ID
 
 class SignIn extends React.Component<{
-  dispatch: Function
+  dispatch: AppDispatch
   error: XMLHttpRequest
   authed: boolean
   pending?: boolean

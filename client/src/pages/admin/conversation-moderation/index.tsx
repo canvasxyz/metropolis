@@ -14,9 +14,10 @@ import ModerateCommentsRejected from "./moderate-comments-rejected"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
+import { AppDispatch } from "../../../store"
 
 class CommentModeration extends React.Component<{
-  dispatch: Function
+  dispatch: AppDispatch
   match: { params: { conversation_id: string }; url: string; path: string }
   location: UrlObject
   unmoderated: { unmoderated_comments: object[] }

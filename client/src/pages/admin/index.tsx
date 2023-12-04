@@ -15,10 +15,11 @@ import ConversationVoters from "./conversation-voters"
 import ConversationReport from "./conversation-report"
 
 import { UrlObject } from "url"
+import { AppDispatch } from "../../store"
 
 class ConversationAdminContainer extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     match: { url: string; path: string; params: { conversation_id: string } }
     zid_metadata: any
     location: UrlObject

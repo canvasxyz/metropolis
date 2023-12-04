@@ -38,6 +38,7 @@ import Survey from "./pages/survey"
 
 /* report */
 import Report from "./pages/report"
+import { AppDispatch } from "./store"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
@@ -66,7 +67,7 @@ PrivateRoute.propTypes = {
 
 class App extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     isLoggedIn: boolean
     location: { pathname: string }
     user: User
@@ -78,7 +79,7 @@ class App extends React.Component<
   }
 > {
   static propTypes: {
-    dispatch: Function
+    dispatch: AppDispatch
     isLoggedIn: unknown
     location: object
     user: object
@@ -267,18 +268,5 @@ class App extends React.Component<
   }
 }
 
-App.propTypes = {
-  dispatch: PropTypes.func,
-  isLoggedIn: PropTypes.bool,
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }),
-  user: PropTypes.shape({
-    uid: PropTypes.number,
-    email: PropTypes.string,
-    created: PropTypes.number,
-    hname: PropTypes.string,
-  }),
-}
 
 export default connect((state: RootState) => state.user)(App)

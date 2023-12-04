@@ -6,6 +6,7 @@ import { connect } from "react-redux"
 import { handleSeedCommentTweetSubmit, seedCommentTweetChanged } from "../../actions"
 import strings from "../../intl"
 import { RootState } from "../../util/types"
+import { AppDispatch } from "../../store"
 
 const styles = {
   card: {
@@ -20,7 +21,7 @@ const styles = {
 
 class ModerateCommentsSeed extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     error: string
     success: any
     loading: any

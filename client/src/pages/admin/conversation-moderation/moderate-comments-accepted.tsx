@@ -5,10 +5,11 @@ import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../..
 import Comment from "./comment"
 import { RootState } from "../../../util/types"
 import { Text } from "theme-ui"
+import { AppDispatch } from "../../../store"
 
 class ModerateCommentsAccepted extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     accepted_comments: object[]
   },
   {}

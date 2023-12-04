@@ -15,10 +15,11 @@ import Voters from "./voters"
 import Commenters from "./commenters"
 import NoPermission from "../no-permission"
 import ReportsList from "./reports-list"
+import { AppDispatch } from "../../../store"
 
 class ConversationStats extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     match: { params: { conversation_id: string }; location: UrlObject }
     zid_metadata: { is_mod: boolean; is_owner: boolean }
     conversation_stats: Record<

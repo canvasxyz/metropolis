@@ -9,12 +9,13 @@ import { Link } from "react-router-dom"
 import strings from "../../intl"
 import { RootState } from "../../util/types"
 import { UrlObject } from "url"
+import { AppDispatch } from "../../store"
 
 const fbAppId = process.env.FB_APP_ID
 
 class CreateUser extends React.Component<{
   location: UrlObject
-  dispatch: Function
+  dispatch: AppDispatch
   error: XMLHttpRequest
   pending: boolean
   facebookError: string
