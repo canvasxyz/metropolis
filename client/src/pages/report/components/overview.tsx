@@ -32,7 +32,7 @@ const Overview = ({
   ptptCountTotal,
   math,
   // comments,
-  //stats,
+  // stats,
   computedStats,
 }) => {
   return (

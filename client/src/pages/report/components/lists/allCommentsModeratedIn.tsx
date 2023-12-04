@@ -30,7 +30,7 @@ function sortByPctAgreed(comments) {
   return _.map(
     _.reverse(
       _.sortBy(comments, (c) => {
-        return c["pctAgreed"]
+        return c.pctAgreed
       })
     ),
     (c) => {
@@ -42,7 +42,7 @@ function sortByPctDisagreed(comments) {
   return _.map(
     _.reverse(
       _.sortBy(comments, (c) => {
-        return c["pctDisagreed"]
+        return c.pctDisagreed
       })
     ),
     (c) => {
@@ -54,7 +54,7 @@ function sortByPctPassed(comments) {
   return _.map(
     _.reverse(
       _.sortBy(comments, (c) => {
-        return c["pctPassed"]
+        return c.pctPassed
       })
     ),
     (c) => {

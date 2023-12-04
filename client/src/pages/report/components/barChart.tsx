@@ -42,18 +42,18 @@ const BarChart = ({
       fill: "rgb(230,230,230)",
     },
   ]
-  let votesForTid = groupVotes && groupVotes.votes[comment.tid]
+  const votesForTid = groupVotes && groupVotes.votes[comment.tid]
   if (groupVotes && !votesForTid) {
     console.warn("probably bad")
   }
   if (groupVotes && votesForTid) {
-    let groupVotesForThisComment = groupVotes.votes[comment.tid]
-    let agrees = groupVotesForThisComment.A
-    let disagrees = groupVotesForThisComment.D
-    let sawTheComment = groupVotesForThisComment.S
-    let passes = sawTheComment - (agrees + disagrees)
-    let totalVotes = agrees + disagrees + passes
-    let nMembers = groupVotes["n-members"]
+    const groupVotesForThisComment = groupVotes.votes[comment.tid]
+    const agrees = groupVotesForThisComment.A
+    const disagrees = groupVotesForThisComment.D
+    const sawTheComment = groupVotesForThisComment.S
+    const passes = sawTheComment - (agrees + disagrees)
+    const totalVotes = agrees + disagrees + passes
+    const nMembers = groupVotes["n-members"]
     arr[0].percent = (totalVotes / nMembers) * 100
     arr[1].percent = (agrees / totalVotes) * 100
     arr[2].percent = (disagrees / totalVotes) * 100

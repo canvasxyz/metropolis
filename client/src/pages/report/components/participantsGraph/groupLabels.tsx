@@ -29,7 +29,7 @@ const Users = ({ selectedGroup }) => {
   )
 }
 
-const Label = ({ ptptCount, centroid, gid, selectedGroup /*, handleClick*/ }) => {
+const Label = ({ ptptCount, centroid, gid, selectedGroup /*, handleClick */ }) => {
   return (
     <g transform={`translate(${centroid.x},${centroid.y})`}>
       <text
@@ -61,7 +61,7 @@ const Label = ({ ptptCount, centroid, gid, selectedGroup /*, handleClick*/ }) =>
   )
 }
 
-const GroupLabels = ({ groups, centroids, selectedGroup /*, handleClick*/ }) => {
+const GroupLabels = ({ groups, centroids, selectedGroup /*, handleClick */ }) => {
   if (!centroids || !groups) {
     return null
   }

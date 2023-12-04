@@ -1,9 +1,9 @@
 /** @jsx jsx */
-import React from "react"
 import { Link } from "react-router-dom"
-import { Box, Heading, Text, jsx } from "theme-ui"
+import { Box, Text, jsx } from "theme-ui"
 
-const Footer: React.FC<{ inSurvey: boolean }> = ({ inSurvey }) => {
+type FooterPropTypes = { inSurvey: boolean }
+const Footer = ({ inSurvey }: FooterPropTypes) => {
   return (
     <Box
       sx={{

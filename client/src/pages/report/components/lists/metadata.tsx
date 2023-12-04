@@ -11,7 +11,7 @@ const Metadata = ({ conversation, comments, ptptCount, formatTid, math, voteColo
 
   const _metadataTids = []
 
-  comments.forEach((comment /*, i*/) => {
+  comments.forEach((comment /*, i */) => {
     if (comment.is_meta) {
       _metadataTids.push(comment.tid)
     }

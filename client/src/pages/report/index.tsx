@@ -99,8 +99,8 @@ class Report extends React.Component<
       report_id: report_id,
       moderation: true,
       mod_gt: isStrictMod ? 0 : -1,
-      //include_social: true,
-      //include_demographics: true,
+      // include_social: true,
+      // include_demographics: true,
       include_voting_patterns: true,
     })
   }
@@ -110,11 +110,13 @@ class Report extends React.Component<
       conversation_id: conversation_id,
     })
   }
+
   getConversation(conversation_id) {
     return net.polisGet("/api/v3/conversations", {
       conversation_id: conversation_id,
     })
   }
+
   getReport(report_id) {
     return net
       .polisGet("/api/v3/reports", {
@@ -127,6 +129,7 @@ class Report extends React.Component<
         return null
       })
   }
+
   getGroupDemographics(conversation_id, report_id) {
     return net.polisGet("/api/v3/group_demographics", {
       conversation_id: conversation_id,
@@ -194,9 +197,9 @@ class Report extends React.Component<
     const groupDemographicsPromise = reportPromise.then((report) => {
       return this.getGroupDemographics(report.conversation_id, report_id)
     })
-    //const conversationStatsPromise = reportPromise.then((report) => {
-    //return this.getConversationStats(report.conversation_id, report_id)
-    //});
+    // const conversationStatsPromise = reportPromise.then((report) => {
+    // return this.getConversationStats(report.conversation_id, report_id)
+    // });
     const participantsOfInterestPromise = reportPromise.then((report) => {
       return this.getParticipantsOfInterest(report.conversation_id)
     })
@@ -218,7 +221,7 @@ class Report extends React.Component<
       participantsOfInterestPromise,
       matrixPromise,
       conversationPromise,
-      //conversationStatsPromise,
+      // conversationStatsPromise,
     ])
       .then((a) => {
         let [
@@ -229,7 +232,7 @@ class Report extends React.Component<
           participants,
           correlationHClust,
           conversation,
-          //conversationstats,
+          // conversationstats,
         ] = a
 
         assertExists(mathResult, "base-clusters")
@@ -248,28 +251,28 @@ class Report extends React.Component<
         assertExists(mathResult.pca, "comment-projection")
         assertExists(mathResult.pca, "comps")
 
-        let indexToTid = mathResult.tids
+        const indexToTid = mathResult.tids
 
         // # ptpts that voted
-        var ptptCountTotal = conversation.participant_count
+        const ptptCountTotal = conversation.participant_count
 
         // # ptpts that voted enough to be included in math
-        var ptptCount = 0
-        _.each(mathResult["group-votes"], (val /*, key*/) => {
+        let ptptCount = 0
+        _.each(mathResult["group-votes"], (val /*, key */) => {
           ptptCount += val["n-members"]
         })
 
-        var badTids = {}
-        var filteredTids = {}
-        var filteredProbabilities = {}
+        const badTids = {}
+        let filteredTids = {}
+        let filteredProbabilities = {}
 
         // prep Correlation matrix.
         if (globals.enableMatrix) {
-          var probabilities = correlationHClust.matrix
-          var tids = correlationHClust.comments
+          const probabilities = correlationHClust.matrix
+          const tids = correlationHClust.comments
           for (let row = 0; row < probabilities.length; row++) {
             if (probabilities[row][0] === "NaN") {
-              let tid = correlationHClust.comments[row]
+              const tid = correlationHClust.comments[row]
               badTids[tid] = true
               // console.log("bad", tid);
             }
@@ -277,26 +280,26 @@ class Report extends React.Component<
           filteredProbabilities = probabilities
             .map((row) => {
               return row.filter((cell, colNum) => {
-                let colTid = correlationHClust.comments[colNum]
+                const colTid = correlationHClust.comments[colNum]
                 return badTids[colTid] !== true
               })
             })
             .filter((row, rowNum) => {
-              let rowTid = correlationHClust.comments[rowNum]
+              const rowTid = correlationHClust.comments[rowNum]
               return badTids[rowTid] !== true
             })
-          filteredTids = tids.filter((tid /*, index*/) => {
+          filteredTids = tids.filter((tid /*, index */) => {
             return badTids[tid] !== true
           })
         }
 
-        var maxTid = -1
+        let maxTid = -1
         for (let i = 0; i < comments.length; i++) {
           if (comments[i].tid > maxTid) {
             maxTid = comments[i].tid
           }
         }
-        var tidWidth = ("" + maxTid).length
+        const tidWidth = ("" + maxTid).length
 
         function pad(n, width, z?) {
           z = z || "0"
@@ -309,8 +312,8 @@ class Report extends React.Component<
           return pad("" + tid, tidWidth)
         }
 
-        let repfulAgreeTidsByGroup = {}
-        let repfulDisageeTidsByGroup = {}
+        const repfulAgreeTidsByGroup = {}
+        const repfulDisageeTidsByGroup = {}
         if (mathResult.repness) {
           _.each(mathResult.repness, (entries, gid) => {
             entries.forEach((entry) => {
@@ -326,9 +329,9 @@ class Report extends React.Component<
         }
 
         // ====== REMEMBER: gid's start at zero, (0, 1, 2) but we show them as group 1, 2, 3 in participation view ======
-        let groupNames = {}
+        const groupNames = {}
         for (let i = 0; i <= 9; i++) {
-          let label = report["label_group_" + i]
+          const label = report["label_group_" + i]
           if (label) {
             groupNames[i] = label
           }
@@ -338,7 +341,7 @@ class Report extends React.Component<
 
         // let maxCount = _.reduce(comments, (memo, c) => { return Math.max(c.count, memo);}, 1);
         comments.map((c) => {
-          var unc = c.pass_count / c.count
+          const unc = c.pass_count / c.count
           if (unc > 0.3) {
             c.unc = unc
             uncertainty.push(c)
@@ -349,21 +352,21 @@ class Report extends React.Component<
         })
         uncertainty = uncertainty.slice(0, 5)
 
-        let extremity = {}
+        const extremity = {}
         _.each(mathResult.pca["comment-extremity"], function (e, index) {
           extremity[indexToTid[index]] = e
         })
 
-        var uniqueCommenters = {}
-        var voteTotals = DataUtils.getVoteTotals(mathResult)
+        const uniqueCommenters = {}
+        const voteTotals = DataUtils.getVoteTotals(mathResult)
         comments = comments.map((c) => {
           c["group-aware-consensus"] = mathResult["group-aware-consensus"][c.tid]
           uniqueCommenters[c.pid] = 1
           c = Object.assign(c, voteTotals[c.tid])
           return c
         })
-        var numUniqueCommenters = _.keys(uniqueCommenters).length
-        var totalVotes = _.reduce(
+        const numUniqueCommenters = _.keys(uniqueCommenters).length
+        const totalVotes = _.reduce(
           _.values(mathResult["user-vote-counts"]),
           function (memo, num) {
             return memo + num
@@ -397,7 +400,7 @@ class Report extends React.Component<
           repfulDisageeTidsByGroup: repfulDisageeTidsByGroup,
           formatTid: formatTid,
           report: report,
-          //conversationStats: conversationstats,
+          // conversationStats: conversationstats,
           computedStats: computedStats,
           nothingToShow: !comments.length || !groupDemographics.length,
         })
@@ -459,13 +462,13 @@ class Report extends React.Component<
           <Overview
             computedStats={this.state.computedStats}
             math={this.state.math}
-            /*comments={this.state.comments}*/
+            /* comments={this.state.comments} */
             ptptCount={this.state.ptptCount}
             ptptCountTotal={this.state.ptptCountTotal}
-            /*demographics={this.state.demographics}*/
+            /* demographics={this.state.demographics} */
             conversation={this.state.conversation}
-            /*voteColors={this.state.voteColors}*/
-            /*stats={this.state.conversationStats}*/
+            /* voteColors={this.state.voteColors} */
+            /* stats={this.state.conversationStats} */
           />
           <Beeswarm
             conversation={this.state.conversation}
@@ -514,10 +517,10 @@ class Report extends React.Component<
           />
           <ParticipantsGraph
             comments={this.state.comments}
-            /*groupNames={this.state.groupNames}*/
+            /* groupNames={this.state.groupNames} */
             badTids={this.state.badTids}
             formatTid={this.state.formatTid}
-            /*repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup}*/
+            /* repfulAgreeTidsByGroup={this.state.repfulAgreeTidsByGroup} */
             math={this.state.math}
             report={this.state.report}
             voteColors={this.state.voteColors}

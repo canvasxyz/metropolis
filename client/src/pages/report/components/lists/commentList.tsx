@@ -7,20 +7,20 @@ import * as globals from "../globals"
 const BarChartCompact = ({ comment, voteCounts, nMembers, voteColors, index }) => {
   if (!comment) return null
 
-  let w = 100
+  const w = 100
   let agrees = 0
   let disagrees = 0
   let sawTheComment = 0
   let missingCounts = false
 
-  if (typeof voteCounts != "undefined") {
+  if (typeof voteCounts !== "undefined") {
     agrees = voteCounts.A
     disagrees = voteCounts.D
     sawTheComment = voteCounts.S
   } else {
     missingCounts = true
   }
-  let passes = sawTheComment - (agrees + disagrees)
+  const passes = sawTheComment - (agrees + disagrees)
   // let totalVotes = agrees + disagrees + passes;
 
   const agree = (agrees / nMembers) * w
@@ -84,14 +84,14 @@ const CommentRow = ({ comment, groups, voteColors, index }) => {
   }
   // const percentAgreed = Math.floor(groupVotesForThisGroup.votes[comment.tid].A / groupVotesForThisGroup.votes[comment.tid].S * 100);
 
-  let BarCharts = []
+  const BarCharts = []
   let totalMembers = 0
 
   // groups
   _.forEach(groups, (g, i) => {
-    let nMembers = g["n-members"]
+    const nMembers = g["n-members"]
     totalMembers += nMembers
-    let gVotes = g.votes[comment.tid]
+    const gVotes = g.votes[comment.tid]
 
     BarCharts.push(
       <BarChartCompact
@@ -198,7 +198,7 @@ class CommentList extends React.Component<
         </span>
       )
     }
-    let labels = []
+    const labels = []
 
     // totals
     labels.push(makeLabel(99, "Overall", this.props.ptptCount))

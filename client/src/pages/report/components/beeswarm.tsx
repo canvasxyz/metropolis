@@ -105,6 +105,7 @@ class Beeswarm extends React.Component<
       axesRendered: false,
     }
   }
+
   onHoverCallback(d) {
     return () => {
       this.setState({ currentBeeswarmComment: d.data })
@@ -120,6 +121,7 @@ class Beeswarm extends React.Component<
       this.setup()
     }
   }
+
   setup() {
     const commentsWithExtremity = []
     _.each(this.props.comments, (comment) => {
@@ -129,7 +131,7 @@ class Beeswarm extends React.Component<
       }
     })
 
-    var x = d3.scaleLinear().rangeRound([0, this.widthMinusMargins])
+    const x = d3.scaleLinear().rangeRound([0, this.widthMinusMargins])
 
     x.domain(
       d3.extent(commentsWithExtremity, function (d) {
@@ -137,7 +139,7 @@ class Beeswarm extends React.Component<
       })
     )
 
-    var simulation = d3
+    const simulation = d3
       .forceSimulation(commentsWithExtremity)
       .force(
         "x",
@@ -151,7 +153,7 @@ class Beeswarm extends React.Component<
       .force("collide", d3.forceCollide(4))
       .stop()
 
-    for (var i = 0; i < 120; ++i) simulation.tick()
+    for (let i = 0; i < 120; ++i) simulation.tick()
 
     const voronoi = d3voronoi()
       .extent([
@@ -180,6 +182,7 @@ class Beeswarm extends React.Component<
       axesRendered: true,
     })
   }
+
   render() {
     return (
       <div style={{ width: this.svgWidth }}>
@@ -225,7 +228,7 @@ class Beeswarm extends React.Component<
           <p style={{ margin: 0 }}> Consensus statements </p>
           <p style={{ margin: 0 }}> Divisive statements</p>
         </div>
-        {/*<ProbabilityLegend/>*/}
+        {/* <ProbabilityLegend/> */}
 
         <div style={{ minHeight: "140px", paddingTop: "20px" }}>
           {this.state.currentBeeswarmComment ? (

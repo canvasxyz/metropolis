@@ -178,9 +178,9 @@ const CreateConversation = ({ dispatch, user }) => {
           <Box>
             <Label sx={{ display: "block", mb: [5] }}>
               <Box sx={{ fontWeight: "700", mb: [1] }}>Title</Box>
-              {/*<Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
+              {/* <Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 A descriptive name for your survey.
-                </Box>*/}
+                </Box> */}
               <Box>
                 <Input
                   placeholder={prefillOptions[prefillSelection].prefillTitle}

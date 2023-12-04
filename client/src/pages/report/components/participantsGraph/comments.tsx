@@ -71,11 +71,11 @@ class Comments extends React.Component<
         >
           <title>Tooltip 2</title>
           {this.props.formatTid(comment.tid)}
-          {/*textArray.map((t, i) => {
+          {/* textArray.map((t, i) => {
               return (
                 <TextSegment key={i} t={t} i={i}/>
               )
-            })*/}
+            }) */}
         </text>
       )
     })

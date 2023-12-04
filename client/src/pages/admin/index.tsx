@@ -4,10 +4,10 @@
 import React from "react"
 import { connect } from "react-redux"
 import { Flex, Box, jsx } from "theme-ui"
-import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
+import { populateZidMetadataStore, resetMetadataStore , populateAllCommentStores, populateVoterStores } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
 import { RootState } from "../../util/types"
-import { populateAllCommentStores, populateVoterStores } from "../../actions"
+
 
 import ConversationConfig from "./conversation-config"
 import ConversationModeration from "./conversation-moderation"

@@ -26,11 +26,13 @@ class ParticipantGroups extends React.Component<{
     super(props)
     this.state = {}
   }
+
   getStyles() {
     return {
       base: {},
     }
   }
+
   render() {
     const styles = this.getStyles()
     if (!this.props.conversation) {
@@ -54,22 +56,22 @@ class ParticipantGroups extends React.Component<{
             formatTid={this.props.formatTid}
           />
           {this.props.math && this.props.comments
-            ? _.map(this.props.math["repness"], (groupComments, gid) => {
+            ? _.map(this.props.math.repness, (groupComments, gid) => {
                 gid = Number(gid)
 
-                let otherGroupVotes = {
+                const otherGroupVotes = {
                   votes: [],
                   "n-members": 0,
                 }
 
-                let MAX_CLUSTERS = 50
-                let temp = this.props.math["group-votes"]
+                const MAX_CLUSTERS = 50
+                const temp = this.props.math["group-votes"]
                 for (let ogid = 0; ogid < MAX_CLUSTERS; ogid++) {
                   if (ogid === gid || !temp[ogid]) {
                     continue
                   }
                   otherGroupVotes["n-members"] += temp[ogid]["n-members"]
-                  let commentVotes = temp[ogid].votes
+                  const commentVotes = temp[ogid].votes
                   _.each(commentVotes, (voteObj, tid) => {
                     tid = Number(tid)
                     if (voteObj) {
@@ -88,19 +90,19 @@ class ParticipantGroups extends React.Component<{
                     comments={this.props.comments}
                     gid={gid}
                     conversation={this.props.conversation}
-                    /*demographicsForGroup={this.props.demographics[gid]} */
+                    /* demographicsForGroup={this.props.demographics[gid]} */
                     groupComments={groupComments}
                     groupName={this.props.groupNames[gid]}
                     groupVotesForThisGroup={this.props.math["group-votes"][gid]}
-                    /*groupVotesForOtherGroups={otherGroupVotes} */
+                    /* groupVotesForOtherGroups={otherGroupVotes} */
                     formatTid={this.props.formatTid}
                     ptptCount={this.props.ptptCount}
-                    /*groupNames={this.props.groupNames} */
+                    /* groupNames={this.props.groupNames} */
                     badTids={this.props.badTids}
-                    /*repfulAgreeTidsByGroup={this.props.repfulAgreeTidsByGroup}*/
-                    /*repfulDisageeTidsByGroup={this.props.repfulDisageeTidsByGroup}*/
+                    /* repfulAgreeTidsByGroup={this.props.repfulAgreeTidsByGroup} */
+                    /* repfulDisageeTidsByGroup={this.props.repfulDisageeTidsByGroup} */
                     math={this.props.math}
-                    /*report={this.props.report}*/
+                    /* report={this.props.report} */
                     voteColors={this.props.voteColors}
                   />
                 )

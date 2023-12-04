@@ -145,7 +145,7 @@ class SignIn extends React.Component<{
             </Link>
           </Text>
         </form>
-        {/*fbAppId && (
+        {/* fbAppId && (
           <Box sx={{ my: 4 }}>
             <Button
               id="facebookSigninButton"
@@ -158,7 +158,7 @@ class SignIn extends React.Component<{
               privacy policy.
             </Text>
           </Box>
-        )*/}
+        ) */}
       </Box>
     )
   }

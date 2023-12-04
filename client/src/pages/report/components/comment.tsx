@@ -22,11 +22,13 @@ class Comment extends React.Component<{
     acceptClickHandler: PropTypes.func,
     rejectClickHandler: PropTypes.func,
   }
+
   getDate() {
     const date = new Date(+this.props.comment.created)
     return `${date.getMonth() + 1} / ${date.getUTCDate()} / ${date.getFullYear()}`
   }
-  getVoteBreakdown(/*comment*/) {
+
+  getVoteBreakdown(/* comment */) {
     if (typeof this.props.comment.agree_count !== "undefined") {
       return (
         <span>

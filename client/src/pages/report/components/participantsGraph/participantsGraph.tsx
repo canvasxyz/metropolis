@@ -234,7 +234,7 @@ class ParticipantsGraph extends React.Component<
               showContour: false
             }) }}>
             Consensus / Divisive color scale
-          </button>*/}
+          </button> */}
           <button
             style={{
               color: this.state.showComments ? "white" : "black",
@@ -399,7 +399,7 @@ class ParticipantsGraph extends React.Component<
           ) : null}
           {this.state.showGroupOutline
             ? hulls.map((hull) => {
-                let gid = hull.group[0].gid
+                const gid = hull.group[0].gid
                 if (_.isNumber(this.props.showOnlyGroup)) {
                   if (gid !== this.props.showOnlyGroup) {
                     return ""

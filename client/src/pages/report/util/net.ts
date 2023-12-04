@@ -3,8 +3,8 @@
 import URLs from "./url"
 import _ from "lodash"
 
-var urlPrefix = URLs.urlPrefix
-var basePath = ""
+const urlPrefix = URLs.urlPrefix
+const basePath = ""
 
 // var pid = "unknownpid";
 
@@ -17,7 +17,7 @@ function polisAjax(api, data, type) {
     api = api.slice(1)
   }
 
-  var url = urlPrefix + basePath + api
+  const url = urlPrefix + basePath + api
 
   // Add the auth token if needed.
   // if (_.contains(authenticatedCalls, api)) {
@@ -30,12 +30,12 @@ function polisAjax(api, data, type) {
   //     //data = $.extend({ token: token}, data); // moving to cookies
   // }
 
-  var promise
-  var config = {
+  let promise
+  const config = {
     url: url,
     contentType: "application/json; charset=utf-8",
     headers: {
-      //"Cache-Control": "no-cache"  // no-cache
+      // "Cache-Control": "no-cache"  // no-cache
       "Cache-Control": "max-age=0",
     },
     xhrFields: {
@@ -44,14 +44,14 @@ function polisAjax(api, data, type) {
     // crossDomain: true,
     dataType: "json",
   }
-  if ("GET" === type) {
+  if (type === "GET") {
     promise = $.ajax(
       $.extend(config, {
         type: "GET",
         data: data,
       })
     )
-  } else if ("POST" === type) {
+  } else if (type === "POST") {
     promise = $.ajax(
       $.extend(config, {
         type: "POST",
@@ -60,17 +60,17 @@ function polisAjax(api, data, type) {
     )
   }
 
-  promise.fail(function (jqXHR /*, message, errorType*/) {
+  promise.fail(function (jqXHR /*, message, errorType */) {
     // sendEvent("Error", api, jqXHR.status);
 
     // logger.error("SEND ERROR");
     console.dir(arguments)
-    if (403 === jqXHR.status) {
+    if (jqXHR.status === 403) {
       // eb.trigger(eb.authNeeded);
     }
-    //logger.dir(data);
-    //logger.dir(message);
-    //logger.dir(errorType);
+    // logger.dir(data);
+    // logger.dir(message);
+    // logger.dir(errorType);
   })
   return promise
 }

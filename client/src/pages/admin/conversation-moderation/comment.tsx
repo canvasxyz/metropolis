@@ -96,5 +96,5 @@ Comment.propTypes = {
 }
 
 export default connect((state: RootState) => {
-  conversation: state.zid_metadata.zid_metadata
+  state.zid_metadata.zid_metadata
 })(Comment)

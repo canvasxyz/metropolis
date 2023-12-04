@@ -157,7 +157,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         >
           <Button variant="text" onClick={(e) => agree(commentId, e.target)}>
             <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
-            {/*<TbCheck style={{ position: "relative", top: "4px" }} />*/}
+            {/* <TbCheck style={{ position: "relative", top: "4px" }} /> */}
             Agree
           </Button>
           <Button variant="text" onClick={(e) => disagree(commentId, e.target)}>
@@ -166,7 +166,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
               width="18"
               sx={{ position: "relative", top: "2px", mr: [2] }}
             />
-            {/*<TbX style={{ position: "relative", top: "4px" }} />*/}
+            {/* <TbX style={{ position: "relative", top: "4px" }} /> */}
             Disagree
           </Button>
           <Button variant="text" onClick={(e) => skip(commentId, e.target)}>

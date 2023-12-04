@@ -41,7 +41,7 @@ export default class Checkbox extends React.Component<
   }
 
   clickHandler() {
-    var newState = !this.state.checked
+    const newState = !this.state.checked
     this.setState({ checked: newState })
     if (this.props.clickHandler) {
       this.props.clickHandler(newState)
