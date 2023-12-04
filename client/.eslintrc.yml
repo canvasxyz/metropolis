@@ -17,6 +17,8 @@ rules:
   # TODO: Migrate to camelcase.
   # snake_case API params and properties makes this a tangled process.
   camelcase: off
+  no-use-before-define: off
+  "@typescript-eslint/no-use-before-define": ["error"]
 parser: '@typescript-eslint/parser'
 parserOptions:
   ecmaFeatures:
