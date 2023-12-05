@@ -7,7 +7,7 @@ import * as types from "../actions"
 const zid = (
   state = {
     loading: false,
-    zid_metadata: {},
+    zid_metadata: {} as any,
     error: null,
     optimistic: 0 /* `h4x0rz` trigger render because shallow comparison https://github.com/reactjs/redux/issues/585 */,
   },

@@ -6,7 +6,6 @@ import { connect } from "react-redux"
 import { Flex, Box, jsx } from "theme-ui"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
-import { RootState } from "../../util/types"
 import { populateAllCommentStores, populateVoterStores } from "../../actions"
 
 import ConversationConfig from "./conversation-config"
@@ -15,7 +14,7 @@ import ConversationVoters from "./conversation-voters"
 import ConversationReport from "./conversation-report"
 
 import { UrlObject } from "url"
-import { AppDispatch } from "../../store"
+import { AppDispatch, RootState } from "../../store"
 
 class ConversationAdminContainer extends React.Component<
   {

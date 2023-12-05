@@ -6,12 +6,11 @@ import NoPermission from "../no-permission"
 import React from "react"
 import { connect } from "react-redux"
 import { Heading, Flex, Box, jsx } from "theme-ui"
-import { RootState } from "../../../util/types"
 import { formatTime } from "../../../util/misc"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
-import { AppDispatch } from "../../../store"
+import { AppDispatch, RootState } from "../../../store"
 
 class ConversationVoters extends React.Component<{
   dispatch: AppDispatch
@@ -66,5 +65,6 @@ export default connect((state: RootState) => state.zid_metadata)(
     return {
       conversation_voters: state.conversation_voters,
     }
+    // @ts-ignore
   })(ConversationVoters)
 )

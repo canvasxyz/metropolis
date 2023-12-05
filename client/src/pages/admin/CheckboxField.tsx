@@ -4,7 +4,7 @@ import { Box, Text } from "theme-ui"
 import PropTypes from "prop-types"
 
 import { handleZidMetadataUpdate } from "../../actions"
-import { RootState } from "../../util/types"
+import { RootState } from "../../store"
 
 export const CheckboxField = ({ field, label = "", subtitle = "", isIntegerBool = false }) => {
   const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)

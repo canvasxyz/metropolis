@@ -6,7 +6,6 @@ import NoPermission from "../no-permission"
 import React from "react"
 import { connect } from "react-redux"
 import { Heading, Flex, Box, jsx } from "theme-ui"
-import { RootState } from "../../../util/types"
 
 import ModerateCommentsTodo from "./moderate-comments-todo"
 import ModerateCommentsAccepted from "./moderate-comments-accepted"
@@ -14,7 +13,7 @@ import ModerateCommentsRejected from "./moderate-comments-rejected"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
-import { AppDispatch } from "../../../store"
+import { AppDispatch, RootState } from "../../../store"
 
 class CommentModeration extends React.Component<{
   dispatch: AppDispatch
@@ -103,5 +102,6 @@ export default connect((state: RootState) => state.zid_metadata)(
       rejected: state.mod_comments_rejected,
       seed: state.seed_comments,
     }
+    // @ts-ignore
   })(CommentModeration)
 )

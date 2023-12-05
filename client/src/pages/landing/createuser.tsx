@@ -7,9 +7,8 @@ import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 import { Link } from "react-router-dom"
 import strings from "../../intl"
-import { RootState } from "../../util/types"
 import { UrlObject } from "url"
-import { AppDispatch } from "../../store"
+import { AppDispatch, RootState } from "../../store"
 
 const fbAppId = process.env.FB_APP_ID
 
@@ -232,4 +231,5 @@ class CreateUser extends React.Component<{
   }
 }
 
+// @ts-ignore
 export default connect((state: RootState) => state.signin)(CreateUser)

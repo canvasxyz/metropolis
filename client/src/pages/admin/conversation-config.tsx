@@ -17,7 +17,7 @@ import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
 import Url from "../../util/url"
-import { RootState } from "../../util/types"
+import { RootState } from "../../store"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME

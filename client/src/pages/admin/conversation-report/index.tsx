@@ -7,7 +7,6 @@ import { Heading, Box, jsx } from "theme-ui"
 
 import dateSetupUtil from "../../../util/data-export-date-setup"
 import ComponentHelpers from "../../../util/component-helpers"
-import { RootState } from "../../../util/types"
 import { populateConversationStatsStore } from "../../../actions"
 
 import NumberCards from "./conversation-stats-number-cards"
@@ -15,7 +14,7 @@ import Voters from "./voters"
 import Commenters from "./commenters"
 import NoPermission from "../no-permission"
 import ReportsList from "./reports-list"
-import { AppDispatch } from "../../../store"
+import { AppDispatch, RootState } from "../../../store"
 
 class ConversationStats extends React.Component<
   {

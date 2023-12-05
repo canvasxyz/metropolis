@@ -5,8 +5,7 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { handleSeedCommentTweetSubmit, seedCommentTweetChanged } from "../../actions"
 import strings from "../../intl"
-import { RootState } from "../../util/types"
-import { AppDispatch } from "../../store"
+import { AppDispatch, RootState } from "../../store"
 
 const styles = {
   card: {

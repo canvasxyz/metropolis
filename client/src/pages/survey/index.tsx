@@ -8,13 +8,14 @@ import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
 
 import api from "../../util/api"
-import type { RootState, Comment, Conversation } from "../../util/types"
+import type { Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 import PostSurvey from "./survey_post"
+import { RootState } from "../../store"
 
 // TODO: enforce comment too long on backend
 

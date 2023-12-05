@@ -8,11 +8,12 @@ import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
-import { Conversation, RootState, User } from "../../util/types"
+import { Conversation, User } from "../../util/types"
 import { populateConversationsStore } from "../../actions"
 import { CreateConversationModal } from "../CreateConversationModal"
 import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
+import { RootState } from "../../store"
 
 const sidebarCollapsibleHeaderStyle = {
   fontSize: "15px",

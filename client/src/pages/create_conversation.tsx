@@ -17,8 +17,8 @@ import {
 import { DropdownMenu } from "../components/dropdown"
 
 import Url from "../util/url"
-import { RootState, Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
+import { RootState } from "../store"
 
 const CreateConversation = ({ dispatch, user }) => {
   const [step, setStep] = useState<number>(0)

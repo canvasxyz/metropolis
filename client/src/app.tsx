@@ -5,7 +5,6 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { populateUserStore } from "./actions"
 import type { User } from "./util/types"
-import { RootState } from "./util/types"
 
 import { Toaster } from "react-hot-toast"
 import { Switch, Route, Link, Redirect } from "react-router-dom"
@@ -38,7 +37,7 @@ import Survey from "./pages/survey"
 
 /* report */
 import Report from "./pages/report"
-import { AppDispatch } from "./store"
+import { AppDispatch, RootState } from "./store"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {

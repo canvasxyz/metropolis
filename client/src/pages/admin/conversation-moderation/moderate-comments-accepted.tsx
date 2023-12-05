@@ -3,9 +3,8 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../../../actions"
 import Comment from "./comment"
-import { RootState } from "../../../util/types"
 import { Text } from "theme-ui"
-import { AppDispatch } from "../../../store"
+import { AppDispatch, RootState } from "../../../store"
 
 class ModerateCommentsAccepted extends React.Component<
   {

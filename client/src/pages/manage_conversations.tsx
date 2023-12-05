@@ -16,9 +16,9 @@ import {
 import { DropdownMenu } from "../components/dropdown"
 
 import Url from "../util/url"
-import { RootState, Conversation } from "../util/types"
+import { Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
-import { AppDispatch } from "../store"
+import { AppDispatch, RootState } from "../store"
 
 class ManageConversations extends React.Component<
   {

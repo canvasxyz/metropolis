@@ -7,9 +7,9 @@ import {
   changeCommentCommentIsMeta,
 } from "../../../actions"
 import Comment from "./comment"
-import { RootState, Comment as CommentType } from "../../../util/types"
+import { Comment as CommentType } from "../../../util/types"
 import { Text } from "theme-ui"
-import { AppDispatch } from "../../../store"
+import { AppDispatch, RootState } from "../../../store"
 
 class ModerateCommentsTodo extends React.Component<
   {

@@ -4,8 +4,8 @@ import { connect } from "react-redux"
 import { Box, Heading } from "theme-ui"
 
 import { User } from "../util/types"
-import { RootState } from "../util/types"
 import Spinner from "../components/spinner"
+import { RootState } from "../store"
 
 class Account extends React.Component<{ user: User }, {}> {
   static propTypes: {
