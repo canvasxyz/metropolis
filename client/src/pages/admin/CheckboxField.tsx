@@ -1,15 +1,15 @@
 import React, { useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import { Box, Text } from "theme-ui"
 import PropTypes from "prop-types"
 
 import { handleZidMetadataUpdate } from "../../actions"
 import { RootState } from "../../store"
+import { useAppDispatch, useAppSelector } from "../../hooks"
 
 export const CheckboxField = ({ field, label = "", subtitle = "", isIntegerBool = false }) => {
-  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
+  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
   const [state, setState] = useState(zid_metadata[field])
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   const handleBoolValueChange = (field) => {
     const val = !state

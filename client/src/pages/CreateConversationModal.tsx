@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useRef } from "react"
 
 import Modal from "react-modal"
-import { useDispatch } from "react-redux"
 import { Box, Input, Textarea, Label, Heading, Button, Text, Flex } from "theme-ui"
 import { handleCreateConversationSubmit } from "../actions"
+import { useAppDispatch } from "../hooks"
 
 type PropTypes = {
   isOpen: boolean
@@ -11,7 +11,7 @@ type PropTypes = {
 }
 
 const CreateConversationInner = () => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const descriptionRef = useRef()
 
   const [title, setTitle] = useState<string>()

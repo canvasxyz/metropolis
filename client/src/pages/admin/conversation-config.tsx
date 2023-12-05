@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
-import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { Heading, Box, Text, Link as ThemeLink, Button, jsx } from "theme-ui"
 import toast from "react-hot-toast"
@@ -18,6 +17,7 @@ import SeedComment from "./seed-comment"
 import api from "../../util/api"
 import Url from "../../util/url"
 import { RootState } from "../../store"
+import { useAppDispatch, useAppSelector } from "../../hooks"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME
@@ -63,8 +63,8 @@ type ConversationConfigProps = {
 
 const ConversationConfig = ({ error }: ConversationConfigProps) => {
   const [showFIPMetadata, setShowFIPMetadata] = useState(false)
-  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
-  const dispatch = useDispatch()
+  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
+  const dispatch = useAppDispatch()
 
   const handleStringValueChange = useCallback(
     (field: string, element) => {

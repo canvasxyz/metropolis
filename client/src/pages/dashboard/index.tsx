@@ -2,7 +2,6 @@
 
 import { Fragment, useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { useDispatch, useSelector } from "react-redux"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
@@ -14,6 +13,7 @@ import { CreateConversationModal } from "../CreateConversationModal"
 import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
 import { RootState } from "../../store"
+import { useAppDispatch, useAppSelector } from "../../hooks"
 
 const sidebarCollapsibleHeaderStyle = {
   fontSize: "15px",
@@ -81,7 +81,7 @@ type DashboardProps = {
 }
 
 const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -92,9 +92,9 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   }, [])
 
   const hist = useHistory()
-  const data = useSelector((state: RootState) => state.conversations)
+  const data = useAppSelector((state: RootState) => state.conversations)
   const conversations: Array<Conversation> = data.conversations || []
-  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
+  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
 
   const [syncInProgress, setSyncInProgress] = useState(false)
 
