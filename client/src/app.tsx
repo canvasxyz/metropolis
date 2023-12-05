@@ -2,7 +2,7 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { populateUserStore } from "./actions"
 import type { User } from "./util/types"
 
@@ -64,25 +64,21 @@ PrivateRoute.propTypes = {
   authed: PropTypes.bool,
 }
 
-class App extends React.Component<
-  {
-    dispatch: AppDispatch
-    isLoggedIn: boolean
-    location: { pathname: string }
-    user: User
-    error: XMLHttpRequest
-    status: number
-  },
+const connector = connect((state: RootState) => state.user)
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+type AppPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch;
+  location: { pathname: string };
+  pending: boolean;
+  status: number;
+}
+
+class App extends React.Component<AppPropTypes,
   {
     sidebarOpen: boolean
   }
 > {
-  static propTypes: {
-    dispatch: AppDispatch
-    isLoggedIn: unknown
-    location: object
-    user: object
-  }
 
   constructor(props) {
     super(props)
@@ -267,5 +263,4 @@ class App extends React.Component<
   }
 }
 
-
-export default connect((state: RootState) => state.user)(App)
+export default connector(App)

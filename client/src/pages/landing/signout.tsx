@@ -1,9 +1,8 @@
 import React from "react"
-import { connect } from "react-redux"
 import { Heading } from "theme-ui"
 
 import { doSignout } from "../../actions"
-import { AppDispatch, RootState } from "../../store"
+import { AppDispatch } from "../../store"
 
 class SignOut extends React.Component<{ dispatch: AppDispatch }, {}> {
   static propTypes: { dispatch: AppDispatch }
@@ -25,4 +24,4 @@ class SignOut extends React.Component<{ dispatch: AppDispatch }, {}> {
 }
 
 
-export default connect((state: RootState) => state.signout)(SignOut)
+export default SignOut

@@ -70,11 +70,12 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
     })
 }
 
-const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
+type SurveyProps = { match: { params: { conversation_id: string } } }
+const Survey = ({
   match: {
     params: { conversation_id },
   },
-}) => {
+}: SurveyProps) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -264,4 +265,4 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   )
 }
 
-export default connect((state: RootState) => ({ z: state.zid_metadata, u: state.user }))(Survey)
+export default Survey

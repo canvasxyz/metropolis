@@ -1,13 +1,11 @@
 import React from "react"
-import { connect } from "react-redux"
 import { doPasswordReset } from "../../actions"
 import { UrlObject } from "url"
 import { AppDispatch } from "../../store"
 
-class PasswordReset extends React.Component<{ dispatch: AppDispatch; location: UrlObject }, {}> {
+class PasswordReset extends React.Component<{ dispatch: AppDispatch; location: UrlObject }> {
   passwordRepeat: HTMLInputElement
   password: HTMLInputElement
-  static propTypes: { dispatch: AppDispatch; location: object }
 
   handleClick(e) {
     e.preventDefault()
@@ -43,4 +41,4 @@ class PasswordReset extends React.Component<{ dispatch: AppDispatch; location: U
 }
 
 
-export default connect()(PasswordReset)
+export default PasswordReset

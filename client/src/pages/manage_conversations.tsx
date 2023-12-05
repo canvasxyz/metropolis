@@ -2,7 +2,7 @@
 
 import { RouteComponentProps, Link } from "react-router-dom"
 import React, { useEffect } from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Box, Grid, Heading, Button, Text, Flex, jsx } from "theme-ui"
 import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
@@ -20,15 +20,20 @@ import { Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
 import { AppDispatch, RootState } from "../store"
 
+const connector = connect((state: RootState) => ({
+  error: state.conversations.error,
+  conversations: state.conversations.conversations,
+  conversation_stats: state.stats.conversation_stats,
+  loading: state.conversations.loading && state.stats.loading,
+}))
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ManageConversationsPropTypes = PropsFromRedux & {
+  history: any;
+  dispatch: AppDispatch;
+}
+
 class ManageConversations extends React.Component<
-  {
-    dispatch: AppDispatch
-    error: Response
-    loading: boolean
-    conversations: Array<Conversation>
-    conversation_stats: any
-    history: any
-  },
+  ManageConversationsPropTypes,
   {
     showArchived: boolean
     filterMinParticipantCount: number
@@ -136,6 +141,4 @@ class ManageConversations extends React.Component<
 }
 
 
-export default connect((state: RootState) => state.stats)(
-  connect((state: RootState) => state.conversations)(ManageConversations),
-)
+export default connector(ManageConversations)

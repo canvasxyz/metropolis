@@ -5,7 +5,7 @@ import * as types from "../actions"
 const conversations = (
   state = {
     loading: false,
-    error: false,
+    error: null,
     conversations: null,
   },
   action,
@@ -14,12 +14,12 @@ const conversations = (
     case types.REQUEST_CONVERSATIONS:
       return Object.assign({}, state, {
         loading: true,
-        error: false,
+        error: null,
       })
     case types.RECEIVE_CONVERSATIONS:
       return Object.assign({}, state, {
         loading: false,
-        error: false,
+        error: null,
         conversations: action.data,
       })
     case types.CONVERSATIONS_FETCH_ERROR:

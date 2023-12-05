@@ -3,7 +3,7 @@
 import { RouteComponentProps, Link } from "react-router-dom"
 import React, { useEffect, useState, useRef } from "react"
 import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Box, Grid, Input, Textarea, Label, Heading, Button, Text, Flex, jsx } from "theme-ui"
 import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
@@ -18,9 +18,13 @@ import { DropdownMenu } from "../components/dropdown"
 
 import Url from "../util/url"
 import ConversationRow from "../components/conversation_row"
-import { RootState } from "../store"
+import { AppDispatch, RootState } from "../store"
 
-const CreateConversation = ({ dispatch, user }) => {
+const connector = connect((state: RootState) => state.user)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type CreateConversationProps = PropsFromRedux & { dispatch: AppDispatch }
+
+const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
   const [step, setStep] = useState<number>(0)
   const [prefillSelection, setPrefillSelection] = useState<number>()
   const descriptionRef = useRef()
@@ -291,4 +295,4 @@ const CreateConversation = ({ dispatch, user }) => {
   )
 }
 
-export default connect((state: RootState) => state.user)(CreateConversation)
+export default connector(CreateConversation)

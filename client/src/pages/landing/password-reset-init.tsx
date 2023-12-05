@@ -1,12 +1,11 @@
 /** @jsx jsx */
 
 import React from "react"
-import { connect } from "react-redux"
 import { doPasswordResetInit } from "../../actions"
 import { Button, jsx } from "theme-ui"
 import { AppDispatch } from "../../store"
 
-class PasswordResetInit extends React.Component<{ dispatch: AppDispatch }, {}> {
+class PasswordResetInit extends React.Component<{ dispatch: AppDispatch }> {
   email: HTMLInputElement
 
   static propTypes: {
@@ -52,4 +51,4 @@ class PasswordResetInit extends React.Component<{ dispatch: AppDispatch }, {}> {
   }
 }
 
-export default connect()(PasswordResetInit)
+export default PasswordResetInit

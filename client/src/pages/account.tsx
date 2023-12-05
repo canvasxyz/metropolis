@@ -1,13 +1,16 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Box, Heading } from "theme-ui"
 
 import { User } from "../util/types"
 import Spinner from "../components/spinner"
 import { RootState } from "../store"
 
-class Account extends React.Component<{ user: User }, {}> {
+const connector = connect((state: RootState) => state.user)
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+class Account extends React.Component<PropsFromRedux> {
   static propTypes: {
     user: object
   }
@@ -59,4 +62,4 @@ Account.propTypes = {
   }),
 }
 
-export default connect((state: RootState) => state.user)(Account)
+export default connector(Account)
