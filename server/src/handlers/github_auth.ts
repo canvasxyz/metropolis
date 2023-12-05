@@ -5,7 +5,7 @@ import { createOAuthUserAuth } from "@octokit/auth-oauth-user";
 import { startSession } from "../session";
 import cookies from "../utils/cookies";
 import fail from "../utils/fail";
-import { getOrCreateUserWithGithubUsername } from "./queries";
+import { updateOrCreateGitHubUser } from "./queries";
 
 /** api handlers for performing a github authentication flow */
 
@@ -41,7 +41,7 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
 
   // get the github username that is associated with the token
   const {
-    data: { login: githubUsername },
+    data: { login: githubUsername, id: githubUserId, email: githubUserEmail },
   } = await octokit.request("GET /user");
 
   if(!githubUsername) {
@@ -50,7 +50,11 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
 
   // the user is now authenticated
 
-  const {uid} = await getOrCreateUserWithGithubUsername(githubUsername);
+  const {uid} = await updateOrCreateGitHubUser({
+    username: githubUsername,
+    id: githubUserId,
+    email: githubUserEmail
+  });
 
   const token = await startSession(uid);
 

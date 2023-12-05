@@ -17,7 +17,7 @@ import {
   FipFields,
   PrFields,
   getConversationByPrId,
-  getOrCreateUserWithGithubUsername,
+  updateOrCreateGitHubUser,
   insertConversationPrAndFip,
   updateConversationPr,
   updateConversationPrAndFip,
@@ -316,8 +316,27 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     );
 
     for (const pull of pulls) {
-      const githubUsername = pull.user?.login as string;
-      const { uid } = await getOrCreateUserWithGithubUsername(githubUsername);
+      if(!pull.user) {
+        continue;
+      }
+
+      // We have to do a separate request to get the email address from the user's profile
+      // because this information is not returned by the pulls endpoint
+      const { data: {email} } = await installationOctokit.request(
+        "GET /users/{username}",
+        {
+          username: pull.user.login,
+          headers: {
+            "X-GitHub-Api-Version": "2022-11-28",
+          },
+        },
+      );
+
+      const { uid } = await updateOrCreateGitHubUser({
+        id: pull.user.id,
+        email,
+        username: pull.user.login
+      });
 
       const prFields: PrFields = {
         owner: uid,
