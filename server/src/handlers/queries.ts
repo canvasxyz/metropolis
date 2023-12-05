@@ -4,6 +4,7 @@ export type GitHubUserData = {
   id: number;
   username: string;
   email: string | null;
+  isRepoCollaborator: boolean;
 }
 
 /** database queries used by the github integrations */
@@ -73,10 +74,16 @@ export async function createGitHubUser(
 ): Promise<{ uid: number }> {
   const createQuery =
     "insert into users " +
-    "(github_user_id, github_username, github_email, is_owner) VALUES " +
-    "($1, $2, $3, $4) " +
+    "(github_user_id, github_username, github_email, is_repo_collaborator, is_owner) VALUES " +
+    "($1, $2, $3, $4, $5) " +
     "returning uid;";
-  const vals = [githubUserData.id, githubUserData.username, githubUserData.email, true];
+  const vals = [
+    githubUserData.id,
+    githubUserData.username,
+    githubUserData.email,
+    githubUserData.isRepoCollaborator,
+    true
+  ];
   const createRes = await queryP(createQuery, vals);
   return createRes[0];
 }
@@ -85,9 +92,14 @@ export async function updateGitHubUserData(
   githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
   const createQuery =
-    "UPDATE users SET github_username = $1, github_email = $2 WHERE github_user_id = $3" +
+    "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4" +
     "returning uid;";
-  const vals = [githubUserData.username, githubUserData.email, githubUserData.id];
+  const vals = [
+    githubUserData.username,
+    githubUserData.email,
+    githubUserData.isRepoCollaborator,
+    githubUserData.id
+  ];
   const updateRes = await queryP(createQuery, vals);
   return updateRes[0];
 }

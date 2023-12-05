@@ -6,6 +6,7 @@ import { startSession } from "../session";
 import cookies from "../utils/cookies";
 import fail from "../utils/fail";
 import { updateOrCreateGitHubUser } from "./queries";
+import { getRepoCollaborators } from "./api_wrappers";
 
 /** api handlers for performing a github authentication flow */
 
@@ -50,10 +51,20 @@ async function handleGithubOauthCallback(req: { p: {uid?: any; code: string; des
 
   // the user is now authenticated
 
+  // check if the user is a proposals repo collaborator or the owner of the repo
+  let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
+  const collaborators = await getRepoCollaborators();
+  for(const collaborator of collaborators) {
+    if(collaborator.id === githubUserId) {
+      isRepoCollaborator = true;
+    }
+  }
+
   const {uid} = await updateOrCreateGitHubUser({
     username: githubUsername,
     id: githubUserId,
-    email: githubUserEmail
+    email: githubUserEmail,
+    isRepoCollaborator
   });
 
   const token = await startSession(uid);
