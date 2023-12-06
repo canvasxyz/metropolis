@@ -118,9 +118,13 @@ export async function getUserUidByGithubUserId(
 export async function getConversationByPrId(
   prId: number,
 ): Promise<(PrFields & { github_sync_enabled: boolean }) | undefined> {
-  const query = `SELECT ${[...PR_FIELDS, "github_sync_enabled", "zid"].join(
+  const query = `SELECT ${[
+    ...PR_FIELDS,
+    "github_sync_enabled",
+    "zinvites.zinvite",
+  ].join(
     ", ",
-  )} FROM conversations WHERE github_pr_id = $1;`;
+  )} FROM conversations LEFT JOIN zinvites ON conversations.zid = zinvites.zid WHERE github_pr_id = $1;`;
   const rows = await queryP(query, [prId]);
   return rows[0];
 }

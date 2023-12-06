@@ -367,7 +367,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       if (existingConversation) {
         if (!existingConversation.github_sync_enabled) {
           console.log(
-            `github sync is disabled for PR ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}), skipping`,
+            `github sync is disabled for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
           );
           continue;
         }
@@ -375,7 +375,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         // update
         if (pull.state == "open") {
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}) is open, updating`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is open, updating`,
           );
           // get fip
           let fipFields;
@@ -388,7 +388,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             );
           } catch (err) {
             console.log(
-              `could not get fip for PR ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}), skipping`,
+              `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
             );
             console.log(err);
             continue;
@@ -398,7 +398,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPrAndFip({ ...prFields, ...fipFields });
         } else {
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}) is closed, updating`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is closed, updating`,
           );
           // we don't care about getting the FIP since it's no longer being discussed
           // but we want to update the PR status to closed
@@ -408,7 +408,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}) does not exist, inserting`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) does not exist, inserting`,
           );
 
           // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
@@ -423,7 +423,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             );
           } catch (err) {
             console.log(
-              `could not get fip for PR ${pull.number} ${pull.head?.label} (zid ${existingConversation.zid}), skipping`,
+              `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
             );
             console.log(err);
             continue;
@@ -435,6 +435,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           });
           const zid = insertedRows[0].zid;
           const zinvite = await generateAndRegisterZinvite(zid, false);
+
+          console.log(
+            `created conversation for PR ${pull.number} ${pull.head?.label} (zinvite ${zinvite})`,
+          );
 
           // const welcomeMessage = getWelcomeMessage(
           //   getServerNameWithProtocol(req),
