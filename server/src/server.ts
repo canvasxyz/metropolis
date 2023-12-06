@@ -7725,6 +7725,12 @@ async function handle_GET_conversations(
 
     conv.is_mod = uid && isAdministrator(uid);
 
+    if(conv.github_pr_id !== null) {
+      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+    } else {
+      conv.github_pr_url = null;
+    }
+
     // Make sure zid is not exposed
     delete conv.zid;
 
