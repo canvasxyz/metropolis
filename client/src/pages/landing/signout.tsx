@@ -1,27 +1,23 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Heading } from "theme-ui"
 
 import { doSignout } from "../../actions"
-import { AppDispatch } from "../../store"
+import { useAppDispatch } from "../../hooks"
 
-class SignOut extends React.Component<{ dispatch: AppDispatch }, {}> {
-  static propTypes: { dispatch: AppDispatch }
+function SignOut() {
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    dispatch(doSignout("/"))
+  }, [])
 
-  componentDidMount() {
-    this.props.dispatch(doSignout("/"))
-  }
-
-  render() {
-    return (
-      <>
-        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
-          Signing Out...
-        </Heading>
-        <p>Please wait a second to be signed out.</p>
-      </>
-    )
-  }
+  return (
+    <>
+      <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
+        Signing Out...
+      </Heading>
+      <p>Please wait a second to be signed out.</p>
+    </>
+  )
 }
-
 
 export default SignOut
