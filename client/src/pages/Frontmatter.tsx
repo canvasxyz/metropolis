@@ -40,13 +40,15 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
                   </td>
                   <td className="border">
                     {valueFieldName === "fip_title" ? (
-                      <Link
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`https://github.com/${conversation.github_repo_owner}/${conversation.github_repo_name}/pull/${conversation.github_pr_id}/files`}
-                      >
-                        {conversation[valueFieldName]}
-                      </Link>
+                      conversation.github_pr_url !== null ? (
+                        <Link
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href={conversation.github_pr_url}
+                        >
+                          {conversation[valueFieldName]}
+                        </Link>
+                      ) : conversation[valueFieldName]
                     ) : valueFieldName === "fip_discussions_to" ? (
                       <Link
                         href={conversation[valueFieldName]}
