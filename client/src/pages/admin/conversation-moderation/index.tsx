@@ -4,9 +4,8 @@ import ComponentHelpers from "../../../util/component-helpers"
 
 import NoPermission from "../no-permission"
 import React from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Heading, Flex, Box, jsx } from "theme-ui"
-import { RootState } from "../../../util/types"
 
 import ModerateCommentsTodo from "./moderate-comments-todo"
 import ModerateCommentsAccepted from "./moderate-comments-accepted"
@@ -14,16 +13,27 @@ import ModerateCommentsRejected from "./moderate-comments-rejected"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
+import { AppDispatch, RootState } from "../../../store"
 
-class CommentModeration extends React.Component<{
-  dispatch: Function
+
+
+const connector = connect((state: RootState) =>
+  ({
+    ...state.zid_metadata,
+    unmoderated: state.mod_comments_unmoderated,
+    accepted: state.mod_comments_accepted,
+    rejected: state.mod_comments_rejected,
+    seed: state.seed_comments,
+  })
+)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type CommentModerationPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch
   match: { params: { conversation_id: string }; url: string; path: string }
   location: UrlObject
-  unmoderated: { unmoderated_comments: object[] }
-  accepted: { accepted_comments: object[] }
-  rejected: { rejected_comments: object[] }
-  seed: object[]
-}> {
+}
+
+class CommentModeration extends React.Component<CommentModerationPropTypes> {
   render() {
     if (ComponentHelpers.shouldShowPermissionsError(this.props)) {
       return <NoPermission />
@@ -94,13 +104,4 @@ class CommentModeration extends React.Component<{
   }
 }
 
-export default connect((state: RootState) => state.zid_metadata)(
-  connect((state: RootState) => {
-    return {
-      unmoderated: state.mod_comments_unmoderated,
-      accepted: state.mod_comments_accepted,
-      rejected: state.mod_comments_rejected,
-      seed: state.seed_comments,
-    }
-  })(CommentModeration)
-)
+export default connector(CommentModeration)

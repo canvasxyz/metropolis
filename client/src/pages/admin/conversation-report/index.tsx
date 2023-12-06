@@ -1,13 +1,12 @@
 /** @jsx jsx */
 
 import React from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { UrlObject } from "url"
 import { Heading, Box, jsx } from "theme-ui"
 
 import dateSetupUtil from "../../../util/data-export-date-setup"
 import ComponentHelpers from "../../../util/component-helpers"
-import { RootState } from "../../../util/types"
 import { populateConversationStatsStore } from "../../../actions"
 
 import NumberCards from "./conversation-stats-number-cards"
@@ -15,22 +14,20 @@ import Voters from "./voters"
 import Commenters from "./commenters"
 import NoPermission from "../no-permission"
 import ReportsList from "./reports-list"
+import { AppDispatch, RootState } from "../../../store"
+
+const connector = connect((state: RootState) => ({
+  ...state.zid_metadata,
+  ...state.stats
+}))
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ConversationStatsPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch
+  match: { params: { conversation_id: string }; location: UrlObject }
+}
 
 class ConversationStats extends React.Component<
-  {
-    dispatch: Function
-    match: { params: { conversation_id: string }; location: UrlObject }
-    zid_metadata: { is_mod: boolean; is_owner: boolean }
-    conversation_stats: Record<
-      string,
-      {
-        firstCommentTimes: number[]
-        firstVoteTimes: number[]
-        voteTimes: number[]
-        commentTimes: number[]
-      }
-    >
-  },
+  ConversationStatsPropTypes,
   {
     months: any[]
     years: any[]
@@ -145,6 +142,4 @@ class ConversationStats extends React.Component<
   }
 }
 
-export default connect((state: RootState) => state.stats)(
-  connect((state: RootState) => state.zid_metadata)(ConversationStats)
-)
+export default connector(ConversationStats)

@@ -2,11 +2,11 @@ import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { Flex, Box, Text, Button, Card } from "theme-ui"
-import { RootState } from "../../../util/types"
+import { AppDispatch, RootState } from "../../../store"
 
 class Comment extends React.Component<
   {
-    dispatch: Function
+    dispatch: AppDispatch
     acceptClickHandler: Function
     rejectClickHandler: Function
     toggleIsMetaHandler: Function

@@ -2,10 +2,9 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { populateUserStore } from "./actions"
 import type { User } from "./util/types"
-import { RootState } from "./util/types"
 
 import { Toaster } from "react-hot-toast"
 import { Switch, Route, Link, Redirect } from "react-router-dom"
@@ -38,6 +37,7 @@ import Survey from "./pages/survey"
 
 /* report */
 import Report from "./pages/report"
+import { AppDispatch, RootState } from "./store"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
@@ -64,25 +64,21 @@ PrivateRoute.propTypes = {
   authed: PropTypes.bool,
 }
 
-class App extends React.Component<
-  {
-    dispatch: Function
-    isLoggedIn: boolean
-    location: { pathname: string }
-    user: User
-    error: XMLHttpRequest
-    status: number
-  },
+const connector = connect((state: RootState) => state.user)
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+type AppPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch;
+  location: { pathname: string };
+  pending: boolean;
+  status: number;
+}
+
+class App extends React.Component<AppPropTypes,
   {
     sidebarOpen: boolean
   }
 > {
-  static propTypes: {
-    dispatch: Function
-    isLoggedIn: unknown
-    location: object
-    user: object
-  }
 
   constructor(props) {
     super(props)
@@ -267,18 +263,4 @@ class App extends React.Component<
   }
 }
 
-App.propTypes = {
-  dispatch: PropTypes.func,
-  isLoggedIn: PropTypes.bool,
-  location: PropTypes.shape({
-    pathname: PropTypes.string,
-  }),
-  user: PropTypes.shape({
-    uid: PropTypes.number,
-    email: PropTypes.string,
-    created: PropTypes.number,
-    hname: PropTypes.string,
-  }),
-}
-
-export default connect((state: RootState) => state.user)(App)
+export default connector(App)

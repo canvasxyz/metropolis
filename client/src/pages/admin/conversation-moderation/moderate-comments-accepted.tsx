@@ -1,19 +1,15 @@
 import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { changeCommentStatusToRejected, changeCommentCommentIsMeta } from "../../../actions"
 import Comment from "./comment"
-import { RootState } from "../../../util/types"
 import { Text } from "theme-ui"
+import { AppDispatch, RootState } from "../../../store"
 
-class ModerateCommentsAccepted extends React.Component<
-  {
-    dispatch: Function
-    accepted_comments: object[]
-  },
-  {}
-> {
-  static propTypes: {}
+const connector = connect((state: RootState) => state.mod_comments_accepted)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ModerateCommentsAcceptedPropTypes = PropsFromRedux & { dispatch: AppDispatch }
+
+class ModerateCommentsAccepted extends React.Component<ModerateCommentsAcceptedPropTypes> {
 
   onCommentRejected(comment) {
     this.props.dispatch(changeCommentStatusToRejected(comment))
@@ -50,9 +46,5 @@ class ModerateCommentsAccepted extends React.Component<
   }
 }
 
-ModerateCommentsAccepted.propTypes = {
-  dispatch: PropTypes.func,
-  accepted_comments: PropTypes.arrayOf(PropTypes.object),
-}
 
-export default connect((state: RootState) => state.mod_comments_accepted)(ModerateCommentsAccepted)
+export default connector(ModerateCommentsAccepted)

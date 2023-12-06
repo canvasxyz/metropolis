@@ -4,21 +4,26 @@ import ComponentHelpers from "../../../util/component-helpers"
 
 import NoPermission from "../no-permission"
 import React from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Heading, Flex, Box, jsx } from "theme-ui"
-import { RootState } from "../../../util/types"
 import { formatTime } from "../../../util/misc"
 
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
+import { AppDispatch, RootState } from "../../../store"
 
-class ConversationVoters extends React.Component<{
-  dispatch: Function
+const connector = connect((state: RootState) => ({
+  conversation_voters: state.conversation_voters,
+}))
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ConversationVotersPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch
   match: { params: { conversation_id: string }; url: string; path: string }
-  conversation_voters: { voters: object[] }
   location: UrlObject
   seed: object[]
-}> {
+}
+
+class ConversationVoters extends React.Component<ConversationVotersPropTypes> {
   render() {
     if (ComponentHelpers.shouldShowPermissionsError(this.props)) {
       return <NoPermission />
@@ -60,10 +65,4 @@ class ConversationVoters extends React.Component<{
   }
 }
 
-export default connect((state: RootState) => state.zid_metadata)(
-  connect((state: RootState) => {
-    return {
-      conversation_voters: state.conversation_voters,
-    }
-  })(ConversationVoters)
-)
+export default connector(ConversationVoters)

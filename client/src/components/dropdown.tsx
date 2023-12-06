@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react"
-import { connect, useDispatch, useSelector } from "react-redux"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 
 import { TbChevronDown } from "react-icons/tb"

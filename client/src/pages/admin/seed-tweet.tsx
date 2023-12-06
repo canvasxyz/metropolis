@@ -1,11 +1,10 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import React from "react"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { handleSeedCommentTweetSubmit, seedCommentTweetChanged } from "../../actions"
 import strings from "../../intl"
-import { RootState } from "../../util/types"
+import { AppDispatch, RootState } from "../../store"
 
 const styles = {
   card: {
@@ -18,17 +17,14 @@ const styles = {
   },
 }
 
-class ModerateCommentsSeed extends React.Component<
-  {
-    dispatch: Function
-    error: string
-    success: any
-    loading: any
-    seedTweetText: string
-    params: { conversation_id: string }
-  },
-  {}
-> {
+const connector = connect((state: RootState) => state.seed_comments_tweet)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ModerateCommentsSeedPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch
+  params: { conversation_id: string }
+}
+
+class ModerateCommentsSeed extends React.Component<ModerateCommentsSeedPropTypes> {
   seed_form_tweet: HTMLTextAreaElement
 
   constructor(props) {
@@ -98,7 +94,7 @@ class ModerateCommentsSeed extends React.Component<
         </p>
         <div onKeyPress={this.handleKey.bind(this)}>
           <textarea
-            value={this.props.seedTweetText}
+            value={this.props.seedText}
             onChange={this.handleTextareaChange.bind(this)}
             rows={1}
             maxLength={200}
@@ -132,7 +128,7 @@ class ModerateCommentsSeed extends React.Component<
   }
 }
 
-export default connect((state: RootState) => state.seed_comments_tweet)(ModerateCommentsSeed)
+export default connector(ModerateCommentsSeed)
 
 /*
   todo

@@ -2,11 +2,10 @@
 /** @jsx jsx */
 
 import React from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { Flex, Box, jsx } from "theme-ui"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
-import { RootState } from "../../util/types"
 import { populateAllCommentStores, populateVoterStores } from "../../actions"
 
 import ConversationConfig from "./conversation-config"
@@ -15,15 +14,18 @@ import ConversationVoters from "./conversation-voters"
 import ConversationReport from "./conversation-report"
 
 import { UrlObject } from "url"
+import { AppDispatch, RootState } from "../../store"
+
+const connector = connect((state: RootState) => state.zid_metadata)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type ConversationAdminContainerPropTypes = PropsFromRedux & {
+  dispatch: AppDispatch
+  location: UrlObject
+  match: { url: string; path: string; params: { conversation_id: string } }
+}
 
 class ConversationAdminContainer extends React.Component<
-  {
-    dispatch: Function
-    match: { url: string; path: string; params: { conversation_id: string } }
-    zid_metadata: any
-    location: UrlObject
-  },
-  {}
+  ConversationAdminContainerPropTypes
 > {
   getCommentsRepeatedly: ReturnType<typeof setInterval>
   loadComments() {
@@ -127,4 +129,4 @@ class ConversationAdminContainer extends React.Component<
   }
 }
 
-export default connect((state: RootState) => state.zid_metadata)(ConversationAdminContainer)
+export default connector(ConversationAdminContainer)

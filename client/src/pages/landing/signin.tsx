@@ -1,26 +1,28 @@
 /** @jsx jsx */
 
 import React from "react"
-import { connect } from "react-redux"
+import { ConnectedProps, connect } from "react-redux"
 import { doSignin, doFacebookSignin, Action } from "../../actions"
 import { Link, Redirect } from "react-router-dom"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 import strings from "../../intl"
-import { RootState } from "../../util/types"
 import { UrlObject, UrlWithStringQuery } from "url"
+import { AppDispatch, RootState } from "../../store"
 
 const fbAppId = process.env.FB_APP_ID
 
-class SignIn extends React.Component<{
-  dispatch: Function
-  error: XMLHttpRequest
-  authed: boolean
-  pending?: boolean
-  signInSuccessful?: boolean
-  facebookError?: string
+const connector = connect((state: RootState) => state.signin)
+type PropsFromRedux = ConnectedProps<typeof connector>
+type CreateUserProps = PropsFromRedux & {
   location: UrlObject
-}> {
+  dispatch: AppDispatch
+  pending: boolean
+  authed: boolean
+  signInSuccessful: boolean
+}
+
+class SignIn extends React.Component<CreateUserProps> {
   email: HTMLInputElement
   password: HTMLInputElement
   facebook_password: HTMLInputElement
@@ -203,4 +205,4 @@ class SignIn extends React.Component<{
   }
 }
 
-export default connect((state: RootState) => state.signin)(SignIn)
+export default connector(SignIn)

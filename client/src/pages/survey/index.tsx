@@ -3,18 +3,20 @@
 import React, { useCallback, useEffect, useState, useRef } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { connect, useDispatch, useSelector } from "react-redux"
+import { connect } from "react-redux"
 import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
 import { useHistory } from "react-router-dom"
 
 import api from "../../util/api"
-import type { RootState, Comment, Conversation } from "../../util/types"
+import type { Comment, Conversation } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 import PostSurvey from "./survey_post"
+import { RootState } from "../../store"
+import { useAppDispatch, useAppSelector } from "../../hooks"
 
 // TODO: enforce comment too long on backend
 
@@ -68,25 +70,26 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
     })
 }
 
-const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
+type SurveyProps = { match: { params: { conversation_id: string } } }
+const Survey = ({
   match: {
     params: { conversation_id },
   },
-}) => {
+}: SurveyProps) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   const hist = useHistory()
-  const dispatch = useDispatch()
+  const dispatch = useAppDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
   const [submittedComments, setSubmittedComments] = useState([])
   const [state, setState] = useState<SurveyState>("loading")
   const [votingAfterPostSurvey, setVotingAfterPostSurvey] = useState(false)
 
-  const { zid_metadata } = useSelector((state: RootState) => state.zid_metadata)
-  const { user } = useSelector((state: RootState) => state.user)
+  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
+  const { user } = useAppSelector((state: RootState) => state.user)
 
   useEffect(() => {
     dispatch(populateZidMetadataStore(conversation_id))
@@ -262,4 +265,4 @@ const Survey: React.FC<{ match: { params: { conversation_id: string } } }> = ({
   )
 }
 
-export default connect((state: RootState) => ({ z: state.zid_metadata, u: state.user }))(Survey)
+export default Survey

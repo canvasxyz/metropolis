@@ -7,8 +7,8 @@ const signin = (
     loading: false,
     facebookLoading: false,
     signInSuccessful: false,
-    error: false,
-    facebookError: false,
+    error: null,
+    facebookError: null,
   },
   action
 ) => {
@@ -17,21 +17,21 @@ const signin = (
       return Object.assign({}, state, {
         loading: false,
         facebookLoading: true,
-        error: false,
-        facebookError: false,
+        error: null,
+        facebookError: null,
       })
     case types.FACEBOOK_SIGNIN_SUCCESSFUL:
       return Object.assign({}, state, {
         loading: false,
         facebookLoading: false,
-        error: false,
-        facebookError: false,
+        error: null,
+        facebookError: null,
       })
     case types.FACEBOOK_SIGNIN_FAILED:
       return Object.assign({}, state, {
         loading: false,
         facebookLoading: false,
-        error: false,
+        error: null,
         facebookError: action.errorCode,
       })
     case types.SIGNIN_INITIATED:
@@ -39,7 +39,7 @@ const signin = (
         loading: false,
         pending: true,
         facebookLoading: false,
-        error: false,
+        error: null,
       })
 
     case "signin reset state":
@@ -48,7 +48,7 @@ const signin = (
         pending: false,
         signInSuccessful: false,
         facebookLoading: false,
-        error: false,
+        error: null,
       })
     case "signin completed successfully":
       return Object.assign({}, state, {
@@ -56,7 +56,7 @@ const signin = (
         pending: false,
         signInSuccessful: true,
         facebookLoading: false,
-        error: false,
+        error: null,
       })
     case types.SIGNIN_ERROR:
       return Object.assign({}, state, {
@@ -70,7 +70,7 @@ const signin = (
         loading: false,
         pending: true,
         facebookLoading: false,
-        error: false,
+        error: null,
       })
     case types.CREATEUSER_ERROR:
       return Object.assign({}, state, {

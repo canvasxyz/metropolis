@@ -7,14 +7,14 @@ import PropTypes from "prop-types"
 import { connect } from "react-redux"
 import { populateAllCommentStores } from "../../actions"
 import { Box, Text, Button, jsx } from "theme-ui"
-import { RootState } from "../../util/types"
 import api from "../../util/api"
 import strings from "../../intl"
+import { AppDispatch } from "../../store"
 
 class ModerateCommentsSeed extends React.Component<
   {
     params: { conversation_id: string }
-    dispatch: Function
+    dispatch: AppDispatch
   },
   {
     success?: boolean
