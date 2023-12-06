@@ -282,9 +282,13 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
                 dispatch(handleCreateConversationSubmit(title, description))
               }}
               disabled={!user}
-              sx={user?.email || user?.xInfo ? {} : { opacity: 0.4, pointerEvents: "none" }}
+              sx={
+                user?.email || user?.githubUserId || user?.xInfo
+                  ? {}
+                  : { opacity: 0.4, pointerEvents: "none" }
+              }
             >
-              {user?.email || user?.xInfo
+              {user?.email || user?.githubUserId || user?.xInfo
                 ? "Create this conversation"
                 : "Log in to create conversations"}
             </Button>

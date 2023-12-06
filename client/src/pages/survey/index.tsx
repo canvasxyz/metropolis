@@ -229,7 +229,10 @@ const Survey = ({
 
       {state === "voting" && (
         <Box sx={{ mb: [5] }}>
-          {!zid_metadata.auth_needed_to_write || !!user?.email || !!user?.xInfo ? (
+          {!zid_metadata.auth_needed_to_write ||
+          !!user?.email ||
+          !!user?.githubUserId ||
+          !!user?.xInfo ? (
             <Box>
               <Box sx={{ mt: [4], mb: [3] }}>Do you have remarks to add? If so, add them here:</Box>
               <SurveyCompose
