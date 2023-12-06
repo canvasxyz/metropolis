@@ -62,7 +62,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
             <Text sx={{ my: 3 }}>
               Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas.
             </Text>
-            {!!user?.email || !!user?.xInfo ? (
+            {user ? (
               <Box sx={{ mt: [6] }}>
                 <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
                   Go to app
