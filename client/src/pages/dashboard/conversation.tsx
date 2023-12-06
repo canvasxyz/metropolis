@@ -26,27 +26,27 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   }, [zid_metadata.conversation_id])
 
   return (
-    <Box>
-      <Box sx={{ width: "100%" }}>
-        {zid_metadata.is_owner && (
-          <Button
-            variant="outlineSecondary"
-            sx={{
-              position: "absolute",
-              top: [4],
-              right: [4],
-              alignItems: "center",
-              display: "flex",
-              gap: [1],
-            }}
-            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
-          >
-            <Box>
-              <TbSettings />
-            </Box>
-            <Text>Edit</Text>
-          </Button>
-        )}
+    <Box sx={{position: "relative"}}>
+      {zid_metadata.is_owner && (
+        <Button
+          variant="outlineSecondary"
+          sx={{
+            position: "sticky",
+            top: [4],
+            left: [4],
+            alignItems: "center",
+            display: "flex",
+            gap: [1],
+          }}
+          onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+        >
+          <Box>
+            <TbSettings />
+          </Box>
+          <Text>Edit</Text>
+        </Button>
+      )}
+      <Box sx={{ width: "100%"}}>
         <Flex
           sx={{
             flexDirection: "column",
