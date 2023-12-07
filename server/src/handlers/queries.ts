@@ -117,7 +117,7 @@ export async function getUserUidByGithubUserId(
 
 export async function getConversationByPrId(
   prId: number,
-): Promise<(PrFields & { github_sync_enabled: boolean }) | undefined> {
+): Promise<(PrFields & { github_sync_enabled: boolean; zinvite: string }) | undefined> {
   const query = `SELECT ${[
     ...PR_FIELDS,
     "github_sync_enabled",

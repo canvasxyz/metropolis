@@ -408,7 +408,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) does not exist, inserting`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} does not exist, inserting`,
           );
 
           // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
@@ -423,7 +423,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             );
           } catch (err) {
             console.log(
-              `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
+              `could not get fip for PR ${pull.number} ${pull.head?.label}, skipping`,
             );
             console.log(err);
             continue;
