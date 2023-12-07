@@ -296,7 +296,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 }}
                 onClick={() => hist.push(`/account`)}
               >
-                <Text>Account {user.email || user.githubUsername}</Text>
+                <Text>{user.email || user.githubUsername || "View Account"}</Text>
               </Button>
             : <Link
                 variant="links.buttonBlack"
