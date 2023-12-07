@@ -281,7 +281,19 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             )}
           </Box>
         </Box>
-        <Box sx={{ overflowY: "scroll", flex: 1 }}>
+        <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
+          <Button
+            variant="outlineSecondary"
+            sx={{
+              position: "absolute",
+              top: [3],
+              right: [4],
+              alignItems: "center",
+            }}
+            onClick={() => hist.push(`/account`)}
+          >
+            <Text>Account</Text>
+          </Button>
           {selectedConversation ? (
             <DashboardConversation
               conversation={selectedConversation}
