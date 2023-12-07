@@ -82,6 +82,7 @@ async function getUser(
     uid: uid,
     email: info.email,
     githubUserId: info.github_user_id,
+    githubUsername: info.github_username,
     hname: info.hname,
     hasXid: !!hasXid,
     xInfo: xInfo && xInfo[0],
