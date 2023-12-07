@@ -7,7 +7,7 @@ const user = (
     loading: false,
     user: null,
     error: false,
-    isLoggedIn: false,
+    isLoggedIn: undefined,
   },
   action,
 ) => {
