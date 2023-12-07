@@ -1,21 +1,15 @@
 import React from "react"
-import PropTypes from "prop-types"
-import { ConnectedProps, connect } from "react-redux"
 import { Box, Heading } from "theme-ui"
 
-import { User } from "../util/types"
 import Spinner from "../components/spinner"
-import { RootState } from "../store"
+import { useAppSelector } from "../hooks"
 
-const connector = connect((state: RootState) => state.user)
-type PropsFromRedux = ConnectedProps<typeof connector>
 
-class Account extends React.Component<PropsFromRedux> {
-  static propTypes: {
-    user: object
-  }
+function Account(){
+  const {user, isLoggedIn} = useAppSelector((state) => state.user)
 
-  buildAccountMarkup() {
+  if(isLoggedIn){
+    const nameToDisplay = user.hname || user.email || user.githubUsername
     return (
       <Box>
         <Heading
@@ -29,37 +23,27 @@ class Account extends React.Component<PropsFromRedux> {
         >
           Account
         </Heading>
-        <p>Hi {this.props.user.hname.split(" ")[0]}!</p>
+        <p>Hi {nameToDisplay}!</p>
         <Box>
-          <p>Name: {this.props.user.hname}</p>
-          <p>Email: {this.props.user.email || "--"}</p>
-          <p>
-            Social:{" "}
-            {!this.props.user.hasFacebook && !this.props.user.hasTwitter
-              ? "No social accounts connected"
-              : ""}
-          </p>
-          <p>
-            {this.props.user.hasFacebook ? <p>Facebook is connected</p> : ""}
-            {this.props.user.hasTwitter ? <p>Twitter is connected</p> : ""}
-          </p>
+          {
+            user.githubUserId ? (
+              <p>
+                GitHub account: <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  href={`https://github.com/${user.githubUsername}`}
+                >{user.githubUsername}</a>
+              </p>
+            ) : (
+              <p>Email: {user.email || "--"}</p>
+            )
+          }
         </Box>
       </Box>
     )
-  }
-
-  render() {
-    return <div>{this.props.user.hname ? this.buildAccountMarkup() : <Spinner />}</div>
+  } else {
+    return <Spinner />
   }
 }
 
-Account.propTypes = {
-  user: PropTypes.shape({
-    hname: PropTypes.string,
-    email: PropTypes.string,
-    hasFacebook: PropTypes.bool,
-    hasTwitter: PropTypes.bool,
-  }),
-}
-
-export default connector(Account)
+export default Account
