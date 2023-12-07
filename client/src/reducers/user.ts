@@ -20,7 +20,6 @@ const user = (
       return Object.assign({}, state, {
         loading: false,
         user: action.data,
-        githubUserId: action.data.githubUserId,
         isLoggedIn: !!action.data.email || !!action.data.githubUserId || !!action.data.xInfo,
         error: false,
       })
