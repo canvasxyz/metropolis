@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Flex, Link, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
@@ -80,7 +80,7 @@ type DashboardProps = {
   selectedConversationId: string | null
 }
 
-const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
+const Dashboard = ({ selectedConversationId }: DashboardProps) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -90,6 +90,8 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   useEffect(() => {
     dispatch(populateConversationsStore())
   }, [])
+
+  const {user, isLoggedIn} = useAppSelector((state: RootState) => state.user)
 
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
@@ -282,18 +284,33 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
           </Box>
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
-          <Button
-            variant="outlineSecondary"
-            sx={{
-              position: "absolute",
-              top: [3],
-              right: [4],
-              alignItems: "center",
-            }}
-            onClick={() => hist.push(`/account`)}
-          >
-            <Text>Account</Text>
-          </Button>
+          {
+            user && isLoggedIn
+            ? <Button
+                variant="outlineSecondary"
+                sx={{
+                  position: "absolute",
+                  top: [3],
+                  right: [4],
+                  alignItems: "center",
+                }}
+                onClick={() => hist.push(`/account`)}
+              >
+                <Text>Account</Text>
+              </Button>
+            : <Link
+                variant="links.buttonBlack"
+                sx={{
+                  position: "absolute",
+                  top: [3],
+                  right: [4],
+                  alignItems: "center",
+                }}
+                href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
+              >
+                Github Login
+              </Link>
+          }
           {selectedConversation ? (
             <DashboardConversation
               conversation={selectedConversation}
