@@ -25,26 +25,31 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
       })
   }, [zid_metadata.conversation_id])
 
+  if(zidMetadataIsLoading) {
+    return <div>Loading...</div>
+  }
+
   return (
     <Box sx={{position: "relative"}}>
       {zid_metadata.is_owner && (
-        <Button
-          variant="outlineSecondary"
-          sx={{
-            position: "sticky",
-            top: [4],
-            left: [4],
-            alignItems: "center",
-            display: "flex",
-            gap: [1],
-          }}
-          onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
-        >
-          <Box>
-            <TbSettings />
-          </Box>
-          <Text>Edit</Text>
-        </Button>
+        // wrapping the button in a 0 by 0 box means that we can use "sticky" positioning
+        // without disrupting the flow of other elements on the page
+        <Box sx={{position: "sticky", top: [4], left: [4], width: [0], height: [0]}}>
+          <Button
+            variant="outlineSecondary"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              gap: [1],
+            }}
+            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+          >
+            <Box>
+              <TbSettings />
+            </Box>
+            <Text>Edit</Text>
+          </Button>
+        </Box>
       )}
       <Box sx={{ width: "100%"}}>
         <Flex
