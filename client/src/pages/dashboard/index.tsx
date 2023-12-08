@@ -14,6 +14,7 @@ import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
+import { DashboardUserButton } from "./user_button"
 
 const sidebarCollapsibleHeaderStyle = {
   fontSize: "15px",
@@ -284,34 +285,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
           </Box>
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
-          {
-            !userIsLoading &&
-            (user && isLoggedIn
-            ? <Button
-                variant="outlineSecondary"
-                sx={{
-                  position: "absolute",
-                  top: [3],
-                  right: [4],
-                  alignItems: "center",
-                }}
-                onClick={() => hist.push(`/account`)}
-              >
-                <Text>{user.email || user.githubUsername || "View Account"}</Text>
-              </Button>
-            : <Link
-                variant="links.buttonBlack"
-                sx={{
-                  position: "absolute",
-                  top: [3],
-                  right: [4],
-                  alignItems: "center",
-                }}
-                href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
-              >
-                Github Login
-              </Link>)
-          }
+          <DashboardUserButton />
           {selectedConversation ? (
             <DashboardConversation
               conversation={selectedConversation}
