@@ -7714,7 +7714,7 @@ async function handle_GET_conversations(
     return;
   }
 
-  conversationsResult.forEach(function (conv) {
+  for (const conv of conversationsResult) {
     conv.created = Number(conv.created);
     conv.modified = Number(conv.modified);
 
@@ -7724,6 +7724,7 @@ async function handle_GET_conversations(
     }
 
     conv.is_mod = uid && isAdministrator(uid);
+    conv.is_owner = uid && conv.owner  === uid;
 
     if(conv.github_pr_id !== null) {
       conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
@@ -7739,8 +7740,7 @@ async function handle_GET_conversations(
     if (conv.context === "") {
       delete conv.context;
     }
-    return conv;
-  });
+  }
 
   res.status(200).json(conversationsResult);
 }
