@@ -38,6 +38,7 @@ function Account(){
               <p>Email: {user.email || "--"}</p>
             )
           }
+          Is repo collaborator: {user.isRepoCollaborator ? "Yes" : "No"}
         </Box>
       </Box>
     )

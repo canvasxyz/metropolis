@@ -89,6 +89,7 @@ async function getUser(
     finishedTutorial: !!info.tut,
     site_ids: [info.site_id],
     created: Number(info.created),
+    isRepoCollaborator: info.is_repo_collaborator,
   };
 }
 
