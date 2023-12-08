@@ -3,7 +3,7 @@
 import { Fragment, useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Flex, Link, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
@@ -14,6 +14,7 @@ import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
+import { DashboardUserButton } from "./user_button"
 
 const sidebarCollapsibleHeaderStyle = {
   fontSize: "15px",
@@ -80,7 +81,7 @@ type DashboardProps = {
   selectedConversationId: string | null
 }
 
-const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
+const Dashboard = ({ selectedConversationId }: DashboardProps) => {
   const dispatch = useAppDispatch()
 
   useEffect(() => {
@@ -90,6 +91,8 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   useEffect(() => {
     dispatch(populateConversationsStore())
   }, [])
+
+  const {user, isLoggedIn, loading: userIsLoading} = useAppSelector((state: RootState) => state.user)
 
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
@@ -281,7 +284,8 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             )}
           </Box>
         </Box>
-        <Box sx={{ overflowY: "scroll", flex: 1 }}>
+        <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
+          <DashboardUserButton />
           {selectedConversation ? (
             <DashboardConversation
               conversation={selectedConversation}

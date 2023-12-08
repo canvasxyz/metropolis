@@ -26,7 +26,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   }, [zid_metadata.conversation_id])
 
   return (
-    <Box sx={{position: "relative"}}>
+    <Box>
       {zid_metadata.is_owner && (
         <Button
           variant="outlineSecondary"
