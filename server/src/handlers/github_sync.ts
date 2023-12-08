@@ -186,13 +186,15 @@ async function getFipFromPR(
 
   if (newFipFilenames.length == 0) {
     // the pull request is not creating a new FIP, ignore this
-    console.error(`no new fips for ${owner}/${repo}#${pull.number}`);
+    console.error(
+      `no new fips for ${owner}/${repo}#${pull.number} ${pull.head?.label}`,
+    );
     throw Error("no new fips");
   }
 
   if (newFipFilenames.length > 1) {
     console.error(
-      `more than one fip for ${owner}/${repo}#${pull.number}, using the first one`,
+      `more than one fip for ${owner}/${repo}#${pull.number} ${pull.head?.label}, using the first one`,
     );
   }
 
@@ -313,34 +315,39 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     const existingFipFilenames = new Set(await getFipFilenames(repoDir));
 
     console.log(
-      `Found ${existingFipFilenames.size} FIPs in master, ${pulls.length} open PRs`,
+      `Found ${existingFipFilenames.size} FIPs in master, ${
+        pulls.length
+      } open FIPs in PRs: ${pulls
+        .map((pull: any) => pull.head?.label)
+        .join(", ")}`,
     );
 
     const repoCollaborators = await getRepoCollaborators();
-    const repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id))
+    const repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id));
 
     for (const pull of pulls) {
-      if(!pull.user) {
+      if (!pull.user) {
         continue;
       }
 
       // We have to do a separate request to get the email address from the user's profile
       // because this information is not returned by the pulls endpoint
-      const { data: {email} } = await installationOctokit.request(
-        "GET /users/{username}",
-        {
-          username: pull.user.login,
-          headers: {
-            "X-GitHub-Api-Version": "2022-11-28",
-          },
+      const {
+        data: { email },
+      } = await installationOctokit.request("GET /users/{username}", {
+        username: pull.user.login,
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
         },
-      );
+      });
 
       const { uid } = await updateOrCreateGitHubUser({
         id: pull.user.id,
         email,
         username: pull.user.login,
-        isRepoCollaborator: repoCollaboratorIds.has(pull.user.id) || pull.user.login === process.env.FIP_REPO_OWNER,
+        isRepoCollaborator:
+          repoCollaboratorIds.has(pull.user.id) ||
+          pull.user.login === process.env.FIP_REPO_OWNER,
       });
 
       const prFields: PrFields = {
@@ -360,7 +367,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       if (existingConversation) {
         if (!existingConversation.github_sync_enabled) {
           console.log(
-            `github sync is disabled for PR ${pull.number}, skipping`,
+            `github sync is disabled for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
           );
           continue;
         }
@@ -368,7 +375,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         // update
         if (pull.state == "open") {
           console.log(
-            `conversation with PR id ${pull.number} is open, updating`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is open, updating`,
           );
           // get fip
           let fipFields;
@@ -380,7 +387,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               mainBranchName,
             );
           } catch (err) {
-            console.log(`could not get fip for PR ${pull.number}, skipping`);
+            console.log(
+              `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
+            );
             console.log(err);
             continue;
           }
@@ -389,7 +398,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPrAndFip({ ...prFields, ...fipFields });
         } else {
           console.log(
-            `conversation with PR id ${pull.number} is closed, updating`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is closed, updating`,
           );
           // we don't care about getting the FIP since it's no longer being discussed
           // but we want to update the PR status to closed
@@ -399,7 +408,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `conversation with PR id ${pull.number} does not exist, inserting`,
+            `conversation with PR id ${pull.number} ${pull.head?.label} does not exist, inserting`,
           );
 
           // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
@@ -413,7 +422,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               mainBranchName,
             );
           } catch (err) {
-            console.log(`could not get fip for PR ${pull.number}, skipping`);
+            console.log(
+              `could not get fip for PR ${pull.number} ${pull.head?.label}, skipping`,
+            );
             console.log(err);
             continue;
           }
@@ -424,6 +435,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           });
           const zid = insertedRows[0].zid;
           const zinvite = await generateAndRegisterZinvite(zid, false);
+
+          console.log(
+            `created conversation for PR ${pull.number} ${pull.head?.label} (zinvite ${zinvite})`,
+          );
 
           // const welcomeMessage = getWelcomeMessage(
           //   getServerNameWithProtocol(req),
@@ -458,7 +473,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           //     }
           //   } catch (err) {
           //     console.log(
-          //       `could not post welcome message to discussion for PR ${pull.number}`,
+          //       `could not post welcome message to discussion for PR ${pull.number} ${pull.head?.label}`,
           //     );
           //   }
           // }

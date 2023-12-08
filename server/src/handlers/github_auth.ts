@@ -7,6 +7,7 @@ import cookies from "../utils/cookies";
 import fail from "../utils/fail";
 import { updateOrCreateGitHubUser } from "./queries";
 import { getRepoCollaborators } from "./api_wrappers";
+import Config from "../config"
 
 /** api handlers for performing a github authentication flow */
 
@@ -16,9 +17,9 @@ export function handle_GET_github_init(
 ){
   let dest = req.p.dest
   const clientId = process.env.GH_APP_CLIENT_ID;
-  const redirectUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&dest=${dest}`;
-
-  res.redirect(redirectUrl);
+  const redirectUri = `${Config.getServerUrl()}/api/v3/github_oauth_callback?dest=${dest}`;
+  const githubAuthorizeUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}`;
+  res.redirect(githubAuthorizeUrl);
 }
 
 export function handle_GET_github_oauth_callback(

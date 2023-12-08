@@ -5,7 +5,7 @@ export type GitHubUserData = {
   username: string;
   email: string | null;
   isRepoCollaborator: boolean;
-}
+};
 
 /** database queries used by the github integrations */
 
@@ -82,7 +82,7 @@ export async function createGitHubUser(
     githubUserData.username,
     githubUserData.email,
     githubUserData.isRepoCollaborator,
-    true
+    true,
   ];
   const createRes = await queryP(createQuery, vals);
   return createRes[0];
@@ -98,7 +98,7 @@ export async function updateGitHubUserData(
     githubUserData.username,
     githubUserData.email,
     githubUserData.isRepoCollaborator,
-    githubUserData.id
+    githubUserData.id,
   ];
   const updateRes = await queryP(createQuery, vals);
   return updateRes[0];
@@ -117,10 +117,14 @@ export async function getUserUidByGithubUserId(
 
 export async function getConversationByPrId(
   prId: number,
-): Promise<(PrFields & { github_sync_enabled: boolean }) | undefined> {
-  const query = `SELECT ${[...PR_FIELDS, "github_sync_enabled"].join(
+): Promise<(PrFields & { github_sync_enabled: boolean; zinvite: string }) | undefined> {
+  const query = `SELECT ${[
+    ...PR_FIELDS,
+    "github_sync_enabled",
+    "zinvites.zinvite",
+  ].join(
     ", ",
-  )} FROM conversations WHERE github_pr_id = $1;`;
+  )} FROM conversations LEFT JOIN zinvites ON conversations.zid = zinvites.zid WHERE github_pr_id = $1;`;
   const rows = await queryP(query, [prId]);
   return rows[0];
 }
