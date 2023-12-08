@@ -94,7 +94,6 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
   const conversations: Array<Conversation> = data.conversations || []
-  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
 
   const [syncInProgress, setSyncInProgress] = useState(false)
 
@@ -285,7 +284,6 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
           {selectedConversation ? (
             <DashboardConversation
               conversation={selectedConversation}
-              zid_metadata={zid_metadata}
             />
           ) : (
             <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>

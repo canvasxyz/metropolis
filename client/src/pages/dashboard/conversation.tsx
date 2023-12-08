@@ -10,28 +10,26 @@ import { TbSettings } from "react-icons/tb"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
+import { Conversation } from "../../util/types"
 
-export const DashboardConversation = ({ conversation, zid_metadata }) => {
+export const DashboardConversation = ({ conversation }: {conversation: Conversation}) => {
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
 
   useEffect(() => {
     api
       .get("/api/v3/reports", {
-        conversation_id: zid_metadata.conversation_id,
+        conversation_id: conversation.conversation_id,
       })
       .then((reports) => {
         setReport(reports[0])
       })
-  }, [zid_metadata.conversation_id])
+  }, [conversation.conversation_id])
 
-  if(zidMetadataIsLoading) {
-    return <div>Loading...</div>
-  }
 
   return (
     <Box sx={{position: "relative"}}>
-      {zid_metadata.is_owner && (
+      {conversation.is_owner && (
         // wrapping the button in a 0 by 0 box means that we can use "sticky" positioning
         // without disrupting the flow of other elements on the page
         <Box sx={{position: "sticky", top: [4], left: [4], width: [0], height: [0]}}>
@@ -42,7 +40,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
               display: "flex",
               gap: [1],
             }}
-            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+            onClick={() => hist.push(`/m/${conversation.conversation_id}`)}
           >
             <Box>
               <TbSettings />
@@ -90,10 +88,10 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             gap: [2],
           }}
         >
-          {zid_metadata.is_owner && (
+          {conversation.is_owner && (
             <Button
               variant="outlineSecondary"
-              onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
+              onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
             >
               Moderate
             </Button>
@@ -101,7 +99,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
           {report && (
             <Button
               variant="outlineSecondary"
-              onClick={() => hist.push(`/r/${zid_metadata.conversation_id}/${report.report_id}`)}
+              onClick={() => hist.push(`/r/${conversation.conversation_id}/${report.report_id}`)}
             >
               Report
             </Button>
