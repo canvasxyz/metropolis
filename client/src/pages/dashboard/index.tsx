@@ -91,7 +91,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     dispatch(populateConversationsStore())
   }, [])
 
-  const {user, isLoggedIn} = useAppSelector((state: RootState) => state.user)
+  const {user, isLoggedIn, loading: userIsLoading} = useAppSelector((state: RootState) => state.user)
 
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
@@ -285,7 +285,8 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           {
-            user && isLoggedIn
+            !userIsLoading &&
+            (user && isLoggedIn
             ? <Button
                 variant="outlineSecondary"
                 sx={{
@@ -309,7 +310,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
               >
                 Github Login
-              </Link>
+              </Link>)
           }
           {selectedConversation ? (
             <DashboardConversation
