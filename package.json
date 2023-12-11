@@ -4,8 +4,7 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "concurrently -n cli,cle,srv,tsc,math -c cyan,cyan,red,red,blue 'npm run dev --workspace=metropolis-client' 'npm run build:dev --workspace=client-embed' 'npm run start:dev --workspace=metropolis-server' 'npm run build:dev --workspace=metropolis-server' 'export $(cat .env) && cd math && clojure -M:run full'",
-    "math": "export $(cat .env) && cd math && clojure -M:run full",
+    "dev": "mprocs",
     "start": "npm run build && npm run serve:prod",
     "build": "rimraf client/build client-embed/dist server/dist && npm run build:prod --workspace=metropolis-client && npm run build:prod --workspace=client-embed && copyfiles -E -u 2 \"client/build/**/*\" server/dist/client && copyfiles -E -u 2 \"client-embed/dist/**/*\" server/dist/embed && npm run build --workspace=metropolis-server",
     "serve:prod": "npm run serve:prod --workspace=metropolis-server"
@@ -17,7 +16,7 @@
   ],
   "devDependencies": {
     "@types/json2csv": "^5.0.3",
-    "concurrently": "^8.0.1",
+    "mprocs": "^0.6.4",
     "copyfiles": "^2.4.1",
     "rimraf": "^5.0.1"
   },
