@@ -67,6 +67,20 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
                   Go to app
                 </RouterLink>
+                <RouterLink sx={{ variant: "links.buttonBlack", px: [4], ml: [2] }} to="/dashboard">
+                  <img
+                    src="/filecoin.png"
+                    width="22"
+                    height="22"
+                    sx={{
+                      display: "inlineBlock",
+                      position: "relative",
+                      top: "5px",
+                      mr: [2],
+                    }}
+                  />
+                  Go to FIPs
+                </RouterLink>
               </Box>
             ) : (
               <Box sx={{ mt: [4] }}>
