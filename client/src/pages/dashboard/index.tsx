@@ -92,7 +92,11 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     dispatch(populateConversationsStore())
   }, [])
 
-  const {user, isLoggedIn, loading: userIsLoading} = useAppSelector((state: RootState) => state.user)
+  const {
+    user,
+    isLoggedIn,
+    loading: userIsLoading,
+  } = useAppSelector((state: RootState) => state.user)
 
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
@@ -186,13 +190,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
               onClick={() => {
                 // github sync
                 setSyncInProgress(true)
+                toast.success("Getting updates from Github...")
                 api
                   .post("api/v3/github_sync", {})
-                  .then(() => {
-                    toast.success("Sync complete")
+                  .then(({ existingFips, openPulls }) => {
+                    toast.success(`Found ${existingFips} existing FIPs, ${openPulls} new FIPs`)
                     setTimeout(() => {
                       location.reload()
-                    }, 1000)
+                    }, 1500)
                   })
                   .fail((error) => {
                     toast.error("Sync error")

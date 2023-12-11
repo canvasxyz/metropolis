@@ -481,7 +481,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     }
 
-    res.json({});
+    res.json({
+      existingFips: existingFipFilenames.size,
+      openPulls: pulls.length,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send((err as any).message);
