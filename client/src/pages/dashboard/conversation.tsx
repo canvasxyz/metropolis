@@ -32,7 +32,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
           variant="outlineSecondary"
           sx={{
             position: "sticky",
-            top: [4],
+            top: [3],
             left: [4],
             alignItems: "center",
             display: "flex",
@@ -46,7 +46,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
           <Text>Edit</Text>
         </Button>
       )}
-      <Box sx={{ width: "100%"}}>
+      <Box sx={{ width: "100%" }}>
         <Flex
           sx={{
             flexDirection: "column",

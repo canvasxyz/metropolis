@@ -189,6 +189,7 @@ export default {
     secondary: {
       color: "background",
       bg: "lightGray",
+      borderRadius: [8],
       "&:hover": {
         bg: "lightGrayActive",
       },
@@ -202,6 +203,7 @@ export default {
       cursor: "pointer",
       border: "1px solid",
       borderColor: "primary",
+      borderRadius: [8],
       "&:hover": {
         color: "primaryActive",
         borderColor: "primaryActive",

@@ -16,17 +16,7 @@ import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { DashboardUserButton } from "./user_button"
 
-const sidebarCollapsibleHeaderStyle = {
-  fontSize: "15px",
-  fontWeight: "700",
-  py: [2],
-  px: [3],
-  cursor: "pointer",
-  userSelect: "none",
-  "&:hover": {
-    backgroundColor: "#F5EEDB",
-  },
-}
+const sidebarBorder = "1px solid #d7d4cfaa"
 
 type ConversationListItemProps = {
   conversation: Conversation
@@ -52,10 +42,10 @@ const ConversationListItem = ({
       fontSize: "15px",
       lineHeight: 1.3,
       backgroundColor:
-        conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#FBF5E9",
+        conversation.conversation_id === selectedConversationId ? "#ede4d1" : "inherit",
       "&:hover": {
         backgroundColor:
-          conversation.conversation_id === selectedConversationId ? "#F5EEDB" : "#F8F2E2",
+          conversation.conversation_id === selectedConversationId ? "#ede4d1" : "inherit",
       },
     }}
     onClick={(e) => {
@@ -105,8 +95,9 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
 
   const [syncInProgress, setSyncInProgress] = useState(false)
 
+  const [showAllFIPConversations, setShowAllFIPConversations] = useLocalStorage("showAll", true)
+  const [showOpenFIPConversations, setShowOpenFIPConversations] = useLocalStorage("showOpen", false)
   const [showNonFIPConversations, setShowNonFIPConversations] = useLocalStorage("showNonFIP", false)
-  const [showOpenFIPConversations, setShowOpenFIPConversations] = useLocalStorage("showOpen", true)
   const [showArchivedConversations, setShowArchivedConversations] = useLocalStorage(
     "showArchived",
     false,
@@ -138,12 +129,17 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
       <style>{"body { border-top: 5px solid #0090ff; border-image: none; }"}</style>
       <Flex sx={{ display: "flex", height: "100%" }}>
         <Box
-          sx={{ overflowY: "scroll", width: ["40%", null, "340px"], borderRight: "1px solid #ddd" }}
+          sx={{
+            overflowY: "scroll",
+            width: ["40%", null, "340px"],
+            borderRight: sidebarBorder,
+            background: "#f7f0e3",
+          }}
         >
           <Flex
             sx={{
               width: "100%",
-              borderBottom: "1px solid #ddd",
+              borderBottom: sidebarBorder,
               pt: "8px",
               pb: "15px",
               px: [4],
@@ -211,83 +207,94 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
               {syncInProgress ? <Spinner size={25} /> : "Sync"}
             </Button>
           </Flex>
-          <Box>
+          <Box
+            sx={{
+              fontSize: "15px",
+              fontWeight: "500",
+              py: [2],
+              px: [3],
+              cursor: "pointer",
+              userSelect: "none",
+            }}
+          >
             <Box
-              sx={sidebarCollapsibleHeaderStyle}
+              variant={showAllFIPConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
               onClick={() => {
-                setShowNonFIPConversations(!showNonFIPConversations)
+                setShowAllFIPConversations(true)
+                setShowNonFIPConversations(false)
                 setShowOpenFIPConversations(false)
                 setShowArchivedConversations(false)
               }}
             >
-              <span sx={{ display: "inline-block", width: [10] }}>
-                {showNonFIPConversations ? "▾" : "▸"}
-              </span>{" "}
-              Non-FIPs ({nonFIPConversations.length})
+              All ({openConversations.length + nonFIPConversations.length})
             </Box>
-            {showNonFIPConversations && (
-              <ConversationListItemSection>
-                {nonFIPConversations.map((conversation) => (
-                  <ConversationListItem
-                    conversation={conversation}
-                    selectedConversationId={selectedConversationId}
-                    navigateToConversation={navigateToConversation}
-                    key={conversation.conversation_id}
-                  />
-                ))}
-              </ConversationListItemSection>
-            )}
             <Box
-              sx={sidebarCollapsibleHeaderStyle}
+              variant={showOpenFIPConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
               onClick={() => {
-                setShowOpenFIPConversations(!showOpenFIPConversations)
+                setShowOpenFIPConversations(true)
+                setShowAllFIPConversations(false)
                 setShowNonFIPConversations(false)
                 setShowArchivedConversations(false)
               }}
             >
-              <span sx={{ display: "inline-block", width: [10] }}>
-                {showOpenFIPConversations ? "▾" : "▸"}
-              </span>{" "}
               FIPs ({openConversations.length})
             </Box>
-            {showOpenFIPConversations && (
-              <ConversationListItemSection>
-                {openConversations.map((conversation) => (
-                  <ConversationListItem
-                    conversation={conversation}
-                    selectedConversationId={selectedConversationId}
-                    navigateToConversation={navigateToConversation}
-                    key={conversation.conversation_id}
-                  />
-                ))}{" "}
-              </ConversationListItemSection>
-            )}
             <Box
-              sx={sidebarCollapsibleHeaderStyle}
+              variant={showNonFIPConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
               onClick={() => {
-                setShowArchivedConversations(!showArchivedConversations)
+                setShowNonFIPConversations(true)
+                setShowAllFIPConversations(false)
+                setShowOpenFIPConversations(false)
+                setShowArchivedConversations(false)
+              }}
+            >
+              Non-FIP ({nonFIPConversations.length})
+            </Box>
+            <Box
+              variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
+              onClick={() => {
+                setShowArchivedConversations(true)
+                setShowAllFIPConversations(false)
                 setShowNonFIPConversations(false)
                 setShowOpenFIPConversations(false)
               }}
             >
-              <span sx={{ display: "inline-block", width: [10] }}>
-                {showArchivedConversations ? "▾" : "▸"}
-              </span>{" "}
-              Archived ({archivedConversations.length})
+              Past {/*({archivedConversations.length})*/}
             </Box>
-            {showArchivedConversations && (
-              <ConversationListItemSection>
-                {archivedConversations.map((conversation) => (
-                  <ConversationListItem
-                    conversation={conversation}
-                    selectedConversationId={selectedConversationId}
-                    navigateToConversation={navigateToConversation}
-                    key={conversation.conversation_id}
-                  />
-                ))}
-              </ConversationListItemSection>
-            )}
           </Box>
+          <ConversationListItemSection>
+            {(showAllFIPConversations || showOpenFIPConversations) &&
+              openConversations.map((conversation) => (
+                <ConversationListItem
+                  conversation={conversation}
+                  selectedConversationId={selectedConversationId}
+                  navigateToConversation={navigateToConversation}
+                  key={conversation.conversation_id}
+                />
+              ))}
+            {(showAllFIPConversations || showNonFIPConversations) &&
+              nonFIPConversations.map((conversation) => (
+                <ConversationListItem
+                  conversation={conversation}
+                  selectedConversationId={selectedConversationId}
+                  navigateToConversation={navigateToConversation}
+                  key={conversation.conversation_id}
+                />
+              ))}
+            {showArchivedConversations &&
+              archivedConversations.map((conversation) => (
+                <ConversationListItem
+                  conversation={conversation}
+                  selectedConversationId={selectedConversationId}
+                  navigateToConversation={navigateToConversation}
+                  key={conversation.conversation_id}
+                />
+              ))}
+          </ConversationListItemSection>
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           <DashboardUserButton />
