@@ -62,16 +62,22 @@ const ConversationListItem = ({
     </Text>
     <Flex sx={{ direction: "row", mt: [1] }}>
       <Text sx={{ color: "#84817D", fontSize: "90%" }}>
-        {conversation.github_pr_id ? (
+        {conversation.fip_created && conversation.github_pr_id ? (
           <Text>
-            PR #{conversation.github_pr_id} opened{" "}
+            PR #{conversation.github_pr_id} created{" "}
             {(() => {
-              const date = new Date(conversation.github_pr_opened_at)
+              const date = new Date(conversation.fip_created)
               return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
           </Text>
         ) : (
-          <Text>Discussion opened</Text>
+          <Text>
+            Poll created{" "}
+            {(() => {
+              const date = new Date(conversation.created)
+              return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
+            })()}
+          </Text>
         )}
       </Text>
     </Flex>
