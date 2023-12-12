@@ -60,8 +60,20 @@ const ConversationListItem = ({
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
     </Text>
-    <Flex sx={{ direction: "row" }}>
-      <Text sx={{ color: "#84817D" }}>{conversation.participant_count} voted</Text>
+    <Flex sx={{ direction: "row", mt: [1] }}>
+      <Text sx={{ color: "#84817D", fontSize: "90%" }}>
+        {conversation.github_pr_id ? (
+          <Text>
+            PR #{conversation.github_pr_id} opened{" "}
+            {(() => {
+              const date = new Date(conversation.github_pr_opened_at)
+              return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
+            })()}
+          </Text>
+        ) : (
+          <Text>Discussion opened</Text>
+        )}
+      </Text>
     </Flex>
   </Box>
 )

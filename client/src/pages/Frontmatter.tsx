@@ -51,22 +51,34 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
                       ) : (
                         conversation[valueFieldName]
                       )
+                    ) : valueFieldName === "fip_author" ? (
+                      conversation[valueFieldName].replace(/"|'/g, "")
                     ) : valueFieldName === "fip_discussions_to" ? (
-                      <Link
-                        href={conversation[valueFieldName]}
-                        target="_blank"
-                        noreferrer="noreferrer"
-                        noopener="noopener"
-                        sx={{
-                          display: "block",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          width: "calc(100% - 20px)",
-                        }}
-                      >
-                        {conversation[valueFieldName]}
-                      </Link>
+                      (() => {
+                        const matches = conversation[valueFieldName].match(/\[.+\]\((.+)\)/)
+                        const links =
+                          matches && matches[1]
+                            ? [matches[1]]
+                            : conversation[valueFieldName].split(", ")
+
+                        return links.map((link) => (
+                          <Link
+                            href={link}
+                            target="_blank"
+                            noreferrer="noreferrer"
+                            noopener="noopener"
+                            sx={{
+                              display: "block",
+                              textOverflow: "ellipsis",
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              width: "calc(100% - 20px)",
+                            }}
+                          >
+                            {link}
+                          </Link>
+                        ))
+                      })()
                     ) : (
                       conversation[valueFieldName]
                     )}

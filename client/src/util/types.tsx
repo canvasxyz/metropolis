@@ -36,6 +36,10 @@ export type Conversation = {
   github_pr_title: string
   github_pr_submitter: string
   github_pr_url: string | null
+  github_pr_opened_at: string
+  github_pr_updated_at: string
+  github_pr_closed_at: string
+  github_pr_merged_at: string
   fip_number: number
   fip_title: string
   fip_author: string
