@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { Fragment, useCallback, useEffect, useState } from "react"
-import { Heading, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -12,6 +12,7 @@ import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
 
 export const DashboardConversation = ({ conversation, zid_metadata }) => {
+  const [collapsed, setCollapsed] = useState(true)
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
 
@@ -62,11 +63,34 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             {conversation.fip_title || conversation.github_pr_title || conversation.topic}
           </Heading>
           <Frontmatter conversation={conversation} />
-          <Box sx={{ wordBreak: "break-word" }}>
+          <Box
+            className={collapsed ? "css-fade" : ""}
+            sx={
+              collapsed
+                ? { wordBreak: "break-word", maxHeight: "200px", overflow: "hidden" }
+                : { wordBreak: "break-word", mb: [5] }
+            }
+          >
             <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {conversation.description}
             </ReactMarkdown>
           </Box>
+          <Link
+            href="#"
+            onClick={() => setCollapsed(!collapsed)}
+            variant="links.primary"
+            sx={{
+              color: "mediumGrayActive",
+              mt: "-20px",
+              py: [3],
+              textAlign: "center",
+              bg: "#ede4d166",
+              borderRadius: 7,
+              "&:hover": { bg: "#ede4d1aa" },
+            }}
+          >
+            {collapsed ? "Show more" : "Show less"}
+          </Link>
         </Flex>
       </Box>
       <Box sx={{ width: "100%", borderBottom: "1px solid #ddd" }}></Box>
