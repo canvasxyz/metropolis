@@ -48,13 +48,22 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
                         >
                           {conversation[valueFieldName]}
                         </Link>
-                      ) : conversation[valueFieldName]
+                      ) : (
+                        conversation[valueFieldName]
+                      )
                     ) : valueFieldName === "fip_discussions_to" ? (
                       <Link
                         href={conversation[valueFieldName]}
                         target="_blank"
                         noreferrer="noreferrer"
                         noopener="noopener"
+                        sx={{
+                          display: "block",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          overflow: "hidden",
+                          width: "calc(100% - 20px)",
+                        }}
                       >
                         {conversation[valueFieldName]}
                       </Link>

@@ -62,7 +62,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             {conversation.fip_title || conversation.github_pr_title || conversation.topic}
           </Heading>
           <Frontmatter conversation={conversation} />
-          <Box>
+          <Box sx={{ wordBreak: "break-word" }}>
             <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {conversation.description}
             </ReactMarkdown>
