@@ -354,6 +354,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_pr_id: pull.number,
         github_pr_title: pull.title,
         github_pr_submitter: pull.user?.login,
+        github_pr_opened_at: pull.opened_at,
+        github_pr_closed_at: pull.closed_at,
+        github_pr_updated_at: pull.updated_at,
+        github_pr_merged_at: pull.merged_at,
       };
 
       // check if there is a conversation with this PR id already
