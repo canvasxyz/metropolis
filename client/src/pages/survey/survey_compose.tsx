@@ -4,6 +4,7 @@ import { TbMessageDots } from "react-icons/tb"
 import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
+import TextareaAutosize from "react-textarea-autosize"
 
 import type { Comment } from "../../util/types"
 import { DropdownButton } from "../../components/dropdown"
@@ -32,7 +33,7 @@ const SurveyComposeBox: React.FC<{
   setSubmittedComments,
   setState,
 }) => {
-  const inputRef = useRef<HTMLInputElement>()
+  const inputRef = useRef<HTMLTextAreaElement>()
   const [cachedComment, setCachedComment] = useLocalStorage(
     "cachedComment-" + zid_metadata.conversation_id,
     "",
@@ -101,22 +102,24 @@ const SurveyComposeBox: React.FC<{
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
-      <Textarea
-        sx={{
-          fontFamily: "body",
-          fontSize: [2],
+      <TextareaAutosize
+        style={{
+          fontFamily: "inherit",
+          fontSize: "1em",
           width: "100%",
           borderRadius: "3px",
-          padding: [2],
+          padding: "8px",
           border: "1px solid",
           borderColor: "lightGray",
-          mb: [3],
+          marginBottom: "10px",
           background: loading ? "#eee" : undefined,
         }}
         disabled={!!loading}
-        rows={2}
+        rows={1}
+        minRows={1}
+        maxRows={9}
         ref={inputRef}
-        placeholder="Write a new statement..."
+        placeholder="Add a comment"
         defaultValue={cachedComment}
         onBlur={(e) => {
           setCachedComment(inputRef.current.value)
@@ -144,7 +147,7 @@ const SurveyComposeBox: React.FC<{
           sx={{ display: "inline-block" }}
           options={[
             {
-              name: "Add statement",
+              name: "Submit",
               onClick: () => {
                 submitComment(inputRef.current.value, 1)
                   .then(() => {
@@ -158,8 +161,8 @@ const SurveyComposeBox: React.FC<{
               },
               default: true,
             },
-            {
-              name: "Add & vote disagree",
+            /*{
+              name: "Submit and disagree",
               onClick: () => {
                 submitComment(inputRef.current.value, -1)
                   .then(() => {
@@ -170,7 +173,7 @@ const SurveyComposeBox: React.FC<{
                     setLoading(false)
                   })
               },
-            },
+            },*/
           ]}
         />
       </Box>

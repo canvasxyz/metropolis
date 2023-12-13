@@ -104,7 +104,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             gap: [2],
             margin: "0 auto",
             pt: [7],
-            pb: [6],
+            pb: [2],
             px: [4],
             maxWidth: "620px",
           }}
@@ -145,30 +145,18 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
           )}
         </Flex>
       </Box>
-      <Box sx={{ width: "100%", position: "relative" }}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: [4],
-            right: [4],
-            px: [2],
-            pt: "4px",
-            pb: "3px",
-            display: "flex",
-            flex: "1",
-            flexDirection: "row",
-            gap: [2],
-          }}
-        ></Box>
+      <Box sx={{ width: "100%", position: "relative", borderTop: "1px solid #e2ddd5", mt: [4] }}>
         <Box
           sx={{
             margin: "0 auto",
             maxWidth: "620px",
             px: [4],
             py: [2],
+            mt: [4],
             lineHeight: 1.45,
           }}
         >
+          <Heading as="h2">Peer Review</Heading>
           <Survey
             match={{
               params: { conversation_id: conversation.conversation_id },

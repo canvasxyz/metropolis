@@ -37,7 +37,7 @@ export const surveyHeadingMini = {
 }
 
 export const surveyBox = {
-  padding: "24px 32px 20px",
+  padding: "26px 32px",
   border: "1px solid",
   borderColor: "lighterGray",
   bg: "bgGray",

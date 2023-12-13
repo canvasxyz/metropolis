@@ -9,6 +9,7 @@ import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
 import { surveyBox, surveyHeadingMini } from "./index"
 import SurveyCard from "./survey_card"
 import SurveyCompose from "./survey_compose"
+import { PrefilledComments } from "./survey_cards"
 
 const PostSurvey = ({
   user,

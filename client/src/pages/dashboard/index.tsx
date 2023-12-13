@@ -16,8 +16,6 @@ import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { DashboardUserButton } from "./user_button"
 
-const sidebarBorder = "1px solid #d7d4cfaa"
-
 type ConversationListItemProps = {
   conversation: Conversation
   selectedConversationId: string | null
@@ -150,14 +148,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
           sx={{
             overflowY: "scroll",
             width: ["40%", null, "310px"],
-            borderRight: sidebarBorder,
+            borderRight: "1px solid #e2ddd5",
             background: "#f7f0e3",
           }}
         >
           <Flex
             sx={{
               width: "100%",
-              borderBottom: sidebarBorder,
+              borderBottom: "1px solid #e2ddd5",
               pt: "8px",
               pb: "15px",
               px: [4],
