@@ -101,7 +101,7 @@ export async function updateGitHubUserData(
 ): Promise<{ uid: number }> {
   const createQuery =
     "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4" +
-    "returning uid;";
+    " returning uid;";
   const vals = [
     githubUserData.username,
     githubUserData.email,
