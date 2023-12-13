@@ -34,6 +34,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   }
 
   useEffect(() => {
+    setCollapsed(collapsibleConversation ? true : false)
     api
       .get("/api/v3/reports", {
         conversation_id: zid_metadata.conversation_id,
