@@ -194,7 +194,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             lineHeight: 1.45,
           }}
         >
-          <Heading as="h2">Peer Review</Heading>
+          <Heading as="h2">Sentiment Check</Heading>
           <Survey
             match={{
               params: { conversation_id: conversation.conversation_id },
