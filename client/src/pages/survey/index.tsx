@@ -233,8 +233,7 @@ const Survey = ({
           !!user?.email ||
           !!user?.githubUserId ||
           !!user?.xInfo ? (
-            <Box>
-              <Box sx={{ mt: [4], mb: [3] }}>Do you have remarks to add? If so, add them here:</Box>
+            <Box sx={{ pt: [2] }}>
               <SurveyCompose
                 key={zid_metadata.conversation_id}
                 zid_metadata={zid_metadata}

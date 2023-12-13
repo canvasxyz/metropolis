@@ -114,7 +114,7 @@ const SurveyComposeBox: React.FC<{
           background: loading ? "#eee" : undefined,
         }}
         disabled={!!loading}
-        rows={4}
+        rows={2}
         ref={inputRef}
         placeholder="Write a new statement..."
         defaultValue={cachedComment}

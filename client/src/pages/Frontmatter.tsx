@@ -35,7 +35,18 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
     valueFieldNames.filter((valueFieldName) => conversation[valueFieldName]).length > 0
 
   return valuesExist ? (
-    <Box sx={{ overflowX: "scroll", mt: [3], px: [3], py: [3], border: "1px solid #ddd" }}>
+    <Box
+      sx={{
+        overflowX: "scroll",
+        mt: [2],
+        px: [2],
+        pt: "10px",
+        pb: "10px",
+        lineHeight: 1.25,
+        fontSize: "0.94em",
+        border: "1px solid #ddd",
+      }}
+    >
       <table>
         <tbody className="border">
           {valueFieldNames.map(
@@ -71,7 +82,7 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
                           if (!matches) return author
                           const username = matches[1]
                           return (
-                            <>
+                            <React.Fragment key={author}>
                               <Link
                                 href={`https://github.com/${username}`}
                                 target="_blank"
@@ -81,7 +92,7 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
                                 {author}
                               </Link>
                               <br />
-                            </>
+                            </React.Fragment>
                           )
                         })
                     ) : valueFieldName === "fip_discussions_to" ? (
@@ -94,6 +105,7 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
 
                         return links.map((link) => (
                           <Link
+                            key={link}
                             href={link}
                             target="_blank"
                             noreferrer="noreferrer"

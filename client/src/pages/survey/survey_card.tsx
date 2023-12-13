@@ -116,7 +116,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         maxHeight: maxHeight,
         width: "100%",
         px: ["24px", "32px"],
-        pt: ["22px", "27px"],
+        pt: ["22px", "20px"],
         pb: ["46px", "36px"],
         overflow: "scroll",
       }}

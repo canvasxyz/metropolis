@@ -149,7 +149,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
         <Box
           sx={{
             overflowY: "scroll",
-            width: ["40%", null, "340px"],
+            width: ["40%", null, "310px"],
             borderRight: sidebarBorder,
             background: "#f7f0e3",
           }}
@@ -193,14 +193,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             <Button
               variant="outlineSecondary"
-              sx={{ mt: [2], ml: [2], minWidth: "60px" }}
+              sx={{ mt: [2], ml: [2], minWidth: "50px", fontSize: "0.94em" }}
               onClick={() => setCreateConversationModalIsOpen(true)}
             >
               Add
             </Button>
             <Button
               variant="outlineSecondary"
-              sx={{ mt: [2], ml: [2], minWidth: "60px" }}
+              sx={{ mt: [2], ml: [2], minWidth: "50px", fontSize: "0.94em" }}
               onClick={() => {
                 // github sync
                 setSyncInProgress(true)
@@ -269,7 +269,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowArchivedConversations(false)
               }}
             >
-              Non-FIP ({nonFIPConversations.length})
+              Polls ({nonFIPConversations.length})
             </Box>
             <Box
               variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}

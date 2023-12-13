@@ -12,9 +12,26 @@ import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
 
 export const DashboardConversation = ({ conversation, zid_metadata }) => {
-  const [collapsed, setCollapsed] = useState(true)
+  const collapsibleConversation = conversation.description.length > 300
+  const [collapsed, setCollapsed] = useState(collapsibleConversation ? true : false)
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
+
+  const generateReport = () => {
+    api
+      .post("/api/v3/reports", {
+        conversation_id: zid_metadata.conversation_id,
+      })
+      .then(() => {
+        api
+          .get("/api/v3/reports", {
+            conversation_id: zid_metadata.conversation_id,
+          })
+          .then((reports) => {
+            setReport(reports[0])
+          })
+      })
+  }
 
   useEffect(() => {
     api
@@ -29,23 +46,56 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   return (
     <Box>
       {zid_metadata.is_owner && (
-        <Button
-          variant="outlineSecondary"
+        <Box
           sx={{
             position: "sticky",
             top: [3],
-            left: [4],
+            pl: [4],
             alignItems: "center",
             display: "flex",
-            gap: [1],
+            gap: [2],
           }}
-          onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
         >
-          <Box>
-            <TbSettings />
-          </Box>
-          <Text>Edit</Text>
-        </Button>
+          <Button
+            variant="outlineSecondary"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              gap: [1],
+            }}
+            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
+          >
+            <Box>
+              <TbSettings />
+            </Box>
+            <Text>Edit</Text>
+          </Button>
+          <Button
+            variant="outlineSecondary"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              gap: [1],
+            }}
+            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
+          >
+            Moderate
+          </Button>
+          {!report && (
+            <Button variant="outlineSecondary" onClick={generateReport}>
+              Generate Report
+            </Button>
+          )}
+          {report && (
+            <Button
+              variant="outlineSecondary"
+              onClick={() => hist.push(`/r/${zid_metadata.conversation_id}/${report.report_id}`)}
+            >
+              View Report
+            </Button>
+          )}
+          <Box sx={{ flex: 1 }}></Box>
+        </Box>
       )}
       <Box sx={{ width: "100%" }}>
         <Flex
@@ -67,33 +117,34 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             className={collapsed ? "css-fade" : ""}
             sx={
               collapsed
-                ? { wordBreak: "break-word", maxHeight: "200px", overflow: "hidden" }
-                : { wordBreak: "break-word", mb: [5] }
+                ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
+                : { wordBreak: "break-word", mb: [3] }
             }
           >
             <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {conversation.description}
             </ReactMarkdown>
           </Box>
-          <Link
-            href="#"
-            onClick={() => setCollapsed(!collapsed)}
-            variant="links.primary"
-            sx={{
-              color: "mediumGrayActive",
-              mt: "-20px",
-              py: [3],
-              textAlign: "center",
-              bg: "#ede4d166",
-              borderRadius: 7,
-              "&:hover": { bg: "#ede4d1aa" },
-            }}
-          >
-            {collapsed ? "Show more" : "Show less"}
-          </Link>
+          {collapsibleConversation && (
+            <Link
+              href="#"
+              onClick={() => setCollapsed(!collapsed)}
+              variant="links.primary"
+              sx={{
+                color: "mediumGrayActive",
+                py: "11px",
+                textAlign: "center",
+                bg: "#ede4d166",
+                fontSize: "0.94em",
+                borderRadius: 7,
+                "&:hover": { bg: "#ede4d1aa" },
+              }}
+            >
+              {collapsed ? "Show more" : "Show less"}
+            </Link>
+          )}
         </Flex>
       </Box>
-      <Box sx={{ width: "100%", borderBottom: "1px solid #ddd" }}></Box>
       <Box sx={{ width: "100%", position: "relative" }}>
         <Box
           sx={{
@@ -108,24 +159,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             flexDirection: "row",
             gap: [2],
           }}
-        >
-          {zid_metadata.is_owner && (
-            <Button
-              variant="outlineSecondary"
-              onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
-            >
-              Moderate
-            </Button>
-          )}
-          {report && (
-            <Button
-              variant="outlineSecondary"
-              onClick={() => hist.push(`/r/${zid_metadata.conversation_id}/${report.report_id}`)}
-            >
-              Report
-            </Button>
-          )}
-        </Box>
+        ></Box>
         <Box
           sx={{
             margin: "0 auto",
@@ -135,10 +169,6 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             lineHeight: 1.45,
           }}
         >
-          <h2>Tell us what you think</h2>
-          <Text as="p" sx={{ mb: [3], pb: [1] }}>
-            Vote on remarks on this FIP by other community members, or add your own:
-          </Text>
           <Survey
             match={{
               params: { conversation_id: conversation.conversation_id },
