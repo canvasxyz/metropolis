@@ -11,11 +11,32 @@ import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
 
+type ReportComment = {
+  active: boolean
+  agree_count: number
+  conversation_id: string
+  count: number
+  created: string
+  disagree_count: number
+  is_meta: boolean
+  is_seed: boolean
+  lang: string | null
+  mod: number
+  pass_count: number
+  pid: number
+  quote_src_url: string | null
+  tid: number
+  tweet_id: string | null
+  txt: string
+  velocity: number
+}
+
 export const DashboardConversation = ({ conversation, zid_metadata }) => {
   const collapsibleConversation = conversation.description.length > 300
   const [collapsed, setCollapsed] = useState(collapsibleConversation ? true : false)
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
+  const [reportComments, setReportComments] = useState<ReportComment[]>([])
 
   const generateReport = () => {
     api
@@ -35,12 +56,25 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
 
   useEffect(() => {
     setCollapsed(collapsibleConversation ? true : false)
+    if (!zid_metadata.conversation_id) return
     api
       .get("/api/v3/reports", {
         conversation_id: zid_metadata.conversation_id,
       })
       .then((reports) => {
         setReport(reports[0])
+        if (!reports[0]) return
+        api
+          .get("/api/v3/comments", {
+            conversation_id: zid_metadata.conversation_id,
+            report_id: reports[0].report_id,
+            mod_gt: -1,
+            moderation: true,
+            include_voting_patterns: true,
+          })
+          .then((comments) => {
+            setReportComments(comments)
+          })
       })
   }, [zid_metadata.conversation_id])
 
@@ -55,6 +89,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
             alignItems: "center",
             display: "flex",
             gap: [2],
+            zIndex: 9998,
           }}
         >
           <Button
@@ -163,6 +198,121 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
               params: { conversation_id: conversation.conversation_id },
             }}
           />
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          position: "relative",
+          borderTop: "1px solid #e2ddd5",
+          pb: [6],
+        }}
+      >
+        <Box
+          sx={{
+            margin: "0 auto",
+            maxWidth: "620px",
+            px: [4],
+            py: [2],
+            mt: [4],
+            lineHeight: 1.45,
+          }}
+        >
+          <Heading as="h2">Report</Heading>
+          <Box sx={{ mt: [4] }}>
+            <Text
+              sx={{
+                fontSize: "0.9em",
+                mb: "10px",
+                color: "#9f9e9b",
+                fontWeight: 500,
+                textAlign: "center",
+              }}
+            >
+              Here are the top comments so far.{" "}
+              <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
+                <Text as="span" variant="links.text">
+                  View full report
+                </Text>
+              </RouterLink>
+            </Text>
+            {reportComments.map((c: ReportComment) => (
+              <ReportCommentRow key={c.tid} reportComment={c} />
+            ))}
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) => {
+  const { agree_count, disagree_count, pass_count, count, tid, txt } = reportComment
+  const row = { display: "flex" }
+  const bar = { px: "1px", py: "2px", lineHeight: 1.2 }
+  const text = { display: "inline-block", fontSize: "0.88em", position: "relative", left: "4px" }
+
+  return (
+    <Box key={tid}>
+      <Box
+        sx={{
+          bg: "bgOffWhite",
+          border: "1px solid #e2ddd5",
+          borderRadius: "7px",
+          mb: [1],
+          pt: "12px",
+          pb: "10px",
+          px: "15px",
+          display: "flex",
+        }}
+      >
+        <Text sx={{ margin: "auto", fontSize: "0.91em", lineHeight: 1.3, flex: 1, pr: [1] }}>
+          {txt}
+        </Text>
+        <Box sx={{ position: "relative", pl: [3] }}>
+          <Box sx={row}>
+            <Box sx={{ width: 70, ...text }}>Agree</Box>
+            <Box sx={{ width: 70 }}>
+              <Box
+                sx={{
+                  width: `${Math.ceil((agree_count / count) * 100)}%`,
+                  bg: "#2fcc71",
+                  ...bar,
+                }}
+              >
+                <Text sx={text}>{agree_count}</Text>
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={row}>
+            <Box sx={{ width: 70, ...text }}>Disagree</Box>
+            <Box sx={{ width: 70 }}>
+              <Box
+                sx={{
+                  width: `${Math.ceil((disagree_count / count) * 100)}%`,
+                  bg: "#e74b3c",
+                  color: "#fff",
+                  ...bar,
+                }}
+              >
+                <Text sx={text}>{disagree_count}</Text>
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={row}>
+            <Box sx={{ width: 70, ...text }}>Pass</Box>
+            <Box sx={{ width: 70 }}>
+              <Box
+                sx={{
+                  width: `${Math.ceil((pass_count / count) * 100)}%`,
+                  bg: "#e6e6e6",
+                  ...bar,
+                }}
+              >
+                <Text sx={text}>{pass_count}</Text>
+              </Box>
+            </Box>
+          </Box>
         </Box>
       </Box>
     </Box>

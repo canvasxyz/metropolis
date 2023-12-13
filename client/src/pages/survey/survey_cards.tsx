@@ -105,7 +105,7 @@ const SurveyCards = ({
                 sx={{
                   fontSize: "0.9em",
                   mb: "12px",
-                  opacity: 0.5,
+                  color: "#9f9e9b",
                   fontWeight: 500,
                   textAlign: "center",
                 }}
@@ -184,7 +184,7 @@ const SurveyCards = ({
             sx={{
               fontSize: "0.9em",
               mb: "10px",
-              opacity: 0.5,
+              color: "#9f9e9b",
               fontWeight: 500,
               textAlign: "center",
             }}
@@ -202,7 +202,7 @@ const SurveyCards = ({
               sx={{
                 fontSize: "0.9em",
                 mb: "10px",
-                opacity: 0.5,
+                color: "#9f9e9b",
                 fontWeight: 500,
                 textAlign: "center",
               }}
