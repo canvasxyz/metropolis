@@ -55,6 +55,8 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   }
 
   useEffect(() => {
+    setReport(undefined)
+    setReportComments([])
     setCollapsed(collapsibleConversation ? true : false)
     if (!zid_metadata.conversation_id) return
     api
