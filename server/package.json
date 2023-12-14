@@ -41,7 +41,6 @@
     "method-override": "^3.0.0",
     "mimelib": "~0.2.19",
     "morgan": "^1.10.0",
-    "multer": "^1.4.5-lts.1",
     "nan": "~2.17.0",
     "nodemailer": "~6.4.16",
     "oauth": "~0.9.14",
