@@ -26,7 +26,23 @@ export const DashboardUserButton = () => {
         }}
         onClick={() => hist.push(`/account`)}
       >
-        <Text>{user.email || user.githubUsername || "View Account"}</Text>
+        <Text sx={{ display: "inline-block" }}>
+          {user.email || user.githubUsername || "View Account"}
+        </Text>
+        {user.githubRepoCollaborator && (
+          <Text
+            sx={{
+              display: "inline-block",
+              fontSize: "0.88em",
+              opacity: 0.7,
+              fontWeight: 600,
+              ml: "6px",
+              mr: "3px",
+            }}
+          >
+            [Mod]
+          </Text>
+        )}
       </Button>
     )
   }
