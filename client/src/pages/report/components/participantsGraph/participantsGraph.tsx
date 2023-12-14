@@ -127,6 +127,13 @@ class ParticipantsGraph extends React.Component<
       return null
     }
 
+    let results
+    try {
+      results = graphUtil(this.props.comments, this.props.math, this.props.badTids)
+    } catch (err) {
+      return null
+    }
+
     const {
       xx,
       yy,
@@ -137,7 +144,7 @@ class ParticipantsGraph extends React.Component<
       commentScaleupFactorX,
       commentScaleupFactorY,
       hulls,
-    } = graphUtil(this.props.comments, this.props.math, this.props.badTids)
+    } = results
 
     const contours = d3contour
       .contourDensity()

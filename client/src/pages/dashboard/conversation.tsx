@@ -43,32 +43,19 @@ export const DashboardConversation = ({
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
+  const [maxCount, setMaxCount] = useState<number>(0)
+  const [refreshInProgress, setRefreshInProgress] = useState(false)
 
   const generateReport = () => {
     api
-      .post("/api/v3/reports", {
-        conversation_id: zid_metadata.conversation_id,
-      })
-      .then(() => {
-        api
-          .get("/api/v3/reports", {
-            conversation_id: zid_metadata.conversation_id,
-          })
-          .then((reports) => {
-            setReport(reports[0])
-          })
-      })
+      .post("/api/v3/reports", { conversation_id: zid_metadata.conversation_id })
+      .then(() => refreshReport())
   }
 
-  useEffect(() => {
-    setReport(undefined)
-    setReportComments([])
-    setCollapsed(!!collapsibleConversation)
-    if (!zid_metadata.conversation_id) return
+  const refreshReport = () => {
+    setRefreshInProgress(true)
     api
-      .get("/api/v3/reports", {
-        conversation_id: zid_metadata.conversation_id,
-      })
+      .get("/api/v3/reports", { conversation_id: zid_metadata.conversation_id })
       .then((reports) => {
         setReport(reports[0])
         if (!reports[0]) return
@@ -82,8 +69,23 @@ export const DashboardConversation = ({
           })
           .then((comments) => {
             setReportComments(comments)
+            setMaxCount(
+              Math.max.apply(
+                this,
+                comments.map((comment) => comment.count),
+              ),
+            )
           })
       })
+      .always(() => setRefreshInProgress(false))
+  }
+
+  useEffect(() => {
+    setReport(undefined)
+    setReportComments([])
+    setCollapsed(!!collapsibleConversation)
+    if (!zid_metadata.conversation_id) return
+    refreshReport()
   }, [zid_metadata.conversation_id])
 
   return (
@@ -228,27 +230,43 @@ export const DashboardConversation = ({
         >
           <Heading as="h2">Sentiment Report</Heading>
           <Box sx={{ mt: [4] }}>
+            {!refreshInProgress && (
+              <Text
+                sx={{
+                  fontSize: "0.9em",
+                  mb: "10px",
+                  color: "#9f9e9b",
+                  fontWeight: 500,
+                  textAlign: "center",
+                }}
+              >
+                {reportComments.length > 0
+                  ? "Here are the top comments so far:"
+                  : "No comments yet. "}
+              </Text>
+            )}
+            {!refreshInProgress &&
+              reportComments.map((c: ReportComment) => (
+                <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
+              ))}
             <Text
               sx={{
                 fontSize: "0.9em",
-                mb: "10px",
+                mt: "10px",
                 color: "#9f9e9b",
                 fontWeight: 500,
                 textAlign: "center",
               }}
             >
-              {reportComments.length > 0
-                ? "Here are the top comments so far. "
-                : "No comments yet. "}
               <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
                 <Text as="span" variant="links.text">
                   View full report
                 </Text>
-              </RouterLink>
+              </RouterLink>{" "}
+              <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
+                Refresh report
+              </Text>
             </Text>
-            {reportComments.map((c: ReportComment) => (
-              <ReportCommentRow key={c.tid} reportComment={c} />
-            ))}
           </Box>
         </Box>
       </Box>
@@ -256,7 +274,13 @@ export const DashboardConversation = ({
   )
 }
 
-const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) => {
+const ReportCommentRow = ({
+  reportComment,
+  maxCount,
+}: {
+  reportComment: ReportComment
+  maxCount: number
+}) => {
   const { agree_count, disagree_count, pass_count, count, tid, txt } = reportComment
   const row = { display: "flex" }
   const bar = { px: "1px", py: "2px", lineHeight: 1.2 }
@@ -272,7 +296,8 @@ const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) =
           mb: [1],
           pt: "12px",
           pb: "10px",
-          px: "15px",
+          pl: "20px",
+          pr: "15px",
           display: "flex",
         }}
       >
@@ -285,7 +310,7 @@ const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) =
             <Box sx={{ width: 70 }}>
               <Box
                 sx={{
-                  width: `${Math.ceil((agree_count / count) * 100)}%`,
+                  width: `${Math.ceil((agree_count / maxCount) * 100)}%`,
                   bg: "#2fcc71",
                   ...bar,
                 }}
@@ -299,7 +324,7 @@ const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) =
             <Box sx={{ width: 70 }}>
               <Box
                 sx={{
-                  width: `${Math.ceil((disagree_count / count) * 100)}%`,
+                  width: `${Math.ceil((disagree_count / maxCount) * 100)}%`,
                   bg: "#e74b3c",
                   color: "#fff",
                   ...bar,
@@ -314,7 +339,7 @@ const ReportCommentRow = ({ reportComment }: { reportComment: ReportComment }) =
             <Box sx={{ width: 70 }}>
               <Box
                 sx={{
-                  width: `${Math.ceil((pass_count / count) * 100)}%`,
+                  width: `${Math.ceil((pass_count / maxCount) * 100)}%`,
                   bg: "#e6e6e6",
                   ...bar,
                 }}
