@@ -11,7 +11,7 @@ var BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlug
 var mri = require("mri")
 var glob = require("glob")
 var fs = require("fs")
-var dotenv = require('dotenv')
+var dotenv = require("dotenv")
 
 dotenv.config()
 
@@ -20,7 +20,6 @@ var argv = process.argv.slice(2)
 var cliArgs = mri(argv)
 
 var enableTwitterWidgets = process.env.ENABLE_TWITTER_WIDGETS === "true"
-var fbAppId = process.env.FB_APP_ID
 
 var embedServiceHostname = process.env.EMBED_SERVICE_HOSTNAME || "metropolis.vote"
 
@@ -64,14 +63,12 @@ module.exports = (env, options) => {
         inject: "body",
         templateParameters: {
           enableTwitterWidgets: enableTwitterWidgets,
-          fbAppId
         },
       }),
       new webpack.DefinePlugin({
         "process.env": {
           NODE_ENV: JSON.stringify(options.mode),
           ENABLE_TWITTER_WIDGETS: JSON.stringify(enableTwitterWidgets),
-          FB_APP_ID: JSON.stringify(fbAppId),
           FIP_REPO_OWNER: JSON.stringify(process.env.FIP_REPO_OWNER),
           FIP_REPO_NAME: JSON.stringify(process.env.FIP_REPO_NAME),
           EMBED_SERVICE_HOSTNAME: JSON.stringify(embedServiceHostname),

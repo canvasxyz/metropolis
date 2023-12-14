@@ -2,15 +2,13 @@
 
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { doCreateUser, doFacebookSignin } from "../../actions"
+import { doCreateUser } from "../../actions"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 import { Link } from "react-router-dom"
 import strings from "../../intl"
 import { UrlObject } from "url"
 import { AppDispatch, RootState } from "../../store"
-
-const fbAppId = process.env.FB_APP_ID
 
 const connector = connect((state: RootState) => state.signin)
 type PropsFromRedux = ConnectedProps<typeof connector>
@@ -25,7 +23,6 @@ class CreateUser extends React.Component<CreateUserProps> {
   email: HTMLInputElement
   password: HTMLInputElement
   password2: HTMLInputElement
-  facebook_password: HTMLInputElement
 
   getDest() {
     return this.props.location.pathname.slice("/createuser".length)
@@ -45,23 +42,6 @@ class CreateUser extends React.Component<CreateUserProps> {
       dest = "/"
     }
     this.props.dispatch(doCreateUser(attrs, dest))
-  }
-
-  facebookButtonClicked() {
-    let dest = this.getDest()
-    if (!dest.length) {
-      dest = "/"
-    }
-    this.props.dispatch(doFacebookSignin(dest))
-  }
-
-  handleFacebookPasswordSubmit() {
-    let dest = this.getDest()
-    if (!dest.length) {
-      dest = "/"
-    }
-    const optionalPassword = this.facebook_password.value
-    this.props.dispatch(doFacebookSignin(dest, optionalPassword))
   }
 
   maybeErrorMessage() {
@@ -184,37 +164,6 @@ class CreateUser extends React.Component<CreateUserProps> {
             Sign In
           </Link>
         </Box>
-
-        {fbAppId && (
-          <React.Fragment>
-            <Button
-              sx={{ my: [2] }}
-              id="signupFacebookButton"
-              onClick={this.facebookButtonClicked.bind(this)}
-            >
-              Sign up with Facebook
-            </Button>
-            <Text>
-              If you click &apos;Sign in with Facebook&apos; and are not an existing user, you will
-              be registered automatically.
-            </Text>
-          </React.Fragment>
-        )}
-      </Box>
-    )
-  }
-
-  drawPasswordConnectFacebookForm() {
-    return (
-      <Box>
-        <Text>
-          A user already exists with the email address associated with this Facebook account.
-        </Text>
-        <Text> Please log into that user account to enable Facebook login.</Text>
-        <input ref={(c) => (this.facebook_password = c)} placeholder="password" type="password" />
-        <Button onClick={this.handleFacebookPasswordSubmit.bind(this)}>
-          {"Connect Facebook Account"}
-        </Button>
       </Box>
     )
   }
@@ -225,9 +174,7 @@ class CreateUser extends React.Component<CreateUserProps> {
         <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
           Create Account
         </Heading>
-        {this.props.facebookError !== "polis_err_user_with_this_email_exists"
-          ? this.drawForm()
-          : this.drawPasswordConnectFacebookForm()}
+        {this.drawForm()}
       </React.Fragment>
     )
   }

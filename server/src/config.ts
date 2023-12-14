@@ -3,10 +3,15 @@ import isTrue from "boolean";
 
 const devHostname = process.env.API_DEV_HOSTNAME || "localhost:8040";
 const devMode = isTrue(process.env.DEV_MODE) as boolean;
-const domainOverride = process.env.DOMAIN_OVERRIDE || null as string | null;
+const domainOverride = process.env.DOMAIN_OVERRIDE || (null as string | null);
 const prodHostname = process.env.API_PROD_HOSTNAME || "pol.is";
-const serverPort = parseInt(process.env.API_SERVER_PORT || process.env.PORT || "8040", 10) as number;
-const shouldUseTranslationAPI = isTrue(process.env.SHOULD_USE_TRANSLATION_API) as boolean;
+const serverPort = parseInt(
+  process.env.API_SERVER_PORT || process.env.PORT || "8040",
+  10,
+) as number;
+const shouldUseTranslationAPI = isTrue(
+  process.env.SHOULD_USE_TRANSLATION_API,
+) as boolean;
 
 export default {
   domainOverride: domainOverride as string | null,
@@ -55,15 +60,17 @@ export default {
   adminEmailDataExport: process.env.ADMIN_EMAIL_DATA_EXPORT as string,
   adminEmailDataExportTest: process.env.ADMIN_EMAIL_DATA_EXPORT_TEST as string,
   adminEmailEmailTest: process.env.ADMIN_EMAIL_EMAIL_TEST as string,
-  adminEmails: process.env.ADMIN_EMAILS || '[]' as string,
-  adminUIDs: process.env.ADMIN_UIDS || '[]' as string,
-  akismetAntispamApiKey: process.env.AKISMET_ANTISPAM_API_KEY || null as string | null,
+  adminEmails: process.env.ADMIN_EMAILS || ("[]" as string),
+  adminUIDs: process.env.ADMIN_UIDS || ("[]" as string),
+  akismetAntispamApiKey:
+    process.env.AKISMET_ANTISPAM_API_KEY || (null as string | null),
   awsRegion: process.env.AWS_REGION as string,
-  backfillCommentLangDetection: isTrue(process.env.BACKFILL_COMMENT_LANG_DETECTION) as boolean,
+  backfillCommentLangDetection: isTrue(
+    process.env.BACKFILL_COMMENT_LANG_DETECTION,
+  ) as boolean,
   cacheMathResults: isTrueOrBlank(process.env.CACHE_MATH_RESULTS) as boolean,
   databaseURL: process.env.DATABASE_URL as string,
   encryptionPassword: process.env.ENCRYPTION_PASSWORD_00001 as string,
-  fbAppId: process.env.FB_APP_ID || null as string | null,
   logLevel: process.env.SERVER_LOG_LEVEL as string,
   logToFile: isTrue(process.env.SERVER_LOG_TO_FILE) as boolean,
 
@@ -74,11 +81,16 @@ export default {
   maxmindUserID: process.env.MAXMIND_USER_ID as string,
   nodeEnv: process.env.NODE_ENV as string,
   polisFromAddress: process.env.POLIS_FROM_ADDRESS as string,
-  readOnlyDatabaseURL: process.env.READ_ONLY_DATABASE_URL || process.env.DATABASE_URL as string,
-  runPeriodicExportTests: isTrue(process.env.RUN_PERIODIC_EXPORT_TESTS) as boolean,
+  readOnlyDatabaseURL:
+    process.env.READ_ONLY_DATABASE_URL || (process.env.DATABASE_URL as string),
+  runPeriodicExportTests: isTrue(
+    process.env.RUN_PERIODIC_EXPORT_TESTS,
+  ) as boolean,
   shouldUseTranslationAPI: setGoogleApplicationCredentials() as boolean,
-  twitterConsumerKey: process.env.TWITTER_CONSUMER_KEY || null as string | null,
-  twitterConsumerSecret: process.env.TWITTER_CONSUMER_SECRET || null as string | null,
+  twitterConsumerKey:
+    process.env.TWITTER_CONSUMER_KEY || (null as string | null),
+  twitterConsumerSecret:
+    process.env.TWITTER_CONSUMER_SECRET || (null as string | null),
   webserverPass: process.env.WEBSERVER_PASS as string,
   webserverUsername: process.env.WEBSERVER_USERNAME as string,
 
@@ -91,12 +103,12 @@ export default {
     process.env.DOMAIN_WHITELIST_ITEM_06 || null,
     process.env.DOMAIN_WHITELIST_ITEM_07 || null,
     process.env.DOMAIN_WHITELIST_ITEM_08 || null,
-  ].filter(item => item !== null) as string[],
+  ].filter((item) => item !== null) as string[],
 };
 
 // Use this function when a value shuould default to true if not set.
 function isTrueOrBlank(val: string | boolean | undefined): boolean {
-  return val === undefined || val === '' || isTrue(val);
+  return val === undefined || val === "" || isTrue(val);
 }
 
 function setGoogleApplicationCredentials(): boolean {
@@ -104,13 +116,17 @@ function setGoogleApplicationCredentials(): boolean {
     return false;
   }
 
-  const googleCredentialsBase64: string | undefined = process.env.GOOGLE_CREDENTIALS_BASE64;
-  const googleCredsStringified: string | undefined = process.env.GOOGLE_CREDS_STRINGIFIED;
+  const googleCredentialsBase64: string | undefined =
+    process.env.GOOGLE_CREDENTIALS_BASE64;
+  const googleCredsStringified: string | undefined =
+    process.env.GOOGLE_CREDS_STRINGIFIED;
 
   try {
     // TODO: Consider deprecating GOOGLE_CREDS_STRINGIFIED in future.
     if (!googleCredentialsBase64 && !googleCredsStringified) {
-      throw new Error("Missing Google credentials. Translation API will be disabled.");
+      throw new Error(
+        "Missing Google credentials. Translation API will be disabled.",
+      );
     }
 
     const creds_string = googleCredentialsBase64
