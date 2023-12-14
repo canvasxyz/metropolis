@@ -8,7 +8,7 @@ import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
 
-const PrefilledComment = ({ zid_metadata, text }: { zid_metadata; text: string }) => {
+const PrefilledComment = ({ text }: { zid_metadata; text: string }) => {
   return (
     <Box
       sx={{
