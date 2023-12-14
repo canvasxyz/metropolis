@@ -184,7 +184,6 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                   width="25"
                   height="25"
                   sx={{
-                    display: "inlineBlock",
                     position: "relative",
                     top: "6px",
                     mr: [2],

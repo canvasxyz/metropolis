@@ -73,7 +73,6 @@ const Index = ({ user }: { user? }) => {
                     width="22"
                     height="22"
                     sx={{
-                      display: "inlineBlock",
                       position: "relative",
                       top: "5px",
                       mr: [2],
