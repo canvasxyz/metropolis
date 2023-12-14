@@ -5,6 +5,9 @@ import * as dotenv from "dotenv";
 import path from "path";
 dotenv.config();
 
+import bodyParser from "body-parser";
+import compress from "compression";
+import cookieParser from "cookie-parser";
 import express from "express";
 import mime from "mime";
 import morgan from "morgan";
@@ -148,7 +151,6 @@ import {
   wantHeader,
 } from "./src/utils/parameter";
 
-// no typedefs for express 3
 const app = express();
 
 // 'dev' format is
@@ -179,8 +181,6 @@ app.disable("x-powered-by");
 ////////////////////////////////////////////
 ////////////////////////////////////////////
 
-const expressUntyped = express as any;
-
 app.use(middleware_responseTime_start);
 
 app.use(redirectIfNotHttps);
@@ -191,11 +191,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(writeDefaultHead);
 
 if (devMode) {
-  app.use(expressUntyped.compress());
+  app.use(compress());
 } else {
   // Cloudflare would apply gzip if we didn't
   // but it's about 2x faster if we do the gzip (for the inbox query on mike's account)
-  app.use(expressUntyped.compress());
+  app.use(compress());
 }
 app.use(middleware_log_request_body);
 app.use(middleware_log_middleware_errors);
