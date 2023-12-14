@@ -395,18 +395,6 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         >
           Prompt participants after they have finished voting to provide their email address, to receive notifications when there are new comments to vote on.
         </CheckboxField>
-
-        <CheckboxField field="auth_opt_fb" label="Facebook login prompt">
-          Show Facebook login prompt
-        </CheckboxField>
-
-        <CheckboxField field="auth_opt_tw" label="Twitter login prompt">
-          Show Twitter login prompt
-        </CheckboxField>
-
-        <CheckboxField field="auth_needed_to_vote" label="Require Auth to Vote">
-          Participants cannot vote without first connecting either Facebook or Twitter
-        </CheckboxField>
           */}
 
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>

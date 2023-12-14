@@ -3,6 +3,7 @@
 import "./report.css"
 
 import React from "react"
+import { Heading, Box } from "theme-ui"
 import _ from "lodash"
 
 import DataUtils from "./util/dataUtils"
@@ -19,7 +20,7 @@ import Beeswarm from "./components/beeswarm"
 import net from "./util/net"
 
 function assertExists(obj, key) {
-  if (typeof obj[key] === "undefined") {
+  if (!obj || typeof obj[key] === "undefined") {
     console.error("assertExists failed. Missing: ", key)
   }
 }
@@ -156,7 +157,7 @@ class Report extends React.Component<
               () => {
                 this.getCorrelationMatrix(math_tick, report_id).then(resolve, reject)
               },
-              this.corMatRetries < 10 ? 200 : 3000
+              this.corMatRetries < 10 ? 200 : 3000,
             ) // try to get a quick response, but don't keep polling at that rate for more than 10 seconds.
           } else if (
             globals.enableMatrix &&
@@ -173,7 +174,7 @@ class Report extends React.Component<
         },
         (err) => {
           reject(err)
-        }
+        },
       )
     })
   }
@@ -368,7 +369,7 @@ class Report extends React.Component<
           function (memo, num) {
             return memo + num
           },
-          0
+          0,
         )
         const computedStats = {
           votesPerVoterAvg: totalVotes / ptptCountTotal,
@@ -405,7 +406,7 @@ class Report extends React.Component<
       .catch((err) => {
         this.setState({
           error: true,
-          errorText: String(err),
+          errorText: String(err.stack),
         })
       })
   }
@@ -422,7 +423,7 @@ class Report extends React.Component<
             height: window.innerHeight,
           },
         })
-      }, 500)
+      }, 500),
     )
   }
 
@@ -430,12 +431,13 @@ class Report extends React.Component<
     if (this.state.error) {
       return (
         <div>
-          <div>Error Loading</div>
-          <div sx={{ my: [2] }}>
-            Maybe this survey doesn’t have any data, or an error was encountered while generating
-            the report?
-          </div>
-          <div sx={{ my: [2] }}>{this.state.errorText}</div>
+          <Heading as="h2" sx={{ my: [3] }}>
+            Error Generating Report
+          </Heading>
+          <Box sx={{ my: [1] }}>Not enough data</Box>
+          <Box as="pre" sx={{ my: [3] }}>
+            <code>{this.state.errorText}</code>
+          </Box>
         </div>
       )
     }

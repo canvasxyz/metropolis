@@ -130,20 +130,6 @@ production. This can be done in the Heroku control panel.
 - `npx webpack --profile --json > stats.json`
 - `npx webpack-bundle-analyzer ./stats.json`
 
-### Facebook Integration (Untested)
-
-Optionally, you can [register with
-Facebook](https://developers.facebook.com/docs/development) and get a
-Facebook App ID to use the Facebook auth features. If you do so, set
-the FB_APP_ID environment variable in the top level `.env` file, or
-manually pass it in when building and running this application.
-
-### Twitter Integration (Untested)
-
-To enable twitter widgets for user authentication, set the
-ENABLE_TWITTER_WIDGETS environment variable to `true` in the top level
-`.env` file, or manually pass it in when building and running.
-
 ### Terminology
 
 - uid: User ID

@@ -22,8 +22,8 @@ export default {
     secondary: "#E6E0D4",
     mediumGray: "#8f8f8f",
     lightGray: "#afafaf",
-    lighterGray: "#e4e5e5",
-    bgGray: "#eee9de",
+    lighterGray: "#e2ddd5",
+    bgGray: "#f7f0e3",
     bgOffWhite: "#fbf7f1",
     primaryActive: "#4e65bd",
     secondaryActive: "#e0e4e7",
@@ -189,6 +189,7 @@ export default {
     secondary: {
       color: "background",
       bg: "lightGray",
+      borderRadius: [8],
       "&:hover": {
         bg: "lightGrayActive",
       },
@@ -202,6 +203,7 @@ export default {
       cursor: "pointer",
       border: "1px solid",
       borderColor: "primary",
+      borderRadius: [8],
       "&:hover": {
         color: "primaryActive",
         borderColor: "primaryActive",

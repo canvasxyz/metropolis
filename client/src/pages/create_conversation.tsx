@@ -1,23 +1,13 @@
 /** @jsx jsx */
 
-import { RouteComponentProps, Link } from "react-router-dom"
-import React, { useEffect, useState, useRef } from "react"
-import PropTypes from "prop-types"
+import React, { useEffect, useState, useRef, Fragment } from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { Box, Grid, Input, Textarea, Label, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
 
 import {
-  populateConversationsStore,
   handleCreateConversationSubmit,
-  handleCloseConversation,
-  handleReopenConversation,
-  populateConversationStatsStore,
 } from "../actions"
-import { DropdownMenu } from "../components/dropdown"
 
-import Url from "../util/url"
-import ConversationRow from "../components/conversation_row"
 import { AppDispatch, RootState } from "../store"
 
 const connector = connect((state: RootState) => state.user)
@@ -34,7 +24,7 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
   const [description, setDescription] = useState<string>()
 
   useEffect(() => {
-    const onpopstate = (event: any) => {
+    const onpopstate = (event) => {
       if (event.state === "select") {
         setStep(0)
       } else if (event.state === "customize") {
@@ -182,9 +172,9 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
           <Box>
             <Label sx={{ display: "block", mb: [5] }}>
               <Box sx={{ fontWeight: "700", mb: [1] }}>Title</Box>
-              {/*<Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
+              {/* <Box sx={{ fontSize: "0.92em", fontStyle: "italic" }}>
                 A descriptive name for your survey.
-                </Box>*/}
+                </Box> */}
               <Box>
                 <Input
                   placeholder={prefillOptions[prefillSelection].prefillTitle}
@@ -229,7 +219,7 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
                               .concat(prefillOptions[prefillSelection].prefillExtra)
                               .split("?")
                               .map((item, index) => {
-                                if (item === "") return
+                                if (item === "") return <Fragment key={index}/>
                                 return <li key={index}>{item}?</li>
                               })}
                           </ul>
@@ -246,12 +236,12 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
                                 prefillOptions[prefillSelection].prefill
                                   .concat(prefillOptions[prefillSelection].prefillExtra)
                                   .split("?")
-                                  .map((item, index) => (item ? `- ${item.trim()}?` : ""))
+                                  .map((item) => (item ? `- ${item.trim()}?` : ""))
                                   .join("\n") +
                                 "\n" +
                                 "You can vote on answers by other members, or add your own."
                               if (descriptionRef.current)
-                                (descriptionRef.current as any).value = desc
+                                (descriptionRef.current as HTMLTextAreaElement).value = desc
                               setDescription(desc)
                               setShowExample(false)
                             }}

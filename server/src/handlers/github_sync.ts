@@ -156,49 +156,43 @@ async function getFipFromPR(
   await execAsync(`git fetch ${remote}`, { cwd: repoDir });
 
   // check out the branch locally
-
   await execAsync(`git switch -c ${remote}-branch ${remote}/${pull.head.ref}`, {
     cwd: repoDir,
   });
 
-  try {
-    await execAsync(`git merge ${mainBranchName} -m "nothing"`, {
-      cwd: repoDir,
-    });
-  } catch (err) {
-    // an error is thrown here if there was a merge conflict that could not be
-    // automatically resolved - we should just ignore these PRs
-    await execAsync(`git reset --merge`, { cwd: repoDir });
-  }
-
-  await execAsync(`git merge --quit`, { cwd: repoDir });
-
-  // get all of the names of the FIPs in this branch
-  const fipFilenames = await getFipFilenames(repoDir);
-  if (fipFilenames === undefined) {
-    throw Error("fipFilenames is undefined");
-  }
-
-  // get the names of the FIPs that are new
-  const newFipFilenames = fipFilenames.filter(
-    (filename) => !existingFipFilenames.has(filename),
+  // (method 1) get updated filenames against the mergebase
+  const { stdout: mergeBase } = await execAsync(
+    `git merge-base ${mainBranchName} ${remote}/${pull.head.ref}`,
+    { cwd: repoDir },
   );
 
-  if (newFipFilenames.length == 0) {
-    // the pull request is not creating a new FIP, ignore this
+  const { stdout: updatedFilenamesText } = await execAsync(
+    `git diff --name-only ${mergeBase}`,
+    { cwd: repoDir },
+  );
+  const updatedFilenames = updatedFilenamesText
+    .trim()
+    .split("\n")
+    .filter(
+      (filename) =>
+        filename.toLowerCase().startsWith("fips/") ||
+        filename.toLowerCase().startsWith("frcs/"),
+    );
+
+  if (updatedFilenames.length === 0) {
     console.error(
-      `no new fips for ${owner}/${repo}#${pull.number} ${pull.head?.label}`,
+      `no changes in ${owner}/${repo}#${pull.number} ${pull.head?.label}`,
     );
     throw Error("no new fips");
   }
 
-  if (newFipFilenames.length > 1) {
+  if (updatedFilenames.length > 1) {
     console.error(
-      `more than one fip for ${owner}/${repo}#${pull.number} ${pull.head?.label}, using the first one`,
+      `multiple changes in ${owner}/${repo}#${pull.number} ${pull.head?.label}, using the last one`,
     );
   }
 
-  const filename = newFipFilenames[0];
+  const filename = updatedFilenames[updatedFilenames.length - 1];
 
   // get the contents of the new FIP
   const content = await fs.readFile(path.join(repoDir, filename), "utf8");
@@ -222,7 +216,7 @@ async function getFipFromPR(
 
   return {
     description,
-    fip_number: fipNumber,
+    fip_number: isNaN(fipNumber) ? undefined : fipNumber,
     fip_title: frontmatterData.title,
     fip_author: frontmatterData.author,
     fip_discussions_to: frontmatterData["discussions-to"],
@@ -360,6 +354,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_pr_id: pull.number,
         github_pr_title: pull.title,
         github_pr_submitter: pull.user?.login,
+        github_pr_opened_at: pull.created_at,
+        github_pr_closed_at: pull.closed_at,
+        github_pr_updated_at: pull.updated_at,
+        github_pr_merged_at: pull.merged_at,
       };
 
       // check if there is a conversation with this PR id already
@@ -481,7 +479,10 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     }
 
-    res.json({});
+    res.json({
+      existingFips: existingFipFilenames.size,
+      openPulls: pulls.length,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).send((err as any).message);

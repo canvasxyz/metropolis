@@ -62,7 +62,7 @@ function ajax(api, data, type, params) {
     // sendEvent("Error", api, jqXHR.status);
 
     // logger.error("SEND ERROR");
-    console.dir("polisAjax promise failed: ", arguments)
+    console.log("polisAjax promise failed: ", jqXHR, message, errorType)
     if (jqXHR.status === 403) {
       // eb.trigger(eb.authNeeded);
     }

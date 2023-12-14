@@ -1,0 +1,16 @@
+procs:
+  client:
+    cwd: client
+    shell: npm run dev
+  client-embed:
+    cwd: client-embed
+    shell: npm run build:dev
+  server:
+    cwd: server
+    shell: npm run start:dev
+  server-build:
+    cwd: server
+    shell: npm run build:dev
+  math:
+    cwd: math
+    shell: export $(cat ../.env) && clojure -M:run full

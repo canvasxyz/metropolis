@@ -1,24 +1,22 @@
-import React, { useEffect, useState, useRef } from "react"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import React, { useState } from "react"
+import { Box, Button } from "theme-ui"
 
 import { TbChevronDown } from "react-icons/tb"
 
 type DropdownMenuOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick
   sx?
 }>
 
 let isFocused
 
 const DropdownMenu = ({
-  sx,
   buttonSx,
   variant,
   rightAlign,
   options,
 }: {
-  sx?
   buttonSx?
   variant?: string
   rightAlign?: boolean
@@ -48,7 +46,7 @@ const DropdownMenu = ({
       <Box
         sx={{
           mt: "1px",
-          borderRadius: "3px",
+          borderRadius: "6px",
           bg: "white",
           position: "absolute",
           right: rightAlign ? "0" : undefined,
@@ -100,7 +98,7 @@ const DropdownMenu = ({
 
 type DropdownButtonOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick
   default?: boolean
 }>
 
@@ -124,13 +122,25 @@ const DropdownButton = ({
   return (
     <Box sx={{ ...sx, position: "relative" }}>
       <Button
-        sx={{ borderRadius: "3px 0 0 3px", borderRight: "1px solid lightGray" }}
+        sx={{
+          borderRadius: "4px 0 0 4px",
+          borderRight: "1px solid lightGray",
+          py: "7px",
+          pb: "6px",
+        }}
         onClick={defaultOption.onClick}
       >
         {defaultOption.name}
       </Button>
       <Button
-        sx={{ borderRadius: "0 3px 3px 0", pr: "6px", pl: "6px", borderColor: "lightGray" }}
+        sx={{
+          borderRadius: "0 4px 4px 0",
+          pr: "6px",
+          pl: "6px",
+          borderColor: "lightGray",
+          py: "7px",
+          pb: "6px",
+        }}
         onClick={() => setOpen(!open)}
         onBlur={() => setTimeout(() => setOpen(false), 10)}
       >
@@ -141,7 +151,7 @@ const DropdownButton = ({
       <Box
         sx={{
           mt: "1px",
-          borderRadius: "3px",
+          borderRadius: "4px",
           bg: "primary",
           position: "absolute",
           right: rightAlign ? "0" : undefined,

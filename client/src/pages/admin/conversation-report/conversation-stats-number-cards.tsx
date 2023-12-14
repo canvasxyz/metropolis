@@ -18,7 +18,7 @@ class NumberCards extends React.Component<
 
   render() {
     const data = this.props.data
-    const averageVotes = data.voteTimes.length / data.firstVoteTimes.length
+    // const averageVotes = data.voteTimes.length / data.firstVoteTimes.length
     return (
       <Box sx={{ display: "flex" }}>
         <Box sx={{ flex: 1 }}>

@@ -112,7 +112,6 @@ If you are deploying to a custom domain (not pol.is) then you need to update bot
 - **`AKISMET_ANTISPAM_API_KEY`** Comment spam detection and filtering.
 - **`AWS_REGION`** Used for S3 data import/export.
 - **`ENABLE_TWITTER_WIDGETS`** set to `true` to enable twitter widgets on the client authentication pages.
-- **`FB_APP_ID`** Must register with Facebook to get an ID to enable Facebook App connectivity.
 - **`GA_TRACKING_ID`** For using Google Analytics on client pages.
 - **`GOOGLE_CREDENTIALS_BASE64`** Required if using Google Translate API. (See below).
 - **`GOOGLE_CREDS_STRINGIFIED`** Alternative to **`GOOGLE_CREDENTIALS_BASE64`** (See below).

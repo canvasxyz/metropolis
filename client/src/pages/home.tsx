@@ -2,9 +2,9 @@
 
 import React, { useEffect } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { Heading, Box, Grid, Flex, Text, Table, Button, Link, jsx } from "theme-ui"
+import { Heading, Box, Grid, Flex, Text, Link, jsx } from "theme-ui"
 
-const Index: React.FC<{ user? }> = ({ user }) => {
+const Index = ({ user }: { user? }) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -67,6 +67,19 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
                   Go to app
                 </RouterLink>
+                <RouterLink sx={{ variant: "links.buttonBlack", px: [4], ml: [2] }} to="/dashboard">
+                  <img
+                    src="/filecoin.png"
+                    width="22"
+                    height="22"
+                    sx={{
+                      position: "relative",
+                      top: "5px",
+                      mr: [2],
+                    }}
+                  />
+                  Go to FIPs
+                </RouterLink>
               </Box>
             ) : (
               <Box sx={{ mt: [4] }}>
@@ -84,7 +97,7 @@ const Index: React.FC<{ user? }> = ({ user }) => {
                 </Text>
                 <Link
                   sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
-                  href="/api/v3/github_oauth_init"
+                  href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
                 >
                   Github Login
                 </Link>

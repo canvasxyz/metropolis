@@ -1,5 +1,4 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { Text, Flex } from "theme-ui"
 
 class NumberCard extends React.Component<

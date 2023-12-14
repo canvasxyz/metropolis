@@ -1,16 +1,11 @@
 /** @jsx jsx */
 
-import React, { useCallback, useEffect, useState, useRef } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-import { connect } from "react-redux"
-import { Box, Heading, Button, Text, Textarea, Flex, Link, jsx } from "theme-ui"
-import { useHistory } from "react-router-dom"
+import React, { useCallback, useEffect, useState } from "react"
+import { Box, Button, jsx } from "theme-ui"
 
 import api from "../../util/api"
-import type { Comment, Conversation } from "../../util/types"
+import type { Comment } from "../../util/types"
 import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
-import { TbChevronsDown, TbChevronsUp, TbSettings } from "react-icons/tb"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
@@ -37,7 +32,7 @@ export const surveyHeadingMini = {
 }
 
 export const surveyBox = {
-  padding: "24px 32px 20px",
+  padding: "26px 32px",
   border: "1px solid",
   borderColor: "lighterGray",
   bg: "bgGray",
@@ -80,7 +75,6 @@ const Survey = ({
     window.scrollTo(0, 0)
   }, [])
 
-  const hist = useHistory()
   const dispatch = useAppDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
@@ -152,7 +146,7 @@ const Survey = ({
       setState("voting")
     })
 
-    const onpopstate = (event) => {
+    const onpopstate = () => {
       const newHash = document.location.hash.slice(1)
       if (newHash && ["voting", "postsurvey"].indexOf(newHash) !== -1) {
         setState(newHash as SurveyState)
@@ -168,7 +162,6 @@ const Survey = ({
 
   const goTo = useCallback((state) => {
     // preserve the root page
-    const hash = document.location.hash.slice(1)
     setState(state)
     history.pushState({}, "", document.location.pathname + "#" + state)
   }, [])
@@ -180,10 +173,6 @@ const Survey = ({
           <SurveyCards
             votedComments={votedComments}
             unvotedComments={unvotedComments}
-            setVotedComments={setVotedComments}
-            submittedComments={submittedComments}
-            setSubmittedComments={setSubmittedComments}
-            user={user}
             goTo={goTo}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c.tid === commentId)
@@ -195,7 +184,7 @@ const Survey = ({
 
               if (
                 zid_metadata.postsurvey &&
-                newVotedComments.length > zid_metadata.postsurvey_limit &&
+                newVotedComments.length > parseInt(zid_metadata.postsurvey_limit, 10) &&
                 !votingAfterPostSurvey
               ) {
                 goTo("postsurvey")
@@ -219,10 +208,8 @@ const Survey = ({
           votedComments={votedComments}
           unvotedComments={unvotedComments}
           submittedComments={submittedComments}
-          user={user}
           goTo={goTo}
           setVotingAfterPostSurvey={setVotingAfterPostSurvey}
-          conversation_id={conversation_id}
           zid_metadata={zid_metadata}
         />
       )}
@@ -233,18 +220,17 @@ const Survey = ({
           !!user?.email ||
           !!user?.githubUserId ||
           !!user?.xInfo ? (
-            <Box>
-              <Box sx={{ mt: [4], mb: [3] }}>Do you have remarks to add? If so, add them here:</Box>
+            <Box sx={{ pt: [2] }}>
               <SurveyCompose
                 key={zid_metadata.conversation_id}
                 zid_metadata={zid_metadata}
                 votedComments={votedComments}
                 unvotedComments={unvotedComments}
                 setVotedComments={setVotedComments}
-                allComments={votedComments.concat(unvotedComments)}
                 submittedComments={submittedComments}
                 setSubmittedComments={setSubmittedComments}
                 setState={setState}
+                showAsModal={false}
               />
             </Box>
           ) : (

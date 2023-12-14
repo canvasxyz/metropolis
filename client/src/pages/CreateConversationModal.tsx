@@ -1,14 +1,9 @@
 import React, { useEffect, useState, useRef } from "react"
 
 import Modal from "react-modal"
-import { Box, Input, Textarea, Label, Heading, Button, Text, Flex } from "theme-ui"
+import { Box, Input, Textarea, Label, Heading, Button, Flex } from "theme-ui"
 import { handleCreateConversationSubmit } from "../actions"
 import { useAppDispatch } from "../hooks"
-
-type PropTypes = {
-  isOpen: boolean
-  setIsOpen: (value: boolean) => void
-}
 
 const CreateConversationInner = () => {
   const dispatch = useAppDispatch()
@@ -75,7 +70,9 @@ const CreateConversationInner = () => {
   )
 }
 
-export const CreateConversationModal: React.FC<PropTypes> = ({ isOpen, setIsOpen }) => {
+export const CreateConversationModal = ({ isOpen, setIsOpen }: { isOpen: boolean
+  setIsOpen: (value: boolean) => void
+ }) => {
   return (
     <Modal
       isOpen={isOpen}

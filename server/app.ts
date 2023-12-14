@@ -184,8 +184,10 @@ const expressUntyped = express as any;
 app.use(middleware_responseTime_start);
 
 app.use(redirectIfNotHttps);
+
 app.use(expressUntyped.cookieParser());
 app.use(expressUntyped.bodyParser());
+
 app.use(writeDefaultHead);
 
 if (devMode) {
@@ -761,17 +763,17 @@ app.put(
   want("spam_filter", getBool, assignToP),
   want("strict_moderation", getBool, assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP),
-  want("description", getOptionalStringLimitLength(500000), assignToP),
+  want("description", getOptionalStringLimitLength(5000000), assignToP),
 
   // FIP fields
   want("fip_number", getInt, assignToP),
-  want("fip_title", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_author", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_discussions_to", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_status", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_type", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_category", getOptionalStringLimitLength(500000), assignToP),
-  want("fip_created", getOptionalStringLimitLength(500000), assignToP),
+  want("fip_title", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_author", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_discussions_to", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_status", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_type", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_category", getOptionalStringLimitLength(5000), assignToP),
+  want("fip_created", getOptionalStringLimitLength(5000), assignToP),
 
   want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
   want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),

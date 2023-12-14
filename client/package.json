@@ -8,8 +8,8 @@
     "dev": "webpack-dev-server --mode=development",
     "build": "rimraf build && npm run build:prod",
     "start": "npm run dev",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint": "eslint src --ignore-path .eslintignore",
+    "lint:fix": "eslint src --fix --ignore-path .eslintignore"
   },
   "devDependencies": {
     "@babel/core": "~7.16.0",
@@ -83,6 +83,7 @@
     "react-modal": "^3.16.1",
     "react-redux": "7.2.2",
     "react-router-dom": "~5.2.0",
+    "react-textarea-autosize": "^8.5.3",
     "redux": "~4.0.5",
     "redux-thunk": "~2.3.0",
     "remark": "^15.0.1",

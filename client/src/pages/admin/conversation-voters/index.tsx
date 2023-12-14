@@ -1,16 +1,13 @@
 /** @jsx jsx */
 
-import ComponentHelpers from "../../../util/component-helpers"
-
-import NoPermission from "../no-permission"
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { Heading, Flex, Box, jsx } from "theme-ui"
-import { formatTime } from "../../../util/misc"
-
-import { Switch, Route, Link } from "react-router-dom"
+import { Heading, Box, jsx } from "theme-ui"
 import { UrlObject } from "url"
+import ComponentHelpers from "../../../util/component-helpers"
+import { formatTime } from "../../../util/misc"
 import { AppDispatch, RootState } from "../../../store"
+import NoPermission from "../no-permission"
 
 const connector = connect((state: RootState) => ({
   conversation_voters: state.conversation_voters,
@@ -30,12 +27,9 @@ class ConversationVoters extends React.Component<ConversationVotersPropTypes> {
     }
     const {
       match,
-      location,
       conversation_voters: { voters },
     } = this.props
     const voterList = voters[match.params.conversation_id]
-
-    const url = location.pathname.split("/")[4]
 
     return (
       <Box>

@@ -4,7 +4,6 @@
 
 import React from "react"
 import PropTypes from "prop-types"
-import { connect } from "react-redux"
 import { populateAllCommentStores } from "../../actions"
 import { Box, Text, Button, jsx } from "theme-ui"
 import api from "../../util/api"
@@ -22,7 +21,7 @@ class ModerateCommentsSeed extends React.Component<
     error?: string
   }
 > {
-  static propTypes: {}
+  static propTypes: object
   seed_form: HTMLTextAreaElement
 
   constructor(props) {
@@ -41,8 +40,7 @@ class ModerateCommentsSeed extends React.Component<
     api
       .post("/api/v3/comments", comment)
       .then(
-        (res) => {
-          const { tid, currentPid } = res
+        () => {
           this.seed_form.value = ""
           this.setState({ ...this.state, success: true })
           setTimeout(() => this.setState({ ...this.state, success: false }), 1000)
