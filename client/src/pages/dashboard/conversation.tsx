@@ -281,7 +281,7 @@ const ReportCommentRow = ({
   reportComment: ReportComment
   maxCount: number
 }) => {
-  const { agree_count, disagree_count, pass_count, count, tid, txt } = reportComment
+  const { agree_count, disagree_count, pass_count, tid, txt } = reportComment
   const row = { display: "flex" }
   const bar = { px: "1px", py: "2px", lineHeight: 1.2 }
   const text = { display: "inline-block", fontSize: "0.88em", position: "relative", left: "4px" }

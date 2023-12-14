@@ -3,7 +3,7 @@
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { doCreateUser } from "../../actions"
-import { Heading, Box, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Button, jsx } from "theme-ui"
 
 import { Link } from "react-router-dom"
 import strings from "../../intl"
