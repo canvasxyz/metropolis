@@ -184,8 +184,10 @@ const expressUntyped = express as any;
 app.use(middleware_responseTime_start);
 
 app.use(redirectIfNotHttps);
-app.use(expressUntyped.cookieParser());
-app.use(expressUntyped.bodyParser());
+
+app.use(cookieParser());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(writeDefaultHead);
 
 if (devMode) {
