@@ -7765,28 +7765,26 @@ function createReport(zid: any) {
   });
 }
 function handle_POST_reports(
-  req: { p: { zid: any; uid?: any } },
+  req: { p: { zid: any } },
   res: { json: (arg0: any) => void },
 ) {
   let zid = req.p.zid;
-  let uid = req.p.uid;
 
-  return (
-    isOwner(zid, uid)
-      // Argument of type '(isMod: any, err: string) => void | globalThis.Promise<void>' is not assignable to parameter of type '(value: unknown) => void | PromiseLike<void>'.ts(2345)
-      // @ts-ignore
-      .then((isMod: any, err: string) => {
-        if (!isMod) {
-          return fail(res, 403, "polis_err_post_reports_permissions", err);
-        }
-        return createReport(zid).then(() => {
-          res.json({});
-        });
-      })
-      .catch((err: any) => {
-        fail(res, 500, "polis_err_post_reports_misc", err);
-      })
-  );
+  queryP("select * from reports where zid = ($1);", [zid])
+    .then((reports: any[]) => {
+      if (reports.length === 0) {
+        return createReport(zid)
+          .then(() => res.json({}))
+          .catch((err: any) => {
+            fail(res, 500, "polis_err_post_reports_misc", err);
+          });
+      }
+
+      fail(res, 500, "polis_err_post_reports_already_exists");
+    })
+    .catch((err: any) => {
+      fail(res, 500, "polis_err_post_reports_misc", err);
+    });
 }
 function handle_PUT_reports(
   req: {

@@ -920,7 +920,6 @@ app.get(
 
 app.post(
   "/api/v3/reports",
-  auth(assignToP),
   want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_reports as any,
 );
