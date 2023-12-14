@@ -920,7 +920,6 @@ app.get(
 
 app.post(
   "/api/v3/reports",
-  auth(assignToP),
   want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_reports as any,
 );
@@ -1161,17 +1160,18 @@ mime.define({
   "image/svg+xml": ["svg"],
 });
 
-// why do svgs get the wrong mimetype otherwise?
-function setCustomHeaders(res: any, path: any) {
-  if (path.endsWith(".svg")) {
-    res.setHeader("Content-Type", "image/svg+xml");
-  }
-}
-
 app.use(
   express.static(path.join(__dirname, "client"), {
     maxAge: "1d",
-    setHeaders: setCustomHeaders,
+    setHeaders: (res, path) => {
+      if (path.endsWith(".html")) {
+        res.setHeader("Content-Type", "text/html; charset=UTF-8");
+        res.setHeader("Cache-Control", "no-cache");
+      }
+      if (path.endsWith(".svg")) {
+        res.setHeader("Content-Type", "image/svg+xml");
+      }
+    },
   }),
 );
 

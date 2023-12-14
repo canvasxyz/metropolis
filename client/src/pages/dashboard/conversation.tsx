@@ -258,14 +258,23 @@ export const DashboardConversation = ({
                 textAlign: "center",
               }}
             >
-              <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
-                <Text as="span" variant="links.text">
-                  View full report
+              {!report && (
+                <Text as="span" variant="links.text" onClick={generateReport}>
+                  Generate Report
                 </Text>
-              </RouterLink>{" "}
-              <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
-                Refresh report
-              </Text>
+              )}
+              {report && (
+                <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
+                  <Text as="span" variant="links.text">
+                    View full report
+                  </Text>
+                </RouterLink>
+              )}
+              {report && (
+                <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
+                  Refresh report
+                </Text>
+              )}
             </Text>
           </Box>
         </Box>
