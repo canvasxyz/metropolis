@@ -31,7 +31,13 @@ type ReportComment = {
   velocity: number
 }
 
-export const DashboardConversation = ({ conversation, zid_metadata }: { conversation, zid_metadata }) => {
+export const DashboardConversation = ({
+  conversation,
+  zid_metadata,
+}: {
+  conversation
+  zid_metadata
+}) => {
   const collapsibleConversation = conversation.description.length > 300
   const [collapsed, setCollapsed] = useState(!!collapsibleConversation)
   const hist = useHistory()
@@ -152,7 +158,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }: { conversa
           </Heading>
           <Frontmatter conversation={conversation} />
           <Box
-            className={collapsed ? "css-fade" : ""}
+            className={collapsed ? "react-markdown css-fade" : "react-markdown"}
             sx={
               collapsed
                 ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
