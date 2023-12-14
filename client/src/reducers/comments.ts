@@ -16,7 +16,7 @@ const accepted_comments = (
         loading: true,
         error: null,
       })
-    case types.RECEIVE_COMMENTS:
+    case types.RECEIVE_COMMENTS: {
       const comments = [...action.data]
       comments.sort((a, b) => a.tid.localeCompare(b.tid))
       return Object.assign({}, state, {
@@ -24,6 +24,7 @@ const accepted_comments = (
         error: null,
         comments,
       })
+    }
     case types.COMMENTS_FETCH_ERROR:
       return Object.assign({}, state, {
         loading: false,
