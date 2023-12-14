@@ -4,7 +4,7 @@ import pg from "../db/pg-query";
 import fail from "../utils/fail";
 import Config from "../config";
 import cookies from "../utils/cookies";
-import Session from "../session";
+import { startSession } from "../session";
 import Utils from "../utils/common";
 import Password from "./password";
 import emailSenders from "../email/senders";
@@ -61,7 +61,9 @@ async function createUser(req: any, res: any) {
   let rows: string | any[];
 
   try {
-    rows = (await pg.queryP("SELECT * FROM users WHERE email = ($1)", [email])) as any;
+    rows = (await pg.queryP("SELECT * FROM users WHERE email = ($1)", [
+      email,
+    ])) as any;
   } catch (err) {
     fail(res, 500, "polis_err_reg_checking_existing_users", err);
     return;
@@ -115,27 +117,20 @@ async function createUser(req: any, res: any) {
   let uid = result && result.rows && result.rows[0] && result.rows[0].uid;
 
   try {
-    await pg.queryP("insert into jianiuevyew (uid, pwhash) values ($1, $2);", [uid, hashedPassword]);
+    await pg.queryP("insert into jianiuevyew (uid, pwhash) values ($1, $2);", [
+      uid,
+      hashedPassword,
+    ]);
   } catch (err) {
-    fail(
-      res,
-      500,
-      "polis_err_reg_failed_to_add_user_record",
-      err
-    );
+    fail(res, 500, "polis_err_reg_failed_to_add_user_record", err);
     return;
   }
 
   let token: any;
   try {
-    token = await Session.startSession(uid);
+    token = await startSession(uid);
   } catch (err) {
-    fail(
-      res,
-      500,
-      "polis_err_reg_failed_to_start_session",
-      err
-    );
+    fail(res, 500, "polis_err_reg_failed_to_start_session", err);
     return;
   }
 
@@ -149,7 +144,7 @@ async function createUser(req: any, res: any) {
   res.json({
     uid: uid,
     hname: hname,
-    email: email
+    email: email,
   });
 }
 
@@ -178,7 +173,7 @@ ${serverName}/api/v3/verify?e=${einvite}`;
     Config.polisFromAddress,
     email,
     "Polis verification",
-    body
+    body,
   );
 }
 
@@ -207,7 +202,7 @@ async function generateAndRegisterZinvite(zid: any, generateShort: any) {
   const zinvite = await Password.generateTokenP(len, false);
   await pg.queryP(
     "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
-    [zid, zinvite]
+    [zid, zinvite],
   );
   return zinvite;
 }

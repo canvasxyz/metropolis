@@ -85,12 +85,45 @@ const COOKIES_TO_CLEAR = cookies.COOKIES_TO_CLEAR;
 import constants from "./utils/constants";
 const DEFAULTS = constants.DEFAULTS;
 
-import Conversation from "./conversation";
-import Session from "./session";
-import Comment from "./comment";
-import Utils from "./utils/common";
-import SQL from "./db/sql";
-// End of re-import
+import {
+  getConversationInfo,
+  getConversationInfoByConversationId,
+  isXidWhitelisted,
+  createXidRecordByZid,
+  getZidFromConversationId,
+} from "./conversation";
+
+import {
+  encrypt,
+  decrypt,
+  makeSessionToken,
+  getUserInfoForSessionToken,
+  startSession,
+  endSession,
+  setupPwReset,
+  getUidForPwResetToken,
+  clearPwResetToken,
+} from "./session";
+
+import {
+  getComments,
+  getNumberOfCommentsRemaining,
+  detectLanguage,
+  translateAndStoreComment,
+  getComment,
+} from "./comment";
+
+import { polisTypes, hexToStr } from "./utils/common";
+
+import {
+  sql_votes_latest_unique,
+  sql_conversations,
+  sql_participant_metadata_answers,
+  sql_participants_extended,
+  sql_reports,
+  sql_users,
+} from "./db/sqlUtils";
+
 import logger from "./utils/logger";
 
 // # notifications
@@ -190,13 +223,6 @@ function ifDefinedSet(
   }
 }
 
-const sql_votes_latest_unique = SQL.sql_votes_latest_unique;
-const sql_conversations = SQL.sql_conversations;
-const sql_participant_metadata_answers = SQL.sql_participant_metadata_answers;
-const sql_participants_extended = SQL.sql_participants_extended;
-const sql_reports = SQL.sql_reports;
-const sql_users = SQL.sql_users;
-
 // // Eventually, the plan is to support a larger number-space by using some lowercase letters.
 // // Waiting to implement that since there's cognitive overhead with mapping the IDs to/from
 // // letters/numbers.
@@ -228,16 +254,6 @@ const sql_users = SQL.sql_users;
 //         generateConversationId: generateConversationId,
 //     };
 // }());
-
-const encrypt = Session.encrypt;
-const decrypt = Session.decrypt;
-const makeSessionToken = Session.makeSessionToken;
-const getUserInfoForSessionToken = Session.getUserInfoForSessionToken;
-const startSession = Session.startSession;
-const endSession = Session.endSession;
-const setupPwReset = Session.setupPwReset;
-const getUidForPwResetToken = Session.getUidForPwResetToken;
-const clearPwResetToken = Session.clearPwResetToken;
 
 function getUidForApiKey(apikey: any) {
   return queryP_readOnly_wRetryIfEmpty(
@@ -291,11 +307,6 @@ function doApiKeyAuth(
 // function getXidRecordByXidConversationId(xid, conversation_id) {
 //   return queryP("select * from xids where xid = ($2) and owner = (select org_id from conversations where zid = (select zid from zinvites where zinvite = ($1)))", [zinvite, xid]);
 // }
-
-const getConversationInfo = Conversation.getConversationInfo;
-const getConversationInfoByConversationId =
-  Conversation.getConversationInfoByConversationId;
-const isXidWhitelisted = Conversation.isXidWhitelisted;
 
 // function doXidOwnerConversationIdAuth(assigner, xid, conversation_id, req, res, next) {
 //   getXidRecordByXidConversationId(xid, conversation_id).then(function(rows) {
@@ -447,7 +458,6 @@ String.prototype.hashCode = function () {
 //     });
 // });
 
-const polisTypes = Utils.polisTypes;
 const setCookie = cookies.setCookie;
 const setPermanentCookie = cookies.setPermanentCookie;
 const setCookieTestCookie = cookies.setCookieTestCookie;
@@ -480,8 +490,6 @@ function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
     },
   );
 }
-
-const detectLanguage = Comment.detectLanguage;
 
 if (Config.backfillCommentLangDetection) {
   queryP("select tid, txt, zid from comments where lang is null;", []).then(
@@ -1074,8 +1082,6 @@ function addCorsHeader(
 ////////////////////////////////////////////
 ////////////////////////////////////////////
 ////////////////////////////////////////////
-
-const hexToStr = Utils.hexToStr;
 
 function handle_GET_launchPrep(
   req: {
@@ -4791,9 +4797,6 @@ function handle_GET_users(
     });
 }
 
-const getComments = Comment.getComments;
-const getNumberOfCommentsRemaining = Comment.getNumberOfCommentsRemaining;
-
 function handle_GET_participation(
   req: { p: { zid: any; uid?: any; strict: any } },
   res: {
@@ -5039,8 +5042,6 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
     );
   });
 }
-
-const translateAndStoreComment = Comment.translateAndStoreComment;
 
 function handle_GET_comments_translations(
   req: { p: { zid: any; tid: any; lang: string } },
@@ -5303,8 +5304,6 @@ function moderateComment(
     );
   });
 }
-
-const getComment = Comment.getComment;
 
 // function muteComment(zid, tid) {
 //     let mod = polisTypes.mod.ban;
@@ -6181,8 +6180,6 @@ function updateConversationModifiedTime(zid: any, t?: undefined) {
   }
   return queryP(query, params);
 }
-
-const createXidRecordByZid = Conversation.createXidRecordByZid;
 
 function handle_PUT_participants_extended(
   req: { p: { zid: any; uid?: any; show_translation_activated: any } },
@@ -9087,7 +9084,7 @@ function handle_POST_users_invite(
 
 function doGetConversationPreloadInfo(conversation_id: any) {
   // return Promise.resolve({});
-  return Conversation.getZidFromConversationId(conversation_id)
+  return getZidFromConversationId(conversation_id)
     .then(function (zid: any) {
       return Promise.all([getConversationInfo(zid)]);
     })
