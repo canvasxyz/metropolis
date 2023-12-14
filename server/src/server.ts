@@ -128,6 +128,12 @@ function isSpam(o: {
   user_agent: any;
   referrer: any;
 }) {
+  if (!Config.akismetAntispamApiKey) {
+    return new Promise((resolve, reject) =>
+      reject(new Error("No Akismet key provided")),
+    );
+  }
+
   return meteredPromise(
     "isSpam",
     new Promise((resolve, reject) => {
@@ -7725,7 +7731,7 @@ async function handle_GET_conversations(
 
     conv.is_mod = uid && isAdministrator(uid);
 
-    if(conv.github_pr_id !== null) {
+    if (conv.github_pr_id !== null) {
       conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
     } else {
       conv.github_pr_url = null;
@@ -7856,12 +7862,13 @@ function handle_GET_reports(
       reportsPromise = queryP("select * from reports where rid = ($1);", [rid]);
     }
   } else if (zid) {
-    reportsPromise = isOwner(zid, uid).then((doesOwnConversation: any) => {
-      if (!doesOwnConversation) {
-        throw "polis_err_permissions";
-      }
-      return queryP("select * from reports where zid = ($1);", [zid]);
-    });
+    reportsPromise = queryP("select * from reports where zid = ($1);", [zid]);
+    // reportsPromise = isOwner(zid, uid).then((doesOwnConversation: any) => {
+    //   if (!doesOwnConversation) {
+    //     throw "polis_err_permissions";
+    //   }
+    //   return queryP("select * from reports where zid = ($1);", [zid]);
+    // });
   } else {
     reportsPromise = queryP(
       "select * from reports where zid in (select zid from conversations where owner = ($1));",
