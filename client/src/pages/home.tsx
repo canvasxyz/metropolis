@@ -97,7 +97,7 @@ const Index = ({ user }: { user? }) => {
                 </Text>
                 <Link
                   sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
-                  href="/api/v3/github_oauth_init"
+                  href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
                 >
                   Github Login
                 </Link>
