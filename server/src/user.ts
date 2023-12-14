@@ -52,11 +52,11 @@ async function getUser(
     return Promise.resolve({});
   }
 
-  let xidInfoPromise = Promise.resolve(null);
+  let xidInfoPromise = Promise.resolve<string | any[] | null>([]);
   if (zid_optional && xid_optional) {
     xidInfoPromise = Conversation.getXidRecord(xid_optional, zid_optional);
   } else if (xid_optional && owner_uid_optional) {
-    xidInfoPromise = Conversation.getXidRecordByXidOwnerId(
+    xidInfoPromise = getXidRecordByXidOwnerId(
       xid_optional,
       owner_uid_optional,
       zid_optional,
@@ -190,10 +190,10 @@ function getXidRecordByXidOwnerId(
   xid: any,
   owner: any,
   zid_optional: any,
-  x_profile_image_url: any,
-  x_name: any,
-  x_email: any,
-  createIfMissing: any,
+  x_profile_image_url?: string,
+  x_name?: string,
+  x_email?: string,
+  createIfMissing?: boolean,
 ) {
   return pg
     .queryP("select * from xids where xid = ($1) and owner = ($2);", [

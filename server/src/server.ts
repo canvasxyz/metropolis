@@ -338,7 +338,7 @@ function doXidApiKeyAuth(
           req.body.x_profile_image_url || req?.query?.x_profile_image_url,
           req.body.x_name || req?.query?.x_name || null,
           req.body.x_email || req?.query?.x_email || null,
-          !!req.body.agid || !!req?.query?.agid || null,
+          !!req.body.agid || !!req?.query?.agid || false,
         ).then((rows: string | any[] | null) => {
           if (!rows || !rows.length) {
             if (isOptional) {
@@ -681,7 +681,7 @@ function doXidConversationIdAuth(
         req.body.x_profile_image_url || req?.query?.x_profile_image_url,
         req.body.x_name || req?.query?.x_name || null,
         req.body.x_email || req?.query?.x_email || null,
-        !!req.body.agid || !!req?.query?.agid || null,
+        !!req.body.agid || !!req?.query?.agid || false,
       ).then((rows: string | any[] | null) => {
         if (!rows || !rows.length) {
           if (isOptional) {
