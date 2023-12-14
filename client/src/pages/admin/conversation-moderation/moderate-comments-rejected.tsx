@@ -11,7 +11,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 type ModerateCommentsRejectedPropTypes = PropsFromRedux & { dispatch: AppDispatch }
 
 class ModerateCommentsRejected extends React.Component<ModerateCommentsRejectedPropTypes> {
-  static propTypes: {}
+  static propTypes: object
 
   onCommentAccepted(comment) {
     this.props.dispatch(changeCommentStatusToAccepted(comment))

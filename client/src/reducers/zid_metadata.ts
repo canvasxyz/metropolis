@@ -1,18 +1,21 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import _ from "lodash"
 import toast from "react-hot-toast"
 import * as types from "../actions"
+import { ZidMetadata } from "../util/types"
 
 const zid = (
   state = {
     loading: false,
-    zid_metadata: {} as any,
+    zid_metadata: {} as ZidMetadata,
     error: null,
     optimistic: 0 /* `h4x0rz` trigger render because shallow comparison https://github.com/reactjs/redux/issues/585 */,
   },
-  action
+  action,
 ) => {
+  let filtered_zid_metadata
+  let filtered_action_data
+
   switch (action.type) {
     case types.REQUEST_ZID_METADATA:
       return Object.assign({}, state, {
@@ -38,7 +41,7 @@ const zid = (
         error: null,
       })
     case types.UPDATE_ZID_METADATA_SUCCESS:
-      const filtered_zid_metadata: any = { ...state.zid_metadata }
+      filtered_zid_metadata = { ...state.zid_metadata }
       delete filtered_zid_metadata.site_id
       delete filtered_zid_metadata.auth_opt_fb
       delete filtered_zid_metadata.auth_opt_fb_computed
@@ -47,7 +50,7 @@ const zid = (
       delete filtered_zid_metadata.ownername
       delete filtered_zid_metadata.is_owner
       delete filtered_zid_metadata.modified
-      const filtered_action_data: any = { ...action.data }
+      filtered_action_data = { ...action.data }
       delete filtered_action_data.auth_opt_fb
       delete filtered_action_data.modified
 

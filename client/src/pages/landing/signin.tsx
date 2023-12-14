@@ -2,15 +2,13 @@
 
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { doSignin, doFacebookSignin, Action } from "../../actions"
+import { doSignin, doFacebookSignin } from "../../actions"
 import { Link, Redirect } from "react-router-dom"
 import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
 import strings from "../../intl"
-import { UrlObject, UrlWithStringQuery } from "url"
+import { UrlObject } from "url"
 import { AppDispatch, RootState } from "../../store"
-
-const fbAppId = process.env.FB_APP_ID
 
 const connector = connect((state: RootState) => state.signin)
 type PropsFromRedux = ConnectedProps<typeof connector>
@@ -28,7 +26,7 @@ class SignIn extends React.Component<CreateUserProps> {
   facebook_password: HTMLInputElement
 
   // eslint-disable-next-line node/handle-callback-err
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError() {
     // Update state so the next render will show the fallback UI.
     return { hasError: true }
   }
@@ -147,7 +145,7 @@ class SignIn extends React.Component<CreateUserProps> {
             </Link>
           </Text>
         </form>
-        {/*fbAppId && (
+        {/* fbAppId && (
           <Box sx={{ my: 4 }}>
             <Button
               id="facebookSigninButton"
@@ -160,7 +158,7 @@ class SignIn extends React.Component<CreateUserProps> {
               privacy policy.
             </Text>
           </Box>
-        )*/}
+        ) */}
       </Box>
     )
   }

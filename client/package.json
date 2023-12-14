@@ -8,8 +8,8 @@
     "dev": "webpack-dev-server --mode=development",
     "build": "rimraf build && npm run build:prod",
     "start": "npm run dev",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix"
+    "lint": "eslint src --ignore-path .eslintignore",
+    "lint:fix": "eslint src --fix --ignore-path .eslintignore"
   },
   "devDependencies": {
     "@babel/core": "~7.16.0",

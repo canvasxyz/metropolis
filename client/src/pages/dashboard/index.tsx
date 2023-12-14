@@ -1,9 +1,9 @@
 /** @jsx jsx */
 
-import { Fragment, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Heading, Box, Flex, Link, Text, Button, jsx } from "theme-ui"
+import { Box, Flex, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
@@ -22,7 +22,7 @@ type ConversationListItemProps = {
   navigateToConversation: (conversationId: string) => void
 }
 
-const ConversationListItemSection = ({ children }) => {
+const ConversationListItemSection = ({ children }: { children }) => {
   return <Box sx={{ minHeight: "calc(100vh - 190px)" }}>{children}</Box>
 }
 
@@ -98,12 +98,6 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     dispatch(populateConversationsStore())
   }, [])
 
-  const {
-    user,
-    isLoggedIn,
-    loading: userIsLoading,
-  } = useAppSelector((state: RootState) => state.user)
-
   const hist = useHistory()
   const data = useAppSelector((state: RootState) => state.conversations)
   const conversations: Array<Conversation> = data.conversations || []
@@ -139,6 +133,26 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     (conversation) => conversation.fip_title && !conversation.is_archived,
   )
   const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
+  const allConversations = openConversations.concat(nonFIPConversations)
+
+  if (showAllFIPConversations) {
+    allConversations.sort((c1, c2) => {
+      return (
+        (c2.github_pr_opened_at ? new Date(c2.github_pr_opened_at).getTime() : c2.created) -
+        (c1.github_pr_opened_at ? new Date(c1.github_pr_opened_at).getTime() : c1.created)
+      )
+    })
+  }
+
+  const selectedConversations = showAllFIPConversations
+    ? allConversations
+    : showOpenFIPConversations
+    ? openConversations
+    : showNonFIPConversations
+    ? nonFIPConversations
+    : showArchivedConversations
+    ? archivedConversations
+    : []
 
   return (
     <Box sx={{ height: "calc(100vh - 7px)" }}>
@@ -235,7 +249,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
           >
             <Box
               variant={showAllFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
               onClick={() => {
                 setShowAllFIPConversations(true)
                 setShowNonFIPConversations(false)
@@ -247,7 +261,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             <Box
               variant={showOpenFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
               onClick={() => {
                 setShowOpenFIPConversations(true)
                 setShowAllFIPConversations(false)
@@ -259,7 +273,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             <Box
               variant={showNonFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
               onClick={() => {
                 setShowNonFIPConversations(true)
                 setShowAllFIPConversations(false)
@@ -267,11 +281,11 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowArchivedConversations(false)
               }}
             >
-              Polls ({nonFIPConversations.length})
+              Community Polls ({nonFIPConversations.length})
             </Box>
             <Box
               variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], display: "inline-block" }}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
               onClick={() => {
                 setShowArchivedConversations(true)
                 setShowAllFIPConversations(false)
@@ -279,37 +293,18 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowOpenFIPConversations(false)
               }}
             >
-              Past {/*({archivedConversations.length})*/}
+              Past {/* ({archivedConversations.length}) */}
             </Box>
           </Box>
           <ConversationListItemSection>
-            {(showAllFIPConversations || showOpenFIPConversations) &&
-              openConversations.map((conversation) => (
-                <ConversationListItem
-                  conversation={conversation}
-                  selectedConversationId={selectedConversationId}
-                  navigateToConversation={navigateToConversation}
-                  key={conversation.conversation_id}
-                />
-              ))}
-            {(showAllFIPConversations || showNonFIPConversations) &&
-              nonFIPConversations.map((conversation) => (
-                <ConversationListItem
-                  conversation={conversation}
-                  selectedConversationId={selectedConversationId}
-                  navigateToConversation={navigateToConversation}
-                  key={conversation.conversation_id}
-                />
-              ))}
-            {showArchivedConversations &&
-              archivedConversations.map((conversation) => (
-                <ConversationListItem
-                  conversation={conversation}
-                  selectedConversationId={selectedConversationId}
-                  navigateToConversation={navigateToConversation}
-                  key={conversation.conversation_id}
-                />
-              ))}
+            {selectedConversations.map((conversation) => (
+              <ConversationListItem
+                conversation={conversation}
+                selectedConversationId={selectedConversationId}
+                navigateToConversation={navigateToConversation}
+                key={conversation.conversation_id}
+              />
+            ))}
           </ConversationListItemSection>
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>

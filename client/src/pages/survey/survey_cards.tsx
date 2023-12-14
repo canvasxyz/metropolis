@@ -2,13 +2,13 @@
 
 import _ from "lodash"
 import React, { Fragment, useState, useRef, useLayoutEffect } from "react"
-import { Box, Heading, Button, Text, Textarea, Link, Flex, jsx } from "theme-ui"
+import { Box, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 
-import { surveyBox, surveyHeadingMini } from "./index"
+import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
 
-const PrefilledComment = ({ text, last }: { text: string; last?: boolean }) => {
+const PrefilledComment = ({ text }: { text: string }) => {
   return (
     <Box
       sx={{
@@ -63,7 +63,7 @@ export const PrefilledComments = () => {
   return (
     <Box sx={{ lineHeight: 1.3 }}>
       <PrefilledComment text="This seems unobjectionable to me." />
-      <PrefilledComment text="We should verify this has support from..." last />
+      <PrefilledComment text="We should verify this has support from..." />
       <PrefilledComment text="There could be unexpected side effects if..." />
       <PrefilledComment text="This proposal would benefit from review by..." />
     </Box>
@@ -71,16 +71,19 @@ export const PrefilledComments = () => {
 }
 
 const SurveyCards = ({
-  user,
   conversation_id,
   votedComments,
   unvotedComments,
-  setVotedComments,
-  submittedComments,
-  setSubmittedComments,
   onVoted,
   goTo,
   zid_metadata,
+}: {
+  conversation_id
+  votedComments
+  unvotedComments
+  onVoted
+  goTo
+  zid_metadata
 }) => {
   const cardsBoxRef = useRef<HTMLElement>()
   const [maxHeight, setMaxHeight] = useState<number>()

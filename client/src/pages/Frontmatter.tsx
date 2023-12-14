@@ -11,16 +11,16 @@ export const Frontmatter = ({ conversation }: FrontmatterProps) => {
     // "title",
     "author",
     "discussions-to",
-    //"type",
-    //"created"
+    // "type",
+    // "created"
   ]
   const valueFieldNames = [
     "fip_status",
     // "fip_title",
     "fip_author",
     "fip_discussions_to",
-    //"fip_type",
-    //"fip_created",
+    // "fip_type",
+    // "fip_created",
   ]
   const valueFieldNamesDisplay = {
     // title: "Title",

@@ -1,37 +1,32 @@
-import React, { useRef, useEffect, useState } from "react"
+import React, { useRef, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import { Box, Heading, Button, Text } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"
 
 import type { Comment } from "../../util/types"
 import { DropdownButton } from "../../components/dropdown"
-import SurveyCard from "./survey_card"
 import api from "../../util/api"
-import { surveyBox, surveyHeadingMini } from "./index"
+import { surveyHeadingMini } from "./index"
 
 Modal.setAppElement("#root")
 
-const SurveyComposeBox: React.FC<{
-  zid_metadata
-  votedComments
-  setVotedComments
-  unvotedComments
-  allComments
-  submittedComments
-  setSubmittedComments
-  setState
-}> = ({
+const SurveyComposeBox = ({
   zid_metadata,
   votedComments,
   setVotedComments,
-  unvotedComments,
-  allComments,
   submittedComments,
   setSubmittedComments,
   setState,
+}: {
+  zid_metadata
+  votedComments
+  setVotedComments
+  submittedComments
+  setSubmittedComments
+  setState
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>()
   const [cachedComment, setCachedComment] = useLocalStorage(
@@ -121,7 +116,7 @@ const SurveyComposeBox: React.FC<{
         ref={inputRef}
         placeholder="Add a comment"
         defaultValue={cachedComment}
-        onBlur={(e) => {
+        onBlur={() => {
           setCachedComment(inputRef.current.value)
         }}
         onKeyDown={(e) => {
@@ -161,7 +156,7 @@ const SurveyComposeBox: React.FC<{
               },
               default: true,
             },
-            /*{
+            /* {
               name: "Submit and disagree",
               onClick: () => {
                 submitComment(inputRef.current.value, -1)
@@ -173,7 +168,7 @@ const SurveyComposeBox: React.FC<{
                     setLoading(false)
                   })
               },
-            },*/
+            }, */
           ]}
         />
       </Box>
@@ -188,12 +183,19 @@ const SurveyCompose = ({
   unvotedComments,
   setVotedComments,
   submittedComments,
-  allComments,
   setSubmittedComments,
   setState,
   showAsModal = false,
+}: {
+  zid_metadata
+  votedComments
+  unvotedComments
+  setVotedComments
+  submittedComments
+  setSubmittedComments
+  setState
+  showAsModal
 }) => {
-  const [showIntro, setShowIntro] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -215,8 +217,6 @@ const SurveyCompose = ({
           zid_metadata={zid_metadata}
           votedComments={votedComments}
           setVotedComments={setVotedComments}
-          unvotedComments={unvotedComments}
-          allComments={allComments}
           submittedComments={submittedComments}
           setSubmittedComments={setSubmittedComments}
           setState={setState}
@@ -265,8 +265,6 @@ const SurveyCompose = ({
             zid_metadata={zid_metadata}
             votedComments={votedComments}
             setVotedComments={setVotedComments}
-            unvotedComments={unvotedComments}
-            allComments={allComments}
             submittedComments={submittedComments}
             setSubmittedComments={setSubmittedComments}
             setState={setState}

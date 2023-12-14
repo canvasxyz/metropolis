@@ -1,22 +1,14 @@
 /** @jsx jsx */
 
-import { RouteComponentProps, Link } from "react-router-dom"
-import React, { useEffect } from "react"
+import React from "react"
+import { Link } from "react-router-dom"
 import { ConnectedProps, connect } from "react-redux"
-import { Box, Grid, Heading, Button, Text, Flex, jsx } from "theme-ui"
-import { TbExternalLink, TbUser, TbCheckbox } from "react-icons/tb"
+import { Box, Heading, Button, Flex, jsx } from "theme-ui"
 
 import {
   populateConversationsStore,
-  handleCreateConversationSubmit,
-  handleCloseConversation,
-  handleReopenConversation,
-  populateConversationStatsStore,
 } from "../actions"
-import { DropdownMenu } from "../components/dropdown"
 
-import Url from "../util/url"
-import { Conversation } from "../util/types"
 import ConversationRow from "../components/conversation_row"
 import { AppDispatch, RootState } from "../store"
 
@@ -28,7 +20,7 @@ const connector = connect((state: RootState) => ({
 }))
 type PropsFromRedux = ConnectedProps<typeof connector>
 type ManageConversationsPropTypes = PropsFromRedux & {
-  history: any;
+  history: History;
   dispatch: AppDispatch;
 }
 

@@ -1,24 +1,22 @@
-import React, { useEffect, useState, useRef } from "react"
-import { Box, Heading, Button, Text, Textarea, Flex, jsx } from "theme-ui"
+import React, { useState } from "react"
+import { Box, Button } from "theme-ui"
 
 import { TbChevronDown } from "react-icons/tb"
 
 type DropdownMenuOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick
   sx?
 }>
 
 let isFocused
 
 const DropdownMenu = ({
-  sx,
   buttonSx,
   variant,
   rightAlign,
   options,
 }: {
-  sx?
   buttonSx?
   variant?: string
   rightAlign?: boolean
@@ -100,7 +98,7 @@ const DropdownMenu = ({
 
 type DropdownButtonOptions = Array<{
   name: string | React.ReactNode
-  onClick: Function
+  onClick
   default?: boolean
 }>
 

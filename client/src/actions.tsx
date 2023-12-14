@@ -1687,7 +1687,7 @@ export const populateConversationStatsStore = (conversation_id, until) => {
 }
 
 const dataExportGet = (conversation_id, format, unixTimestamp, untilEnabled) => {
-  let url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
+  const url = `/api/v3/dataExport?conversation_id=${conversation_id}&format=${format}`
   return $.get(url)
 }
 

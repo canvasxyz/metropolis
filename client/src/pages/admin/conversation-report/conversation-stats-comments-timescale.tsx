@@ -14,7 +14,7 @@ class CommentsTimescale extends React.Component<
   },
   {}
 > {
-  static propTypes: {}
+  static propTypes: object
 
   render() {
     return (

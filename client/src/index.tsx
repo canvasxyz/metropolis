@@ -30,7 +30,7 @@ class Root extends React.Component {
   }
 }
 
-// @ts-ignore
+// @ts-expect-error global jquery
 window.$ = $
 
 ReactDOM.render(<Root />, document.getElementById("root"))

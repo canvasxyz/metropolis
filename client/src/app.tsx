@@ -4,11 +4,10 @@ import React from "react"
 import PropTypes from "prop-types"
 import { ConnectedProps, connect } from "react-redux"
 import { populateUserStore } from "./actions"
-import type { User } from "./util/types"
 
 import { Toaster } from "react-hot-toast"
-import { Switch, Route, Link, Redirect } from "react-router-dom"
-import { Flex, Box, jsx } from "theme-ui"
+import { Switch, Route, Redirect } from "react-router-dom"
+import { Box, jsx } from "theme-ui"
 
 import Header from "./components/header"
 import Footer from "./components/footer"
@@ -151,7 +150,6 @@ class App extends React.Component<AppPropTypes,
                 !document.location.pathname.startsWith("/dashboard") && (
                   <Header
                     isLoggedIn={this.props.isLoggedIn}
-                    user={this.props.user}
                     inSurvey={inSurvey}
                   />
                 )}

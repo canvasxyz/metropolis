@@ -1,34 +1,31 @@
 /** @jsx jsx */
 
 import $ from "jquery"
-import React, { useEffect, useState, useRef } from "react"
+import React, { useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { connect } from "react-redux"
 import { toast } from "react-hot-toast"
-import { Box, Heading, Button, Text, Input, jsx } from "theme-ui"
+import { Box, Button, Text, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
 import { DropdownMenu } from "../../components/dropdown"
-import { TbHeart, TbArrowBigUpLine, TbCheck, TbEdit, TbX } from "react-icons/tb"
 
 type SurveyCardProps = {
   comment: Comment
   conversationId: string
-  onVoted: Function
+  onVoted: (commentId: string) => void
   hasVoted: boolean
   maxHeight?: number
 }
 
 const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: SurveyCardProps) => {
-  const { tid: commentId, txt, created, pid } = comment
+  const { tid: commentId, txt } = comment
 
-  const [voting, setVoting] = useState(false)
   const [editingVote, setEditingVote] = useState(false)
 
   const animateOut = (target) =>
-    new Promise<void>((resolve, reject) => {
+    new Promise<void>((resolve) => {
       $(target).closest(".survey-card").addClass("animation-exit")
       setTimeout(() => resolve(), 300)
     })
@@ -36,7 +33,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
   // returns promise {nextComment: {tid:...}} or {} if no further comments
   const agree = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
-    setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
@@ -54,12 +50,10 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
           setEditingVote(false)
         })
       })
-      .always(() => setVoting(false))
   }
 
   const disagree = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
-    setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
@@ -77,12 +71,10 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
           setEditingVote(false)
         })
       })
-      .always(() => setVoting(false))
   }
 
   const skip = (commentId: string, target: HTMLElement) => {
     // ;(event.currentTarget as any).blur() // for editing past votes
-    setVoting(true)
     api
       .post("api/v3/votes", {
         pid: "mypid",
@@ -100,7 +92,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
           setEditingVote(false)
         })
       })
-      .always(() => setVoting(false))
   }
 
   return (
@@ -129,7 +120,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
           }}
         >
           <Text className="react-markdown">
-            <ReactMarkdown children={txt} remarkPlugins={[remarkGfm]} linkTarget="_blank" />
+            <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">{txt}</ReactMarkdown>
           </Text>
         </Text>
         {hasVoted && (
@@ -157,7 +148,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         >
           <Button variant="text" onClick={(e) => agree(commentId, e.target)}>
             <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
-            {/*<TbCheck style={{ position: "relative", top: "4px" }} />*/}
             Agree
           </Button>
           <Button variant="text" onClick={(e) => disagree(commentId, e.target)}>
@@ -166,7 +156,6 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
               width="18"
               sx={{ position: "relative", top: "2px", mr: [2] }}
             />
-            {/*<TbX style={{ position: "relative", top: "4px" }} />*/}
             Disagree
           </Button>
           <Button variant="text" onClick={(e) => skip(commentId, e.target)}>

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Fragment, useCallback, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
@@ -31,9 +31,9 @@ type ReportComment = {
   velocity: number
 }
 
-export const DashboardConversation = ({ conversation, zid_metadata }) => {
+export const DashboardConversation = ({ conversation, zid_metadata }: { conversation, zid_metadata }) => {
   const collapsibleConversation = conversation.description.length > 300
-  const [collapsed, setCollapsed] = useState(collapsibleConversation ? true : false)
+  const [collapsed, setCollapsed] = useState(!!collapsibleConversation)
   const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
@@ -57,7 +57,7 @@ export const DashboardConversation = ({ conversation, zid_metadata }) => {
   useEffect(() => {
     setReport(undefined)
     setReportComments([])
-    setCollapsed(collapsibleConversation ? true : false)
+    setCollapsed(!!collapsibleConversation)
     if (!zid_metadata.conversation_id) return
     api
       .get("/api/v3/reports", {
