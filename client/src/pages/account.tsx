@@ -1,6 +1,5 @@
 import React from "react"
 import { Box, Heading, Image } from "theme-ui"
-import { TbExternalLink } from "react-icons/tb"
 import { Link as RouterLink } from "react-router-dom"
 
 import Spinner from "../components/spinner"
