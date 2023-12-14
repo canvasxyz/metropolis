@@ -32,7 +32,7 @@
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.3",
     "errorhandler": "^1.4.3",
-    "express": "^4.18.2",
+    "express": "^5.0.0-beta.1",
     "express-session": "^1.17.3",
     "fb": "~1.0.2",
     "http-proxy": "~1.18.1",

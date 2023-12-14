@@ -1136,7 +1136,7 @@ const fetchIndexForAdminPage = (
   res: express.Response,
 ) => {
   res.setHeader("Content-Type", "text/html");
-  res.sendfile(__dirname + "/client/index.html");
+  res.sendFile(__dirname + "/client/index.html");
 };
 
 app.get("^/$", fetchIndexForAdminPage);
@@ -1186,7 +1186,7 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
       encoding: "utf8",
     });
     res.set(JSON.parse(headers));
-    res.sendfile(__dirname + "/embed/embed.js");
+    res.sendFile(__dirname + "/embed/embed.js");
     return;
   }
 
@@ -1210,7 +1210,7 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
     return;
   }
   // all other files just need headers
-  res.sendfile(__dirname + path);
+  res.sendFile(__dirname + path);
 };
 
 app.get(/^\/embed$/, fetchEmbed);
