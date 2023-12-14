@@ -3,6 +3,7 @@
 import $ from "jquery"
 import api from "./util/api"
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Action = any
 
 /* ======= Types ======= */
