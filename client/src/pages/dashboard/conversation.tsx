@@ -226,7 +226,7 @@ export const DashboardConversation = ({
             lineHeight: 1.45,
           }}
         >
-          <Heading as="h2">Report</Heading>
+          <Heading as="h2">Sentiment Report</Heading>
           <Box sx={{ mt: [4] }}>
             <Text
               sx={{
@@ -237,7 +237,9 @@ export const DashboardConversation = ({
                 textAlign: "center",
               }}
             >
-              Here are the top comments so far.{" "}
+              {reportComments.length > 0
+                ? "Here are the top comments so far. "
+                : "No comments yet. "}
               <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
                 <Text as="span" variant="links.text">
                   View full report
