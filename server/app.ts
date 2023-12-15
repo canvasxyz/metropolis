@@ -202,9 +202,9 @@ if (devMode) {
 app.use(middleware_log_request_body);
 app.use(middleware_log_middleware_errors);
 
-app.all("/api/v3/*", addCorsHeader);
-app.all("/font/*", addCorsHeader);
-app.all("/api/v3/*", middleware_check_if_options);
+app.all("/api/v3/(.+)", addCorsHeader);
+app.all("/font/(.+)", addCorsHeader);
+app.all("/api/v3/(.+)", middleware_check_if_options);
 
 ////////////////////////////////////////////
 ////////////////////////////////////////////
