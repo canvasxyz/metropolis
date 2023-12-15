@@ -49,6 +49,7 @@ export type ZidMetadata = {
   github_pr_submitter: string | null
   github_pr_title: string | null
   github_pr_updated_at: string | null
+  github_pr_url: string | null
   github_repo_name: string | null
   github_repo_owner: string | null
   github_sync_enabled: boolean | null
