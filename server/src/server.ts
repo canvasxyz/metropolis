@@ -7750,6 +7750,12 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
   );
   const conv = conversationRows[0];
 
+  if (conv.github_pr_id !== null) {
+    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+  } else {
+    conv.github_pr_url = null;
+  }
+
   const convHasMetadata = await getConversationHasMetadata(zid);
   const translations = await getConversationTranslationsMinimal(zid, lang);
 
