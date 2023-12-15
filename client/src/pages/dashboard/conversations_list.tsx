@@ -7,6 +7,8 @@ import { RootState } from "../../store"
 import { ConversationSummary, populateConversationsSummary } from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
 
+type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
+
 const ConversationsList = ({selectedConversationId}: {selectedConversationId: string | null}) => {
   const dispatch = useAppDispatch()
   const hist = useHistory()
@@ -14,14 +16,7 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
   const {data} = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const [showAllFIPConversations, setShowAllFIPConversations] = useLocalStorage("showAll", true)
-  const [showOpenFIPConversations, setShowOpenFIPConversations] = useLocalStorage("showOpen", false)
-  const [showNonFIPConversations, setShowNonFIPConversations] = useLocalStorage("showNonFIP", false)
-  const [showArchivedConversations, setShowArchivedConversations] = useLocalStorage(
-    "showArchived",
-    false,
-  )
-  const [showHiddenConversations, setShowHiddenConversations] = useLocalStorage("showHidden", false)
+  const [selectedConversationList, setSelectedConversationList] = useLocalStorage<ConversationListSelection>("selectedConversationList", "all-fip")
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
@@ -45,31 +40,31 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
       conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
   )
   const allConversations = openConversations.concat(nonFIPConversations)
-  const archivedConversations = conversations.filter(
-    (conversation) => conversation.is_archived && !conversation.is_hidden,
-  )
-  const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
 
-  if (showAllFIPConversations) {
+  let conversationsToDisplay: ConversationSummary[]
+  if (selectedConversationList === "all-fip") {
     allConversations.sort((c1, c2) => {
       return (
         (c2.github_pr_opened_at ? new Date(c2.github_pr_opened_at).getTime() : c2.created) -
         (c1.github_pr_opened_at ? new Date(c1.github_pr_opened_at).getTime() : c1.created)
       )
     })
+    conversationsToDisplay = allConversations
+  } else if (selectedConversationList === "open-fip") {
+    conversationsToDisplay = openConversations
+  } else if (selectedConversationList === "non-fip") {
+    conversationsToDisplay = nonFIPConversations
+  } else if (selectedConversationList === "archived") {
+    const archivedConversations = conversations.filter(
+      (conversation) => conversation.is_archived && !conversation.is_hidden,
+    )
+    conversationsToDisplay = archivedConversations
+  } else if (selectedConversationList === "hidden") {
+    const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
+    conversationsToDisplay = hiddenConversations
+  } else {
+    conversationsToDisplay = []
   }
-
-  const selectedConversations = showAllFIPConversations
-    ? allConversations
-    : showOpenFIPConversations
-    ? openConversations
-    : showNonFIPConversations
-    ? nonFIPConversations
-    : showArchivedConversations
-    ? archivedConversations
-    : showHiddenConversations
-    ? hiddenConversations
-    : []
 
   return <React.Fragment>
     <Box
@@ -82,47 +77,35 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
       }}
     >
       <Box
-        variant={showAllFIPConversations ? "buttons.primary" : "buttons.outline"}
+        variant={selectedConversationList === "all-fip" ? "buttons.primary" : "buttons.outline"}
         sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
         onClick={() => {
-          setShowAllFIPConversations(true)
-          setShowNonFIPConversations(false)
-          setShowOpenFIPConversations(false)
-          setShowArchivedConversations(false)
-          setShowHiddenConversations(false)
+          setSelectedConversationList("all-fip")
         }}
       >
         All ({openConversations.length + nonFIPConversations.length})
       </Box>
       <Box
-        variant={showOpenFIPConversations ? "buttons.primary" : "buttons.outline"}
+        variant={selectedConversationList === "open-fip" ? "buttons.primary" : "buttons.outline"}
         sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
         onClick={() => {
-          setShowOpenFIPConversations(true)
-          setShowAllFIPConversations(false)
-          setShowNonFIPConversations(false)
-          setShowArchivedConversations(false)
-          setShowHiddenConversations(false)
+          setSelectedConversationList("open-fip")
         }}
       >
         FIPs ({openConversations.length})
       </Box>
       <Box
-        variant={showNonFIPConversations ? "buttons.primary" : "buttons.outline"}
+        variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}
         sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
         onClick={() => {
-          setShowNonFIPConversations(true)
-          setShowAllFIPConversations(false)
-          setShowOpenFIPConversations(false)
-          setShowArchivedConversations(false)
-          setShowHiddenConversations(false)
+          setSelectedConversationList("non-fip")
         }}
       >
         Polls ({nonFIPConversations.length})
       </Box>
     </Box>
     <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
-      {selectedConversations.map((conversation) => (
+      {conversationsToDisplay.map((conversation) => (
         <ConversationListItem
           conversation={conversation}
           selectedConversationId={selectedConversationId}
@@ -133,27 +116,19 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
     </Box>
     <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
       <Box
-        variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
+        variant={selectedConversationList === "archived" ? "buttons.primary" : "buttons.outline"}
         sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
         onClick={() => {
-          setShowArchivedConversations(true)
-          setShowAllFIPConversations(false)
-          setShowNonFIPConversations(false)
-          setShowOpenFIPConversations(false)
-          setShowHiddenConversations(false)
+          setSelectedConversationList("archived")
         }}
       >
         Past
       </Box>
       <Box
-        variant={showHiddenConversations ? "buttons.primary" : "buttons.outline"}
+        variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
         sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
         onClick={() => {
-          setShowArchivedConversations(false)
-          setShowAllFIPConversations(false)
-          setShowNonFIPConversations(false)
-          setShowOpenFIPConversations(false)
-          setShowHiddenConversations(true)
+          setSelectedConversationList("hidden")
         }}
       >
         Hidden
