@@ -32,7 +32,7 @@ import CreateConversation from "./pages/create_conversation"
 import ManageConversations from "./pages/manage_conversations"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
-import Survey from "./pages/survey"
+import SurveyWithLoader from "./pages/survey/survey_with_loader"
 
 /* report */
 import Report from "./pages/report"
@@ -224,7 +224,7 @@ class App extends React.Component<AppPropTypes,
                           path="/account"
                           component={Account}
                         />
-                        <Route path="/c/:conversation_id" component={Survey} />
+                        <Route path="/c/:conversation_id" component={SurveyWithLoader} />
                         <Route path="/r/:conversation_id/:report_id" component={Report} />
                       </Box>
                     )
