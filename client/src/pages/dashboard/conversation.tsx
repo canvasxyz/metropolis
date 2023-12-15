@@ -13,7 +13,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
-import { handleModerateConversation, handleUnmoderateConversation, populateZidMetadataStore, resetMetadataStore } from "../../actions"
+import { handleModerateConversation, handleUnmoderateConversation, populateZidMetadataStore } from "../../actions"
 
 type ReportComment = {
   active: boolean
@@ -93,9 +93,6 @@ export const DashboardConversation = ({
 
   useEffect(() => {
     dispatch(populateZidMetadataStore(selectedConversationId))
-    return () => {
-      dispatch(resetMetadataStore())
-    }
   }, [selectedConversationId])
 
   return (
