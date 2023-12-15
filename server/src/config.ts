@@ -3,8 +3,8 @@ import isTrue from "boolean";
 
 const devHostname = process.env.API_DEV_HOSTNAME || "localhost:8040";
 const devMode = isTrue(process.env.DEV_MODE) as boolean;
-const domainOverride = process.env.DOMAIN_OVERRIDE || (null as string | null);
-const prodHostname = process.env.API_PROD_HOSTNAME || "pol.is";
+const domainOverride = process.env.DOMAIN_OVERRIDE || null;
+const prodHostname = process.env.API_PROD_HOSTNAME || "metropolis.vote";
 const serverPort = parseInt(
   process.env.API_SERVER_PORT || process.env.PORT || "8040",
   10,
@@ -26,14 +26,8 @@ export default {
     if (domainOverride) {
       return `${req.protocol}://${domainOverride}`;
     }
-    if (req.headers.host.includes("preprod.pol.is")) {
-      return "https://preprod.pol.is";
-    }
-    if (req.headers.host.includes("embed.pol.is")) {
-      return "https://embed.pol.is";
-    }
-    if (req.headers.host.includes("survey.pol.is")) {
-      return "https://survey.pol.is";
+    if (req.headers.host.includes("metropolis.vote")) {
+      return "https://metropolis.vote";
     }
 
     return `https://${prodHostname}`;

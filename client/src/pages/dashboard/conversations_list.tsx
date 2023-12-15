@@ -209,6 +209,8 @@ const ConversationListItem = ({
               const date = new Date(conversation.fip_created)
               return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
+            {conversation.fip_status && " · "}
+            {conversation.fip_status}
           </Text>
         ) : (
           <Text>
@@ -217,6 +219,9 @@ const ConversationListItem = ({
               const date = new Date(conversation.created)
               return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
+            {" · "}
+            {conversation.participant_count} participant
+            {conversation.participant_count !== 1 ? "s" : ""}
           </Text>
         )}
       </Text>

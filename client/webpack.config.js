@@ -76,49 +76,6 @@ module.exports = (env, options) => {
       }),
       // Only run analyzer when specified in flag.
       ...(cliArgs.analyze ? [new BundleAnalyzerPlugin({ defaultSizes: "gzip" })] : []),
-      // Only compress and create headerJson files during production builds.
-      ...(isDevBuild || isDevServer || cliArgs.analyze
-        ? []
-        : [
-            new EventHooksPlugin({
-              afterEmit: () => {
-                function writeHeadersJson(matchGlob, headersData = {}) {
-                  const files = glob.sync(path.resolve(__dirname, "build", matchGlob))
-                  files.forEach((f, i) => {
-                    const headersFilePath = f + ".headersJson"
-                    fs.writeFileSync(headersFilePath, JSON.stringify(headersData))
-                  })
-                }
-
-                function writeHeadersJsonHtml() {
-                  const headersData = {
-                    "x-amz-acl": "public-read",
-                    "Content-Type": "text/html; charset=UTF-8",
-                    "Cache-Control": "no-cache",
-                  }
-                  writeHeadersJson("*.html", headersData)
-                }
-
-                function writeHeadersJsonJs() {
-                  const headersData = {
-                    "x-amz-acl": "public-read",
-                    "Content-Encoding": "gzip",
-                    "Content-Type": "application/javascript",
-                    "Cache-Control": "no-transform,public,max-age=31536000,s-maxage=31536000",
-                  }
-                  writeHeadersJson("static/js/*.js?(.map)", headersData)
-                }
-
-                function writeHeadersJsonMisc() {
-                  writeHeadersJson("favicon.ico")
-                }
-
-                writeHeadersJsonHtml()
-                writeHeadersJsonJs()
-                writeHeadersJsonMisc()
-              },
-            }),
-          ]),
     ],
     optimization: {
       minimize: !isDevBuild,

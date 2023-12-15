@@ -148,7 +148,7 @@ export const DashboardConversation = ({
                 [Mod]
               </Text>
             )}
-            Review Comments
+            Moderate Comments
           </Button>
           <Button
             variant="outlineSecondary"
@@ -182,7 +182,7 @@ export const DashboardConversation = ({
                 [Mod]
               </Text>
             )}
-            {zid_metadata.is_hidden ? "Unhide Proposal" : "Hide Proposal"}
+            {zid_metadata.is_hidden ? "Unhide" : "Hide"}
           </Button>
         </Box>
       )}

@@ -43,7 +43,7 @@ const COOKIES_TO_CLEAR = {
 let oneYear = 1000 * 60 * 60 * 24 * 365;
 
 function cookieDomain(req: any) {
-  const origin = req?.headers?.origin || "";
+  const origin = req?.headers?.origin || req?.body?.dest || "";
   const parsedOrigin = url.parse(origin);
   if (parsedOrigin.hostname === "localhost") {
     return "localhost";
@@ -164,7 +164,7 @@ function getPermanentCookieAndEnsureItIsSet(
   }
 }
 
-export default {
+export {
   COOKIES,
   COOKIES_TO_CLEAR,
   cookieDomain,

@@ -9,9 +9,11 @@ export type ConversationSummary = {
   fip_created: string | null
   fip_title: string | null
   fip_number: number
+  fip_status: string
   github_pr_opened_at: string | null
   github_pr_title: string | null
   github_pr_id: string | null
+  participant_count: number
   topic: string | null
   is_archived: boolean
   is_hidden: boolean
