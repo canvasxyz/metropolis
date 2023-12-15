@@ -305,9 +305,9 @@ const Collapsible = ({children, shouldCollapse}: {children: React.ReactElement; 
 
   return (<React.Fragment>
     <Box
-      className={collapsed ? "react-markdown css-fade" : "react-markdown"}
+      className={shouldCollapse && collapsed ? "react-markdown css-fade" : "react-markdown"}
       sx={
-        collapsed
+        shouldCollapse && collapsed
           ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
           : { wordBreak: "break-word", mb: [3] }
       }
