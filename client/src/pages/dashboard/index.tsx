@@ -115,13 +115,6 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     hist.push(`/dashboard/c/${conversationId}`)
   }, [])
 
-  const selectedConversation =
-    selectedConversationId !== null
-      ? conversations.filter(
-          (conversation) => conversation.conversation_id === selectedConversationId,
-        )[0]
-      : null
-
   const nonFIPConversations = conversations.filter(
     (conversation) =>
       !conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
