@@ -114,7 +114,7 @@ async function createUser(req: any, res: any) {
     return;
   }
 
-  let uid = result && result[0] && result[0].uid;
+  let uid = result && result.rows && result.rows[0] && result.rows[0].uid;
 
   try {
     await pg.queryP("insert into jianiuevyew (uid, pwhash) values ($1, $2);", [
