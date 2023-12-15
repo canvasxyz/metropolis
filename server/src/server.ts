@@ -7841,6 +7841,43 @@ async function handle_GET_conversations(
   res.status(200).json(conversationsResult);
 }
 
+async function handle_GET_conversations_summary(req: Request, res: Response) {
+  // which fields do we want?
+  const query =
+    "SELECT conversations.*, users.hname, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid;";
+  const rows = await queryP_readOnly(query, []);
+
+  rows.forEach(function (conv) {
+    conv.created = Number(conv.created);
+    conv.modified = Number(conv.modified);
+
+    // if there is no topic, provide a UTC timstamp instead
+    if (_.isUndefined(conv.topic) || conv.topic === "") {
+      conv.topic = new Date(conv.created).toUTCString();
+    }
+
+    // conv.is_mod = uid && isAdministrator(uid);
+
+    if (conv.github_pr_id !== null) {
+      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+    } else {
+      conv.github_pr_url = null;
+    }
+
+    // Make sure zid is not exposed
+    delete conv.zid;
+
+    delete conv.is_anon;
+    delete conv.is_public;
+    if (conv.context === "") {
+      delete conv.context;
+    }
+    return conv;
+  });
+
+  return res.json(rows);
+}
+
 function createReport(zid: any) {
   //   Argument of type '(report_id: string) => Promise<unknown>' is not assignable to parameter of type '(value: unknown) => unknown'.
   // Types of parameters 'report_id' and 'value' are incompatible.
@@ -9480,6 +9517,7 @@ export {
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
+  handle_GET_conversations_summary,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
   handle_GET_domainWhitelist,

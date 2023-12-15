@@ -42,6 +42,7 @@ import {
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
+  handle_GET_conversations_summary,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
@@ -993,6 +994,11 @@ app.post(
   want("topic", getOptionalStringLimitLength(400), assignToP, ""),
   want("description", getOptionalStringLimitLength(500000), assignToP, ""),
   handle_POST_conversations,
+);
+
+app.get(
+  "/api/v3/conversations_summary",
+  handle_GET_conversations_summary
 );
 
 app.post(
