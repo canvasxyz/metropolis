@@ -81,6 +81,6 @@ async function handleGithubOauthCallback(
     return fail(res, 500, "polis_err_adding_cookies", err);
   }
 
-  const dest = req.p.dest || req.body?.dest;
+  const dest = req.p.dest;
   res.redirect(dest);
 }
