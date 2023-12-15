@@ -7842,9 +7842,26 @@ async function handle_GET_conversations(
 }
 
 async function handle_GET_conversations_summary(req: Request, res: Response) {
-  // which fields do we want?
-  const query =
-    "SELECT conversations.*, users.hname, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid;";
+  const query = `
+  SELECT
+    conversations.created,
+    conversations.topic,
+    conversations.fip_created,
+    conversations.fip_title,
+    conversations.fip_number,
+    conversations.github_pr_opened_at,
+    conversations.github_pr_title,
+    conversations.github_pr_id,
+    conversations.is_archived,
+    conversations.is_hidden,
+    users.hname,
+    zinvites.zinvite as conversation_id
+  FROM
+    conversations
+  JOIN users ON conversations.owner = users.uid
+  JOIN zinvites ON conversations.zid = zinvites.zid;
+  `
+
   const rows = await queryP_readOnly(query, []);
 
   rows.forEach(function (conv) {
