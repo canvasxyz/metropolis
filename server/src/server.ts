@@ -4450,7 +4450,7 @@ function denyIfNotFromWhitelistedDomain(
     headers?: { referrer: string };
     p: { zid: any; domain_whitelist_override_key: any };
   },
-  res: any,
+  res: { send: (arg0: number, arg1: string) => void },
   next: (arg0?: string) => void,
 ) {
   let isWithinIframe =
@@ -4492,13 +4492,13 @@ function denyIfNotFromWhitelistedDomain(
       if (isOk) {
         next();
       } else {
-        res.status(403).send("polis_err_domain");
+        res.send(403, "polis_err_domain");
         next("polis_err_domain");
       }
     })
     .catch(function (err: any) {
       logger.error("error in isParentDomainWhitelisted", err);
-      res.status(403).send("polis_err_domain");
+      res.send(403, "polis_err_domain");
       next("polis_err_domain_misc");
     });
 }
@@ -7113,7 +7113,7 @@ function handle_PUT_conversations(
 
 async function handle_DELETE_metadata_questions(
   req: { p: { uid?: any; pmqid: any } },
-  res: { sendStatus: (arg0: number) => void },
+  res: { send: (arg0: number) => void },
 ) {
   let uid = req.p.uid;
   let pmqid = req.p.pmqid;
@@ -7157,12 +7157,12 @@ async function handle_DELETE_metadata_questions(
     fail(res, 500, "polis_err_delete_participant_metadata_question", err);
   }
 
-  res.sendStatus(200);
+  res.send(200);
 }
 
 async function handle_DELETE_metadata_answers(
   req: { p: { uid?: any; pmaid: any } },
-  res: { sendStatus: (arg0: number) => void },
+  res: { send: (arg0: number) => void },
 ) {
   let uid = req.p.uid;
   let pmaid = req.p.pmaid;
@@ -7200,7 +7200,7 @@ async function handle_DELETE_metadata_answers(
   } catch (err) {
     return fail(res, 500, "polis_err_delete_participant_metadata_answers", err);
   }
-  res.sendStatus(200);
+  res.send(200);
 }
 
 async function getZidForAnswer(pmaid: any) {
@@ -9327,13 +9327,13 @@ function middleware_log_middleware_errors(
 
 function middleware_check_if_options(
   req: { method: string },
-  res: { sendStatus: (arg0: number) => any },
+  res: { send: (arg0: number) => any },
   next: () => any,
 ) {
   if (req.method.toLowerCase() !== "options") {
     return next();
   }
-  return res.sendStatus(204);
+  return res.send(204);
 }
 
 let middleware_responseTime_start = responseTime(function (

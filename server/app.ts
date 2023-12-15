@@ -5,9 +5,6 @@ import * as dotenv from "dotenv";
 import path from "path";
 dotenv.config();
 
-import bodyParser from "body-parser";
-import compress from "compression";
-import cookieParser from "cookie-parser";
 import express from "express";
 import mime from "mime";
 import morgan from "morgan";
@@ -151,6 +148,7 @@ import {
   wantHeader,
 } from "./src/utils/parameter";
 
+// no typedefs for express 3
 const app = express();
 
 // 'dev' format is
@@ -181,6 +179,8 @@ app.disable("x-powered-by");
 ////////////////////////////////////////////
 ////////////////////////////////////////////
 
+const expressUntyped = express as any;
+
 app.use(middleware_responseTime_start);
 
 app.use(redirectIfNotHttps);
@@ -191,11 +191,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(writeDefaultHead);
 
 if (devMode) {
-  app.use(compress());
+  app.use(expressUntyped.compress());
 } else {
   // Cloudflare would apply gzip if we didn't
   // but it's about 2x faster if we do the gzip (for the inbox query on mike's account)
-  app.use(compress());
+  app.use(expressUntyped.compress());
 }
 app.use(middleware_log_request_body);
 app.use(middleware_log_middleware_errors);
@@ -1135,7 +1135,7 @@ const fetchIndexForAdminPage = (
   res: express.Response,
 ) => {
   res.setHeader("Content-Type", "text/html");
-  res.sendFile(__dirname + "/client/index.html");
+  res.sendfile(__dirname + "/client/index.html");
 };
 
 app.get("^/$", fetchIndexForAdminPage);
@@ -1160,18 +1160,17 @@ mime.define({
   "image/svg+xml": ["svg"],
 });
 
+// why do svgs get the wrong mimetype otherwise?
+function setCustomHeaders(res: any, path: any) {
+  if (path.endsWith(".svg")) {
+    res.setHeader("Content-Type", "image/svg+xml");
+  }
+}
+
 app.use(
   express.static(path.join(__dirname, "client"), {
     maxAge: "1d",
-    setHeaders: (res, path) => {
-      if (path.endsWith(".html")) {
-        res.setHeader("Content-Type", "text/html; charset=UTF-8");
-        res.setHeader("Cache-Control", "no-cache");
-      }
-      if (path.endsWith(".svg")) {
-        res.setHeader("Content-Type", "image/svg+xml");
-      }
-    },
+    setHeaders: setCustomHeaders,
   }),
 );
 
@@ -1186,7 +1185,7 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
       encoding: "utf8",
     });
     res.set(JSON.parse(headers));
-    res.sendFile(__dirname + "/embed/embed.js");
+    res.sendfile(__dirname + "/embed/embed.js");
     return;
   }
 
@@ -1210,7 +1209,7 @@ const fetchEmbed = (req: express.Request, res: express.Response) => {
     return;
   }
   // all other files just need headers
-  res.sendFile(__dirname + path);
+  res.sendfile(__dirname + path);
 };
 
 app.get(/^\/embed$/, fetchEmbed);
