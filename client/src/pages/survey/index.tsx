@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import React, { useCallback, useEffect, useState } from "react"
-import { Box, Button, jsx } from "theme-ui"
+import { Box, Button, Link, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -174,6 +174,7 @@ const Survey = ({
             votedComments={votedComments}
             unvotedComments={unvotedComments}
             goTo={goTo}
+            user={user}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c.tid === commentId)
               const newUnvotedComments = unvotedComments.filter((c) => c.tid !== commentId)
@@ -235,6 +236,14 @@ const Survey = ({
             </Box>
           ) : (
             <Box>
+              <Link
+                variant="links.buttonBlack"
+                sx={{ display: "block", textAlign: "center", width: "100%" }}
+                href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
+              >
+                Login with Github to comment
+              </Link>
+              {/*
               <Button
                 variant="outlineGray"
                 sx={{ width: "100%" }}
@@ -244,8 +253,8 @@ const Survey = ({
                   )}`)
                 }
               >
-                Create an account to add statements
-              </Button>
+                Create an account to add comments
+                </Button>*/}
             </Box>
           )}
         </Box>

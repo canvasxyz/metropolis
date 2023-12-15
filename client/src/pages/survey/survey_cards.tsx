@@ -8,7 +8,7 @@ import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
 
-const PrefilledComment = ({ text }: { zid_metadata; text: string }) => {
+const PrefilledComment = ({ user, text }: { zid_metadata; user; text: string }) => {
   return (
     <Box
       sx={{
@@ -23,49 +23,58 @@ const PrefilledComment = ({ text }: { zid_metadata; text: string }) => {
       }}
     >
       <Text sx={{ flex: 1 }}>{text}</Text>
-      <Button
-        variant="text"
-        sx={{
-          background: "mediumGreen !important",
-          my: "-3px",
-          py: [1],
-          px: [2],
-          fontSize: "0.94em",
-          "&:hover": { bg: "mediumGreenActive !important" },
-        }}
-        onClick={() => {
-          const box: HTMLTextAreaElement = document.querySelector(
-            "textarea[placeholder='Add a comment']",
-          )
-          if (!box) return
+      {(!!user?.email || !!user?.githubUserId || !!user?.xInfo) && (
+        <Button
+          variant="text"
+          sx={{
+            background: "mediumGreen !important",
+            my: "-3px",
+            py: [1],
+            px: [2],
+            fontSize: "0.94em",
+            "&:hover": { bg: "mediumGreenActive !important" },
+          }}
+          onClick={() => {
+            const box: HTMLTextAreaElement = document.querySelector(
+              "textarea[placeholder='Add a comment']",
+            )
+            if (!box) return
 
-          box.value = text.replace("...", " ")
-          box.focus()
-        }}
-      >
-        <Fragment>
-          <img src="/comment.svg" width="14" sx={{ position: "relative", top: "2px", mr: [1] }} />
-          Comment
-        </Fragment>
-      </Button>
+            box.value = text.replace("...", " ")
+            box.focus()
+          }}
+        >
+          <Fragment>
+            <img src="/comment.svg" width="14" sx={{ position: "relative", top: "2px", mr: [1] }} />
+            Comment
+          </Fragment>
+        </Button>
+      )}
     </Box>
   )
 }
 
-export const PrefilledComments = ({ zid_metadata }: { zid_metadata }) => {
+export const PrefilledComments = ({ user, zid_metadata }: { user; zid_metadata }) => {
   return (
     <Box sx={{ lineHeight: 1.3 }}>
-      <PrefilledComment text="This seems unobjectionable to me." zid_metadata={zid_metadata} />
+      <PrefilledComment
+        text="This seems unobjectionable to me."
+        user={user}
+        zid_metadata={zid_metadata}
+      />
       <PrefilledComment
         text="Another way to accomplish this might be..."
+        user={user}
         zid_metadata={zid_metadata}
       />
       <PrefilledComment
         text="We should make sure this has support from..."
+        user={user}
         zid_metadata={zid_metadata}
       />
       <PrefilledComment
         text="This proposal would benefit from review by..."
+        user={user}
         zid_metadata={zid_metadata}
       />
     </Box>
@@ -79,6 +88,7 @@ const SurveyCards = ({
   onVoted,
   goTo,
   zid_metadata,
+  user,
 }: {
   conversation_id
   votedComments
@@ -86,6 +96,7 @@ const SurveyCards = ({
   onVoted
   goTo
   zid_metadata
+  user
 }) => {
   const cardsBoxRef = useRef<HTMLElement>()
   const [maxHeight, setMaxHeight] = useState<number>()
@@ -180,7 +191,7 @@ const SurveyCards = ({
           >
             <Text>Add your comment to this proposal:</Text>
           </Box>
-          <PrefilledComments zid_metadata={zid_metadata} />
+          <PrefilledComments user={user} zid_metadata={zid_metadata} />
         </Box>
       )}
 
@@ -201,7 +212,7 @@ const SurveyCards = ({
               </Text>
               <Text></Text>
             </Box>
-            <PrefilledComments zid_metadata={zid_metadata} />
+            <PrefilledComments user={user} zid_metadata={zid_metadata} />
           </Box>
           {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
             <Button
