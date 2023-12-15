@@ -208,7 +208,11 @@ const SurveyCards = ({
               }}
             >
               <Text sx={{ flex: 1 }}>
-                You’ve voted on all {votedComments.length} comments, but you can still add more:
+                You’ve voted on all {votedComments.length} comments, but you can
+                {!!user?.email || !!user?.githubUserId || !!user?.xInfo
+                  ? " still"
+                  : " log in to"}{" "}
+                add more:
               </Text>
               <Text></Text>
             </Box>

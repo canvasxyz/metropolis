@@ -16,12 +16,12 @@ const PostSurvey = ({
   goTo,
   setVotingAfterPostSurvey,
 }: {
-  submittedComments,
-  votedComments,
-  unvotedComments,
-  zid_metadata,
-  goTo,
-  setVotingAfterPostSurvey,
+  submittedComments
+  votedComments
+  unvotedComments
+  zid_metadata
+  goTo
+  setVotingAfterPostSurvey
 }) => {
   return (
     <React.Fragment>

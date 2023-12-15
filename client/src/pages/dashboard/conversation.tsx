@@ -237,7 +237,6 @@ export const DashboardConversation = ({
                   mb: "10px",
                   color: "#9f9e9b",
                   fontWeight: 500,
-                  textAlign: "center",
                 }}
               >
                 {reportComments.length > 0
@@ -321,6 +320,7 @@ const ReportCommentRow = ({
                 sx={{
                   width: `${Math.ceil((agree_count / maxCount) * 100)}%`,
                   bg: "#2fcc71",
+                  color: agree_count / maxCount < 0.2 ? "#222" : "#fff",
                   ...bar,
                 }}
               >
@@ -335,7 +335,7 @@ const ReportCommentRow = ({
                 sx={{
                   width: `${Math.ceil((disagree_count / maxCount) * 100)}%`,
                   bg: "#e74b3c",
-                  color: "#fff",
+                  color: disagree_count / maxCount < 0.2 ? "#222" : "#fff",
                   ...bar,
                 }}
               >

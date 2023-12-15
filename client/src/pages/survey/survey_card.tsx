@@ -119,8 +119,10 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
             wordBreak: "break-word",
           }}
         >
-          <Text className="react-markdown">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">{txt}</ReactMarkdown>
+          <Text className="react-markdown-card">
+            <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
+              {txt}
+            </ReactMarkdown>
           </Text>
         </Text>
         {hasVoted && (
