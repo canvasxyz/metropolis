@@ -91,6 +91,7 @@ async function getUser(
     finishedTutorial: !!info.tut,
     site_ids: [info.site_id],
     created: Number(info.created),
+    isRepoCollaborator: info.is_repo_collaborator,
   };
 }
 
@@ -274,9 +275,19 @@ function isAdministrator(uid: number) {
   return polisDevs.indexOf(uid) >= 0;
 }
 
+async function isRepoCollaborator(uid: number) {
+  // get user
+  const user = await getUserInfoForUid2(uid);
+  return user.is_repo_collaborator;
+}
+
 async function isOwner(zid: number, uid: number) {
   if (isAdministrator(uid)) {
     // admins are owners of everything
+    return true;
+  }
+
+  if(await isRepoCollaborator(uid)) {
     return true;
   }
 

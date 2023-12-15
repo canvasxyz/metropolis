@@ -89,7 +89,7 @@ class ManageConversations extends React.Component<
         <Box mt={5}>
           {conversations &&
             conversations
-              .filter((c) => !c.is_archived && !c.fip_title && c.hname)
+              .filter((c) => !c.is_archived && !c.fip_title)
               .map((c, i) => (
                 <ConversationRow
                   key={c.conversation_id || i}
@@ -103,7 +103,7 @@ class ManageConversations extends React.Component<
           {this.state.showArchived &&
             conversations &&
             conversations
-              .filter((c) => c.is_archived && !c.fip_title && c.hname)
+              .filter((c) => c.is_archived && !c.fip_title)
               .map((c, i) => (
                 <ConversationRow
                   key={c.conversation_id || i}
