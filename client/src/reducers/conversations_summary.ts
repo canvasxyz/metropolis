@@ -25,7 +25,7 @@ type ConversationSummaryState = {
   error: null
 } | {
   status: "loading"
-  data: null
+  data: null | ConversationSummary[]
   error: null
 } | {
   status: "succeeded"
@@ -49,7 +49,6 @@ const conversationsSummarySlice = createSlice({
     builder
       .addCase(populateConversationsSummary.pending, (state) => {
         state.status = "loading";
-        state.data = null;
       })
       .addCase(populateConversationsSummary.fulfilled, (state, action) => {
         state.status = "succeeded";
