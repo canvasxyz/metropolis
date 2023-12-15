@@ -42,7 +42,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
             />
           </Link>
         ) : (
-          <Link to={isLoggedIn ? "/conversations" : "/"}>
+          <Link to="/">
             <img
               src="/foundation.png"
               width="20"
@@ -51,10 +51,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
           </Link>
         )}
         {!inSurvey && (
-          <Link
-            sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }}
-            to={isLoggedIn ? "/conversations" : "/"}
-          >
+          <Link sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }} to="/">
             Metropolis
           </Link>
         )}
