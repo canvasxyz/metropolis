@@ -1,15 +1,19 @@
 /** @jsx jsx */
 
 import React, { useEffect, useState } from "react"
+import { toast } from "react-hot-toast"
 import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbSettings } from "react-icons/tb"
 
+import { RootState } from "../../store"
+import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
+import { handleModerateConversation, handleUnmoderateConversation } from "../../actions"
 
 type ReportComment = {
   active: boolean
@@ -38,9 +42,12 @@ export const DashboardConversation = ({
   conversation
   zid_metadata
 }) => {
+  const hist = useHistory()
+  const dispatch = useAppDispatch()
+  const { user } = useAppSelector((state: RootState) => state.user)
+
   const collapsibleConversation = conversation.description.length > 300
   const [collapsed, setCollapsed] = useState(!!collapsibleConversation)
-  const hist = useHistory()
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
   const [maxCount, setMaxCount] = useState<number>(0)
@@ -93,7 +100,7 @@ export const DashboardConversation = ({
       {zid_metadata.is_owner && (
         <Box
           sx={{
-            position: "sticky",
+            position: "absolute",
             top: [3],
             pl: [4],
             alignItems: "center",
@@ -125,22 +132,55 @@ export const DashboardConversation = ({
             }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
           >
-            Moderate
+            {user.githubRepoCollaborator && (
+              <Text
+                sx={{
+                  display: "inline-block",
+                  fontSize: "0.88em",
+                  opacity: 0.7,
+                  fontWeight: 600,
+                  ml: "2px",
+                }}
+              >
+                [Mod]
+              </Text>
+            )}
+            Review Comments
           </Button>
-          {!report && (
-            <Button variant="outlineSecondary" onClick={generateReport}>
-              Generate Report
-            </Button>
-          )}
-          {report && (
-            <Button
-              variant="outlineSecondary"
-              onClick={() => hist.push(`/r/${zid_metadata.conversation_id}/${report.report_id}`)}
-            >
-              View Report
-            </Button>
-          )}
-          <Box sx={{ flex: 1 }}></Box>
+          <Button
+            variant="outlineSecondary"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              gap: [1],
+            }}
+            onClick={() => {
+              if (zid_metadata.is_hidden) {
+                if (!confirm("Show this proposal to users again?")) return
+                dispatch(handleUnmoderateConversation(zid_metadata.conversation_id))
+                toast.success("Proposal restored")
+              } else {
+                if (!confirm("Hide this proposal from users?")) return
+                dispatch(handleModerateConversation(zid_metadata.conversation_id))
+                toast.success("Proposal hidden")
+              }
+            }}
+          >
+            {user.githubRepoCollaborator && (
+              <Text
+                sx={{
+                  display: "inline-block",
+                  fontSize: "0.88em",
+                  opacity: 0.7,
+                  fontWeight: 600,
+                  ml: "2px",
+                }}
+              >
+                [Mod]
+              </Text>
+            )}
+            {zid_metadata.is_hidden ? "Unhide Proposal" : "Hide Proposal"}
+          </Button>
         </Box>
       )}
       <Box sx={{ width: "100%" }}>
@@ -149,7 +189,7 @@ export const DashboardConversation = ({
             flexDirection: "column",
             gap: [2],
             margin: "0 auto",
-            pt: [7],
+            pt: [8],
             pb: [2],
             px: [4],
             maxWidth: "620px",

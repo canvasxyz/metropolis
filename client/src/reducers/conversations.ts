@@ -40,6 +40,18 @@ const conversations = (
           c.conversation_id === action.data ? { ...c, is_archived: false } : c,
         ),
       })
+    case types.MODERATE_CONVERSATION_SUCCESS:
+      return Object.assign({}, state, {
+        conversations: state.conversations?.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_hidden: true } : c,
+        ),
+      })
+    case types.UNMODERATE_CONVERSATION_SUCCESS:
+      return Object.assign({}, state, {
+        conversations: state.conversations?.map((c) =>
+          c.conversation_id === action.data ? { ...c, is_hidden: false } : c,
+        ),
+      })
     default:
       return state
   }

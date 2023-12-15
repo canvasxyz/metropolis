@@ -84,6 +84,8 @@ import {
   handle_POST_contexts,
   handle_POST_conversation_close,
   handle_POST_conversation_reopen,
+  handle_POST_conversation_moderate,
+  handle_POST_conversation_unmoderate,
   handle_POST_conversations,
   handle_POST_convSubscriptions,
   handle_POST_domainWhitelist,
@@ -746,6 +748,22 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_reopen as any,
+);
+
+app.post(
+  "/api/v3/conversation/moderate",
+  moveToBody,
+  auth(assignToP),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_conversation_moderate as any,
+);
+
+app.post(
+  "/api/v3/conversation/unmoderate",
+  moveToBody,
+  auth(assignToP),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_conversation_unmoderate as any,
 );
 
 app.put(

@@ -25,9 +25,13 @@ export const VOTERS_FETCH_ERROR = "VOTERS_FETCH_ERROR"
 
 export const CLOSE_CONVERSATION_SUCCESS = "CLOSE_CONVERSATION_SUCCESS"
 export const CLOSE_CONVERSATION_ERROR = "CLOSE_CONVERSATION_ERROR"
-
 export const REOPEN_CONVERSATION_SUCCESS = "REOPEN_CONVERSATION_SUCCESS"
 export const REOPEN_CONVERSATION_ERROR = "REOPEN_CONVERSATION_ERROR"
+
+export const MODERATE_CONVERSATION_SUCCESS = "MODERATE_CONVERSATION_SUCCESS"
+export const MODERATE_CONVERSATION_ERROR = "MODERATE_CONVERSATION_ERROR"
+export const UNMODERATE_CONVERSATION_SUCCESS = "UNMODERATE_CONVERSATION_SUCCESS"
+export const UNMODERATE_CONVERSATION_ERROR = "UNMODERATE_CONVERSATION_ERROR"
 
 /* zid for clarity - this is conversation config */
 export const REQUEST_ZID_METADATA = "REQUEST_ZID_METADATA"
@@ -641,6 +645,44 @@ export const handleReopenConversation = (conversation_id) => {
         return res
       },
       (err) => dispatch({ type: REOPEN_CONVERSATION_ERROR, data: err }),
+    )
+  }
+}
+
+const postModerateConversation = (conversation_id) => {
+  return api.post("/api/v3/conversation/moderate", {
+    conversation_id,
+  })
+}
+
+export const handleModerateConversation = (conversation_id) => {
+  return (dispatch) => {
+    return postModerateConversation(conversation_id).then(
+      (res) => {
+        dispatch({ type: MODERATE_CONVERSATION_SUCCESS, data: conversation_id })
+        dispatch(populateZidMetadataStore(conversation_id, true))
+        return res
+      },
+      (err) => dispatch({ type: MODERATE_CONVERSATION_ERROR, data: err }),
+    )
+  }
+}
+
+const postUnmoderateConversation = (conversation_id) => {
+  return api.post("/api/v3/conversation/unmoderate", {
+    conversation_id,
+  })
+}
+
+export const handleUnmoderateConversation = (conversation_id) => {
+  return (dispatch) => {
+    return postUnmoderateConversation(conversation_id).then(
+      (res) => {
+        dispatch({ type: UNMODERATE_CONVERSATION_SUCCESS, data: conversation_id })
+        dispatch(populateZidMetadataStore(conversation_id, true))
+        return res
+      },
+      (err) => dispatch({ type: UNMODERATE_CONVERSATION_ERROR, data: err }),
     )
   }
 }

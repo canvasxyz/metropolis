@@ -22,10 +22,6 @@ type ConversationListItemProps = {
   navigateToConversation: (conversationId: string) => void
 }
 
-const ConversationListItemSection = ({ children }: { children }) => {
-  return <Box sx={{ minHeight: "calc(100vh - 190px)" }}>{children}</Box>
-}
-
 const ConversationListItem = ({
   conversation,
   selectedConversationId,
@@ -112,6 +108,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     "showArchived",
     false,
   )
+  const [showHiddenConversations, setShowHiddenConversations] = useLocalStorage("showHidden", false)
 
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
@@ -127,13 +124,18 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
       : null
 
   const nonFIPConversations = conversations.filter(
-    (conversation) => !conversation.fip_title && !conversation.is_archived,
+    (conversation) =>
+      !conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
   )
   const openConversations = conversations.filter(
-    (conversation) => conversation.fip_title && !conversation.is_archived,
+    (conversation) =>
+      conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
   )
-  const archivedConversations = conversations.filter((conversation) => conversation.is_archived)
   const allConversations = openConversations.concat(nonFIPConversations)
+  const archivedConversations = conversations.filter(
+    (conversation) => conversation.is_archived && !conversation.is_hidden,
+  )
+  const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
 
   if (showAllFIPConversations) {
     allConversations.sort((c1, c2) => {
@@ -152,6 +154,8 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     ? nonFIPConversations
     : showArchivedConversations
     ? archivedConversations
+    : showHiddenConversations
+    ? hiddenConversations
     : []
 
   return (
@@ -160,10 +164,11 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
       <Flex sx={{ display: "flex", height: "100%" }}>
         <Box
           sx={{
-            overflowY: "scroll",
             width: ["40%", null, "310px"],
             borderRight: "1px solid #e2ddd5",
             background: "#f7f0e3",
+            maxHeight: "100vh",
+            overflow: "hidden",
           }}
         >
           <Flex
@@ -242,7 +247,6 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
               fontWeight: "500",
               py: [2],
               px: [3],
-              cursor: "pointer",
               userSelect: "none",
             }}
           >
@@ -254,6 +258,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowNonFIPConversations(false)
                 setShowOpenFIPConversations(false)
                 setShowArchivedConversations(false)
+                setShowHiddenConversations(false)
               }}
             >
               All ({openConversations.length + nonFIPConversations.length})
@@ -266,6 +271,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowAllFIPConversations(false)
                 setShowNonFIPConversations(false)
                 setShowArchivedConversations(false)
+                setShowHiddenConversations(false)
               }}
             >
               FIPs ({openConversations.length})
@@ -278,24 +284,13 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowAllFIPConversations(false)
                 setShowOpenFIPConversations(false)
                 setShowArchivedConversations(false)
+                setShowHiddenConversations(false)
               }}
             >
-              Community Polls ({nonFIPConversations.length})
-            </Box>
-            <Box
-              variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
-              onClick={() => {
-                setShowArchivedConversations(true)
-                setShowAllFIPConversations(false)
-                setShowNonFIPConversations(false)
-                setShowOpenFIPConversations(false)
-              }}
-            >
-              Past {/* ({archivedConversations.length}) */}
+              Polls ({nonFIPConversations.length})
             </Box>
           </Box>
-          <ConversationListItemSection>
+          <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
             {selectedConversations.map((conversation) => (
               <ConversationListItem
                 conversation={conversation}
@@ -304,7 +299,35 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 key={conversation.conversation_id}
               />
             ))}
-          </ConversationListItemSection>
+          </Box>
+          <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
+            <Box
+              variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              onClick={() => {
+                setShowArchivedConversations(true)
+                setShowAllFIPConversations(false)
+                setShowNonFIPConversations(false)
+                setShowOpenFIPConversations(false)
+                setShowHiddenConversations(false)
+              }}
+            >
+              Past
+            </Box>
+            <Box
+              variant={showHiddenConversations ? "buttons.primary" : "buttons.outline"}
+              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              onClick={() => {
+                setShowArchivedConversations(false)
+                setShowAllFIPConversations(false)
+                setShowNonFIPConversations(false)
+                setShowOpenFIPConversations(false)
+                setShowHiddenConversations(true)
+              }}
+            >
+              Hidden
+            </Box>
+          </Box>
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           <DashboardUserButton />

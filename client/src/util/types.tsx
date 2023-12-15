@@ -61,6 +61,7 @@ export type ZidMetadata = {
   is_active: boolean
   is_anon: boolean
   is_archived: boolean | null
+  is_hidden: boolean | null
   is_data_open: boolean
   is_mod: boolean
   is_owner: boolean
@@ -98,6 +99,7 @@ export type ZidMetadata = {
 export type Conversation = {
   conversation_id: string
   is_archived: boolean
+  is_hidden: boolean
   is_owner: boolean
   is_mod: boolean
   topic: string

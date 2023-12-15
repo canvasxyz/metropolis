@@ -62,6 +62,7 @@ import {
   getPidForParticipant,
   pidCache,
   getXidRecordByXidOwnerId,
+  isRepoCollaborator,
   isAdministrator,
   isOwner,
   isOwnerOrParticipant,
@@ -6821,6 +6822,90 @@ function handle_POST_conversation_reopen(
     });
 }
 
+function handle_POST_conversation_moderate(
+  req: { p: { zid: any; uid?: any } },
+  res: {
+    status: (arg0: number) => {
+      (): any;
+      new (): any;
+      json: { (arg0: any): void; new (): any };
+    };
+  },
+) {
+  let q = "select * from conversations where zid = ($1)";
+  let params = [req.p.zid];
+  if (!isAdministrator(req.p.uid) && !isRepoCollaborator(req.p.uid)) {
+    fail(res, 500, "polis_err_moderating_conversation_disallowed");
+    return;
+  }
+  queryP(q, params)
+    .then(function (rows: string | any[]) {
+      if (!rows || !rows.length) {
+        fail(
+          res,
+          500,
+          "polis_err_moderating_conversation_no_such_conversation",
+        );
+        return;
+      }
+      let conv = rows[0];
+      queryP("update conversations set is_hidden = true where zid = ($1);", [
+        conv.zid,
+      ])
+        .then(function () {
+          res.status(200).json({});
+        })
+        .catch(function (err: any) {
+          fail(res, 500, "polis_err_moderating_conversation2", err);
+        });
+    })
+    .catch(function (err: any) {
+      fail(res, 500, "polis_err_moderating_conversation", err);
+    });
+}
+
+function handle_POST_conversation_unmoderate(
+  req: { p: { zid: any; uid?: any } },
+  res: {
+    status: (arg0: number) => {
+      (): any;
+      new (): any;
+      json: { (arg0: any): void; new (): any };
+    };
+  },
+) {
+  let q = "select * from conversations where zid = ($1)";
+  let params = [req.p.zid];
+  if (!isAdministrator(req.p.uid) && !isRepoCollaborator(req.p.uid)) {
+    fail(res, 500, "polis_err_unmoderating_conversation_disallowed");
+    return;
+  }
+  queryP(q, params)
+    .then(function (rows: string | any[]) {
+      if (!rows || !rows.length) {
+        fail(
+          res,
+          500,
+          "polis_err_unmoderating_conversation_no_such_conversation",
+        );
+        return;
+      }
+      let conv = rows[0];
+      queryP("update conversations set is_hidden = false where zid = ($1);", [
+        conv.zid,
+      ])
+        .then(function () {
+          res.status(200).json({});
+        })
+        .catch(function (err: any) {
+          fail(res, 500, "polis_err_unmoderating_conversation2", err);
+        });
+    })
+    .catch(function (err: any) {
+      fail(res, 500, "polis_err_unmoderating_conversation", err);
+    });
+}
+
 function handle_PUT_users(
   req: { p: { uid?: any; uid_of_user: any; email: any; hname: any } },
   res: { json: (arg0: any) => void },
@@ -9431,6 +9516,8 @@ export {
   handle_POST_contexts,
   handle_POST_conversation_close,
   handle_POST_conversation_reopen,
+  handle_POST_conversation_moderate,
+  handle_POST_conversation_unmoderate,
   handle_POST_conversations,
   handle_POST_convSubscriptions,
   handle_POST_domainWhitelist,

@@ -287,7 +287,7 @@ async function isOwner(zid: number, uid: number) {
     return true;
   }
 
-  if(await isRepoCollaborator(uid)) {
+  if (await isRepoCollaborator(uid)) {
     return true;
   }
 
@@ -317,6 +317,7 @@ export {
   createDummyUser,
   getPidPromise,
   getPidForParticipant,
+  isRepoCollaborator,
   isAdministrator,
   isOwner,
   isOwnerOrParticipant,
