@@ -245,7 +245,7 @@ const Survey = ({
                 }
               >
                 Create an account to add comments
-                </Button>*/}
+                </Button> */}
             </Box>
           )}
         </Box>
