@@ -1,11 +1,11 @@
 // eslint-disable-next-line no-use-before-define
 import React from "react"
 import { Box, Text, Link } from "theme-ui"
-import { Conversation } from "../util/types"
+import { ZidMetadata } from "../util/types"
 
-type FrontmatterProps = { conversation: Conversation }
+type FrontmatterProps = { zid_metadata: ZidMetadata }
 
-export const Frontmatter = ({ conversation }: FrontmatterProps) => {
+export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
   const fields = [
     "status",
     // "title",

@@ -331,11 +331,8 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           <DashboardUserButton />
-          {selectedConversation ? (
-            <DashboardConversation
-              conversation={selectedConversation}
-              zid_metadata={zid_metadata}
-            />
+          {selectedConversationId ? (
+            <DashboardConversation selectedConversationId={selectedConversationId} />
           ) : (
             <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
               <Flex sx={{ margin: "auto", flexDirection: "column", alignItems: "center" }}>
