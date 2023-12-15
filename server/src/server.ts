@@ -161,24 +161,26 @@ function isSpam(o: {
   user_agent: any;
   referrer: any;
 }) {
-  if (!Config.akismetAntispamApiKey) {
-    return new Promise((resolve, reject) =>
-      reject(new Error("No Akismet key provided")),
-    );
-  }
+  return new Promise((resolve) => resolve(false));
 
-  return meteredPromise(
-    "isSpam",
-    new Promise((resolve, reject) => {
-      akismet.checkSpam(o, function (err: any, spam: any) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(spam);
-        }
-      });
-    }),
-  );
+  // if (!Config.akismetAntispamApiKey) {
+  //   return new Promise((resolve, reject) =>
+  //     reject(new Error("No Akismet key provided")),
+  //   );
+  // }
+
+  // return meteredPromise(
+  //   "isSpam",
+  //   new Promise((resolve, reject) => {
+  //     akismet.checkSpam(o, function (err: any, spam: any) {
+  //       if (err) {
+  //         reject(err);
+  //       } else {
+  //         resolve(spam);
+  //       }
+  //     });
+  //   }),
+  // );
 }
 
 // basic defaultdict implementation
