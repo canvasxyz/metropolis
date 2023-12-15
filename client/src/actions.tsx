@@ -516,10 +516,7 @@ export const populateZidMetadataStore = (conversation_id, reload?: boolean) => {
     dispatch(requestZidMetadata(conversation_id))
     return fetchZidMetadata(conversation_id).then(
       (res) => dispatch(receiveZidMetadata(res)),
-      (err) => {
-        console.log(err)
-        dispatch(zidMetadataFetchError(err))
-      },
+      (err) => dispatch(zidMetadataFetchError(err)),
     )
   }
 }
