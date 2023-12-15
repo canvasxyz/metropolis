@@ -43,7 +43,7 @@ export const DashboardConversation = ({
   const hist = useHistory()
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((state: RootState) => state.user)
-  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
+  const { zid_metadata, error: zidMetadataError } = useAppSelector((state: RootState) => state.zid_metadata)
 
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
@@ -94,6 +94,14 @@ export const DashboardConversation = ({
   useEffect(() => {
     dispatch(populateZidMetadataStore(selectedConversationId))
   }, [selectedConversationId])
+
+  useEffect(() => {
+    if(zidMetadataError) {
+      toast.error("Couldn't retrieve conversation")
+      // redirect to main dashboard
+      hist.push(`/dashboard`)
+    }
+  }, [zidMetadataError])
 
   return (
     <Box>
