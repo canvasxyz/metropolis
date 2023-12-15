@@ -2,6 +2,7 @@
 
 import $ from "jquery"
 import api from "./util/api"
+import { populateConversationsSummary } from "./reducers/conversations_summary"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Action = any
@@ -515,7 +516,10 @@ export const populateZidMetadataStore = (conversation_id, reload?: boolean) => {
     dispatch(requestZidMetadata(conversation_id))
     return fetchZidMetadata(conversation_id).then(
       (res) => dispatch(receiveZidMetadata(res)),
-      (err) => dispatch(zidMetadataFetchError(err)),
+      (err) => {
+        console.log(err)
+        dispatch(zidMetadataFetchError(err))
+      },
     )
   }
 }
@@ -661,6 +665,7 @@ export const handleModerateConversation = (conversation_id) => {
       (res) => {
         dispatch({ type: MODERATE_CONVERSATION_SUCCESS, data: conversation_id })
         dispatch(populateZidMetadataStore(conversation_id, true))
+        dispatch(populateConversationsSummary())
         return res
       },
       (err) => dispatch({ type: MODERATE_CONVERSATION_ERROR, data: err }),
@@ -680,6 +685,7 @@ export const handleUnmoderateConversation = (conversation_id) => {
       (res) => {
         dispatch({ type: UNMODERATE_CONVERSATION_SUCCESS, data: conversation_id })
         dispatch(populateZidMetadataStore(conversation_id, true))
+        dispatch(populateConversationsSummary())
         return res
       },
       (err) => dispatch({ type: UNMODERATE_CONVERSATION_ERROR, data: err }),
