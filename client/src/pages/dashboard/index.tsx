@@ -7,17 +7,17 @@ import { Box, Flex, Text, Button, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
-import { Conversation, User } from "../../util/types"
-import { populateConversationsStore } from "../../actions"
+import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
 import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { DashboardUserButton } from "./user_button"
+import { ConversationSummary, populateConversationsSummary } from "../../reducers/conversations_summary"
 
 type ConversationListItemProps = {
-  conversation: Conversation
+  conversation: ConversationSummary
   selectedConversationId: string | null
   navigateToConversation: (conversationId: string) => void
 }
@@ -91,13 +91,12 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
   }, [])
 
   useEffect(() => {
-    dispatch(populateConversationsStore())
+    dispatch(populateConversationsSummary())
   }, [])
 
   const hist = useHistory()
-  const data = useAppSelector((state: RootState) => state.conversations)
-  const conversations: Array<Conversation> = data.conversations || []
-  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
+  const {data} = useAppSelector((state: RootState) => state.conversations_summary)
+  const conversations = data || []
 
   const [syncInProgress, setSyncInProgress] = useState(false)
 

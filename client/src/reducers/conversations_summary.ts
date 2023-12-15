@@ -5,7 +5,7 @@ const populateConversationsSummary = createAsyncThunk('conversations_summary/pop
   return await response.json();
 });
 
-type ConversationSummary = {
+export type ConversationSummary = {
   fip_created: string | null
   fip_title: string | null
   fip_number: number
