@@ -2,12 +2,12 @@ import _ from "underscore";
 import Translate from "@google-cloud/translate";
 
 import pg from "./db/pg-query";
-import SQL from "./db/sql";
+import * as SQL from "./db/sqlUtils";
 import { meteredPromise } from "./utils/metered";
 import Utils from "./utils/common";
 
 import Config from "./config";
-import Conversation from "./conversation";
+import { getConversationInfo } from "./conversation";
 import { CommentType } from "./d";
 
 // TODO should this be a number instead?
@@ -52,7 +52,8 @@ function getComments(o: CommentType) {
     ? _getCommentsForModerationList(o)
     : _getCommentsList(o);
   let conv: { is_anon: any } | null = null;
-  return commentListPromise.then(function (rows: Row[]) {
+  return commentListPromise
+    .then(function (rows: Row[]) {
       let cols = [
         "txt",
         "tid",
@@ -143,7 +144,7 @@ function _getCommentsForModerationList(o: {
       return pg.queryP_metered_readOnly(
         "_getCommentsForModerationList",
         "select * from comments where comments.zid = ($1)" + modClause,
-        params
+        params,
       );
     }
 
@@ -152,7 +153,7 @@ function _getCommentsForModerationList(o: {
         "_getCommentsForModerationList",
         "select * from (select tid, vote, count(*) from votes_latest_unique where zid = ($1) group by tid, vote) as foo full outer join comments on foo.tid = comments.tid where comments.zid = ($1)" +
           modClause,
-        params
+        params,
       )
       .then((rows_) => {
         let rows = rows_ as Row[];
@@ -201,72 +202,73 @@ function _getCommentsList(o: {
   random: any;
   limit: any;
 }) {
-  return meteredPromise("_getCommentsList",
-  (async () => {
-    const conv = await Conversation.getConversationInfo(o.zid) as {
-      strict_moderation: any;
-      prioritize_seed: any;
-    };
+  return meteredPromise(
+    "_getCommentsList",
+    (async () => {
+      const conv = (await getConversationInfo(o.zid)) as {
+        strict_moderation: any;
+        prioritize_seed: any;
+      };
 
-    let q = SQL.sql_comments
-      .select(SQL.sql_comments.star())
-      .where(SQL.sql_comments.zid.equals(o.zid));
-    if (!_.isUndefined(o.pid)) {
-      q = q.and(SQL.sql_comments.pid.equals(o.pid));
-    }
-    if (!_.isUndefined(o.tids)) {
-      q = q.and(SQL.sql_comments.tid.in(o.tids));
-    }
-    if (!_.isUndefined(o.mod)) {
-      q = q.and(SQL.sql_comments.mod.equals(o.mod));
-    }
-    if (!_.isUndefined(o.not_voted_by_pid)) {
-      // 'SELECT * FROM comments WHERE zid = 12 AND tid NOT IN (SELECT tid FROM votes WHERE pid = 1);'
-      // Don't return comments the user has already voted on.
-      q = q.and(
-        SQL.sql_comments.tid.notIn(
-          SQL.sql_votes_latest_unique
-            .subQuery()
-            .select(SQL.sql_votes_latest_unique.tid)
-            .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
-            .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid))
-        )
-      );
-    } else if (!_.isUndefined(o.submitted_by_pid)) {
-      q = q.and(SQL.sql_comments.pid.equals(o.submitted_by_pid));
-    }
-
-    if (!_.isUndefined(o.withoutTids)) {
-      q = q.and(SQL.sql_comments.tid.notIn(o.withoutTids));
-    }
-    if (!o.moderation) {
-      q = q.and(SQL.sql_comments.active.equals(true));
-      if (conv.strict_moderation) {
-        q = q.and(SQL.sql_comments.mod.equals(Utils.polisTypes.mod.ok));
-      } else {
-        q = q.and(SQL.sql_comments.mod.notEquals(Utils.polisTypes.mod.ban));
+      let q = SQL.sql_comments
+        .select(SQL.sql_comments.star())
+        .where(SQL.sql_comments.zid.equals(o.zid));
+      if (!_.isUndefined(o.pid)) {
+        q = q.and(SQL.sql_comments.pid.equals(o.pid));
       }
-    }
-
-    q = q.and(SQL.sql_comments.velocity.gt(0)); // filter muted comments
-
-    if (!_.isUndefined(o.random)) {
-      if (conv.prioritize_seed) {
-        q = q.order("is_seed desc, random()");
-      } else {
-        q = q.order("random()");
+      if (!_.isUndefined(o.tids)) {
+        q = q.and(SQL.sql_comments.tid.in(o.tids));
       }
-    } else {
-      q = q.order(SQL.sql_comments.created);
-    }
-    if (!_.isUndefined(o.limit)) {
-      q = q.limit(o.limit);
-    } else {
-      q = q.limit(999); // TODO paginate
-    }
+      if (!_.isUndefined(o.mod)) {
+        q = q.and(SQL.sql_comments.mod.equals(o.mod));
+      }
+      if (!_.isUndefined(o.not_voted_by_pid)) {
+        // 'SELECT * FROM comments WHERE zid = 12 AND tid NOT IN (SELECT tid FROM votes WHERE pid = 1);'
+        // Don't return comments the user has already voted on.
+        q = q.and(
+          SQL.sql_comments.tid.notIn(
+            SQL.sql_votes_latest_unique
+              .subQuery()
+              .select(SQL.sql_votes_latest_unique.tid)
+              .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
+              .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid)),
+          ),
+        );
+      } else if (!_.isUndefined(o.submitted_by_pid)) {
+        q = q.and(SQL.sql_comments.pid.equals(o.submitted_by_pid));
+      }
 
-    return await pg.queryP(q.toString(), []) as Row[];
-  })()
+      if (!_.isUndefined(o.withoutTids)) {
+        q = q.and(SQL.sql_comments.tid.notIn(o.withoutTids));
+      }
+      if (!o.moderation) {
+        q = q.and(SQL.sql_comments.active.equals(true));
+        if (conv.strict_moderation) {
+          q = q.and(SQL.sql_comments.mod.equals(Utils.polisTypes.mod.ok));
+        } else {
+          q = q.and(SQL.sql_comments.mod.notEquals(Utils.polisTypes.mod.ban));
+        }
+      }
+
+      q = q.and(SQL.sql_comments.velocity.gt(0)); // filter muted comments
+
+      if (!_.isUndefined(o.random)) {
+        if (conv.prioritize_seed) {
+          q = q.order("is_seed desc, random()");
+        } else {
+          q = q.order("random()");
+        }
+      } else {
+        q = q.order(SQL.sql_comments.created);
+      }
+      if (!_.isUndefined(o.limit)) {
+        q = q.limit(o.limit);
+      } else {
+        q = q.limit(999); // TODO paginate
+      }
+
+      return (await pg.queryP(q.toString(), [])) as Row[];
+    })(),
   );
 }
 
@@ -278,7 +280,7 @@ function getNumberOfCommentsRemaining(zid: any, pid: any) {
       "remaining as (select count(*) as remaining from c left join v on c.tid = v.tid where v.vote is null), " +
       "total as (select count(*) as total from c) " +
       "select cast(remaining.remaining as integer), cast(total.total as integer), cast(($2) as integer) as pid from remaining, total;",
-    [zid, pid]
+    [zid, pid],
   );
 }
 
@@ -291,7 +293,7 @@ function translateAndStoreComment(zid: any, tid: any, txt: any, lang: any) {
         pg
           .queryP(
             "insert into comment_translations (zid, tid, txt, lang, src) values ($1, $2, $3, $4, $5) returning *;",
-            [zid, tid, translation, lang, src]
+            [zid, tid, translation, lang, src],
           )
           //       Argument of type '(rows: Row[]) => Row' is not assignable to parameter of type '(value: unknown) => Row | PromiseLike<Row>'.
           // Types of parameters 'rows' and 'value' are incompatible.
@@ -326,15 +328,6 @@ function detectLanguage(txt: any) {
 }
 
 export {
-  getComment,
-  getComments,
-  _getCommentsForModerationList,
-  getNumberOfCommentsRemaining,
-  translateAndStoreComment,
-  detectLanguage,
-};
-
-export default {
   getComment,
   getComments,
   _getCommentsForModerationList,

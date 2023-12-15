@@ -4,11 +4,15 @@ import LruCache from "lru-cache";
 import pg from "./db/pg-query";
 import { meteredPromise } from "./utils/metered";
 
-import Conversation from "./conversation";
+import {
+  getXidRecord,
+  getConversationInfo,
+  isXidWhitelisted,
+  createXidRecord,
+} from "./conversation";
 import LRUCache from "lru-cache";
 import logger from "./utils/logger";
 import Config from "./config";
-import { getConversationInfo } from "./conversation";
 
 const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
 
@@ -54,7 +58,7 @@ async function getUser(
 
   let xidInfoPromise = Promise.resolve<string | any[] | null>([]);
   if (zid_optional && xid_optional) {
-    xidInfoPromise = Conversation.getXidRecord(xid_optional, zid_optional);
+    xidInfoPromise = getXidRecord(xid_optional, zid_optional);
   } else if (xid_optional && owner_uid_optional) {
     xidInfoPromise = getXidRecordByXidOwnerId(
       xid_optional,
@@ -210,10 +214,10 @@ function getXidRecordByXidOwnerId(
 
         const shouldCreateXidEntryPromise = !zid_optional
           ? Promise.resolve(true)
-          : Conversation.getConversationInfo(zid_optional).then(
+          : getConversationInfo(zid_optional).then(
               (conv: { use_xid_whitelist: any }) => {
                 return conv.use_xid_whitelist
-                  ? Conversation.isXidWhitelisted(owner, xid)
+                  ? isXidWhitelisted(owner, xid)
                   : Promise.resolve(true);
               },
             );
@@ -223,7 +227,7 @@ function getXidRecordByXidOwnerId(
             return null;
           }
           return createDummyUser().then((newUid: any) => {
-            return Conversation.createXidRecord(
+            return createXidRecord(
               owner,
               newUid,
               xid,
@@ -250,7 +254,7 @@ function getXidRecordByXidOwnerId(
 }
 
 function getXidStuff(xid: any, zid: any) {
-  return Conversation.getXidRecord(xid, zid).then((rows: string | any[]) => {
+  return getXidRecord(xid, zid).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
       return "noXidRecord";
     }

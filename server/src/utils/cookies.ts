@@ -2,8 +2,8 @@ import _ from "underscore";
 import url from "url";
 
 import Config from "../config";
-import Session from "../session";
-import { getUserInfoForUid2 } from "../user"
+import { makeSessionToken } from "../session";
+import { getUserInfoForUid2 } from "../user";
 
 type Options = {
   maxAge?: number;
@@ -61,7 +61,7 @@ function setCookie(
   res: { cookie: (arg0: any, arg1: any, arg2: any) => void },
   name: string,
   value: number,
-  options: Options
+  options: Options,
 ) {
   const opts: Options = _.clone(options || {});
   opts.path = _.isUndefined(opts.path) ? "/" : opts.path;
@@ -133,7 +133,7 @@ async function addCookies(
   req: { cookies: { [x: string]: any } },
   res: { header: (arg0: string, arg1: any) => void },
   token: any,
-  uid: any
+  uid: any,
 ) {
   const opts = await getUserInfoForUid2(uid);
   let email = opts.email;
@@ -145,7 +145,7 @@ async function addCookies(
   setUserCreatedTimestampCookie(req, res, created);
 
   if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
-    setPermanentCookie(req, res, Session.makeSessionToken());
+    setPermanentCookie(req, res, makeSessionToken());
   }
 
   res.header("x-polis", token);
@@ -153,10 +153,10 @@ async function addCookies(
 
 function getPermanentCookieAndEnsureItIsSet(
   req: { cookies: { [x: string]: any } },
-  res: any
+  res: any,
 ) {
   if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
-    let token = Session.makeSessionToken();
+    let token = makeSessionToken();
     setPermanentCookie(req, res, token);
     return token;
   } else {

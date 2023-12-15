@@ -133,7 +133,7 @@ const sql_reports = sql.define({
   ],
 });
 
-const SQL: any = {
+export {
   sql_conversations,
   sql_comments,
   sql_votes_latest_unique,
@@ -142,5 +142,3 @@ const SQL: any = {
   sql_reports,
   sql_users,
 };
-
-export default SQL;

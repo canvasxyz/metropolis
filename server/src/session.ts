@@ -90,7 +90,10 @@ async function getUserInfoForSessionToken(sessionToken: unknown) {
 
   let results;
   try {
-    results = await pg.queryP("select uid from auth_tokens where token = ($1);", [sessionToken])
+    results = await pg.queryP(
+      "select uid from auth_tokens where token = ($1);",
+      [sessionToken],
+    );
   } catch (err) {
     logger.error("token_fetch_error", err);
     throw new Error("token_fetch_error");
@@ -109,12 +112,17 @@ async function getUserInfoForSessionToken(sessionToken: unknown) {
 async function startSession(uid: any) {
   let token = makeSessionToken();
   logger.info("startSession");
-  await pg.queryP("insert into auth_tokens (uid, token, created) values ($1, $2, default);", [uid, token]);
+  await pg.queryP(
+    "insert into auth_tokens (uid, token, created) values ($1, $2, default);",
+    [uid, token],
+  );
   return token;
 }
 
 async function endSession(sessionToken: any) {
-  await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken]);
+  await pg.queryP("delete from auth_tokens where token = ($1);", [
+    sessionToken,
+  ]);
 }
 
 async function setupPwReset(uid: any) {
@@ -127,7 +135,10 @@ async function setupPwReset(uid: any) {
       .substr(0, 100);
   }
   let token = makePwResetToken();
-  await pg.queryP("insert into pwreset_tokens (uid, token, created) values ($1, $2, default);", [uid, token]);
+  await pg.queryP(
+    "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
+    [uid, token],
+  );
 }
 
 async function getUidForPwResetToken(pwresettoken: any) {
@@ -136,7 +147,8 @@ async function getUidForPwResetToken(pwresettoken: any) {
     // TODO "and created > timestamp - x"
     results = await pg.queryP(
       "select uid from pwreset_tokens where token = ($1);",
-      [pwresettoken]);
+      [pwresettoken],
+    );
   } catch (err) {
     logger.error("pwresettoken_fetch_error", err);
     throw new Error("pwresettoken_fetch_error");
@@ -148,7 +160,7 @@ async function getUidForPwResetToken(pwresettoken: any) {
   }
 
   let uid = results[0].uid;
-  return {uid};
+  return { uid };
 }
 
 function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
@@ -161,23 +173,11 @@ function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
         return;
       }
       cb(null);
-    }
+    },
   );
 }
 
 export {
-  encrypt,
-  decrypt,
-  makeSessionToken,
-  getUserInfoForSessionToken,
-  startSession,
-  endSession,
-  setupPwReset,
-  getUidForPwResetToken,
-  clearPwResetToken,
-};
-
-export default {
   encrypt,
   decrypt,
   makeSessionToken,
