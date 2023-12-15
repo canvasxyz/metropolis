@@ -164,7 +164,7 @@ function getPermanentCookieAndEnsureItIsSet(
   }
 }
 
-export default {
+export {
   COOKIES,
   COOKIES_TO_CLEAR,
   cookieDomain,

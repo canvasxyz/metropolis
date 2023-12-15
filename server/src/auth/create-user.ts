@@ -3,13 +3,15 @@ import _ from "underscore";
 import pg from "../db/pg-query";
 import fail from "../utils/fail";
 import Config from "../config";
-import cookies from "../utils/cookies";
+import { addCookies } from "../utils/cookies";
 import { startSession } from "../session";
-import Utils from "../utils/common";
-import Password from "./password";
-import emailSenders from "../email/senders";
+import { hexToStr } from "../utils/common";
+import { generateTokenP, generateHashedPassword } from "./password";
+import { sendTextEmail } from "../email/senders";
 
-const sendTextEmail = emailSenders.sendTextEmail;
+const polisFromAddress = Config.polisFromAddress;
+const getServerNameWithProtocol = Config.getServerNameWithProtocol;
+
 async function createUser(req: any, res: any) {
   let hname = req.p.hname;
   let password = req.p.password;
@@ -77,7 +79,7 @@ async function createUser(req: any, res: any) {
   let hashedPassword: string;
   try {
     hashedPassword = await new Promise((resolve, reject) => {
-      Password.generateHashedPassword(password, (err, res) => {
+      generateHashedPassword(password, (err, res) => {
         if (err) {
           reject(err);
         } else if (!res) {
@@ -135,7 +137,7 @@ async function createUser(req: any, res: any) {
   }
 
   try {
-    await cookies.addCookies(req, res, token, uid);
+    await addCookies(req, res, token, uid);
   } catch (err) {
     fail(res, 500, "polis_err_adding_user", err);
     return;
@@ -149,7 +151,7 @@ async function createUser(req: any, res: any) {
 }
 
 function doSendVerification(req: any, email: any) {
-  return Password.generateTokenP(30, false).then(function (einvite: any) {
+  return generateTokenP(30, false).then(function (einvite: any) {
     return pg
       .queryP("insert into einvites (email, einvite) values ($1, $2);", [
         email,
@@ -162,19 +164,14 @@ function doSendVerification(req: any, email: any) {
 }
 
 function sendVerificationEmail(req: any, email: any, einvite: any) {
-  let serverName = Config.getServerNameWithProtocol(req);
+  let serverName = getServerNameWithProtocol(req);
   let body = `Welcome to pol.is!
 
 Click this link to verify your email address:
 
 ${serverName}/api/v3/verify?e=${einvite}`;
 
-  return sendTextEmail(
-    Config.polisFromAddress,
-    email,
-    "Polis verification",
-    body,
-  );
+  return sendTextEmail(polisFromAddress, email, "Polis verification", body);
 }
 
 function decodeParams(encodedStringifiedJson: string | string[]) {
@@ -189,7 +186,7 @@ function decodeParams(encodedStringifiedJson: string | string[]) {
   } else {
     encodedStringifiedJson = encodedStringifiedJson.slice(4);
   }
-  let stringifiedJson = Utils.hexToStr(encodedStringifiedJson as string);
+  let stringifiedJson = hexToStr(encodedStringifiedJson as string);
   let o = JSON.parse(stringifiedJson);
   return o;
 }
@@ -199,7 +196,7 @@ async function generateAndRegisterZinvite(zid: any, generateShort: any) {
   if (generateShort) {
     len = 6;
   }
-  const zinvite = await Password.generateTokenP(len, false);
+  const zinvite = await generateTokenP(len, false);
   await pg.queryP(
     "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
     [zid, zinvite],

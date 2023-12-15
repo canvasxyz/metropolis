@@ -18,8 +18,8 @@ import _ from "underscore";
 import pg from "pg";
 
 import { addInRamMetric, meteredPromise } from "./utils/metered";
-import CreateUser from "./auth/create-user";
-import Password from "./auth/password";
+import { generateAndRegisterZinvite, createUser } from "./auth/create-user";
+import { generateToken, generateTokenP } from "./auth/password";
 import {
   query,
   query_readOnly,
@@ -73,19 +73,19 @@ const devMode = Config.isDevMode;
 
 const escapeLiteral = pg.Client.prototype.escapeLiteral;
 
-const generateAndRegisterZinvite = CreateUser.generateAndRegisterZinvite;
-const generateToken = Password.generateToken;
-const generateTokenP = Password.generateTokenP;
-
 // TODO: Maybe able to remove
 import { generateHashedPassword } from "./auth/password";
-import cookies from "./utils/cookies";
-const COOKIES = cookies.COOKIES;
-const COOKIES_TO_CLEAR = cookies.COOKIES_TO_CLEAR;
-
-import constants from "./utils/constants";
-const DEFAULTS = constants.DEFAULTS;
-
+import {
+  COOKIES,
+  COOKIES_TO_CLEAR,
+  setCookie,
+  setPermanentCookie,
+  setCookieTestCookie,
+  addCookies,
+  getPermanentCookieAndEnsureItIsSet,
+  cookieDomain,
+} from "./utils/cookies";
+import { DEFAULTS } from "./utils/constants";
 import {
   getConversationInfo,
   getConversationInfoByConversationId,
@@ -127,17 +127,13 @@ import {
 
 import logger from "./utils/logger";
 
-// # notifications
-import emailSenders from "./email/senders";
+import { sendTextEmail } from "./email/senders";
 import { Request, Response } from "express";
 import { getConversationIdFetchZid } from "./utils/parameter";
 import { insertConversationPrAndFip } from "./handlers/queries";
-const sendTextEmail = emailSenders.sendTextEmail;
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
-
 const polisFromAddress = Config.polisFromAddress;
-
 const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:8040
 
 let akismet = akismetLib.client({
@@ -460,13 +456,6 @@ String.prototype.hashCode = function () {
 //             });
 //     });
 // });
-
-const setCookie = cookies.setCookie;
-const setPermanentCookie = cookies.setPermanentCookie;
-const setCookieTestCookie = cookies.setCookieTestCookie;
-const addCookies = cookies.addCookies;
-const getPermanentCookieAndEnsureItIsSet =
-  cookies.getPermanentCookieAndEnsureItIsSet;
 
 function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
   function doInsert() {
@@ -2212,7 +2201,7 @@ function clearCookie(
 ) {
   res?.clearCookie?.(cookieName, {
     path: "/",
-    domain: cookies.cookieDomain(req),
+    domain: cookieDomain(req),
   });
 }
 
@@ -2237,7 +2226,7 @@ function clearCookies(
     if (COOKIES_TO_CLEAR[cookieName]) {
       res?.clearCookie?.(cookieName, {
         path: "/",
-        domain: cookies.cookieDomain(req),
+        domain: cookieDomain(req),
       });
     }
   }
@@ -4745,7 +4734,7 @@ function handle_GET_conversationStats(
 }
 
 function handle_POST_auth_new(req: any, res: any) {
-  CreateUser.createUser(req, res);
+  createUser(req, res);
 } // end /api/v3/auth/new
 
 function handle_POST_tutorial(

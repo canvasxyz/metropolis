@@ -10,7 +10,12 @@ import nodemailer from "nodemailer";
 import Config from "../config";
 import logger from "../utils/logger";
 
-function sendTextEmail(sender: any, recipient: any, subject: any, text: any) {
+export function sendTextEmail(
+  sender: any,
+  recipient: any,
+  subject: any,
+  text: any,
+) {
   const transporter = nodemailer.createTransport({
     host: "smtp.sendgrid.net",
     port: 587,
@@ -21,15 +26,17 @@ function sendTextEmail(sender: any, recipient: any, subject: any, text: any) {
     },
   } as any);
 
-  const mail = transporter.sendMail({ from: sender, to: recipient, subject: subject, text: text });
+  const mail = transporter.sendMail({
+    from: sender,
+    to: recipient,
+    subject: subject,
+    text: text,
+  });
 
-  mail
-    .catch(function (err: any) {
-      logger.error("polis_err_email_sender_failed_transport_priority_1", err);
-      logger.error(`Unable to send email via sendgrid to: ${recipient}`, err);
-    });
+  mail.catch(function (err: any) {
+    logger.error("polis_err_email_sender_failed_transport_priority_1", err);
+    logger.error(`Unable to send email via sendgrid to: ${recipient}`, err);
+  });
 
   return mail;
 }
-
-export default { sendTextEmail };
