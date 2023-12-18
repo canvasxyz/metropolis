@@ -199,7 +199,7 @@ async function getFipFromPR(
 
   // try to extract fip number
   const fipNumberMatch = filename.match(/fip-([0-9]*)/);
-  const fipNumber = fipNumberMatch ? parseInt(fipNumberMatch[1], 10) : 0;
+  let fipNumber = fipNumberMatch ? parseInt(fipNumberMatch[1], 10) : 0;
 
   // try to extract frontmatter
   const contentParts = content.split("---");
@@ -212,6 +212,15 @@ async function getFipFromPR(
   } catch (err) {
     console.error(err);
     frontmatterData = {};
+  }
+
+  // try to extract fip number again
+  if (!fipNumber || isNaN(fipNumber)) {
+    const frontMatterFipNumberMatch =
+      frontMatterData.fip.match(/(fip-)?([0-9]*)/);
+    fipNumber = frontMatterFipNumberMatch
+      ? parseInt(frontMatterFipNumberMatch[2], 10)
+      : 0;
   }
 
   return {
