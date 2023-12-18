@@ -4,7 +4,10 @@ import { Box, Flex, Text } from "theme-ui"
 
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
-import { ConversationSummary, populateConversationsSummary } from "../../reducers/conversations_summary"
+import {
+  ConversationSummary,
+  populateConversationsSummary,
+} from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
 
 const Badge = ({ children }: { children: React.ReactNode }) => {
@@ -31,25 +34,29 @@ const Badge = ({ children }: { children: React.ReactNode }) => {
 
 type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
 
-const ConversationsList = ({selectedConversationId}: {selectedConversationId: string | null}) => {
+const ConversationsList = ({
+  selectedConversationId,
+}: {
+  selectedConversationId: string | null
+}) => {
   const dispatch = useAppDispatch()
   const hist = useHistory()
 
-  const {data} = useAppSelector((state: RootState) => state.conversations_summary)
+  const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const [selectedConversationList, setSelectedConversationList] = useLocalStorage<ConversationListSelection>("selectedConversationList", "all-fip")
+  const [selectedConversationList, setSelectedConversationList] =
+    useLocalStorage<ConversationListSelection>("selectedConversationList", "all-fip")
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
   }, [])
 
-
   const navigateToConversation = useCallback((conversationId) => {
     hist.push(`/dashboard/c/${conversationId}`)
   }, [])
 
-  if(data === null) {
+  if (data === null) {
     return <React.Fragment></React.Fragment>
   }
 
@@ -88,110 +95,112 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
     conversationsToDisplay = []
   }
 
-  return <React.Fragment>
-    <Box
-      sx={{
-        fontSize: "15px",
-        fontWeight: "500",
-        py: [2],
-        px: [3],
-        userSelect: "none",
-      }}
-    >
+  return (
+    <React.Fragment>
       <Box
-        variant={selectedConversationList === "all-fip" ? "buttons.primary" : "buttons.outline"}
         sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          display: "inline-block",
-          bg: selectedConversationList === "all-fip" ? "#667ccb !important" : undefined,
-        }}
-        onClick={() => {
-          setSelectedConversationList("all-fip")
+          fontSize: "15px",
+          fontWeight: "500",
+          py: [2],
+          px: [3],
+          userSelect: "none",
         }}
       >
-        All
+        <Box
+          variant={selectedConversationList === "all-fip" ? "buttons.primary" : "buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            display: "inline-block",
+            bg: selectedConversationList === "all-fip" ? "#667ccb !important" : undefined,
+          }}
+          onClick={() => {
+            setSelectedConversationList("all-fip")
+          }}
+        >
+          All
+        </Box>
+        <Box
+          variant={selectedConversationList === "open-fip" ? "buttons.primary" : "buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            display: "inline-block",
+            bg: selectedConversationList === "open-fip" ? "#667ccb !important" : undefined,
+          }}
+          onClick={() => {
+            setSelectedConversationList("open-fip")
+          }}
+        >
+          FIP PRs <Badge>{openConversations.length}</Badge>
+        </Box>
+        <Box
+          variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            display: "inline-block",
+            bg: selectedConversationList === "non-fip" ? "#667ccb !important" : undefined,
+          }}
+          onClick={() => {
+            setSelectedConversationList("non-fip")
+          }}
+        >
+          Discussions <Badge>{nonFIPConversations.length}</Badge>
+        </Box>
       </Box>
-      <Box
-        variant={selectedConversationList === "open-fip" ? "buttons.primary" : "buttons.outline"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          display: "inline-block",
-          bg: selectedConversationList === "open-fip" ? "#667ccb !important" : undefined,
-        }}
-        onClick={() => {
-          setSelectedConversationList("open-fip")
-        }}
-      >
-        FIP PRs ({openConversations.length})
+      <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
+        {conversationsToDisplay.map((conversation) => (
+          <ConversationListItem
+            conversation={conversation}
+            selectedConversationId={selectedConversationId}
+            navigateToConversation={navigateToConversation}
+            key={conversation.conversation_id}
+          />
+        ))}
       </Box>
-      <Box
-        variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          display: "inline-block",
-          bg: selectedConversationList === "non-fip" ? "#667ccb !important" : undefined,
-        }}
-        onClick={() => {
-          setSelectedConversationList("non-fip")
-        }}
-      >
-        Discussions <Badge>{nonFIPConversations.length}</Badge>
+      <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
+        <Box
+          variant={selectedConversationList === "archived" ? "buttons.primary" : "buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            display: "inline-block",
+            bg: selectedConversationList === "archived" ? "#667ccb !important" : undefined,
+          }}
+          onClick={() => {
+            setSelectedConversationList("archived")
+          }}
+        >
+          Past
+        </Box>
+        <Box
+          variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            display: "inline-block",
+            bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
+          }}
+          onClick={() => {
+            setSelectedConversationList("hidden")
+          }}
+        >
+          Hidden
+        </Box>
       </Box>
-    </Box>
-    <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
-      {conversationsToDisplay.map((conversation) => (
-        <ConversationListItem
-          conversation={conversation}
-          selectedConversationId={selectedConversationId}
-          navigateToConversation={navigateToConversation}
-          key={conversation.conversation_id}
-        />
-      ))}
-    </Box>
-    <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
-      <Box
-        variant={selectedConversationList === "archived" ? "buttons.primary" : "buttons.outline"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          display: "inline-block",
-          bg: selectedConversationList === "archived" ? "#667ccb !important" : undefined,
-        }}
-        onClick={() => {
-          setSelectedConversationList("archived")
-        }}
-      >
-        Past
-      </Box>
-      <Box
-        variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          display: "inline-block",
-          bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
-        }}
-        onClick={() => {
-          setSelectedConversationList("hidden")
-        }}
-      >
-        Hidden
-      </Box>
-    </Box>
-  </React.Fragment>
+    </React.Fragment>
+  )
 }
 
 type ConversationListItemProps = {
@@ -236,13 +245,11 @@ const ConversationListItem = ({
       <Text sx={{ color: "#84817D", fontSize: "90%" }}>
         {conversation.fip_created && conversation.github_pr_id ? (
           <Text>
-            PR #{conversation.github_pr_id} created{" "}
+            PR #{conversation.github_pr_id} · Created{" "}
             {(() => {
               const date = new Date(conversation.fip_created)
               return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
-            {conversation.fip_status && " · "}
-            {conversation.fip_status}
           </Text>
         ) : (
           <Text>

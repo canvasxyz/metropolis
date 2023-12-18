@@ -5,30 +5,30 @@ import { ZidMetadata } from "../util/types"
 
 type FrontmatterProps = { zid_metadata: ZidMetadata }
 
+const splitAuthors = (authorList) => {
+  const result = authorList
+    .replace(
+      "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
+      "",
+    )
+    .replace(/"/g, "")
+    .split(/, | and /)
+  if (result.length === 1) {
+    return result[0].split(/ @/).map((i) => {
+      return `@${i.replace(/^@/, "").trim()}`
+    })
+  }
+  return result
+}
+
 export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
-  const fields = [
-    "status",
-    // "title",
-    "author",
-    "discussions-to",
-    // "type",
-    // "created"
-  ]
-  const valueFieldNames = [
-    "fip_status",
-    // "fip_title",
-    "fip_author",
-    "fip_discussions_to",
-    // "fip_type",
-    // "fip_created",
-  ]
+  const fields = ["title", "status", "author", "discussions-to"]
+  const valueFieldNames = ["github_pr_title", "fip_status", "fip_author", "fip_discussions_to"]
   const valueFieldNamesDisplay = {
-    // title: "Title",
+    title: "PR",
     author: "Author",
     "discussions-to": "Discussion",
     status: "Status",
-    // type: "Type",
-    // created: "Created",
   }
 
   const valuesExist =
@@ -57,44 +57,37 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
                     <Text sx={{ fontWeight: "700" }}>{valueFieldNamesDisplay[fields[i]]}</Text>
                   </td>
                   <td className="border">
-                    {valueFieldName === "fip_status" ? (
+                    {valueFieldName === "github_pr_title" ? (
                       conversation.github_pr_url !== null ? (
                         <Link
                           target="_blank"
                           rel="noopener noreferrer"
                           href={conversation.github_pr_url}
                         >
-                          {conversation[valueFieldName]}
+                          {conversation[valueFieldName]} (#{conversation.github_pr_id})
                         </Link>
                       ) : (
                         conversation[valueFieldName]
                       )
                     ) : valueFieldName === "fip_author" ? (
-                      conversation[valueFieldName]
-                        .replace(
-                          "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
-                          "",
+                      splitAuthors(conversation[valueFieldName]).map((author, i) => {
+                        const matches = author.match(/.*@(\w+)/)
+                        if (!matches) return author
+                        const username = matches[1]
+                        return (
+                          <React.Fragment key={author}>
+                            <Link
+                              href={`https://github.com/${username}`}
+                              target="_blank"
+                              noreferrer="noreferrer"
+                              noopener="noopener"
+                            >
+                              {author}
+                            </Link>
+                            {i < splitAuthors(conversation[valueFieldName]).length - 1 ? ", " : ""}
+                          </React.Fragment>
                         )
-                        .replace(/"|'/g, "")
-                        .split(", ")
-                        .map((author) => {
-                          const matches = author.match(/.*@(\w+)/)
-                          if (!matches) return author
-                          const username = matches[1]
-                          return (
-                            <React.Fragment key={author}>
-                              <Link
-                                href={`https://github.com/${username}`}
-                                target="_blank"
-                                noreferrer="noreferrer"
-                                noopener="noopener"
-                              >
-                                {author}
-                              </Link>
-                              <br />
-                            </React.Fragment>
-                          )
-                        })
+                      })
                     ) : valueFieldName === "fip_discussions_to" ? (
                       (() => {
                         const matches = conversation[valueFieldName].match(/\[.+\]\((.+)\)/)
