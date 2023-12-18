@@ -16,6 +16,28 @@ import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { DashboardUserButton } from "./user_button"
 
+const Badge = ({ children }) => {
+  return (
+    <Box
+      sx={{
+        ml: "2px",
+        display: "inline-block",
+        fontSize: "0.82em",
+        padding: "1px 5px",
+        bg: "primaryActive",
+        borderRadius: 99,
+        color: "#fbf5e9",
+        minWidth: 21,
+        textAlign: "center",
+        position: "relative",
+        top: "-1px",
+      }}
+    >
+      {children}
+    </Box>
+  )
+}
+
 type ConversationListItemProps = {
   conversation: Conversation
   selectedConversationId: string | null
@@ -257,7 +279,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
           >
             <Box
               variant={showAllFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              sx={{
+                px: [2],
+                py: [1],
+                mr: [1],
+                mb: [1],
+                display: "inline-block",
+                bg: showAllFIPConversations ? "#667ccb !important" : undefined,
+              }}
               onClick={() => {
                 setShowAllFIPConversations(true)
                 setShowNonFIPConversations(false)
@@ -266,11 +295,18 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowHiddenConversations(false)
               }}
             >
-              All ({openConversations.length + nonFIPConversations.length})
+              All
             </Box>
             <Box
               variant={showOpenFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              sx={{
+                px: [2],
+                py: [1],
+                mr: [1],
+                mb: [1],
+                display: "inline-block",
+                bg: showOpenFIPConversations ? "#667ccb !important" : undefined,
+              }}
               onClick={() => {
                 setShowOpenFIPConversations(true)
                 setShowAllFIPConversations(false)
@@ -279,11 +315,18 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowHiddenConversations(false)
               }}
             >
-              FIPs ({openConversations.length})
+              FIP PRs <Badge>{openConversations.length}</Badge>
             </Box>
             <Box
               variant={showNonFIPConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              sx={{
+                px: [2],
+                py: [1],
+                mr: [1],
+                mb: [1],
+                display: "inline-block",
+                bg: showNonFIPConversations ? "#667ccb !important" : undefined,
+              }}
               onClick={() => {
                 setShowNonFIPConversations(true)
                 setShowAllFIPConversations(false)
@@ -292,10 +335,10 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 setShowHiddenConversations(false)
               }}
             >
-              Polls ({nonFIPConversations.length})
+              Discussions <Badge>{nonFIPConversations.length}</Badge>
             </Box>
           </Box>
-          <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
+          <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll", pb: [8] }}>
             {selectedConversations.map((conversation) => (
               <ConversationListItem
                 conversation={conversation}
@@ -308,7 +351,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
           <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
             <Box
               variant={showArchivedConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              sx={{
+                px: [2],
+                py: [1],
+                mr: [1],
+                mb: [1],
+                display: "inline-block",
+                bg: showArchivedConversations ? "#667ccb !important" : undefined,
+              }}
               onClick={() => {
                 setShowArchivedConversations(true)
                 setShowAllFIPConversations(false)
@@ -321,7 +371,14 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             </Box>
             <Box
               variant={showHiddenConversations ? "buttons.primary" : "buttons.outline"}
-              sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+              sx={{
+                px: [2],
+                py: [1],
+                mr: [1],
+                mb: [1],
+                display: "inline-block",
+                bg: showHiddenConversations ? "#667ccb !important" : undefined,
+              }}
               onClick={() => {
                 setShowArchivedConversations(false)
                 setShowAllFIPConversations(false)

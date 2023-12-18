@@ -179,7 +179,7 @@ export const DashboardConversation = ({
                 [Mod]
               </Text>
             )}
-            {zid_metadata.is_hidden ? "Unhide" : "Hide"}
+            {zid_metadata.is_hidden ? "Unhide proposal" : "Hide proposal"}
           </Button>
         </Box>
       )}

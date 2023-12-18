@@ -179,22 +179,24 @@ export default {
     primary: {
       color: "background",
       bg: "primary",
+      fontFamily: "body",
       borderRadius: [8],
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "primary",
       "&:hover": {
         bg: "primaryActive",
       },
-      fontFamily: "body",
-      cursor: "pointer",
     },
     secondary: {
       color: "background",
       bg: "lightGray",
+      fontFamily: "body",
+      cursor: "pointer",
       borderRadius: [8],
       "&:hover": {
         bg: "lightGrayActive",
       },
-      fontFamily: "body",
-      cursor: "pointer",
     },
     outline: {
       color: "primary",
