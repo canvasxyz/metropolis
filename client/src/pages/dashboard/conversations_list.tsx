@@ -7,7 +7,7 @@ import { RootState } from "../../store"
 import { ConversationSummary, populateConversationsSummary } from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
 
-const Badge = ({ children }) => {
+const Badge = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box
       sx={{
