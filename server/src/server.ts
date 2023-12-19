@@ -7739,6 +7739,12 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
   );
   const conv = conversationRows[0];
 
+  if (conv.github_pr_id !== null) {
+    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+  } else {
+    conv.github_pr_url = null;
+  }
+
   const convHasMetadata = await getConversationHasMetadata(zid);
   const translations = await getConversationTranslationsMinimal(zid, lang);
 
@@ -7822,6 +7828,52 @@ async function handle_GET_conversations(
   });
 
   res.status(200).json(conversationsResult);
+}
+
+async function handle_GET_conversations_summary(req: Request, res: Response) {
+  const query = `
+  SELECT
+    conversations.created,
+    conversations.topic,
+    conversations.fip_created,
+    conversations.fip_title,
+    conversations.fip_number,
+    conversations.fip_status,
+    conversations.github_pr_opened_at,
+    conversations.github_pr_title,
+    conversations.github_pr_id,
+    conversations.is_archived,
+    conversations.is_hidden,
+    conversations.participant_count,
+    users.hname,
+    zinvites.zinvite as conversation_id
+  FROM
+    conversations
+  JOIN users ON conversations.owner = users.uid
+  JOIN zinvites ON conversations.zid = zinvites.zid;
+  `
+
+  const rows = await queryP_readOnly(query, []);
+
+  rows.forEach(function (conv) {
+    conv.created = Number(conv.created);
+    conv.modified = Number(conv.modified);
+
+    // if there is no topic, provide a UTC timstamp instead
+    if (_.isUndefined(conv.topic) || conv.topic === "") {
+      conv.topic = new Date(conv.created).toUTCString();
+    }
+
+    if (conv.github_pr_id !== null) {
+      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+    } else {
+      conv.github_pr_url = null;
+    }
+
+    return conv;
+  });
+
+  return res.json(rows);
 }
 
 function createReport(zid: any) {
@@ -9463,6 +9515,7 @@ export {
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
+  handle_GET_conversations_summary,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
   handle_GET_domainWhitelist,

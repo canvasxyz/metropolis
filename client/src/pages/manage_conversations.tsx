@@ -5,16 +5,13 @@ import { Link } from "react-router-dom"
 import { ConnectedProps, connect } from "react-redux"
 import { Box, Heading, Button, Flex, jsx } from "theme-ui"
 
-import {
-  populateConversationsStore,
-} from "../actions"
-
 import ConversationRow from "../components/conversation_row"
 import { AppDispatch, RootState } from "../store"
+import { populateConversationsSummary } from "../reducers/conversations_summary"
 
 const connector = connect((state: RootState) => ({
   error: state.conversations.error,
-  conversations: state.conversations.conversations,
+  conversations: state.conversations_summary.data,
   conversation_stats: state.stats.conversation_stats,
   loading: state.conversations.loading && state.stats.loading,
 }))
@@ -50,13 +47,13 @@ class ManageConversations extends React.Component<
   }
 
   componentDidMount() {
-    this.props.dispatch(populateConversationsStore())
+    this.props.dispatch(populateConversationsSummary())
     // loading true or just do that in constructor
     // check your connectivity and try again
   }
 
   firePopulateInboxAction() {
-    this.props.dispatch(populateConversationsStore())
+    this.props.dispatch(populateConversationsSummary())
   }
 
   onFilterChange() {

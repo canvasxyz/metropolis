@@ -13,7 +13,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
-import { handleModerateConversation, handleUnmoderateConversation } from "../../actions"
+import { handleModerateConversation, handleUnmoderateConversation, populateZidMetadataStore } from "../../actions"
 
 type ReportComment = {
   active: boolean
@@ -36,22 +36,26 @@ type ReportComment = {
 }
 
 export const DashboardConversation = ({
-  conversation,
-  zid_metadata,
+  selectedConversationId
 }: {
-  conversation
-  zid_metadata
+  selectedConversationId: string
 }) => {
   const hist = useHistory()
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((state: RootState) => state.user)
+  const { zid_metadata, error: zidMetadataError } = useAppSelector((state: RootState) => state.zid_metadata)
 
-  const collapsibleConversation = conversation.description.length > 300
-  const [collapsed, setCollapsed] = useState(!!collapsibleConversation)
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
   const [maxCount, setMaxCount] = useState<number>(0)
   const [refreshInProgress, setRefreshInProgress] = useState(false)
+
+  useEffect(() => {
+    setReport(undefined)
+    setReportComments([])
+    if (!zid_metadata.conversation_id) return
+    refreshReport()
+  }, [zid_metadata.conversation_id])
 
   const generateReport = () => {
     api
@@ -88,12 +92,16 @@ export const DashboardConversation = ({
   }
 
   useEffect(() => {
-    setReport(undefined)
-    setReportComments([])
-    setCollapsed(!!collapsibleConversation)
-    if (!zid_metadata.conversation_id) return
-    refreshReport()
-  }, [zid_metadata.conversation_id])
+    dispatch(populateZidMetadataStore(selectedConversationId))
+  }, [selectedConversationId])
+
+  useEffect(() => {
+    if(zidMetadataError) {
+      toast.error("Couldn't retrieve conversation")
+      // redirect to main dashboard
+      hist.push(`/dashboard`)
+    }
+  }, [zidMetadataError])
 
   return (
     <Box>
@@ -196,39 +204,14 @@ export const DashboardConversation = ({
           }}
         >
           <Heading as="h2">
-            {conversation.fip_title || conversation.github_pr_title || conversation.topic}
+            {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
-          <Frontmatter conversation={conversation} />
-          <Box
-            className={collapsed ? "react-markdown css-fade" : "react-markdown"}
-            sx={
-              collapsed
-                ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
-                : { wordBreak: "break-word", mb: [3] }
-            }
-          >
+          <Frontmatter zid_metadata={zid_metadata} />
+          <Collapsible shouldCollapse={zid_metadata.description && zid_metadata.description.length > 300}>
             <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
-              {conversation.description}
+              {zid_metadata.description}
             </ReactMarkdown>
-          </Box>
-          {collapsibleConversation && (
-            <Link
-              href="#"
-              onClick={() => setCollapsed(!collapsed)}
-              variant="links.primary"
-              sx={{
-                color: "mediumGrayActive",
-                py: "11px",
-                textAlign: "center",
-                bg: "#ede4d166",
-                fontSize: "0.94em",
-                borderRadius: 7,
-                "&:hover": { bg: "#ede4d1aa" },
-              }}
-            >
-              {collapsed ? "Show more" : "Show less"}
-            </Link>
-          )}
+          </Collapsible>
         </Flex>
       </Box>
       <Box sx={{ width: "100%", position: "relative", borderTop: "1px solid #e2ddd5", mt: [4] }}>
@@ -245,7 +228,7 @@ export const DashboardConversation = ({
           <Heading as="h2">Sentiment Check</Heading>
           <Survey
             match={{
-              params: { conversation_id: conversation.conversation_id },
+              params: { conversation_id: zid_metadata.conversation_id },
             }}
           />
         </Box>
@@ -320,6 +303,41 @@ export const DashboardConversation = ({
       </Box>
     </Box>
   )
+}
+
+const Collapsible = ({children, shouldCollapse}: {children: React.ReactElement; shouldCollapse: boolean}) => {
+  const [collapsed, setCollapsed] = useState(shouldCollapse)
+
+  return (<React.Fragment>
+    <Box
+      className={shouldCollapse && collapsed ? "react-markdown css-fade" : "react-markdown"}
+      sx={
+        shouldCollapse && collapsed
+          ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
+          : { wordBreak: "break-word", mb: [3] }
+      }
+    >
+      {children}
+    </Box>
+    {shouldCollapse && (
+      <Link
+        href="#"
+        onClick={() => setCollapsed(!collapsed)}
+        variant="links.primary"
+        sx={{
+          color: "mediumGrayActive",
+          py: "11px",
+          textAlign: "center",
+          bg: "#ede4d166",
+          fontSize: "0.94em",
+          borderRadius: 7,
+          "&:hover": { bg: "#ede4d1aa" },
+        }}
+      >
+        {collapsed ? "Show more" : "Show less"}
+      </Link>
+    )}
+  </React.Fragment>)
 }
 
 const ReportCommentRow = ({

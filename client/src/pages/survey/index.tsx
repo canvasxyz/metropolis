@@ -1,17 +1,16 @@
 /** @jsx jsx */
 
 import React, { useCallback, useEffect, useState } from "react"
-import { Box, Button, Link, jsx } from "theme-ui"
+import { Box, Link, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
-import { populateZidMetadataStore, resetMetadataStore } from "../../actions"
 
 import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 import PostSurvey from "./survey_post"
 import { RootState } from "../../store"
-import { useAppDispatch, useAppSelector } from "../../hooks"
+import { useAppSelector } from "../../hooks"
 
 // TODO: enforce comment too long on backend
 
@@ -75,7 +74,6 @@ const Survey = ({
     window.scrollTo(0, 0)
   }, [])
 
-  const dispatch = useAppDispatch()
   const [unvotedComments, setUnvotedComments] = useState([])
   const [votedComments, setVotedComments] = useState([])
   const [submittedComments, setSubmittedComments] = useState([])
@@ -84,13 +82,6 @@ const Survey = ({
 
   const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
   const { user } = useAppSelector((state: RootState) => state.user)
-
-  useEffect(() => {
-    dispatch(populateZidMetadataStore(conversation_id))
-    return () => {
-      dispatch(resetMetadataStore())
-    }
-  }, [conversation_id])
 
   useEffect(() => {
     if (!zid_metadata || Object.keys(zid_metadata).length === 0) return
@@ -254,7 +245,7 @@ const Survey = ({
                 }
               >
                 Create an account to add comments
-                </Button>*/}
+                </Button> */}
             </Box>
           )}
         </Box>

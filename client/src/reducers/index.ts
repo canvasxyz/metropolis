@@ -2,6 +2,7 @@
 
 import { combineReducers } from "redux"
 import conversations from "./conversations"
+import conversations_summary from "./conversations_summary"
 import user from "./user"
 import zid_metadata from "./zid_metadata"
 import mod_comments_accepted from "./mod_comments_accepted"
@@ -22,6 +23,7 @@ import conversation_voters from "./voters"
 
 const rootReducer = combineReducers({
   conversations,
+  conversations_summary,
   user,
   zid_metadata,
   math,
