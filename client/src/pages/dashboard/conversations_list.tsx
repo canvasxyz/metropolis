@@ -7,6 +7,28 @@ import { RootState } from "../../store"
 import { ConversationSummary, populateConversationsSummary } from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
 
+const Badge = ({ children }) => {
+  return (
+    <Box
+      sx={{
+        ml: "2px",
+        display: "inline-block",
+        fontSize: "0.82em",
+        padding: "1px 5px",
+        bg: "primaryActive",
+        borderRadius: 99,
+        color: "#fbf5e9",
+        minWidth: 21,
+        textAlign: "center",
+        position: "relative",
+        top: "-1px",
+      }}
+    >
+      {children}
+    </Box>
+  )
+}
+
 type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
 
 const ConversationsList = ({selectedConversationId}: {selectedConversationId: string | null}) => {
@@ -78,30 +100,51 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
     >
       <Box
         variant={selectedConversationList === "all-fip" ? "buttons.primary" : "buttons.outline"}
-        sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          display: "inline-block",
+          bg: selectedConversationList === "all-fip" ? "#667ccb !important" : undefined,
+        }}
         onClick={() => {
           setSelectedConversationList("all-fip")
         }}
       >
-        All ({openConversations.length + nonFIPConversations.length})
+        All
       </Box>
       <Box
         variant={selectedConversationList === "open-fip" ? "buttons.primary" : "buttons.outline"}
-        sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          display: "inline-block",
+          bg: selectedConversationList === "open-fip" ? "#667ccb !important" : undefined,
+        }}
         onClick={() => {
           setSelectedConversationList("open-fip")
         }}
       >
-        FIPs ({openConversations.length})
+        FIP PRs ({openConversations.length})
       </Box>
       <Box
         variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}
-        sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          display: "inline-block",
+          bg: selectedConversationList === "non-fip" ? "#667ccb !important" : undefined,
+        }}
         onClick={() => {
           setSelectedConversationList("non-fip")
         }}
       >
-        Polls ({nonFIPConversations.length})
+        Discussions <Badge>{nonFIPConversations.length}</Badge>
       </Box>
     </Box>
     <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
@@ -117,7 +160,14 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
     <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
       <Box
         variant={selectedConversationList === "archived" ? "buttons.primary" : "buttons.outline"}
-        sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          display: "inline-block",
+          bg: selectedConversationList === "archived" ? "#667ccb !important" : undefined,
+        }}
         onClick={() => {
           setSelectedConversationList("archived")
         }}
@@ -126,7 +176,14 @@ const ConversationsList = ({selectedConversationId}: {selectedConversationId: st
       </Box>
       <Box
         variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
-        sx={{ px: [2], py: [1], mr: [1], mb: [1], display: "inline-block" }}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          display: "inline-block",
+          bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
+        }}
         onClick={() => {
           setSelectedConversationList("hidden")
         }}

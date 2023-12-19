@@ -316,8 +316,21 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         .join(", ")}`,
     );
 
-    const repoCollaborators = await getRepoCollaborators();
-    const repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id));
+    let repoCollaboratorIds;
+    try {
+      const repoCollaborators = await getRepoCollaborators();
+      repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id));
+    } catch (error) {
+      const repoCollaborators = ["raykyri", "kaitlin-beegle", "luckyparadise"];
+      const response = await Promise.all(
+        repoCollaborators.map((user) =>
+          fetch("https://api.github.com/users/${user}")
+            .then((response) => response.json())
+            .then((json) => json.id),
+        ),
+      );
+      repoCollaboratorIds = new Set(response);
+    }
 
     for (const pull of pulls) {
       if (!pull.user) {
