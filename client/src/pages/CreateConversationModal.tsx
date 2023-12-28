@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react"
-
 import Modal from "react-modal"
 import { Box, Input, Textarea, Label, Heading, Button, Flex } from "theme-ui"
+
 import { handleCreateConversationSubmit } from "../actions"
 import { useAppDispatch } from "../hooks"
 
@@ -9,8 +9,9 @@ const CreateConversationInner = () => {
   const dispatch = useAppDispatch()
   const descriptionRef = useRef()
 
-  const [title, setTitle] = useState<string>()
-  const [description, setDescription] = useState<string>()
+  const [title, setTitle] = useState<string>("")
+  const [description, setDescription] = useState<string>("")
+  const [error, setError] = useState<string>()
 
   useEffect(() => {
     window.onpopstate = onpopstate
@@ -24,55 +25,68 @@ const CreateConversationInner = () => {
     <Box>
       <Flex>
         <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
-          Add a survey
+          Add a discussion
         </Heading>
       </Flex>
 
       <Box sx={{ mt: 5 }}>
         <Box>
           <Label sx={{ display: "block", mb: [5] }}>
-            <Box sx={{ mb: [1] }}>Title</Box>
-            <Box>
-              <Input
-                placeholder={"Placeholder title"}
-                onChange={(i) => {
-                  setTitle(i.target.value)
-                }}
-                defaultValue={title}
-              />
-            </Box>
+            <Box sx={{ mb: [1] }}>Discussion Title</Box>
+            <Input
+              placeholder={"An idea, problem, or prompt"}
+              onChange={(i) => {
+                setTitle(i.target.value)
+              }}
+              autoFocus
+              defaultValue={title}
+            />
           </Label>
           <form>
-            <Box>
+            <Label sx={{ display: "block", mb: [4] }}>
+              <Box sx={{ mb: [1] }}>Description</Box>
               <Textarea
                 id="new_conversation_description"
                 ref={descriptionRef}
-                placeholder="Markdown supported"
+                placeholder="A 1-2 paragraph explanation (Markdown supported)"
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)
                 }}
                 defaultValue={description}
               ></Textarea>
-            </Box>
+            </Label>
           </form>
           <Button
             variant="primary"
             onClick={() => {
-              dispatch(handleCreateConversationSubmit(title, description))
+              if (title.trim().length < 20) {
+                setError("Title should be at least 20 characters")
+                return
+              } else if (description.trim().length < 20) {
+                setError("Description should be at least 100 characters")
+                return
+              }
+              setError("")
+              dispatch(handleCreateConversationSubmit(title, description, true))
             }}
           >
             Create survey
           </Button>
         </Box>
+        {error && <Box sx={{ color: "mediumRedActive", fontWeight: 500, mt: [3] }}>{error}</Box>}
       </Box>
     </Box>
   )
 }
 
-export const CreateConversationModal = ({ isOpen, setIsOpen }: { isOpen: boolean
+export const CreateConversationModal = ({
+  isOpen,
+  setIsOpen,
+}: {
+  isOpen: boolean
   setIsOpen: (value: boolean) => void
- }) => {
+}) => {
   return (
     <Modal
       isOpen={isOpen}

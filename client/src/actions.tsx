@@ -595,7 +595,7 @@ const postCreateConversation = (topic, description) => {
   })
 }
 
-export const handleCreateConversationSubmit = (topic, description) => {
+export const handleCreateConversationSubmit = (topic, description, fromDashboard?) => {
   return (dispatch) => {
     dispatch(createConversationStart())
     return postCreateConversation(topic, description)
@@ -607,7 +607,7 @@ export const handleCreateConversationSubmit = (topic, description) => {
         (err) => dispatch(createConversationPostError(err)),
       )
       .then((res) => {
-        window.location.assign("/m/" + res.conversation_id)
+        window.location.assign((fromDashboard ? "/dashboard/c/" : "/m/") + res.conversation_id)
       })
   }
 }

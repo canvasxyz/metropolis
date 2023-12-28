@@ -91,7 +91,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                     display: "inline",
                   }}
                 >
-                  FIL Metropolis
+                  Metropolis
                 </Text>
               </RouterLink>
             </Box>

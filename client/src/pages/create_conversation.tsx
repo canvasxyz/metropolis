@@ -4,9 +4,7 @@ import React, { useEffect, useState, useRef, Fragment } from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { Box, Grid, Input, Textarea, Label, Heading, Button, Text, Flex, jsx } from "theme-ui"
 
-import {
-  handleCreateConversationSubmit,
-} from "../actions"
+import { handleCreateConversationSubmit } from "../actions"
 
 import { AppDispatch, RootState } from "../store"
 
@@ -219,7 +217,7 @@ const CreateConversation = ({ dispatch, user }: CreateConversationProps) => {
                               .concat(prefillOptions[prefillSelection].prefillExtra)
                               .split("?")
                               .map((item, index) => {
-                                if (item === "") return <Fragment key={index}/>
+                                if (item === "") return <Fragment key={index} />
                                 return <li key={index}>{item}?</li>
                               })}
                           </ul>
