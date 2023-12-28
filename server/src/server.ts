@@ -7734,7 +7734,7 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
 
 async function getOneConversation(zid: any, uid?: number, lang?: null) {
   const conversationRows = await queryP_readOnly(
-    "select * from conversations left join (select uid, site_id from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
+    "select *, u.github_username from conversations left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
     [zid],
   );
   const conv = conversationRows[0];
@@ -7787,7 +7787,7 @@ async function handle_GET_conversations(
   const uid = req.p.uid;
 
   const query =
-    "SELECT conversations.*, users.hname, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;";
+    "SELECT conversations.*, users.hname, users.github_username, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;";
   // TODO paginate
   const limit = req.p.limit || 999;
 
@@ -7846,12 +7846,13 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.is_hidden,
     conversations.participant_count,
     users.hname,
+    users.github_username,
     zinvites.zinvite as conversation_id
   FROM
     conversations
   JOIN users ON conversations.owner = users.uid
   JOIN zinvites ON conversations.zid = zinvites.zid;
-  `
+  `;
 
   const rows = await queryP_readOnly(query, []);
 

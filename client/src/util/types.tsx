@@ -53,6 +53,7 @@ export type ZidMetadata = {
   github_repo_name: string | null
   github_repo_owner: string | null
   github_sync_enabled: boolean | null
+  github_username: string | null
   /* more unused stuff */
   help_bgcolor: string | null
   help_color: string | null

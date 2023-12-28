@@ -6,7 +6,7 @@ import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { TbSettings } from "react-icons/tb"
+import { TbSettings, TbBrandGithub } from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
@@ -159,7 +159,7 @@ export const DashboardConversation = ({
                 [Mod]
               </Text>
             )}
-            Moderate Comments
+            Moderate
           </Button>
           <Button
             variant="outlineSecondary"
@@ -193,7 +193,7 @@ export const DashboardConversation = ({
                 [Mod]
               </Text>
             )}
-            {zid_metadata.is_hidden ? "Unhide proposal" : "Hide proposal"}
+            {zid_metadata.is_hidden ? "Unhide" : "Hide"}
           </Button>
         </Box>
       )}
@@ -205,6 +205,7 @@ export const DashboardConversation = ({
             margin: "0 auto",
             pt: [8],
             pb: [2],
+            mt: [3],
             px: [4],
             maxWidth: "620px",
           }}
@@ -212,6 +213,23 @@ export const DashboardConversation = ({
           <Heading as="h2">
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
+          {!zid_metadata.fip_title && !zid_metadata.github_pr_title && (
+            <Box sx={{ mt: [1] }}>
+              <Button
+                variant="outlineSecondary"
+                sx={{ display: "inline-block", width: "initial", fontSize: "0.94em" }}
+                as="a"
+                target="_blank"
+                rel="noreferrer"
+                href={`https://github.com/${zid_metadata.github_username}`}
+              >
+                <Box sx={{ display: "inline", position: "relative", top: "1px", mr: "2px" }}>
+                  <TbBrandGithub />
+                </Box>
+                {zid_metadata.github_username}
+              </Button>
+            </Box>
+          )}
           <Frontmatter zid_metadata={zid_metadata} />
           {zid_metadata.description && (
             <Collapsible shouldCollapse={zid_metadata.description?.length > 300}>

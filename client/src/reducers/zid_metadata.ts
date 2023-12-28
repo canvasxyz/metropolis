@@ -43,7 +43,7 @@ const zid = (
     case types.ZID_METADATA_FETCH_ERROR:
       return Object.assign({}, state, {
         loading: false,
-        error: action.data
+        error: action.data,
       })
     case types.UPDATE_ZID_METADATA_SUCCESS:
       filtered_zid_metadata = { ...state.zid_metadata }
