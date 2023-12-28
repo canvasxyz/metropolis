@@ -227,10 +227,20 @@ async function getFipFromPR(
       : 0;
   }
 
+  let fipTitle;
+  try {
+    fipTitle = JSON.parse(frontmatterData.title);
+    if (typeof fipTitle !== "string") {
+      fipTitle = frontmatterData.title;
+    }
+  } catch (err) {
+    fipTitle = frontmatterData.title;
+  }
+
   return {
     description,
     fip_number: isNaN(fipNumber) ? undefined : fipNumber,
-    fip_title: frontmatterData.title,
+    fip_title: fipTitle,
     fip_author: frontmatterData.author,
     fip_discussions_to: frontmatterData["discussions-to"],
     fip_status: frontmatterData.status,
