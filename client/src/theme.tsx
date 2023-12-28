@@ -301,16 +301,10 @@ export default {
         color: "primary",
       },
       "&:hover": {
-        color: "primary",
-        borderBottom: "solid",
-        borderWidth: 1.5,
-        borderColor: "primary",
+        textDecoration: "underline",
       },
       textDecoration: "none",
       cursor: "pointer",
-      borderBottom: "solid",
-      borderWidth: 2,
-      borderColor: "transparent",
     },
   },
 }
