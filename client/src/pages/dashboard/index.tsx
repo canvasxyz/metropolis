@@ -109,10 +109,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             <DashboardConversation selectedConversationId={selectedConversationId} />
           ) : (
             <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
-              <Flex sx={{ margin: "auto", flexDirection: "column", alignItems: "center" }}>
-                <img src="/foundation.png" height="200" style={{ opacity: 0.2 }} />
-                <h3 sx={{ mt: [4], opacity: 0.4 }}>Select a survey</h3>
-              </Flex>
+              <h3 sx={{ fontWeight: 500, mt: [4], opacity: 0.4 }}>Select a survey</h3>
             </Flex>
           )}
         </Box>

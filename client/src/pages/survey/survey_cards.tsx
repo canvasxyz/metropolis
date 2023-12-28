@@ -44,10 +44,7 @@ const PrefilledComment = ({ user, text }: { zid_metadata; user; text: string }) 
             box.focus()
           }}
         >
-          <Fragment>
-            <img src="/comment.svg" width="14" sx={{ position: "relative", top: "2px", mr: [1] }} />
-            Comment
-          </Fragment>
+          <img src="/comment.svg" width="14" sx={{ position: "relative", top: "2px" }} />
         </Button>
       )}
     </Box>

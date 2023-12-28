@@ -193,24 +193,27 @@ const ConversationsList = ({
         >
           Past
         </Box>
-        <Box
-          variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            display: "inline-block",
-            bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
-            fontSize: "0.94em",
-            fontWeight: 500,
-          }}
-          onClick={() => {
-            setSelectedConversationList("hidden")
-          }}
-        >
-          Hidden
-        </Box>
+        {(selectedConversationList === "archived" || selectedConversationList === "hidden") && (
+          <Box
+            variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
+            sx={{
+              px: [2],
+              py: [1],
+              mr: [1],
+              mb: [1],
+              display: "inline-block",
+              bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
+              fontSize: "0.94em",
+              fontWeight: 500,
+            }}
+            onClick={() => {
+              if (!confirm("Show polls hidden by moderators?")) return
+              setSelectedConversationList("hidden")
+            }}
+          >
+            Hidden
+          </Box>
+        )}
       </Box>
       {selectedConversationList === "open-fip" && (
         <Button
@@ -304,14 +307,11 @@ const ConversationListItem = ({
           </Text>
         ) : (
           <Text>
-            Poll created{" "}
+            Discussion · Created{" "}
             {(() => {
               const date = new Date(conversation.created)
               return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
-            {" · "}
-            {conversation.participant_count} participant
-            {conversation.participant_count !== 1 ? "s" : ""}
           </Text>
         )}
       </Text>

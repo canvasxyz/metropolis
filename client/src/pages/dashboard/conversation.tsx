@@ -213,11 +213,13 @@ export const DashboardConversation = ({
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
           <Frontmatter zid_metadata={zid_metadata} />
-          <Collapsible shouldCollapse={zid_metadata.description?.length > 300}>
-            <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
-              {zid_metadata.description}
-            </ReactMarkdown>
-          </Collapsible>
+          {zid_metadata.description && (
+            <Collapsible shouldCollapse={zid_metadata.description?.length > 300}>
+              <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
+                {zid_metadata.description}
+              </ReactMarkdown>
+            </Collapsible>
+          )}
         </Flex>
       </Box>
       <Box sx={{ width: "100%", position: "relative", borderTop: "1px solid #e2ddd5", mt: [4] }}>
@@ -325,7 +327,7 @@ const Collapsible = ({
       <Box
         className={collapsed ? "react-markdown css-fade" : "react-markdown"}
         sx={
-          shouldCollapse && collapsed
+          collapsed
             ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
             : { wordBreak: "break-word", mb: [3] }
         }
