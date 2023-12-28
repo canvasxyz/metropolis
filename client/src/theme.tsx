@@ -104,6 +104,7 @@ export default {
       color: "#fbf5e9 !important",
       "&:hover": {
         bg: "#4e65bd !important",
+        textDecoration: "none",
       },
       bg: "primary",
       fontFamily: "body",
@@ -121,6 +122,7 @@ export default {
       "&:hover": {
         backgroundColor: "#444 !important",
         borderBottomColor: "#444",
+        textDecoration: "none",
       },
       fontFamily: "body",
       cursor: "pointer",

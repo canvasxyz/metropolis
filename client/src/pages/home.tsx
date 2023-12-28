@@ -84,18 +84,10 @@ const Index = ({ user }: { user? }) => {
               </Box>
             ) : (
               <Box sx={{ mt: [4] }}>
-                <RouterLink sx={{ variant: "links.button", lineHeight: 3 }} to="/createuser">
-                  Sign up
-                </RouterLink>
-                <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
-                  or
-                </Text>
                 <RouterLink sx={{ variant: "links.button", lineHeight: 3 }} to="/signin">
                   Sign in
                 </RouterLink>
-                <Text sx={{ display: "inline", my: [2], mx: [2], fontFamily: "monospace" }}>
-                  or
-                </Text>
+                <Text sx={{ display: "inline", my: [2], mx: [2] }}>or</Text>
                 <Link
                   sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
                   href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
@@ -104,30 +96,14 @@ const Index = ({ user }: { user? }) => {
                 </Link>
               </Box>
             )}
-            <Box sx={{ mt: [6, 4] }}>
-              <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/c/65vvimnjkp">
-                Try a survey
-              </RouterLink>
-              ,{" "}
-              <RouterLink sx={{ variant: "links.text", fontWeight: 400 }} to="/create">
-                create a survey
-              </RouterLink>
-              , or{" "}
-              <RouterLink
-                sx={{ variant: "links.text", fontWeight: 400 }}
-                to="/r/65vvimnjkp/r8zmxnjabtcz8daf9hjrk"
-              >
-                read a report
-              </RouterLink>
-            </Box>
           </Box>
         </Box>
         <Box
           sx={{
             flex: 3,
             display: ["none", "block"],
-            mt: [9],
-            pt: "18px",
+            mt: [7],
+            pt: "10px",
             mr: [0, 0, 0, "-20px"],
             pl: [3],
           }}
