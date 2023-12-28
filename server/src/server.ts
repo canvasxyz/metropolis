@@ -6811,7 +6811,7 @@ function handle_POST_conversation_reopen(
     });
 }
 
-function handle_POST_conversation_moderate(
+async function handle_POST_conversation_moderate(
   req: { p: { zid: any; uid?: any } },
   res: {
     status: (arg0: number) => {
@@ -6823,7 +6823,7 @@ function handle_POST_conversation_moderate(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isAdministrator(req.p.uid) && !isRepoCollaborator(req.p.uid)) {
+  if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
     fail(res, 500, "polis_err_moderating_conversation_disallowed");
     return;
   }
@@ -6853,7 +6853,7 @@ function handle_POST_conversation_moderate(
     });
 }
 
-function handle_POST_conversation_unmoderate(
+async function handle_POST_conversation_unmoderate(
   req: { p: { zid: any; uid?: any } },
   res: {
     status: (arg0: number) => {
@@ -6865,7 +6865,7 @@ function handle_POST_conversation_unmoderate(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isAdministrator(req.p.uid) && !isRepoCollaborator(req.p.uid)) {
+  if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
     fail(res, 500, "polis_err_unmoderating_conversation_disallowed");
     return;
   }

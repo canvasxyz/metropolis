@@ -161,26 +161,26 @@ export const DashboardConversation = ({
             )}
             Moderate
           </Button>
-          <Button
-            variant="outlineSecondary"
-            sx={{
-              alignItems: "center",
-              display: "flex",
-              gap: [1],
-            }}
-            onClick={() => {
-              if (zid_metadata.is_hidden) {
-                if (!confirm("Show this proposal to users again?")) return
-                dispatch(handleUnmoderateConversation(zid_metadata.conversation_id))
-                toast.success("Proposal restored")
-              } else {
-                if (!confirm("Hide this proposal from users?")) return
-                dispatch(handleModerateConversation(zid_metadata.conversation_id))
-                toast.success("Proposal hidden")
-              }
-            }}
-          >
-            {user.githubRepoCollaborator && (
+          {user.githubRepoCollaborator && (
+            <Button
+              variant="outlineSecondary"
+              sx={{
+                alignItems: "center",
+                display: "flex",
+                gap: [1],
+              }}
+              onClick={() => {
+                if (zid_metadata.is_hidden) {
+                  if (!confirm("Show this proposal to users again?")) return
+                  dispatch(handleUnmoderateConversation(zid_metadata.conversation_id))
+                  toast.success("Proposal restored")
+                } else {
+                  if (!confirm("Hide this proposal from users?")) return
+                  dispatch(handleModerateConversation(zid_metadata.conversation_id))
+                  toast.success("Proposal hidden")
+                }
+              }}
+            >
               <Text
                 sx={{
                   display: "inline-block",
@@ -192,9 +192,9 @@ export const DashboardConversation = ({
               >
                 [Mod]
               </Text>
-            )}
-            {zid_metadata.is_hidden ? "Unhide" : "Hide"}
-          </Button>
+              {zid_metadata.is_hidden ? "Unhide" : "Hide"}
+            </Button>
+          )}
         </Box>
       )}
       <Box sx={{ width: "100%" }}>
