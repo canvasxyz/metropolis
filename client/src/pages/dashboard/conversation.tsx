@@ -13,7 +13,11 @@ import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
-import { handleModerateConversation, handleUnmoderateConversation, populateZidMetadataStore } from "../../actions"
+import {
+  handleModerateConversation,
+  handleUnmoderateConversation,
+  populateZidMetadataStore,
+} from "../../actions"
 
 type ReportComment = {
   active: boolean
@@ -36,14 +40,16 @@ type ReportComment = {
 }
 
 export const DashboardConversation = ({
-  selectedConversationId
+  selectedConversationId,
 }: {
   selectedConversationId: string
 }) => {
   const hist = useHistory()
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((state: RootState) => state.user)
-  const { zid_metadata, error: zidMetadataError } = useAppSelector((state: RootState) => state.zid_metadata)
+  const { zid_metadata, error: zidMetadataError } = useAppSelector(
+    (state: RootState) => state.zid_metadata,
+  )
 
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
@@ -96,7 +102,7 @@ export const DashboardConversation = ({
   }, [selectedConversationId])
 
   useEffect(() => {
-    if(zidMetadataError) {
+    if (zidMetadataError) {
       toast.error("Couldn't retrieve conversation")
       // redirect to main dashboard
       hist.push(`/dashboard`)
@@ -207,7 +213,7 @@ export const DashboardConversation = ({
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
           <Frontmatter zid_metadata={zid_metadata} />
-          <Collapsible shouldCollapse={zid_metadata.description && zid_metadata.description.length > 300}>
+          <Collapsible shouldCollapse={zid_metadata.description?.length > 300}>
             <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {zid_metadata.description}
             </ReactMarkdown>
@@ -305,39 +311,47 @@ export const DashboardConversation = ({
   )
 }
 
-const Collapsible = ({children, shouldCollapse}: {children: React.ReactElement; shouldCollapse: boolean}) => {
+const Collapsible = ({
+  children,
+  shouldCollapse,
+}: {
+  children: React.ReactElement
+  shouldCollapse: boolean
+}) => {
   const [collapsed, setCollapsed] = useState(shouldCollapse)
 
-  return (<React.Fragment>
-    <Box
-      className={shouldCollapse && collapsed ? "react-markdown css-fade" : "react-markdown"}
-      sx={
-        shouldCollapse && collapsed
-          ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
-          : { wordBreak: "break-word", mb: [3] }
-      }
-    >
-      {children}
-    </Box>
-    {shouldCollapse && (
-      <Link
-        href="#"
-        onClick={() => setCollapsed(!collapsed)}
-        variant="links.primary"
-        sx={{
-          color: "mediumGrayActive",
-          py: "11px",
-          textAlign: "center",
-          bg: "#ede4d166",
-          fontSize: "0.94em",
-          borderRadius: 7,
-          "&:hover": { bg: "#ede4d1aa" },
-        }}
+  return (
+    <React.Fragment>
+      <Box
+        className={collapsed ? "react-markdown css-fade" : "react-markdown"}
+        sx={
+          shouldCollapse && collapsed
+            ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
+            : { wordBreak: "break-word", mb: [3] }
+        }
       >
-        {collapsed ? "Show more" : "Show less"}
-      </Link>
-    )}
-  </React.Fragment>)
+        {children}
+      </Box>
+      {shouldCollapse && (
+        <Link
+          href="#"
+          onClick={() => setCollapsed(!collapsed)}
+          variant="links.primary"
+          sx={{
+            color: "mediumGrayActive",
+            py: "11px",
+            textAlign: "center",
+            bg: "#ede4d166",
+            fontSize: "0.94em",
+            borderRadius: 7,
+            "&:hover": { bg: "#ede4d1aa" },
+          }}
+        >
+          {collapsed ? "Show more" : "Show less"}
+        </Link>
+      )}
+    </React.Fragment>
+  )
 }
 
 const ReportCommentRow = ({

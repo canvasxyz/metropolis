@@ -236,7 +236,6 @@ const ConversationListItem = ({
     key={conversation.conversation_id}
   >
     <Text sx={{ fontWeight: 500 }}>
-      {conversation.fip_number ? `FIP-${conversation.fip_number}: ` : ""}
       {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
