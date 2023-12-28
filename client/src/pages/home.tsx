@@ -57,10 +57,11 @@ const Index = ({ user }: { user? }) => {
                 fontWeight: "700",
               }}
             >
-              The self-organizing collective survey
+              Open-source consensus engine
             </Heading>
             <Text sx={{ my: 3 }}>
-              Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas.
+              Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas, using
+              collaborative polling and advanced statistics.
             </Text>
             {!!user?.email || !!user?.githubUserId || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
@@ -158,39 +159,19 @@ const Index = ({ user }: { user? }) => {
           ))}
         </Box>
       </Flex>
-      <Box
-        sx={{
-          mt: [9],
-          mb: [8],
-          textAlign: "center",
-          backgroundColor: "bgGray",
-          py: [3],
-          px: [3],
-          borderRadius: "4px",
-          lineHeight: 1.3,
-        }}
-      >
-        Metropolis is in alpha. Your data is safe, but our interfaces are still evolving rapidly.
-      </Box>
       <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9] }}>
         <Heading as="h3" sx={{ pb: 4 }}>
           Ask any question
         </Heading>
         <Grid gap={2} columns={[2, "1fr 2fr"]} sx={{ fontSize: "0.94em" }}>
           <Box sx={grid}>Learn about members</Box>
-          <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “What makes you excited to be in this community?’’
-          </Box>
+          <Box sx={{ ...grid }}>“What makes you excited to be in this community?’’</Box>
           <Box sx={grid}>Collect feedback</Box>
-          <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “How could we improve our user interface?’’
-          </Box>
+          <Box sx={{ ...grid }}>“How could we improve our user interface?’’</Box>
           <Box sx={grid}>Set priorities</Box>
-          <Box sx={{ ...grid, fontStyle: "italic" }}>
-            “Which initiatives should we focus on this year?’’
-          </Box>
+          <Box sx={{ ...grid }}>“Which initiatives should we focus on this year?’’</Box>
           <Box sx={{ borderBottom: "1px solid", ...grid, pb: "12px" }}>Delegation support</Box>
-          <Box sx={{ borderBottom: "1px solid", fontStyle: "italic", ...grid, pb: "12px" }}>
+          <Box sx={{ borderBottom: "1px solid", ...grid, pb: "12px" }}>
             “As a delegate, who do you represent? What perspectives do you bring to the table, and
             what kinds of proposals would you like to support?’’
           </Box>
@@ -204,8 +185,8 @@ const Index = ({ user }: { user? }) => {
           prioritizes which ones to show in realtime.
         </p>
         <p>
-          3. We use statistical methods to build a profile of top responses, key opinion groups,
-          areas of consensus, and points of further exploration.
+          3. We generate a report of top responses, key opinion groups, areas of consensus, and
+          points of further exploration.
         </p>
       </Box>
       <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9] }}>

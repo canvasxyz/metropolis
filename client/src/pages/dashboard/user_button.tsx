@@ -22,7 +22,7 @@ export const DashboardUserButton = () => {
           top: [3],
           right: [4],
           alignItems: "center",
-          zIndex: 9999,
+          zIndex: 1,
         }}
         onClick={() => hist.push(`/account`)}
       >

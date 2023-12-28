@@ -8,7 +8,6 @@ import { toast } from "react-hot-toast"
 import api from "../../util/api"
 import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
-import Spinner from "../../components/spinner"
 import { DashboardConversation } from "./conversation"
 import { DashboardUserButton } from "./user_button"
 import ConversationsList from "./conversations_list"
@@ -23,9 +22,28 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
     window.scrollTo(0, 0)
   }, [])
 
-  const [syncInProgress, setSyncInProgress] = useState(false)
-
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
+  const [syncInProgress, setSyncInProgress] = useState(false)
+  const syncPRs = () => {
+    // github sync
+    setSyncInProgress(true)
+    toast.success("Getting updates from Github...")
+    api
+      .post("api/v3/github_sync", {})
+      .then(({ existingFips, openPulls }) => {
+        toast.success(`Found ${existingFips} existing FIPs, ${openPulls} new FIPs`)
+        setTimeout(() => {
+          location.reload()
+        }, 1500)
+      })
+      .fail((error) => {
+        toast.error("Sync error")
+        console.error(error)
+      })
+      .always(() => {
+        setSyncInProgress(false)
+      })
+  }
 
   return (
     <Box sx={{ height: "calc(100vh - 7px)" }}>
@@ -38,6 +56,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             background: "#f7f0e3",
             maxHeight: "100vh",
             overflow: "hidden",
+            position: "relative",
           }}
         >
           <Flex
@@ -76,41 +95,13 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
                 </Text>
               </RouterLink>
             </Box>
-            <Button
-              variant="outlineSecondary"
-              sx={{ mt: [2], ml: [2], minWidth: "50px", fontSize: "0.94em" }}
-              onClick={() => setCreateConversationModalIsOpen(true)}
-            >
-              Add
-            </Button>
-            <Button
-              variant="outlineSecondary"
-              sx={{ mt: [2], ml: [2], minWidth: "50px", fontSize: "0.94em" }}
-              onClick={() => {
-                // github sync
-                setSyncInProgress(true)
-                toast.success("Getting updates from Github...")
-                api
-                  .post("api/v3/github_sync", {})
-                  .then(({ existingFips, openPulls }) => {
-                    toast.success(`Found ${existingFips} existing FIPs, ${openPulls} new FIPs`)
-                    setTimeout(() => {
-                      location.reload()
-                    }, 1500)
-                  })
-                  .fail((error) => {
-                    toast.error("Sync error")
-                    console.error(error)
-                  })
-                  .always(() => {
-                    setSyncInProgress(false)
-                  })
-              }}
-            >
-              {syncInProgress ? <Spinner size={25} /> : "Sync"}
-            </Button>
           </Flex>
-          <ConversationsList selectedConversationId={selectedConversationId} />
+          <ConversationsList
+            selectedConversationId={selectedConversationId}
+            setCreateConversationModalIsOpen={setCreateConversationModalIsOpen}
+            syncPRs={syncPRs}
+            syncInProgress={syncInProgress}
+          />
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           <DashboardUserButton />

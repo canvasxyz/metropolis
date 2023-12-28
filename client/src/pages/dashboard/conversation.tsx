@@ -120,7 +120,7 @@ export const DashboardConversation = ({
             alignItems: "center",
             display: "flex",
             gap: [2],
-            zIndex: 9998,
+            zIndex: 1,
           }}
         >
           <Button

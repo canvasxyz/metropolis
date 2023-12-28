@@ -15,7 +15,7 @@ const splitAuthors = (authorList) => {
     .split(/, | and /)
   if (result.length === 1) {
     return result[0].split(/ @/).map((i) => {
-      return `@${i.replace(/^@/, "").trim()}`
+      return `${i.slice(1).indexOf("@") !== -1 ? "" : "@"}${i.replace(/^@/, "").trim()}`
     })
   }
   return result

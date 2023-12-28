@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Box, Flex, Text } from "theme-ui"
+import { Button, Box, Flex, Text } from "theme-ui"
+import { TbRefresh } from "react-icons/tb"
 
+import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
 import {
@@ -36,8 +38,14 @@ type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived"
 
 const ConversationsList = ({
   selectedConversationId,
+  setCreateConversationModalIsOpen,
+  syncPRs,
+  syncInProgress,
 }: {
   selectedConversationId: string | null
+  setCreateConversationModalIsOpen: Function
+  syncPRs: Function
+  syncInProgress: boolean
 }) => {
   const dispatch = useAppDispatch()
   const hist = useHistory()
@@ -99,6 +107,7 @@ const ConversationsList = ({
     <React.Fragment>
       <Box
         sx={{
+          position: "relative",
           fontSize: "15px",
           fontWeight: "500",
           py: [2],
@@ -175,6 +184,8 @@ const ConversationsList = ({
             mb: [1],
             display: "inline-block",
             bg: selectedConversationList === "archived" ? "#667ccb !important" : undefined,
+            fontSize: "0.94em",
+            fontWeight: 500,
           }}
           onClick={() => {
             setSelectedConversationList("archived")
@@ -191,6 +202,8 @@ const ConversationsList = ({
             mb: [1],
             display: "inline-block",
             bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
+            fontSize: "0.94em",
+            fontWeight: 500,
           }}
           onClick={() => {
             setSelectedConversationList("hidden")
@@ -199,6 +212,45 @@ const ConversationsList = ({
           Hidden
         </Box>
       </Box>
+      {selectedConversationList === "open-fip" && (
+        <Button
+          variant={"buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            position: "absolute",
+            bottom: [2],
+            right: "11px",
+            fontSize: "0.94em",
+            fontWeight: 500,
+          }}
+          onClick={() => syncPRs()}
+        >
+          {syncInProgress ? <Spinner size={25} /> : <TbRefresh />}{" "}
+          {syncInProgress ? "Syncing..." : "Sync PRs"}
+        </Button>
+      )}
+      {selectedConversationList === "non-fip" && (
+        <Button
+          variant={"buttons.outline"}
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            position: "absolute",
+            bottom: [2],
+            right: "11px",
+            fontSize: "0.94em",
+            fontWeight: 500,
+          }}
+          onClick={() => setCreateConversationModalIsOpen(true)}
+        >
+          + Add
+        </Button>
+      )}
     </React.Fragment>
   )
 }
