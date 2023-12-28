@@ -7,6 +7,7 @@ import { Endpoints } from "@octokit/types";
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 
+import { DEFAULT_REPO_COLLABORATORS } from "./github_auth";
 import { generateAndRegisterZinvite } from "../auth/create-user";
 import Config from "../config";
 import {
@@ -333,9 +334,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       const repoCollaborators = await getRepoCollaborators();
       repoCollaboratorIds = new Set(repoCollaborators.map((c) => c.id));
     } catch (error) {
-      const repoCollaborators = ["raykyri", "kaitlin-beegle", "luckyparadise"];
       const response = await Promise.all(
-        repoCollaborators.map((user) =>
+        DEFAULT_REPO_COLLABORATORS.map((user) =>
           fetch("https://api.github.com/users/${user}")
             .then((response) => response.json())
             .then((json) => json.id),

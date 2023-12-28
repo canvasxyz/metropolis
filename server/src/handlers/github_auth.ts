@@ -9,6 +9,12 @@ import { updateOrCreateGitHubUser } from "./queries";
 import { getRepoCollaborators } from "./api_wrappers";
 import Config from "../config";
 
+export const DEFAULT_REPO_COLLABORATORS = [
+  "raykyri",
+  "kaitlin-beegle",
+  "luckyparadise",
+];
+
 /** api handlers for performing a github authentication flow */
 
 export function handle_GET_github_init(
@@ -61,12 +67,14 @@ async function handleGithubOauthCallback(
   let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
   try {
     const collaborators = await getRepoCollaborators();
-    for (const collaborator of collaborators) {
-      if (collaborator.id === githubUserId) {
-        isRepoCollaborator = true;
-      }
+    if (collaborators.indexOf(githubUserId) !== -1) {
+      isRepoCollaborator = true;
     }
-  } catch (err) {}
+  } catch (err) {
+    if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {
+      isRepoCollaborator = true;
+    }
+  }
 
   const { uid } = await updateOrCreateGitHubUser({
     username: githubUsername,
