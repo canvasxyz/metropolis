@@ -59,12 +59,14 @@ async function handleGithubOauthCallback(
 
   // check if the user is a proposals repo collaborator or the owner of the repo
   let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
-  const collaborators = await getRepoCollaborators();
-  for (const collaborator of collaborators) {
-    if (collaborator.id === githubUserId) {
-      isRepoCollaborator = true;
+  try {
+    const collaborators = await getRepoCollaborators();
+    for (const collaborator of collaborators) {
+      if (collaborator.id === githubUserId) {
+        isRepoCollaborator = true;
+      }
     }
-  }
+  } catch (err) {}
 
   const { uid } = await updateOrCreateGitHubUser({
     username: githubUsername,
