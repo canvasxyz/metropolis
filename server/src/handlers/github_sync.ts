@@ -89,6 +89,7 @@ function parseFrontmatter(source: string) {
 
   // reduce into object
   const frontmatter: FIPFrontmatterData = {
+    fip: "",
     title: "",
     author: "",
     "discussions-to": "",
@@ -160,19 +161,22 @@ async function getFipFromPR(
     cwd: repoDir,
   });
 
-  // (method 1) get updated filenames against the mergebase
+  // get updated filenames against the mergebase, unless the FIP PR isn't against master
   const { stdout: mergeBase } = await execAsync(
     `git merge-base ${mainBranchName} ${remote}/${pull.head.ref}`,
     { cwd: repoDir },
   );
-
   const { stdout: updatedFilenamesText } = await execAsync(
-    `git diff --name-only ${mergeBase}`,
+    `git diff --name-status ${
+      pull.base.ref === mainBranchName ? mergeBase : pull.base.ref
+    }`,
     { cwd: repoDir },
   );
   const updatedFilenames = updatedFilenamesText
     .trim()
     .split("\n")
+    .filter((fn) => fn.startsWith("A"))
+    .map((fn) => fn.slice(1).trim())
     .filter(
       (filename) =>
         filename.toLowerCase().startsWith("fips/") ||
@@ -180,10 +184,9 @@ async function getFipFromPR(
     );
 
   if (updatedFilenames.length === 0) {
-    console.error(
-      `no changes in ${owner}/${repo}#${pull.number} ${pull.head?.label}`,
+    throw Error(
+      `no fips created in https://github.com/${owner}/${repo}/pull/${pull.number} [${pull.head?.label}]`,
     );
-    throw Error("no new fips");
   }
 
   if (updatedFilenames.length > 1) {
@@ -216,10 +219,10 @@ async function getFipFromPR(
 
   // try to extract fip number again
   if (!fipNumber || isNaN(fipNumber)) {
-    const frontMatterFipNumberMatch =
-      frontMatterData.fip.match(/(fip-)?([0-9]*)/);
-    fipNumber = frontMatterFipNumberMatch
-      ? parseInt(frontMatterFipNumberMatch[2], 10)
+    const frontmatterFipNumberMatch =
+      frontmatterData.fip.match(/(fip-)?([0-9]*)/);
+    fipNumber = frontmatterFipNumberMatch
+      ? parseInt(frontmatterFipNumberMatch[2], 10)
       : 0;
   }
 
