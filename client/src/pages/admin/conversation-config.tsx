@@ -1,8 +1,8 @@
 /** @jsx jsx */
 
 import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
-import { Link } from "react-router-dom"
-import { Heading, Box, Text, Link as ThemeLink, Button, jsx } from "theme-ui"
+import { Link as RouterLink } from "react-router-dom"
+import { Heading, Box, Text, Link, Button, jsx } from "theme-ui"
 import toast from "react-hot-toast"
 
 import {
@@ -126,22 +126,30 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         subtitle="Uncheck to disable voting"
       />
 
-      <Box sx={{ mt: [4], mb: [4] }}>
-        <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
-          Go to survey
-        </Link>
+      <Box sx={{ my: [4] }}>
+        <RouterLink to={"/dashboard/c/" + zid_metadata.conversation_id}>
+          <Button sx={{ ml: [2] }} variant="outlineSecondary">
+            Go to FIP dashboard
+          </Button>
+        </RouterLink>
+        {!zid_metadata.github_pr_id && (
+          <RouterLink to={"/c/" + zid_metadata.conversation_id}>
+            <Button sx={{ ml: [2] }} variant="outlineSecondary">
+              Go to survey
+            </Button>
+          </RouterLink>
+        )}
         {reports && reports[0] && (
-          <Link
-            sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
-          >
-            Go to report
-          </Link>
+          <RouterLink to={`/r/${zid_metadata.conversation_id}/${(reports[0] as any).report_id}`}>
+            <Button sx={{ ml: [2] }} variant="outlineSecondary">
+              Go to report
+            </Button>
+          </RouterLink>
         )}
       </Box>
 
       <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Topic</Text>
+        <Text sx={{ mb: [2] }}>Title</Text>
         <Input
           onBlur={(e) => handleStringValueChange("topic", e.target)}
           defaultValue={zid_metadata.topic}
@@ -158,17 +166,19 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
-      <a
-        href="#"
-        onClick={(e) => {
-          e.preventDefault()
-          setShowFIPMetadata(!showFIPMetadata)
-        }}
-      >
-        <Text variant="links.a" sx={{ mb: [2] }}>
-          {showFIPMetadata ? "Hide" : "Show"} FIP Metadata
-        </Text>
-      </a>
+      {zid_metadata.github_pr_id && (
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault()
+            setShowFIPMetadata(!showFIPMetadata)
+          }}
+        >
+          <Text variant="links.a" sx={{ mb: [2] }}>
+            {showFIPMetadata ? "Hide" : "Show"} FIP Metadata
+          </Text>
+        </a>
+      )}
 
       <Box
         sx={{
@@ -293,7 +303,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           />
         </Box>
       </Box>
-
+      {/*
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Post-Survey Redirect
       </Heading>
@@ -363,6 +373,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           defaultValue={zid_metadata.postsurvey_redirect || ""}
         />
       </Box>
+       */}
 
       <Heading as="h3" sx={{ mt: [6], mb: 4 }}>
         Permissions
@@ -371,20 +382,20 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       <CheckboxField
         field="write_type"
         label="Enable comments"
-        subtitle="Participants can write their own cards (Recommended: ON)"
+        subtitle="Participants can add comments (Recommended: ON)"
         isIntegerBool
       />
 
       <CheckboxField
         field="auth_needed_to_write"
-        label="Email required for responses"
-        subtitle="Require an email to submit comments (Recommended: OFF)"
+        label="Email required for comments"
+        subtitle="Require email to submit comments (Recommended: OFF)"
       />
 
       <CheckboxField
         field="strict_moderation"
-        label="Moderation required for responses"
-        subtitle="Require moderators to approve submitted comments before voters can see them"
+        label="Moderator approval required for comments"
+        subtitle="Require moderators to approve submitted comments before voters can see them (Recommended: OFF)"
       />
 
       {/*
@@ -402,73 +413,29 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       </Heading>
       <Box>
         <Text>Copy this HTML into your page to embed this survey.</Text>
-        <Box
-          sx={{
-            mt: [2],
-            mb: [3],
-            px: [3],
-            py: [1],
-            border: "1px solid lightGray",
-            borderRadius: "6px",
-          }}
-        >
-          <pre style={{ fontSize: "14px" }}>
-            {"<div"}
-            {" class='polis'"}
-            {" data-conversation_id='" + zid_metadata.conversation_id + "'>"}
-            {"</div>\n"}
-            {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
-          </pre>
-        </Box>
+        <pre style={{ fontSize: "14px" }}>
+          {"<div"}
+          {" class='polis'"}
+          {" data-conversation_id='" + zid_metadata.conversation_id + "'>"}
+          {"</div>"}
+          {"<script async src='" + Url.urlPrefix + "embed.js'></script>"}
+        </pre>
 
+        {/*
         <CheckboxField
           field="importance_enabled"
           label="Show importance on embeds"
           subtitle={`Show "This comment is important" checkbox on the embed interface`}
         />
+     */}
       </Box>
 
+      {/*
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Add seed comments
       </Heading>
 
-      <SeedComment params={{ conversation_id: zid_metadata.conversation_id }} dispatch={dispatch} />
-
-      {zid_metadata.is_archived ? (
-        <Button
-          variant="outlineRed"
-          onClick={(e) => {
-            if (!confirm("Reopen this conversation?")) return
-            dispatch(handleReopenConversation(zid_metadata.conversation_id))
-          }}
-        >
-          Unarchive Conversation
-        </Button>
-      ) : (
-        <Button
-          variant="outlineRed"
-          onClick={(e) => {
-            if (!confirm("Archive this conversation?")) return
-            dispatch(handleCloseConversation(zid_metadata.conversation_id))
-          }}
-        >
-          Archive Conversation
-        </Button>
-      )}
-
-      <Box sx={{ mt: [4] }}>
-        <Link sx={{ variant: "styles.a" }} to={"/c/" + zid_metadata.conversation_id}>
-          Go to survey
-        </Link>
-        {reports && reports[0] && (
-          <Link
-            sx={{ variant: "styles.a", ml: [3] }}
-            to={"/r/" + zid_metadata.conversation_id + "/" + (reports[0] as any).report_id}
-          >
-            Go to report
-          </Link>
-        )}
-      </Box>
+      <SeedComment params={{ conversation_id: zid_metadata.conversation_id }} dispatch={dispatch} />*/}
     </Box>
   )
 }

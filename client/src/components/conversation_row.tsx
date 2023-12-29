@@ -10,7 +10,7 @@ import {
 } from "../actions"
 import { DropdownMenu } from "../components/dropdown"
 
-function ConversationRow({ c, i, stats, dispatch }: { c, i, stats, dispatch }) {
+function ConversationRow({ c, i, stats, dispatch }: { c; i; stats; dispatch }) {
   useEffect(() => {
     if (!stats && !c.is_archived) {
       const until = null
@@ -129,9 +129,9 @@ function ConversationRow({ c, i, stats, dispatch }: { c, i, stats, dispatch }) {
                   },
                 },
                 {
-                  name: "Move to trash",
+                  name: "Move to archive",
                   onClick: () => {
-                    if (!confirm("Move this conversation to the trash?")) return
+                    if (!confirm("Archive this conversation?")) return
                     dispatch(handleCloseConversation(c.conversation_id))
                   },
                   sx: { variant: "buttons.outlineRed" },
@@ -145,7 +145,7 @@ function ConversationRow({ c, i, stats, dispatch }: { c, i, stats, dispatch }) {
               rightAlign
               options={[
                 {
-                  name: "Recover from trash",
+                  name: "Unarchive",
                   onClick: () => {
                     if (confirm("Reopen this archived conversation?")) {
                       dispatch(handleReopenConversation(c.conversation_id))

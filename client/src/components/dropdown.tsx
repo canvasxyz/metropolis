@@ -66,7 +66,7 @@ const DropdownMenu = ({
                   if (isFocused === index) setOpen(false)
                 }, 10)
               }
-              variant="outlineLightGray"
+              variant={variant || "outlineLightGray"}
               sx={{
                 display: "block",
                 width: "100%",
@@ -124,7 +124,7 @@ const DropdownButton = ({
       <Button
         sx={{
           borderRadius: "4px 0 0 4px",
-          borderRight: "1px solid lightGray",
+          borderRight: "1px solid #fbf5e9",
           py: "7px",
           pb: "6px",
         }}
@@ -137,7 +137,6 @@ const DropdownButton = ({
           borderRadius: "0 4px 4px 0",
           pr: "6px",
           pl: "6px",
-          borderColor: "lightGray",
           py: "7px",
           pb: "6px",
         }}

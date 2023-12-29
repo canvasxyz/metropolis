@@ -6,7 +6,15 @@ import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { TbSettings, TbBrandGithub } from "react-icons/tb"
+import {
+  TbArchive,
+  TbArchiveOff,
+  TbPencil,
+  TbSettings,
+  TbBrandGithub,
+  TbFlame,
+  TbHammer,
+} from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
@@ -16,6 +24,8 @@ import Survey from "../survey"
 import {
   handleModerateConversation,
   handleUnmoderateConversation,
+  handleCloseConversation,
+  handleReopenConversation,
   populateZidMetadataStore,
 } from "../../actions"
 
@@ -125,76 +135,52 @@ export const DashboardConversation = ({
         >
           <Button
             variant="outlineSecondary"
-            sx={{
-              alignItems: "center",
-              display: "flex",
-              gap: [1],
-            }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
           >
-            <Box>
-              <TbSettings />
-            </Box>
-            <Text>Edit</Text>
+            <TbPencil /> Edit
           </Button>
           <Button
             variant="outlineSecondary"
-            sx={{
-              alignItems: "center",
-              display: "flex",
-              gap: [1],
-            }}
             onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
           >
-            {user.githubRepoCollaborator && (
-              <Text
-                sx={{
-                  display: "inline-block",
-                  fontSize: "0.88em",
-                  opacity: 0.7,
-                  fontWeight: 600,
-                  ml: "2px",
-                }}
-              >
-                [Mod]
-              </Text>
-            )}
-            Moderate
+            <TbHammer /> Moderate
           </Button>
           {user.githubRepoCollaborator && (
             <Button
               variant="outlineSecondary"
-              sx={{
-                alignItems: "center",
-                display: "flex",
-                gap: [1],
-              }}
               onClick={() => {
                 if (zid_metadata.is_hidden) {
                   if (!confirm("Show this proposal to users again?")) return
                   dispatch(handleUnmoderateConversation(zid_metadata.conversation_id))
-                  toast.success("Proposal restored")
                 } else {
                   if (!confirm("Hide this proposal from users?")) return
                   dispatch(handleModerateConversation(zid_metadata.conversation_id))
-                  toast.success("Proposal hidden")
                 }
               }}
             >
-              <Text
-                sx={{
-                  display: "inline-block",
-                  fontSize: "0.88em",
-                  opacity: 0.7,
-                  fontWeight: 600,
-                  ml: "2px",
-                }}
-              >
-                [Mod]
-              </Text>
-              {zid_metadata.is_hidden ? "Unhide" : "Hide"}
+              <TbFlame /> {zid_metadata.is_hidden ? "Unmark spam" : "Mark as spam"}
             </Button>
           )}
+          {(zid_metadata.is_owner || user.githubRepoCollaborator) &&
+            !zid_metadata.github_pr_title && (
+              <Button
+                variant="outlineSecondary"
+                onClick={() => {
+                  if (zid_metadata.is_archived) {
+                    if (!confirm("Close this discussion?")) return
+                    dispatch(handleReopenConversation(zid_metadata.conversation_id))
+                    location.reload()
+                  } else {
+                    if (!confirm("Reopen this discussion?")) return
+                    dispatch(handleCloseConversation(zid_metadata.conversation_id))
+                    location.reload()
+                  }
+                }}
+              >
+                {zid_metadata.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
+                {zid_metadata.is_archived ? "Reopen" : "Mark as closed"}
+              </Button>
+            )}
         </Box>
       )}
       <Box sx={{ width: "100%" }}>
@@ -214,25 +200,25 @@ export const DashboardConversation = ({
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
           {!zid_metadata.fip_title && !zid_metadata.github_pr_title && (
-            <Box sx={{ mt: [1] }}>
-              <Button
-                variant="outlineSecondary"
-                sx={{ display: "inline-block", width: "initial", fontSize: "0.94em" }}
+            <Text sx={{ fontSize: "0.94em" }}>
+              Created by{" "}
+              <Text
+                variant="links.a"
                 as="a"
                 target="_blank"
                 rel="noreferrer"
                 href={`https://github.com/${zid_metadata.github_username}`}
               >
-                <Box sx={{ display: "inline", position: "relative", top: "1px", mr: "2px" }}>
-                  <TbBrandGithub />
-                </Box>
                 {zid_metadata.github_username}
-              </Button>
-            </Box>
+              </Text>
+            </Text>
           )}
           <Frontmatter zid_metadata={zid_metadata} />
           {zid_metadata.description && (
-            <Collapsible shouldCollapse={zid_metadata.description?.length > 300}>
+            <Collapsible
+              key={zid_metadata.conversation_id}
+              shouldCollapse={zid_metadata.description?.length > 300}
+            >
               <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
                 {zid_metadata.description}
               </ReactMarkdown>
