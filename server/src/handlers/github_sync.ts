@@ -28,6 +28,7 @@ import {
 const getServerNameWithProtocol = Config.getServerNameWithProtocol;
 
 type FIPFrontmatterData = {
+  fip?: string;
   title?: string;
   author?: string;
   "discussions-to"?: string;
@@ -221,7 +222,7 @@ async function getFipFromPR(
   // try to extract fip number again
   if (!fipNumber || isNaN(fipNumber)) {
     const frontmatterFipNumberMatch =
-      frontmatterData.fip.match(/(fip-)?([0-9]*)/);
+      frontmatterData.fip?.match(/(fip-)?([0-9]*)/);
     fipNumber = frontmatterFipNumberMatch
       ? parseInt(frontmatterFipNumberMatch[2], 10)
       : 0;
@@ -229,9 +230,11 @@ async function getFipFromPR(
 
   let fipTitle;
   try {
-    fipTitle = JSON.parse(frontmatterData.title);
-    if (typeof fipTitle !== "string") {
-      fipTitle = frontmatterData.title;
+    if (
+      frontmatterData.title &&
+      typeof JSON.parse(frontmatterData.title) === "string"
+    ) {
+      fipTitle = JSON.parse(frontmatterData.title);
     }
   } catch (err) {
     fipTitle = frontmatterData.title;
@@ -423,7 +426,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             console.log(
               `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
             );
-            console.log(err);
             continue;
           }
 

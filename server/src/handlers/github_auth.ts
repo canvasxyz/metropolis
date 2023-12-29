@@ -62,15 +62,16 @@ async function handleGithubOauthCallback(
   }
 
   // the user is now authenticated
-
-  // check if the user is a proposals repo collaborator or the owner of the repo
+  // check if the user is a proposals repo collaborator/owner
   let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
   try {
     const collaborators = await getRepoCollaborators();
-    if (collaborators.indexOf(githubUserId) !== -1) {
+    if (collaborators.map((c) => c.id).indexOf(githubUserId) !== -1) {
       isRepoCollaborator = true;
     }
   } catch (err) {
+    console.log("Could not get collaborators, is the app connected to Github");
+    console.log(err.message);
     if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {
       isRepoCollaborator = true;
     }
