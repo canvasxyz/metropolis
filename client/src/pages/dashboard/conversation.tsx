@@ -10,8 +10,6 @@ import {
   TbArchive,
   TbArchiveOff,
   TbPencil,
-  TbSettings,
-  TbBrandGithub,
   TbFlame,
   TbHammer,
 } from "react-icons/tb"
@@ -167,11 +165,11 @@ export const DashboardConversation = ({
                 variant="outlineSecondary"
                 onClick={() => {
                   if (zid_metadata.is_archived) {
-                    if (!confirm("Close this discussion?")) return
+                    if (!confirm("Reopen this discussion?")) return
                     dispatch(handleReopenConversation(zid_metadata.conversation_id))
                     location.reload()
                   } else {
-                    if (!confirm("Reopen this discussion?")) return
+                    if (!confirm("Close this discussion?")) return
                     dispatch(handleCloseConversation(zid_metadata.conversation_id))
                     location.reload()
                   }

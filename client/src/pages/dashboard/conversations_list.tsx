@@ -145,7 +145,7 @@ const ConversationsList = ({
             setSelectedConversationList("open-fip")
           }}
         >
-          FIP PRs <Badge>{openConversations.length}</Badge>
+          FIPs <Badge>{openConversations.length}</Badge>
         </Box>
         <Box
           variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}

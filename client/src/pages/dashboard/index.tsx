@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Box, Flex, Text, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 
 import api from "../../util/api"
@@ -51,7 +51,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
       <Flex sx={{ display: "flex", height: "100%" }}>
         <Box
           sx={{
-            width: ["40%", null, "310px"],
+            width: ["40%", null, "290px"],
             borderRight: "1px solid #e2ddd5",
             background: "#f7f0e3",
             maxHeight: "100vh",
