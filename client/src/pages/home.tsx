@@ -57,7 +57,7 @@ const Index = ({ user }: { user? }) => {
                 fontWeight: "700",
               }}
             >
-              Open-source consensus engine
+              The collaborative consensus tool
             </Heading>
             <Text sx={{ my: 3 }}>
               Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas, using
@@ -65,29 +65,12 @@ const Index = ({ user }: { user? }) => {
             </Text>
             {!!user?.email || !!user?.githubUserId || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.button", px: [4] }} to="/conversations">
-                  Go to app
-                </RouterLink>
                 <RouterLink sx={{ variant: "links.buttonBlack", px: [4], ml: [2] }} to="/dashboard">
-                  <img
-                    src="/filecoin.png"
-                    width="22"
-                    height="22"
-                    sx={{
-                      position: "relative",
-                      top: "5px",
-                      mr: [2],
-                    }}
-                  />
-                  Go to FIPs
+                  Go to application
                 </RouterLink>
               </Box>
             ) : (
               <Box sx={{ mt: [4] }}>
-                <RouterLink sx={{ variant: "links.button", lineHeight: 3 }} to="/signin">
-                  Sign in
-                </RouterLink>
-                <Text sx={{ display: "inline", my: [2], mx: [2] }}>or</Text>
                 <Link
                   sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
                   href={`/api/v3/github_oauth_init?dest=${window.location.href}`}

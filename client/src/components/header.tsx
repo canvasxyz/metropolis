@@ -74,8 +74,8 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
                 About
               </Link>
                */}
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/signin">
-                Sign in
+              <Link sx={{ variant: "links.nav", ml: [4] }} to="/">
+                Back home
               </Link>
             </React.Fragment>
           )}

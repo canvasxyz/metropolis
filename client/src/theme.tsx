@@ -190,6 +190,19 @@ export default {
         bg: "primaryActive",
       },
     },
+    disabled: {
+      color: "background",
+      bg: "primary",
+      fontFamily: "body",
+      borderRadius: [8],
+      border: "1px solid",
+      borderColor: "primary",
+      "&:hover": {
+        bg: "primaryActive",
+      },
+      opacity: 0.4,
+      pointerEvents: "none",
+    },
     secondary: {
       color: "background",
       bg: "lightGray",

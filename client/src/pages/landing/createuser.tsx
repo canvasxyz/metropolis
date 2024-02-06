@@ -149,6 +149,8 @@ class CreateUser extends React.Component<CreateUserProps> {
             sx={{ my: [2], px: [4] }}
             id="createUserButton"
             onClick={this.handleLoginClicked.bind(this)}
+            variant="buttons.disabled"
+            disabled
           >
             {this.props.pending ? "Creating account..." : "Create account"}
           </Button>

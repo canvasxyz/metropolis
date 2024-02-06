@@ -29,7 +29,6 @@ import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
 import CreateConversation from "./pages/create_conversation"
-import ManageConversations from "./pages/manage_conversations"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import SurveyWithLoader from "./pages/survey/survey_with_loader"
@@ -67,18 +66,18 @@ const connector = connect((state: RootState) => state.user)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 type AppPropTypes = PropsFromRedux & {
-  dispatch: AppDispatch;
-  location: { pathname: string };
-  pending: boolean;
-  status: number;
+  dispatch: AppDispatch
+  location: { pathname: string }
+  pending: boolean
+  status: number
 }
 
-class App extends React.Component<AppPropTypes,
+class App extends React.Component<
+  AppPropTypes,
   {
     sidebarOpen: boolean
   }
 > {
-
   constructor(props) {
     super(props)
     this.state = {
@@ -148,10 +147,7 @@ class App extends React.Component<AppPropTypes,
             >
               {document.location.pathname !== "/" &&
                 !document.location.pathname.startsWith("/dashboard") && (
-                  <Header
-                    isLoggedIn={this.props.isLoggedIn}
-                    inSurvey={inSurvey}
-                  />
+                  <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
                 )}
               <Box
                 sx={{
@@ -169,7 +165,13 @@ class App extends React.Component<AppPropTypes,
                 />
                 <Route
                   path="/dashboard/c/:conversation_id"
-                  render={({match: {params: {conversation_id}}}) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
+                  render={({
+                    match: {
+                      params: { conversation_id },
+                    },
+                  }) => (
+                    <Dashboard selectedConversationId={conversation_id} user={this.props.user} />
+                  )}
                 />
                 <Route exact path="/about" render={() => <About />} />
                 <Route
@@ -210,13 +212,6 @@ class App extends React.Component<AppPropTypes,
                     return (
                       <Box>
                         <Route exact path="/create" component={CreateConversation} />
-                        <PrivateRoute
-                          isLoading={this.isLoading()}
-                          authed={this.isAuthed()}
-                          exact
-                          path="/conversations"
-                          component={ManageConversations}
-                        />
                         <PrivateRoute
                           isLoading={this.isLoading()}
                           authed={this.isAuthed()}

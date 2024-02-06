@@ -112,6 +112,8 @@ class SignIn extends React.Component<CreateUserProps> {
             sx={{ mt: [4], my: [2], px: [4] }}
             id="signinButton"
             onClick={this.handleLoginClicked.bind(this)}
+            variant="buttons.disabled"
+            disabled
           >
             {this.props.pending ? "Signing in..." : "Sign in"}
           </Button>
