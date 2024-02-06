@@ -4,7 +4,10 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "mprocs",
+    "dev": "run-pty % npm run client:dev % npm run server:build:dev % npm run server:start:dev",
+    "client:dev": "npm run dev --workspace=client",
+    "server:build:dev": "npm run build:dev --workspace=server",
+    "server:start:dev": "npm run start:dev --workspace=server",
     "start": "npm run build && npm run serve:prod",
     "build": "rimraf client/build client-embed/dist server/dist && npm run build:prod --workspace=metropolis-client && npm run build:prod --workspace=client-embed && copyfiles -E -u 2 \"client/build/**/*\" server/dist/client && copyfiles -E -u 2 \"client-embed/dist/**/*\" server/dist/embed && npm run build --workspace=metropolis-server",
     "serve:prod": "npm run serve:prod --workspace=metropolis-server"
@@ -16,7 +19,7 @@
   ],
   "devDependencies": {
     "@types/json2csv": "^5.0.3",
-    "mprocs": "^0.6.4",
+    "run-pty": "^4.1.0",
     "copyfiles": "^2.4.1",
     "rimraf": "^5.0.1"
   },
