@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
-import { TbRefresh } from "react-icons/tb"
+import { TbRefresh, TbGitPullRequest } from "react-icons/tb"
 
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
@@ -299,18 +299,28 @@ const ConversationListItem = ({
       <Text sx={{ color: "#84817D", fontSize: "90%" }}>
         {conversation.fip_created && conversation.github_pr_id ? (
           <Text>
-            PR #{conversation.github_pr_id} · Created{" "}
+            <TbGitPullRequest color="#3fba50" /> #{conversation.github_pr_id} opened on{" "}
             {(() => {
               const date = new Date(conversation.fip_created)
-              return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
+              return date.toLocaleDateString("en-us", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+              // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
           </Text>
         ) : (
           <Text>
-            Discussion · Created{" "}
+            Discussion created{" "}
             {(() => {
               const date = new Date(conversation.created)
-              return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
+              return date.toLocaleDateString("en-us", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+              // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
             })()}
           </Text>
         )}

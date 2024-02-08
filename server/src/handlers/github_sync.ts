@@ -187,13 +187,13 @@ async function getFipFromPR(
 
   if (updatedFilenames.length === 0) {
     throw Error(
-      `no fips created in https://github.com/${owner}/${repo}/pull/${pull.number} [${pull.head?.label}]`,
+      `[${pull.head?.label}] no FIP-XXXX.md files created in PR #${pull.number}`,
     );
   }
 
   if (updatedFilenames.length > 1) {
     console.error(
-      `multiple changes in ${owner}/${repo}#${pull.number} ${pull.head?.label}, using the last one`,
+      `[${pull.head?.label}] multiple FIP-XXXX.md files changed in PR #${pull.number}, using the last one`,
     );
   }
 
@@ -309,7 +309,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     // get existing fips on master
     const { data: pulls } = await installationOctokit.request(
-      "GET /repos/{owner}/{repo}/pulls?state=all",
+      "GET /repos/{owner}/{repo}/pulls?state=open",
       {
         repo: process.env.FIP_REPO_NAME,
         owner: process.env.FIP_REPO_OWNER,
@@ -337,9 +337,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     console.log(
       `Found ${existingFipFilenames.size} FIPs in master, ${
         pulls.length
-      } open FIPs in PRs: ${pulls
-        .map((pull: any) => pull.head?.label)
-        .join(", ")}`,
+      } open FIPs in PRs: \n${pulls
+        .map((pull: any) => "- " + pull.head?.label)
+        .join("\n")}`,
     );
 
     let repoCollaboratorIds;
@@ -403,7 +403,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       if (existingConversation) {
         if (!existingConversation.github_sync_enabled) {
           console.log(
-            `github sync is disabled for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
+            `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`,
           );
           continue;
         }
@@ -411,7 +411,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         // update
         if (pull.state == "open") {
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is open, updating`,
+            `[${pull.head?.label}] updating metadata for PR #${pull.number}`,
           );
           // get fip
           let fipFields;
@@ -424,7 +424,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
             );
           } catch (err) {
             console.log(
-              `could not get fip for PR ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}), skipping`,
+              `[${pull.head?.label}] could not get fip for PR #${pull.number}`,
             );
             continue;
           }
@@ -433,7 +433,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           await updateConversationPrAndFip({ ...prFields, ...fipFields });
         } else {
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} (zinvite ${existingConversation.zinvite}) is closed, updating`,
+            `[${pull.head?.label}] closing conversation with PR #${pull.number}`,
           );
           // we don't care about getting the FIP since it's no longer being discussed
           // but we want to update the PR status to closed
@@ -443,7 +443,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `conversation with PR id ${pull.number} ${pull.head?.label} does not exist, inserting`,
+            `[${pull.head?.label}] creating new polis conversation for PR #${pull.number}`,
           );
 
           // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
@@ -457,10 +457,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               mainBranchName,
             );
           } catch (err) {
-            console.log(
-              `could not get fip for PR ${pull.number} ${pull.head?.label}, skipping`,
-            );
-            console.log(err);
+            console.log(`[${pull.head?.label}] skipping PR #${pull.number}`);
             continue;
           }
 
@@ -472,7 +469,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           const zinvite = await generateAndRegisterZinvite(zid, false);
 
           console.log(
-            `created conversation for PR ${pull.number} ${pull.head?.label} (zinvite ${zinvite})`,
+            `[${pull.head?.label}] created polis conversation for PR #${pull.number}`,
           );
 
           // const welcomeMessage = getWelcomeMessage(

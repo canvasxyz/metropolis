@@ -65,7 +65,7 @@ const Index = ({ user }: { user? }) => {
             </Text>
             {!!user?.email || !!user?.githubUserId || !!user?.xInfo ? (
               <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.buttonBlack", px: [4], ml: [2] }} to="/dashboard">
+                <RouterLink sx={{ variant: "links.buttonBlack", px: [4] }} to="/dashboard">
                   Go to application
                 </RouterLink>
               </Box>
