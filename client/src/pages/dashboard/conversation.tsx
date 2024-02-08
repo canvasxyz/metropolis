@@ -2,30 +2,17 @@
 
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Flex, Text, Button, jsx } from "theme-ui"
+import { Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import {
-  TbArchive,
-  TbArchiveOff,
-  TbPencil,
-  TbFlame,
-  TbHammer,
-} from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
-import {
-  handleModerateConversation,
-  handleUnmoderateConversation,
-  handleCloseConversation,
-  handleReopenConversation,
-  populateZidMetadataStore,
-} from "../../actions"
+import { populateZidMetadataStore } from "../../actions"
 
 type ReportComment = {
   active: boolean
@@ -54,7 +41,6 @@ export const DashboardConversation = ({
 }) => {
   const hist = useHistory()
   const dispatch = useAppDispatch()
-  const { user } = useAppSelector((state: RootState) => state.user)
   const { zid_metadata, error: zidMetadataError } = useAppSelector(
     (state: RootState) => state.zid_metadata,
   )
@@ -119,79 +105,17 @@ export const DashboardConversation = ({
 
   return (
     <Box>
-      {zid_metadata.is_owner && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: [3],
-            pl: [4],
-            alignItems: "center",
-            display: "flex",
-            gap: [2],
-            zIndex: 1,
-          }}
-        >
-          <Button
-            variant="outlineSecondary"
-            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}`)}
-          >
-            <TbPencil /> Edit
-          </Button>
-          <Button
-            variant="outlineSecondary"
-            onClick={() => hist.push(`/m/${zid_metadata.conversation_id}/comments`)}
-          >
-            <TbHammer /> Moderate
-          </Button>
-          {user.githubRepoCollaborator && (
-            <Button
-              variant="outlineSecondary"
-              onClick={() => {
-                if (zid_metadata.is_hidden) {
-                  if (!confirm("Show this proposal to users again?")) return
-                  dispatch(handleUnmoderateConversation(zid_metadata.conversation_id))
-                } else {
-                  if (!confirm("Hide this proposal from users?")) return
-                  dispatch(handleModerateConversation(zid_metadata.conversation_id))
-                }
-              }}
-            >
-              <TbFlame /> {zid_metadata.is_hidden ? "Unmark spam" : "Mark as spam"}
-            </Button>
-          )}
-          {(zid_metadata.is_owner || user.githubRepoCollaborator) &&
-            !zid_metadata.github_pr_title && (
-              <Button
-                variant="outlineSecondary"
-                onClick={() => {
-                  if (zid_metadata.is_archived) {
-                    if (!confirm("Reopen this discussion?")) return
-                    dispatch(handleReopenConversation(zid_metadata.conversation_id))
-                    location.reload()
-                  } else {
-                    if (!confirm("Close this discussion?")) return
-                    dispatch(handleCloseConversation(zid_metadata.conversation_id))
-                    location.reload()
-                  }
-                }}
-              >
-                {zid_metadata.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
-                {zid_metadata.is_archived ? "Reopen" : "Mark as closed"}
-              </Button>
-            )}
-        </Box>
-      )}
       <Box sx={{ width: "100%" }}>
         <Flex
           sx={{
             flexDirection: "column",
             gap: [2],
             margin: "0 auto",
-            pt: [8],
+            pt: [5],
             pb: [2],
             mt: [3],
-            px: [4],
-            maxWidth: "620px",
+            px: [5],
+            maxWidth: "960px",
           }}
         >
           <Heading as="h2">
@@ -212,24 +136,14 @@ export const DashboardConversation = ({
             </Text>
           )}
           <Frontmatter zid_metadata={zid_metadata} />
-          {zid_metadata.description && (
-            <Collapsible
-              key={zid_metadata.conversation_id}
-              shouldCollapse={zid_metadata.description?.length > 300}
-            >
-              <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
-                {zid_metadata.description}
-              </ReactMarkdown>
-            </Collapsible>
-          )}
         </Flex>
       </Box>
       <Box sx={{ width: "100%", position: "relative", borderTop: "1px solid #e2ddd5", mt: [4] }}>
         <Box
           sx={{
             margin: "0 auto",
-            maxWidth: "620px",
-            px: [4],
+            maxWidth: "960px",
+            px: [5],
             py: [2],
             mt: [4],
             lineHeight: 1.45,
@@ -254,8 +168,8 @@ export const DashboardConversation = ({
         <Box
           sx={{
             margin: "0 auto",
-            maxWidth: "620px",
-            px: [4],
+            maxWidth: "960px",
+            px: [5],
             py: [2],
             mt: [4],
             lineHeight: 1.45,
@@ -312,49 +226,6 @@ export const DashboardConversation = ({
         </Box>
       </Box>
     </Box>
-  )
-}
-
-const Collapsible = ({
-  children,
-  shouldCollapse,
-}: {
-  children: React.ReactElement
-  shouldCollapse: boolean
-}) => {
-  const [collapsed, setCollapsed] = useState(shouldCollapse)
-
-  return (
-    <React.Fragment>
-      <Box
-        className={collapsed ? "react-markdown css-fade" : "react-markdown"}
-        sx={
-          collapsed
-            ? { wordBreak: "break-word", maxHeight: "170px", overflow: "hidden" }
-            : { wordBreak: "break-word", mb: [3] }
-        }
-      >
-        {children}
-      </Box>
-      {shouldCollapse && (
-        <Link
-          href="#"
-          onClick={() => setCollapsed(!collapsed)}
-          variant="links.primary"
-          sx={{
-            color: "mediumGrayActive",
-            py: "11px",
-            textAlign: "center",
-            bg: "#ede4d166",
-            fontSize: "0.94em",
-            borderRadius: 7,
-            "&:hover": { bg: "#ede4d1aa" },
-          }}
-        >
-          {collapsed ? "Show more" : "Show less"}
-        </Link>
-      )}
-    </React.Fragment>
   )
 }
 

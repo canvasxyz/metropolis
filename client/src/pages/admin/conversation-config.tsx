@@ -97,7 +97,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       .then((reports) => {
         setReports(reports)
       })
-  }, [])
+  }, [zid_metadata.conversation_id])
 
   if (zid_metadata && !zid_metadata.is_owner) {
     return <NoPermission />

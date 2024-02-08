@@ -14,6 +14,29 @@ export default {
     body: 1.45,
     heading: 1.125,
   },
+  boxes: {
+    menu: {
+      bg: "background",
+      py: "2px",
+      boxShadow: "0 0 8px rgba(0, 0, 0, 0.125)",
+      position: "absolute",
+      right: 0,
+      mt: [2],
+      width: "150px",
+      origin: "top-right",
+      borderRadius: "8px",
+      zIndex: 9999,
+      // bg-white shadow-lg ring-1 ring-black/5 focus:outline-none
+    },
+    menuitem: {
+      py: "5px",
+      px: "7px",
+      pl: "10px",
+      "&:hover": {
+        bg: "#ede4d1",
+      },
+    },
+  },
   colors: {
     text: "#44474d",
     textDark: "#111",

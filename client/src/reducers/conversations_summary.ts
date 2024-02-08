@@ -1,9 +1,12 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
-const populateConversationsSummary = createAsyncThunk('conversations_summary/populateConversationsSummary', async () => {
-  const response = await fetch('/api/v3/conversations_summary');
-  return await response.json();
-});
+const populateConversationsSummary = createAsyncThunk(
+  "conversations_summary/populateConversationsSummary",
+  async () => {
+    const response = await fetch("/api/v3/conversations_summary")
+    return await response.json()
+  },
+)
 
 export type ConversationSummary = {
   fip_created: string | null
@@ -17,52 +20,58 @@ export type ConversationSummary = {
   topic: string | null
   is_archived: boolean
   is_hidden: boolean
+  is_owner: boolean
+  owner: number
   conversation_id: string
   created: number
 }
 
-type ConversationSummaryState = {
-  status: "idle"
-  data: null
-  error: null
-} | {
-  status: "loading"
-  data: null | ConversationSummary[]
-  error: null
-} | {
-  status: "succeeded"
-  data: ConversationSummary[]
-  error: null
-} | {
-  status: "failed"
-  data: null
-  error: string
-}
+type ConversationSummaryState =
+  | {
+      status: "idle"
+      data: null
+      error: null
+    }
+  | {
+      status: "loading"
+      data: null | ConversationSummary[]
+      error: null
+    }
+  | {
+      status: "succeeded"
+      data: ConversationSummary[]
+      error: null
+    }
+  | {
+      status: "failed"
+      data: null
+      error: string
+    }
 
 const conversationsSummarySlice = createSlice({
   name: "conversations_summary",
   initialState: {
     status: "idle",
     data: null,
-    error: null
+    error: null,
   } as ConversationSummaryState,
   reducers: {},
   extraReducers(builder) {
     builder
       .addCase(populateConversationsSummary.pending, (state) => {
-        state.status = "loading";
+        state.status = "loading"
       })
       .addCase(populateConversationsSummary.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.data = action.payload;
+        state.status = "succeeded"
+        state.data = action.payload
       })
       .addCase(populateConversationsSummary.rejected, (state, action) => {
-        state.status = "failed";
-        state.data = null;
-        state.error = action.error.message;
+        state.status = "failed"
+        state.data = null
+        state.error = action.error.message
       })
-  }
-});
+  },
+})
 
-export default conversationsSummarySlice.reducer;
+export default conversationsSummarySlice.reducer
 export { populateConversationsSummary }

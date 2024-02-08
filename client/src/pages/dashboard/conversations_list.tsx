@@ -1,7 +1,19 @@
 import React, { useCallback, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
-import { TbRefresh, TbGitPullRequest } from "react-icons/tb"
+import { Link as RouterLink } from "react-router-dom"
+import {
+  TbChevronDown,
+  TbDots,
+  TbPencil,
+  TbRefresh,
+  TbGitPullRequest,
+  TbHammer,
+  TbFlame,
+  TbArchiveOff,
+  TbArchive,
+} from "react-icons/tb"
+import { Menu } from "@headlessui/react"
 
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
@@ -11,6 +23,13 @@ import {
   populateConversationsSummary,
 } from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
+
+import {
+  handleModerateConversation,
+  handleUnmoderateConversation,
+  handleCloseConversation,
+  handleReopenConversation,
+} from "../../actions"
 
 const Badge = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -37,14 +56,16 @@ const Badge = ({ children }: { children: React.ReactNode }) => {
 type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
 
 const ConversationsList = ({
+  user,
   selectedConversationId,
   setCreateConversationModalIsOpen,
   syncPRs,
   syncInProgress,
 }: {
+  user
   selectedConversationId: string | null
-  setCreateConversationModalIsOpen: Function
-  syncPRs: Function
+  setCreateConversationModalIsOpen: (arg0: boolean) => void
+  syncPRs: () => void
   syncInProgress: boolean
 }) => {
   const dispatch = useAppDispatch()
@@ -53,8 +74,8 @@ const ConversationsList = ({
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const [selectedConversationList, setSelectedConversationList] =
-    useLocalStorage<ConversationListSelection>("selectedConversationList", "all-fip")
+  const [selectedConversations, setSelectedConversations] =
+    useLocalStorage<ConversationListSelection>("selectedConversations", "all-fip")
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
@@ -79,7 +100,7 @@ const ConversationsList = ({
   const allConversations = openConversations.concat(nonFIPConversations)
 
   let conversationsToDisplay: ConversationSummary[]
-  if (selectedConversationList === "all-fip") {
+  if (selectedConversations === "all-fip") {
     allConversations.sort((c1, c2) => {
       return (
         (c2.github_pr_opened_at ? new Date(c2.github_pr_opened_at).getTime() : c2.created) -
@@ -87,16 +108,16 @@ const ConversationsList = ({
       )
     })
     conversationsToDisplay = allConversations
-  } else if (selectedConversationList === "open-fip") {
+  } else if (selectedConversations === "open-fip") {
     conversationsToDisplay = openConversations
-  } else if (selectedConversationList === "non-fip") {
+  } else if (selectedConversations === "non-fip") {
     conversationsToDisplay = nonFIPConversations
-  } else if (selectedConversationList === "archived") {
+  } else if (selectedConversations === "archived") {
     const archivedConversations = conversations.filter(
       (conversation) => conversation.is_archived && !conversation.is_hidden,
     )
     conversationsToDisplay = archivedConversations
-  } else if (selectedConversationList === "hidden") {
+  } else if (selectedConversations === "hidden") {
     const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
     conversationsToDisplay = hiddenConversations
   } else {
@@ -113,109 +134,82 @@ const ConversationsList = ({
           py: [2],
           px: [3],
           userSelect: "none",
+          borderBottom: "1px solid #e2ddd5",
         }}
       >
+        {selectedConversations === "all-fip"
+          ? "All"
+          : selectedConversations === "open-fip"
+          ? "Open FIPs"
+          : selectedConversations === "non-fip"
+          ? "Discussions"
+          : selectedConversations === "archived"
+          ? "Closed"
+          : selectedConversations === "hidden"
+          ? "Spam"
+          : ""}
         <Box
-          variant={selectedConversationList === "all-fip" ? "buttons.primary" : "buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            display: "inline-block",
-            bg: selectedConversationList === "all-fip" ? "#667ccb !important" : undefined,
-          }}
-          onClick={() => {
-            setSelectedConversationList("all-fip")
-          }}
+          sx={{ position: "absolute", top: "10px", right: "12px" }}
+          onClick={(e) => e.stopPropagation()}
         >
-          All
-        </Box>
-        <Box
-          variant={selectedConversationList === "open-fip" ? "buttons.primary" : "buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            display: "inline-block",
-            bg: selectedConversationList === "open-fip" ? "#667ccb !important" : undefined,
-          }}
-          onClick={() => {
-            setSelectedConversationList("open-fip")
-          }}
-        >
-          FIPs <Badge>{openConversations.length}</Badge>
-        </Box>
-        <Box
-          variant={selectedConversationList === "non-fip" ? "buttons.primary" : "buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            display: "inline-block",
-            bg: selectedConversationList === "non-fip" ? "#667ccb !important" : undefined,
-          }}
-          onClick={() => {
-            setSelectedConversationList("non-fip")
-          }}
-        >
-          Discussions <Badge>{nonFIPConversations.length}</Badge>
+          <Menu>
+            <Menu.Button as="div">
+              <Box sx={{ cursor: "pointer", position: "relative", top: "-2px" }}>
+                <TbChevronDown />
+              </Box>
+            </Menu.Button>
+            <Menu.Items as={Box}>
+              <Box variant="boxes.menu">
+                <Menu.Item>
+                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("all-fip")}>
+                    All
+                  </Box>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box
+                    variant="boxes.menuitem"
+                    onClick={() => setSelectedConversations("open-fip")}
+                  >
+                    Open FIPs ({openConversations.length})
+                  </Box>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
+                    Discussions ({nonFIPConversations.length})
+                  </Box>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box
+                    variant="boxes.menuitem"
+                    onClick={() => setSelectedConversations("archived")}
+                  >
+                    Closed
+                  </Box>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("hidden")}>
+                    Spam
+                  </Box>
+                </Menu.Item>
+              </Box>
+            </Menu.Items>
+          </Menu>
         </Box>
       </Box>
       <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
         {conversationsToDisplay.map((conversation) => (
           <ConversationListItem
+            hist={hist}
+            user={user}
             conversation={conversation}
             selectedConversationId={selectedConversationId}
             navigateToConversation={navigateToConversation}
             key={conversation.conversation_id}
+            dispatch={dispatch}
           />
         ))}
       </Box>
-      <Box sx={{ left: [3], bottom: [2], position: "absolute" }}>
-        <Box
-          variant={selectedConversationList === "archived" ? "buttons.primary" : "buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            display: "inline-block",
-            bg: selectedConversationList === "archived" ? "#667ccb !important" : undefined,
-            fontSize: "0.94em",
-            fontWeight: 500,
-          }}
-          onClick={() => {
-            setSelectedConversationList("archived")
-          }}
-        >
-          Past
-        </Box>
-        {(selectedConversationList === "archived" || selectedConversationList === "hidden") && (
-          <Box
-            variant={selectedConversationList === "hidden" ? "buttons.primary" : "buttons.outline"}
-            sx={{
-              px: [2],
-              py: [1],
-              mr: [1],
-              mb: [1],
-              display: "inline-block",
-              bg: selectedConversationList === "hidden" ? "#667ccb !important" : undefined,
-              fontSize: "0.94em",
-              fontWeight: 500,
-            }}
-            onClick={() => {
-              if (!confirm("Show polls hidden by moderators?")) return
-              setSelectedConversationList("hidden")
-            }}
-          >
-            Hidden
-          </Box>
-        )}
-      </Box>
-      {selectedConversationList === "open-fip" && (
+      {selectedConversations === "open-fip" && (
         <Button
           variant={"buttons.outline"}
           sx={{
@@ -235,7 +229,7 @@ const ConversationsList = ({
           {syncInProgress ? "Syncing..." : "Sync PRs"}
         </Button>
       )}
-      {selectedConversationList === "non-fip" && (
+      {
         <Button
           variant={"buttons.outline"}
           sx={{
@@ -251,26 +245,33 @@ const ConversationsList = ({
           }}
           onClick={() => setCreateConversationModalIsOpen(true)}
         >
-          + Add
+          Add a discussion
         </Button>
-      )}
+      }
     </React.Fragment>
   )
 }
 
 type ConversationListItemProps = {
+  hist
+  user
   conversation: ConversationSummary
   selectedConversationId: string | null
   navigateToConversation: (conversationId: string) => void
+  dispatch
 }
 
 const ConversationListItem = ({
+  hist,
+  user,
   conversation,
   selectedConversationId,
   navigateToConversation,
+  dispatch,
 }: ConversationListItemProps) => (
   <Box
     sx={{
+      position: "relative",
       p: [3],
       pl: [4],
       cursor: "pointer",
@@ -326,6 +327,80 @@ const ConversationListItem = ({
         )}
       </Text>
     </Flex>
+    {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
+      <Box
+        sx={{ position: "absolute", top: "10px", right: "12px" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Menu>
+          <Menu.Button as="div">
+            <TbDots />
+          </Menu.Button>
+          <Menu.Items as={Box}>
+            <Box variant="boxes.menu">
+              <Menu.Item>
+                <Box
+                  variant="boxes.menuitem"
+                  onClick={() => hist.push(`/m/${conversation.conversation_id}`)}
+                >
+                  <TbPencil /> Edit
+                </Box>
+              </Menu.Item>
+
+              <Menu.Item>
+                <Box
+                  variant="boxes.menuitem"
+                  onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
+                >
+                  <TbHammer /> Moderate
+                </Box>
+              </Menu.Item>
+              {user.githubRepoCollaborator && (
+                <Menu.Item>
+                  <Box
+                    variant="boxes.menuitem"
+                    onClick={() => {
+                      if (conversation.is_hidden) {
+                        if (!confirm("Show this proposal to users again?")) return
+                        dispatch(handleUnmoderateConversation(conversation.conversation_id))
+                      } else {
+                        if (!confirm("Hide this proposal from users?")) return
+                        dispatch(handleModerateConversation(conversation.conversation_id))
+                      }
+                    }}
+                  >
+                    <TbFlame /> {conversation.is_hidden ? "Unmark spam" : "Mark as spam"}
+                  </Box>
+                </Menu.Item>
+              )}
+              {user &&
+                (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) &&
+                !conversation.github_pr_title && (
+                  <Menu.Item>
+                    <Box
+                      variant="boxes.menuitem"
+                      onClick={() => {
+                        if (conversation.is_archived) {
+                          if (!confirm("Reopen this discussion?")) return
+                          dispatch(handleReopenConversation(conversation.conversation_id))
+                          location.reload()
+                        } else {
+                          if (!confirm("Close this discussion?")) return
+                          dispatch(handleCloseConversation(conversation.conversation_id))
+                          location.reload()
+                        }
+                      }}
+                    >
+                      {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
+                      {conversation.is_archived ? "Reopen" : "Mark as closed"}
+                    </Box>
+                  </Menu.Item>
+                )}
+            </Box>
+          </Menu.Items>
+        </Menu>
+      </Box>
+    )}
   </Box>
 )
 

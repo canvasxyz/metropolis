@@ -60,6 +60,7 @@
     "webpack-dev-server": "~4.6.0"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.18",
     "@reduxjs/toolkit": "^2.0.1",
     "@types/d3": "^7.4.0",
     "@types/facebook-js-sdk": "^3.3.6",

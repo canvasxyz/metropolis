@@ -17,7 +17,7 @@ type DashboardProps = {
   selectedConversationId: string | null
 }
 
-const Dashboard = ({ selectedConversationId }: DashboardProps) => {
+const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -101,6 +101,7 @@ const Dashboard = ({ selectedConversationId }: DashboardProps) => {
             setCreateConversationModalIsOpen={setCreateConversationModalIsOpen}
             syncPRs={syncPRs}
             syncInProgress={syncInProgress}
+            user={user}
           />
         </Box>
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>

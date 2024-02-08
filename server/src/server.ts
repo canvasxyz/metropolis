@@ -7845,6 +7845,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.is_archived,
     conversations.is_hidden,
     conversations.participant_count,
+    conversations.owner,
     users.hname,
     users.github_username,
     zinvites.zinvite as conversation_id
