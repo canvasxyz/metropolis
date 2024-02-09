@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
+import { Button, Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -13,6 +13,7 @@ import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
 import Survey from "../survey"
 import { populateZidMetadataStore } from "../../actions"
+import { SentimentCheck } from "./sentiment_check"
 
 type ReportComment = {
   active: boolean
@@ -137,20 +138,18 @@ export const DashboardConversation = ({
           )}
           <Frontmatter zid_metadata={zid_metadata} />
         </Flex>
-      </Box>
-      <Box sx={{ width: "100%", position: "relative", borderTop: "1px solid #e2ddd5", mt: [4] }}>
         <Box
           sx={{
             margin: "0 auto",
             maxWidth: "960px",
             px: [5],
-            py: [2],
-            mt: [4],
+            py: [3],
             lineHeight: 1.45,
           }}
         >
-          <Heading as="h2">Sentiment Check</Heading>
+          {zid_metadata.fip_author && <SentimentCheck />}
           <Survey
+            key={zid_metadata.conversation_id}
             match={{
               params: { conversation_id: zid_metadata.conversation_id },
             }}
@@ -175,7 +174,7 @@ export const DashboardConversation = ({
             lineHeight: 1.45,
           }}
         >
-          <Heading as="h2">Sentiment Report</Heading>
+          <Heading as="h2">Report</Heading>
           <Box sx={{ mt: [4] }}>
             {!refreshInProgress && (
               <Text

@@ -125,8 +125,8 @@ const DropdownButton = ({
         sx={{
           borderRadius: "4px 0 0 4px",
           borderRight: "1px solid #fbf5e9",
-          py: "7px",
-          pb: "6px",
+          lineHeight: "20px",
+          py: "5px",
         }}
         onClick={defaultOption.onClick}
       >
@@ -135,10 +135,9 @@ const DropdownButton = ({
       <Button
         sx={{
           borderRadius: "0 4px 4px 0",
-          pr: "6px",
-          pl: "6px",
-          py: "7px",
-          pb: "6px",
+          lineHeight: "20px",
+          px: "6px",
+          py: "5px",
         }}
         onClick={() => setOpen(!open)}
         onBlur={() => setTimeout(() => setOpen(false), 10)}

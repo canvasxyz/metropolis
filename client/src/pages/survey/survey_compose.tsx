@@ -7,7 +7,6 @@ import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"
 
 import type { Comment } from "../../util/types"
-import { DropdownButton } from "../../components/dropdown"
 import api from "../../util/api"
 import { surveyHeadingMini } from "./index"
 
@@ -106,7 +105,7 @@ const SurveyComposeBox = ({
           padding: "8px",
           border: "1px solid",
           borderColor: "lightGray",
-          marginBottom: "10px",
+          marginTop: "0px",
           background: loading ? "#eee" : undefined,
         }}
         disabled={!!loading}
@@ -114,7 +113,7 @@ const SurveyComposeBox = ({
         minRows={1}
         maxRows={9}
         ref={inputRef}
-        placeholder="Add a comment"
+        placeholder="Add a note"
         defaultValue={cachedComment}
         onBlur={() => {
           setCachedComment(inputRef.current.value)
@@ -138,39 +137,30 @@ const SurveyComposeBox = ({
         }}
       />
       <Box sx={{ mb: [3] }}>
-        <DropdownButton
-          sx={{ display: "inline-block" }}
-          options={[
-            {
-              name: "Submit",
-              onClick: () => {
-                submitComment(inputRef.current.value, 1)
-                  .then(() => {
-                    inputRef.current.value = ""
-                    setError("")
-                  })
-                  .finally(() => {
-                    setLoading(false)
-                    inputRef.current.focus()
-                  })
-              },
-              default: true,
-            },
-            /* {
-              name: "Submit and disagree",
-              onClick: () => {
-                submitComment(inputRef.current.value, -1)
-                  .then(() => {
-                    inputRef.current.value = ""
-                    setError("")
-                  })
-                  .finally(() => {
-                    setLoading(false)
-                  })
-              },
-            }, */
-          ]}
-        />
+        <Button
+          variant="primary"
+          sx={{
+            mt: [1],
+            py: "6px",
+            px: "10px",
+            minWidth: "100px",
+            fontSize: "0.98em",
+            fontWeight: 500,
+          }}
+          onClick={() => {
+            submitComment(inputRef.current.value, 1)
+              .then(() => {
+                inputRef.current.value = ""
+                setError("")
+              })
+              .finally(() => {
+                setLoading(false)
+                inputRef.current.focus()
+              })
+          }}
+        >
+          Submit
+        </Button>
       </Box>
       <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
     </form>

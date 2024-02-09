@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-use-before-define
 import React, { useState } from "react"
-import { Box, Text, Link } from "theme-ui"
+import { Button, Box, Text, Link } from "theme-ui"
 import { ZidMetadata } from "../util/types"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -9,13 +9,13 @@ type FrontmatterProps = { zid_metadata: ZidMetadata }
 
 const splitAuthors = (authorList = "") => {
   const result = authorList
-    .replace(
+    ?.replace(
       "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
       "",
     )
     .replace(/"/g, "")
     .split(/, | and /)
-  if (result.length === 1) {
+  if (result && result.length === 1) {
     return result[0].split(/ @/).map((i) => {
       return `${i.slice(1).indexOf("@") !== -1 ? "" : "@"}${i.replace(/^@/, "").trim()}`
     })
@@ -35,12 +35,21 @@ const Collapsible = ({
   const [collapsed, setCollapsed] = useState(shouldCollapse)
 
   return (
-    <React.Fragment>
+    <Box sx={{ mb: [1] }}>
       <Box
         className={collapsed ? "react-markdown css-fade" : "react-markdown"}
         sx={
           collapsed
-            ? { wordBreak: "break-word", maxHeight: "80px", overflow: "hidden" }
+            ? {
+                wordBreak: "break-word",
+                maxHeight: "80px",
+                overflow: "hidden",
+                // try to use webkit-line-clamp
+                display: "-webkit-box",
+                "line-clamp": 4,
+                "-webkit-line-clamp": 4,
+                "-webkit-box-orient": "vertical",
+              }
             : { wordBreak: "break-word", maxHeight: "300px", overflow: "scroll", mb: [1] }
         }
       >
@@ -64,14 +73,11 @@ const Collapsible = ({
           {collapsed ? "Show more" : "Show less"}
         </Link>
       )}
-    </React.Fragment>
+    </Box>
   )
 }
 
 export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
-  const fields = ["title", "status", "author", "discussions-to"]
-  const valueFieldNames = ["github_pr_title", "fip_status", "fip_author", "fip_discussions_to"]
-
   const matches = conversation["fip_discussions_to"]?.match(/\[.+\]\((.+)\)/)
   const links =
     matches && matches[1] ? [matches[1]] : conversation["fip_discussions_to"]?.split(", ")
@@ -101,7 +107,7 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
         mt: [2],
         px: [2],
         pt: "10px",
-        pb: "10px",
+        pb: "4px",
         lineHeight: 1.25,
         fontSize: "0.94em",
         border: "1px solid #ddd",
@@ -109,61 +115,63 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
     >
       <table>
         <tbody className="border">
+          {(conversation.github_pr_url || conversation.github_pr_title) && (
+            <tr>
+              <td>
+                <Text sx={{ fontWeight: "700" }}>PR</Text>
+              </td>
+              <td>
+                {conversation.github_pr_url !== null ? (
+                  <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
+                    {conversation.github_pr_title} (#{conversation.github_pr_id})
+                  </Link>
+                ) : (
+                  conversation.github_pr_title
+                )}
+              </td>
+            </tr>
+          )}
+          {discussions && discussions.length > 0 && (
+            <tr>
+              <td>
+                <Text sx={{ fontWeight: "700" }}>Discussion</Text>
+              </td>
+              <td>{discussions}</td>
+            </tr>
+          )}
+          {conversation.fip_author && (
+            <tr>
+              <td>
+                <Text sx={{ fontWeight: "700" }}>Author</Text>
+              </td>
+              <td>
+                {splitAuthors(conversation.fip_author)?.map((author, i) => {
+                  const matches = author.match(/.*@(\w+)/)
+                  if (!matches) return author
+                  const username = matches[1]
+                  return (
+                    <React.Fragment key={author}>
+                      <Link
+                        href={`https://github.com/${username}`}
+                        target="_blank"
+                        noreferrer="noreferrer"
+                        noopener="noopener"
+                      >
+                        {author}
+                      </Link>
+                      {i < splitAuthors(conversation.fip_author).length - 1 ? ", " : ""}
+                    </React.Fragment>
+                  )
+                })}
+              </td>
+            </tr>
+          )}
           <tr>
-            <td>
-              <Text sx={{ fontWeight: "700" }}>PR</Text>
-            </td>
-            <td>
-              {conversation.github_pr_url !== null ? (
-                <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
-                  {conversation.github_pr_title} (#{conversation.github_pr_id})
-                </Link>
-              ) : (
-                conversation.github_pr_title
-              )}
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <Text sx={{ fontWeight: "700" }}>Discussion</Text>
-            </td>
-            <td>{discussions}</td>
-          </tr>
-          <tr>
-            <td>
-              <Text sx={{ fontWeight: "700" }}>Author</Text>
-            </td>
-            <td>
-              {splitAuthors(conversation.fip_author).map((author, i) => {
-                const matches = author.match(/.*@(\w+)/)
-                if (!matches) return author
-                const username = matches[1]
-                return (
-                  <React.Fragment key={author}>
-                    <Link
-                      href={`https://github.com/${username}`}
-                      target="_blank"
-                      noreferrer="noreferrer"
-                      noopener="noopener"
-                    >
-                      {author}
-                    </Link>
-                    {i < splitAuthors(conversation.fip_author).length - 1 ? ", " : ""}
-                  </React.Fragment>
-                )
-              })}
-            </td>
-          </tr>
-          {/*<tr>
-            <td>
-              <Text sx={{ fontWeight: "700" }}>Status</Text>
-            </td>
-            <td>{conversation.fip_status}</td>
-            </tr>*/}
-          <tr>
-            <td>
-              <Text sx={{ fontWeight: "700" }}>Text</Text>
-            </td>
+            {conversation.fip_author && (
+              <td>
+                <Text sx={{ fontWeight: "700" }}>Text</Text>
+              </td>
+            )}
             <td>
               {conversation.description && (
                 <Collapsible

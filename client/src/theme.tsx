@@ -52,9 +52,9 @@ export default {
     secondaryActive: "#e0e4e7",
     mediumGrayActive: "#63676e",
     lightGrayActive: "#9f9f9f",
-    mediumRed: "#e26666",
+    mediumRed: "#dd413c",
     mediumRedActive: "#d32d28",
-    mediumGreen: "#5fa240",
+    mediumGreen: "#539a33",
     mediumGreenActive: "#448b24",
   },
   forms: {

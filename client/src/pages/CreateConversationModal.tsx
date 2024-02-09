@@ -25,16 +25,19 @@ const CreateConversationInner = () => {
     <Box>
       <Flex>
         <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
-          Add a discussion
+          Open a discussion
         </Heading>
       </Flex>
 
       <Box sx={{ mt: 5 }}>
         <Box>
           <Label sx={{ display: "block", mb: [5] }}>
-            <Box sx={{ mb: [1] }}>Discussion Title</Box>
+            <Box sx={{ mb: [4] }}>
+              Use this form to add a custom sentiment check, for topics that don't fit in a PR.
+            </Box>
+            <Box sx={{ mb: [1] }}>Title</Box>
             <Input
-              placeholder={"An idea, problem, or prompt"}
+              placeholder={"What would you like to ask about?"}
               onChange={(i) => {
                 setTitle(i.target.value)
               }}
@@ -48,7 +51,7 @@ const CreateConversationInner = () => {
               <Textarea
                 id="new_conversation_description"
                 ref={descriptionRef}
-                placeholder="A 1-2 paragraph explanation (Markdown supported)"
+                placeholder="Explain why you’re polling the community for a sentiment check. Ask for ideas or opinions."
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)

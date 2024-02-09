@@ -8,76 +8,6 @@ import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
 
-const PrefilledComment = ({ user, text }: { zid_metadata; user; text: string }) => {
-  return (
-    <Box
-      sx={{
-        bg: "bgOffWhite",
-        border: "1px solid #e2ddd5",
-        borderRadius: "7px",
-        mb: [1],
-        pt: "12px",
-        pb: "10px",
-        px: "15px",
-        display: "flex",
-      }}
-    >
-      <Text sx={{ flex: 1 }}>{text}</Text>
-      {(!!user?.email || !!user?.githubUserId || !!user?.xInfo) && (
-        <Button
-          variant="text"
-          sx={{
-            background: "mediumGreen !important",
-            my: "-3px",
-            py: [1],
-            px: [2],
-            fontSize: "0.94em",
-            "&:hover": { bg: "mediumGreenActive !important" },
-          }}
-          onClick={() => {
-            const box: HTMLTextAreaElement = document.querySelector(
-              "textarea[placeholder='Add a comment']",
-            )
-            if (!box) return
-
-            box.value = text.replace("...", " ")
-            box.focus()
-          }}
-        >
-          <img src="/comment.svg" width="14" sx={{ position: "relative", top: "2px" }} />
-        </Button>
-      )}
-    </Box>
-  )
-}
-
-export const PrefilledComments = ({ user, zid_metadata }: { user; zid_metadata }) => {
-  return (
-    <Box sx={{ lineHeight: 1.3 }}>
-      <PrefilledComment
-        text="This seems unobjectionable to me."
-        user={user}
-        zid_metadata={zid_metadata}
-      />
-      <PrefilledComment
-        text="Another way to accomplish this might be..."
-        user={user}
-        zid_metadata={zid_metadata}
-      />
-      <PrefilledComment
-        text="We should make sure this has support from..."
-        user={user}
-        zid_metadata={zid_metadata}
-      />
-      <PrefilledComment
-        text="This proposal would benefit from review by..."
-        user={user}
-        zid_metadata={zid_metadata}
-      />
-    </Box>
-  )
-}
-
 const SurveyCards = ({
   conversation_id,
   votedComments,
@@ -109,23 +39,26 @@ const SurveyCards = ({
   }, [votedComments.length])
 
   return (
-    <Box sx={{ position: "relative" }}>
+    <Box sx={{ position: "relative", minHeight: "170px" }}>
       {unvotedComments.length > 0 && (
-        <Box sx={{ position: "relative", ...surveyBox }}>
-          {unvotedComments.length > 0 && (
-            <Box
-              sx={{
-                display: "flex",
-                fontSize: "0.9em",
-                mb: "12px",
-                color: "#9f9e9b",
-                fontWeight: 500,
-              }}
-            >
-              <Text sx={{ flex: 1 }}>Vote on comments on this proposal:</Text>
-              <Text>{unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining</Text>
-            </Box>
-          )}
+        <Box sx={{ position: "relative" }}>
+          <Box
+            sx={{
+              display: "flex",
+              fontSize: "0.94em",
+              fontWeight: 700,
+            }}
+          >
+            <Text sx={{ flex: 1 }}>Notes</Text>
+          </Box>
+          <Box sx={{ fontSize: "0.94em", mb: "12px" }}>
+            Vote on ideas and perspectives about this proposal{" "}
+            {unvotedComments.length > 0 && (
+              <React.Fragment>
+                ({unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining)
+              </React.Fragment>
+            )}
+          </Box>
           <Box sx={{ position: "relative" }} ref={cardsBoxRef}>
             {unvotedComments[0] && (
               <SurveyCard
@@ -143,7 +76,6 @@ const SurveyCards = ({
                   <Box
                     key={comment.tid}
                     sx={{
-                      zIndex: -1,
                       position: "absolute",
                       top: 0,
                       left: 0,
@@ -177,43 +109,15 @@ const SurveyCards = ({
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
-        <Box sx={{ ...surveyBox }}>
-          <Box
-            sx={{
-              fontSize: "0.9em",
-              mb: "10px",
-              color: "#9f9e9b",
-              fontWeight: 500,
-            }}
-          >
-            <Text>Add your comment to this proposal:</Text>
-          </Box>
-          <PrefilledComments user={user} zid_metadata={zid_metadata} />
+        <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+          No notes on this proposal yet.
         </Box>
       )}
 
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
-          <Box sx={{ ...surveyBox }}>
-            <Box
-              sx={{
-                fontSize: "0.9em",
-                mb: "10px",
-                color: "#9f9e9b",
-                fontWeight: 500,
-                display: "flex",
-              }}
-            >
-              <Text sx={{ flex: 1 }}>
-                You’ve voted on all {votedComments.length} comments, but you can
-                {!!user?.email || !!user?.githubUserId || !!user?.xInfo
-                  ? " still"
-                  : " log in to"}{" "}
-                add more:
-              </Text>
-              <Text></Text>
-            </Box>
-            <PrefilledComments user={user} zid_metadata={zid_metadata} />
+          <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+            You’ve voted on all {votedComments.length} notes so far.
           </Box>
           {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
             <Button

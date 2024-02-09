@@ -231,7 +231,7 @@ const ConversationsList = ({
       )}
       {
         <Button
-          variant={"buttons.outline"}
+          variant={"buttons.primary"}
           sx={{
             px: [2],
             py: [1],
@@ -241,11 +241,12 @@ const ConversationsList = ({
             bottom: [2],
             right: "11px",
             fontSize: "0.94em",
+            width: "calc(100% - 32px)",
             fontWeight: 500,
           }}
           onClick={() => setCreateConversationModalIsOpen(true)}
         >
-          Add a discussion
+          Open a discussion
         </Button>
       }
     </React.Fragment>
@@ -364,7 +365,8 @@ const ConversationListItem = ({
                         if (!confirm("Show this proposal to users again?")) return
                         dispatch(handleUnmoderateConversation(conversation.conversation_id))
                       } else {
-                        if (!confirm("Hide this proposal from users?")) return
+                        if (!confirm("Mark as spam? This will hide the proposal from users."))
+                          return
                         dispatch(handleModerateConversation(conversation.conversation_id))
                       }
                     }}

@@ -31,13 +31,11 @@ export const surveyHeadingMini = {
 }
 
 export const surveyBox = {
-  padding: "26px 32px",
+  padding: "26px 32px 24px",
   border: "1px solid",
   borderColor: "lighterGray",
   bg: "bgGray",
   borderRadius: "8px",
-  mt: [3, null, 4],
-  mb: [3, null, 4],
 }
 
 // reorder the next comments according to the backend api
@@ -167,8 +165,8 @@ const Survey = ({
             goTo={goTo}
             user={user}
             onVoted={(commentId: string) => {
-              const comment = unvotedComments.find((c) => c.tid === commentId)
-              const newUnvotedComments = unvotedComments.filter((c) => c.tid !== commentId)
+              const comment = unvotedComments.find((c) => c && c.tid === commentId)
+              const newUnvotedComments = unvotedComments.filter((c) => c && c.tid !== commentId)
               setUnvotedComments(newUnvotedComments)
               if (!comment) return
               const newVotedComments = [...votedComments, comment]
@@ -212,7 +210,7 @@ const Survey = ({
           !!user?.email ||
           !!user?.githubUserId ||
           !!user?.xInfo ? (
-            <Box sx={{ pt: [2] }}>
+            <Box sx={{ pt: [3] }}>
               <SurveyCompose
                 key={zid_metadata.conversation_id}
                 zid_metadata={zid_metadata}
