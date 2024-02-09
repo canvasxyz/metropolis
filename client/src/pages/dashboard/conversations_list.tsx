@@ -129,7 +129,7 @@ const ConversationsList = ({
       selectedConversationId === null &&
       conversationsToDisplay.length > 0
     ) {
-      hist.push(`/dashboard/c/${conversationsToDisplay[0].conversation_id}`)
+      hist.replace(`/dashboard/c/${conversationsToDisplay[0].conversation_id}`)
     }
   }, [selectedConversationId, selectedConversations.length, conversationsToDisplay.length])
 
@@ -293,11 +293,9 @@ const ConversationListItem = ({
       userSelect: "none",
       fontSize: "15px",
       lineHeight: 1.3,
-      backgroundColor:
-        conversation.conversation_id === selectedConversationId ? "#ede4d1" : "inherit",
+      bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
       "&:hover": {
-        backgroundColor:
-          conversation.conversation_id === selectedConversationId ? "#ede4d1" : "inherit",
+        bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
       },
     }}
     onClick={(e) => {

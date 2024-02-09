@@ -17,20 +17,10 @@ const Index = ({ user }: { user? }) => {
     lineHeight: 1.35,
   }
 
-  const comingSoon = {
-    py: 4,
-    width: "100%",
-    textAlign: "center",
-    lineHeight: 1.25,
-    color: "#777",
-    bg: "bgGray",
-    borderRadius: "8px",
-  }
-
   const samples = [
-    "The level of conflict we have right now is okay. We shouldn't expect total agreement among everyone.",
-    "I really like our iOS widgets. We should explore more projects like that - avatars, collectibles, and toys are fun and approachable for lots of people.",
-    "It can be hard to understand why the organization works the way it does. Since governance is an important part of our legitimacy, it would help to have a writer come in and do a profile to tell our story.",
+    "The proposal to upgrade sector storage seems ready for launch.",
+    "We should consider using Matrix and Element for giving the community a place to discuss governance issues. Their values around decentralization line up well with ours, and lots of other platforms use them.",
+    "I'm personally overwhelmed by the number of governance platforms that I have to keep up with. It would be easier to continue to use Github discussions.",
   ]
 
   return (
@@ -57,7 +47,7 @@ const Index = ({ user }: { user? }) => {
                 fontWeight: "700",
               }}
             >
-              The collaborative consensus tool
+              The collaborative consensus engine
             </Heading>
             <Text sx={{ my: 3 }}>
               Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas, using
@@ -67,8 +57,8 @@ const Index = ({ user }: { user? }) => {
               <RouterLink
                 sx={{
                   variant: "links.buttonBlack",
-                  px: [4],
                   mr: [2],
+                  lineHeight: 3,
                 }}
                 to="/dashboard"
               >
@@ -151,17 +141,6 @@ const Index = ({ user }: { user? }) => {
           3. We generate a report of top responses, key opinion groups, areas of consensus, and
           points of further exploration.
         </p>
-      </Box>
-      <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9] }}>
-        <Heading as="h3" sx={{ mb: [4] }}>
-          Coming soon
-        </Heading>
-        <Grid gap={[2]} columns={[2]}>
-          <Box sx={comingSoon}>Advanced analysis</Box>
-          <Box sx={comingSoon}>Advanced voting UI</Box>
-          <Box sx={comingSoon}>Web3 login</Box>
-          <Box sx={comingSoon}>Token gating</Box>
-        </Grid>
       </Box>
       <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>

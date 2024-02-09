@@ -34,7 +34,7 @@ export const surveyBox = {
   padding: "26px 32px 24px",
   border: "1px solid",
   borderColor: "lighterGray",
-  bg: "bgGray",
+  bg: "bgOffWhite",
   borderRadius: "8px",
 }
 

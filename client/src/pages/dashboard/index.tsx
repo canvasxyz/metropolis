@@ -56,7 +56,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
           sx={{
             width: ["40%", null, "290px"],
             borderRight: "1px solid #e2ddd5",
-            background: "#f7f0e3",
+            bg: "bgOffWhite",
             maxHeight: "100vh",
             overflow: "hidden",
             position: "relative",
