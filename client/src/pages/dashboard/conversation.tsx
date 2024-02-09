@@ -37,8 +37,10 @@ type ReportComment = {
 
 export const DashboardConversation = ({
   selectedConversationId,
+  user,
 }: {
   selectedConversationId: string
+  user
 }) => {
   const hist = useHistory()
   const dispatch = useAppDispatch()
@@ -170,7 +172,7 @@ export const DashboardConversation = ({
               <Box sx={{ fontSize: "0.94em", mb: "16px" }}>
                 Indicate your support or opposition to this FIP:
               </Box>
-              <SentimentCheck />
+              <SentimentCheck user={user} />
             </Box>
           )}
           {zid_metadata.fip_author && (

@@ -51,7 +51,7 @@ export default {
     bgOffWhite: "#faf9f6",
     primaryActive: "#4e65bd",
     secondaryActive: "#e0e4e7",
-    mediumGrayActive: "#63676e",
+    mediumGrayActive: "#7f7f7f",
     lightGrayActive: "#9f9f9f",
     mediumRed: "#dd413c",
     mediumRedActive: "#d32d28",

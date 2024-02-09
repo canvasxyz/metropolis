@@ -110,7 +110,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
         <Box sx={{ overflowY: "scroll", flex: 1, position: "relative" }}>
           <DashboardUserButton />
           {selectedConversationId ? (
-            <DashboardConversation selectedConversationId={selectedConversationId} />
+            <DashboardConversation selectedConversationId={selectedConversationId} user={user} />
           ) : (
             <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
               <h3 sx={{ fontWeight: 500, mt: [4], opacity: 0.4 }}>Select a survey</h3>
