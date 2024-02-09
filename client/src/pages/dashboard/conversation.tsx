@@ -143,7 +143,7 @@ export const DashboardConversation = ({
             margin: "0 auto",
             maxWidth: "960px",
             px: [5],
-            py: [3],
+            py: [2],
             lineHeight: 1.45,
           }}
         >
