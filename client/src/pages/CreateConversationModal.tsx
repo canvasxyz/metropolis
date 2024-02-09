@@ -33,7 +33,8 @@ const CreateConversationInner = () => {
         <Box>
           <Label sx={{ display: "block", mb: [5] }}>
             <Box sx={{ mb: [4] }}>
-              Use this form to add a custom sentiment check, for topics that don't fit in a PR.
+              Use this form to create custom sentiment checks and surveys, for topics that don't
+              have a existing FIP or don't fit in one.
             </Box>
             <Box sx={{ mb: [1] }}>Title</Box>
             <Input
@@ -63,18 +64,18 @@ const CreateConversationInner = () => {
           <Button
             variant="primary"
             onClick={() => {
-              if (title.trim().length < 20) {
-                setError("Title should be at least 20 characters")
+              if (title.trim().length === 0) {
+                setError("Title can't be empty")
                 return
-              } else if (description.trim().length < 20) {
-                setError("Description should be at least 100 characters")
+              } else if (description.trim().length === 0) {
+                setError("Please write a longer description")
                 return
               }
               setError("")
               dispatch(handleCreateConversationSubmit(title, description, true))
             }}
           >
-            Create survey
+            Create discussion
           </Button>
         </Box>
         {error && <Box sx={{ color: "mediumRedActive", fontWeight: 500, mt: [3] }}>{error}</Box>}

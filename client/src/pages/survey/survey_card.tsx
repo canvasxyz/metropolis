@@ -108,7 +108,7 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         width: "100%",
         px: ["24px", "32px"],
         pt: ["22px", "20px"],
-        pb: ["46px", "36px"],
+        pb: ["46px", "46px"],
         overflow: "scroll",
       }}
     >
@@ -146,13 +146,13 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
           </Box>
         )}
         <Box
-          sx={{ position: "absolute", bottom: ["10px", "14px"], marginLeft: "-15px", pb: [2, 0] }}
+          sx={{ position: "absolute", bottom: ["10px", "20px"], marginLeft: "-2px", pb: [2, 0] }}
         >
-          <Button variant="text" onClick={(e) => agree(commentId, e.target)}>
+          <Button variant="vote" onClick={(e) => agree(commentId, e.target)} sx={{ mr: [2] }}>
             <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
             Agree
           </Button>
-          <Button variant="text" onClick={(e) => disagree(commentId, e.target)}>
+          <Button variant="vote" onClick={(e) => disagree(commentId, e.target)} sx={{ mr: [2] }}>
             <img
               src="/disagree.svg"
               width="18"
@@ -160,8 +160,8 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
             />
             Disagree
           </Button>
-          <Button variant="text" onClick={(e) => skip(commentId, e.target)}>
-            Skip<Text sx={{ display: ["none", "inline"] }}> / Unsure</Text>
+          <Button variant="vote" onClick={(e) => skip(commentId, e.target)} sx={{ mr: [2] }}>
+            Skip
           </Button>
         </Box>
       </Box>

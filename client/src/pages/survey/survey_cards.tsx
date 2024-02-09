@@ -89,7 +89,15 @@ const SurveyCards = ({
                 )
               })}
           </Box>
-          <Box sx={{ position: "absolute", top: [3], right: [4], fontSize: "0.94em" }}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: [3],
+              right: [4],
+              fontSize: "0.91em",
+              color: "mediumGray",
+            }}
+          >
             {unvotedComments.length > 0 && (
               <Box>{unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining</Box>
             )}

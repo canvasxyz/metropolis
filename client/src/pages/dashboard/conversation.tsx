@@ -11,7 +11,7 @@ import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
 import { Frontmatter } from "../Frontmatter"
-import Survey from "../survey"
+import Survey, { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 
@@ -147,7 +147,32 @@ export const DashboardConversation = ({
             lineHeight: 1.45,
           }}
         >
-          {zid_metadata.fip_author && <SentimentCheck />}
+          {zid_metadata.fip_author && (
+            <Box
+              sx={{
+                overflowX: "scroll",
+                py: [3],
+                px: "19px",
+                mb: [4],
+                lineHeight: 1.35,
+                border: "1px solid #ddd",
+              }}
+            >
+              <Box
+                sx={{
+                  display: "flex",
+                  fontSize: "0.94em",
+                  fontWeight: 700,
+                }}
+              >
+                <Text sx={{ flex: 1 }}>Sentiment Check</Text>
+              </Box>
+              <Box sx={{ fontSize: "0.94em", mb: "16px" }}>
+                Indicate your support or opposition to this FIP:
+              </Box>
+              <SentimentCheck />
+            </Box>
+          )}
           {zid_metadata.fip_author && (
             <Box>
               <Box
@@ -157,10 +182,11 @@ export const DashboardConversation = ({
                   fontWeight: 700,
                 }}
               >
-                <Text sx={{ flex: 1 }}>Notes</Text>
+                <Text sx={{ flex: 1 }}>Consensus Check</Text>
               </Box>
               <Box sx={{ fontSize: "0.94em", mb: "12px" }}>
-                Vote on ideas and perspectives about this proposal{" "}
+                Submit comments or suggestions related to this{" "}
+                {zid_metadata.fip_author ? "FIP" : "discussion"} for the community to vote on:
               </Box>
             </Box>
           )}
@@ -185,10 +211,17 @@ export const DashboardConversation = ({
         >
           <Box sx={{ fontWeight: 700 }}>Top Notes</Box>
           <Box>
-            {!refreshInProgress && (
-              <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
-                {reportComments.length === 0 && "See a summary of how people voted on notes:"}
-              </Text>
+            {!refreshInProgress && report && (
+              <Box>
+                <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
+                  {reportComments.length === 0 && "See a summary of how people voted on notes:"}
+                </Text>
+                {reportComments.length === 0 && (
+                  <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+                    No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+                  </Box>
+                )}
+              </Box>
             )}
             {!refreshInProgress &&
               reportComments.map((c: ReportComment) => (
@@ -197,7 +230,7 @@ export const DashboardConversation = ({
             <Text
               sx={{
                 fontSize: "0.9em",
-                mt: "10px",
+                mt: "20px",
                 color: "#9f9e9b",
                 fontWeight: 500,
                 textAlign: "center",

@@ -378,10 +378,12 @@ const ConversationListItem = ({
                       if (conversation.is_hidden) {
                         if (!confirm("Show this proposal to users again?")) return
                         dispatch(handleUnmoderateConversation(conversation.conversation_id))
+                        toast.success("Removed from spam")
                       } else {
                         if (!confirm("Mark as spam? This will hide the proposal from users."))
                           return
                         dispatch(handleModerateConversation(conversation.conversation_id))
+                        toast.success("Moved to spam")
                       }
                     }}
                   >

@@ -46,7 +46,8 @@ export default {
     mediumGray: "#8f8f8f",
     lightGray: "#afafaf",
     lighterGray: "#e2ddd5",
-    bgGray: "#f7f0e3",
+    bgGray: "#ede4d1",
+    bgGrayActive: "#e7dec8",
     bgOffWhite: "#fbf7f1",
     primaryActive: "#4e65bd",
     secondaryActive: "#e0e4e7",
@@ -188,14 +189,16 @@ export default {
     },
   },
   buttons: {
-    text: {
-      bg: "transparent",
+    vote: {
+      bg: "bgGray",
       color: "text",
       cursor: "pointer",
       fontFamily: "body",
       fontSize: "0.96em",
+      fontWeight: 500,
+      borderRadius: 8,
       "&:hover": {
-        backgroundColor: "bgGray",
+        backgroundColor: "bgGrayActive",
         color: "textDark",
       },
       pb: [0, 1],
