@@ -42,13 +42,15 @@ export const DashboardUserButton = () => {
         right: [4],
         px: "12px",
         py: "5px",
+        borderRadius: "8px",
+        fontSize: "0.94em",
         fontWeight: 500,
         opacity: 0.98,
         alignItems: "center",
       }}
       href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
     >
-      Github Login
+      Sign in with Github
     </Link>
   )
 }

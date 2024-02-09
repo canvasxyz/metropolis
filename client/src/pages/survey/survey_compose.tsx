@@ -141,7 +141,7 @@ const SurveyComposeBox = ({
           variant="primary"
           sx={{
             mt: [1],
-            py: "6px",
+            py: "4px",
             px: "10px",
             minWidth: "100px",
             fontSize: "0.98em",

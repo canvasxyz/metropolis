@@ -39,26 +39,9 @@ const SurveyCards = ({
   }, [votedComments.length])
 
   return (
-    <Box sx={{ position: "relative", minHeight: "170px" }}>
+    <Box sx={{ position: "relative", minHeight: "120px" }}>
       {unvotedComments.length > 0 && (
         <Box sx={{ position: "relative" }}>
-          <Box
-            sx={{
-              display: "flex",
-              fontSize: "0.94em",
-              fontWeight: 700,
-            }}
-          >
-            <Text sx={{ flex: 1 }}>Notes</Text>
-          </Box>
-          <Box sx={{ fontSize: "0.94em", mb: "12px" }}>
-            Vote on ideas and perspectives about this proposal{" "}
-            {unvotedComments.length > 0 && (
-              <React.Fragment>
-                ({unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining)
-              </React.Fragment>
-            )}
-          </Box>
           <Box sx={{ position: "relative" }} ref={cardsBoxRef}>
             {unvotedComments[0] && (
               <SurveyCard
@@ -83,16 +66,16 @@ const SurveyCards = ({
                       transition: "0.2s ease-in-out",
                       transform:
                         index === 0
-                          ? "rotate(-0.25deg)"
+                          ? "rotate(-0.15deg)"
                           : index === 1
-                          ? "rotate(0.25deg) translate(2px, 0)"
+                          ? "rotate(0.15deg) translate(2px, 0)"
                           : index === 2
-                          ? "rotate(-0.65deg)"
+                          ? "rotate(-0.25deg)"
                           : index === 3
-                          ? "rotate(0.65deg translate(-3px, 0))"
+                          ? "rotate(0.25deg translate(-3px, 0))"
                           : index === 4
-                          ? "rotate(-1deg translate(-1px, 0))"
-                          : "rotate(1deg)",
+                          ? "rotate(-0.5deg translate(-1px, 0))"
+                          : "rotate(0.5deg)",
                     }}
                   >
                     <SurveyCard
@@ -106,11 +89,16 @@ const SurveyCards = ({
                 )
               })}
           </Box>
+          <Box sx={{ position: "absolute", top: [3], right: [4], fontSize: "0.94em" }}>
+            {unvotedComments.length > 0 && (
+              <Box>{unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining</Box>
+            )}
+          </Box>
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
         <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-          No notes on this proposal yet.
+          No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
         </Box>
       )}
 

@@ -148,6 +148,22 @@ export const DashboardConversation = ({
           }}
         >
           {zid_metadata.fip_author && <SentimentCheck />}
+          {zid_metadata.fip_author && (
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  fontSize: "0.94em",
+                  fontWeight: 700,
+                }}
+              >
+                <Text sx={{ flex: 1 }}>Notes</Text>
+              </Box>
+              <Box sx={{ fontSize: "0.94em", mb: "12px" }}>
+                Vote on ideas and perspectives about this proposal{" "}
+              </Box>
+            </Box>
+          )}
           <Survey
             key={zid_metadata.conversation_id}
             match={{
@@ -156,36 +172,22 @@ export const DashboardConversation = ({
           />
         </Box>
       </Box>
-      <Box
-        sx={{
-          width: "100%",
-          position: "relative",
-          borderTop: "1px solid #e2ddd5",
-          pb: [6],
-        }}
-      >
+      <Box>
         <Box
           sx={{
             margin: "0 auto",
             maxWidth: "960px",
             px: [5],
             py: [2],
-            mt: [4],
+            pb: [4],
             lineHeight: 1.45,
           }}
         >
-          <Heading as="h2">Report</Heading>
-          <Box sx={{ mt: [4] }}>
+          <Box sx={{ fontWeight: 700 }}>Report</Box>
+          <Box>
             {!refreshInProgress && (
-              <Text
-                sx={{
-                  fontSize: "0.9em",
-                  mb: "10px",
-                  color: "#9f9e9b",
-                  fontWeight: 500,
-                }}
-              >
-                {reportComments.length > 0 ? "Here are the top notes so far:" : "No notes yet. "}
+              <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
+                {reportComments.length === 0 && "See a summary of how people voted on notes:"}
               </Text>
             )}
             {!refreshInProgress &&

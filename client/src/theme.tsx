@@ -22,7 +22,7 @@ export default {
       position: "absolute",
       right: 0,
       mt: [2],
-      width: "150px",
+      minWidth: "150px",
       origin: "top-right",
       borderRadius: "8px",
       zIndex: 9999,

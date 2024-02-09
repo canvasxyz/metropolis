@@ -293,7 +293,7 @@ const ConversationListItem = ({
     }}
     key={conversation.conversation_id}
   >
-    <Text sx={{ fontWeight: 500 }}>
+    <Text sx={{ fontWeight: 500, lineHeight: 1.18 }}>
       {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
@@ -339,7 +339,7 @@ const ConversationListItem = ({
             <TbDots />
           </Menu.Button>
           <Menu.Items as={Box}>
-            <Box variant="boxes.menu">
+            <Box variant="boxes.menu" sx={{ width: "190px" }}>
               <Menu.Item>
                 <Box
                   variant="boxes.menuitem"
@@ -354,7 +354,7 @@ const ConversationListItem = ({
                   variant="boxes.menuitem"
                   onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
                 >
-                  <TbHammer /> Moderate
+                  <TbHammer /> Moderate comments
                 </Box>
               </Menu.Item>
               {user.githubRepoCollaborator && (

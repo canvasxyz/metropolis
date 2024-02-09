@@ -63,22 +63,26 @@ const Index = ({ user }: { user? }) => {
               Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas, using
               collaborative polling and advanced statistics.
             </Text>
-            {!!user?.email || !!user?.githubUserId || !!user?.xInfo ? (
-              <Box sx={{ mt: [6] }}>
-                <RouterLink sx={{ variant: "links.buttonBlack", px: [4] }} to="/dashboard">
-                  Go to application
-                </RouterLink>
-              </Box>
-            ) : (
-              <Box sx={{ mt: [4] }}>
+            <Box sx={{ mt: 4 }}>
+              <RouterLink
+                sx={{
+                  variant: "links.buttonBlack",
+                  px: [4],
+                  mr: [2],
+                }}
+                to="/dashboard"
+              >
+                Go to app
+              </RouterLink>
+              {!user?.email && !user?.githubUserId && !user?.xInfo && (
                 <Link
                   sx={{ variant: "links.buttonBlack", lineHeight: 3 }}
                   href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
                 >
                   Sign in with Github
                 </Link>
-              </Box>
-            )}
+              )}
+            </Box>
           </Box>
         </Box>
         <Box
