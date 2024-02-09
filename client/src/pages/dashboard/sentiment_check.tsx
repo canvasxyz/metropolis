@@ -9,6 +9,15 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
   const [opposed, setOpposed] = useState([])
   const [neutral, setNeutral] = useState([])
 
+  const isSupported = supported.find((u) => u === user.githubUsername)
+  const isOpposed = opposed.find((u) => u === user.githubUsername)
+  const isNeutral = neutral.find((u) => u === user.githubUsername)
+
+  const activeStyles = { opacity: 0.7, pointerEvents: "none" }
+  const supportedStyles = isSupported ? activeStyles : {}
+  const opposedStyles = isOpposed ? activeStyles : {}
+  const neutralStyles = isNeutral ? activeStyles : {}
+
   const voteSupport = (e) => {
     e.preventDefault()
     if (supported.find((u) => u === user.githubUsername)) {
@@ -56,10 +65,11 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
             bg: "mediumGreen",
             "&:hover": { bg: "mediumGreenActive" },
             mr: "8px",
+            ...supportedStyles,
           }}
           onClick={voteSupport}
         >
-          Support
+          {isSupported ? "Support (selected)" : "Support"}
         </Button>
         <Box sx={{ fontSize: "0.94em", mt: [2] }}>{supported.length} supporting</Box>
       </Box>
@@ -76,10 +86,11 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
             fontWeight: 500,
             bg: "mediumRed",
             "&:hover": { bg: "mediumRedActive" },
+            ...opposedStyles,
           }}
           onClick={voteOppose}
         >
-          Oppose
+          {isOpposed ? "Oppose (selected)" : "Oppose"}
         </Button>
         <Box sx={{ fontSize: "0.94em", mt: [2] }}>{opposed.length} against</Box>
       </Box>
@@ -96,10 +107,11 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
             fontWeight: 500,
             bg: "mediumGray",
             "&:hover": { bg: "mediumGrayActive" },
+            ...neutralStyles,
           }}
           onClick={voteNeutral}
         >
-          Neutral
+          {isNeutral ? "Neutral (selected)" : "Neutral"}
         </Button>
         <Box sx={{ fontSize: "0.94em", mt: [2] }}>{neutral.length} neutral</Box>
       </Box>
