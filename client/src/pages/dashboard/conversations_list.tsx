@@ -103,6 +103,7 @@ const ConversationsList = ({
   const archivedConversations = conversations.filter(
     (conversation) => conversation.is_archived && !conversation.is_hidden,
   )
+  const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
 
   let conversationsToDisplay: ConversationSummary[]
   if (selectedConversations === "all-fip") {
@@ -120,7 +121,6 @@ const ConversationsList = ({
   } else if (selectedConversations === "archived") {
     conversationsToDisplay = archivedConversations
   } else if (selectedConversations === "hidden") {
-    const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
     conversationsToDisplay = hiddenConversations
   } else {
     conversationsToDisplay = []
@@ -379,8 +379,7 @@ const ConversationListItem = ({
                 </Menu.Item>
               )}
               {user &&
-                (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) &&
-                !conversation.github_pr_title && (
+                (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
                   <Menu.Item>
                     <Box
                       variant="boxes.menuitem"

@@ -6735,7 +6735,7 @@ function generateAndReplaceZinvite(zid: any, generateShortZinvite: any) {
   });
 }
 
-function handle_POST_conversation_close(
+async function handle_POST_conversation_close(
   req: { p: { zid: any; uid?: any } },
   res: {
     status: (arg0: number) => {
@@ -6747,7 +6747,7 @@ function handle_POST_conversation_close(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isAdministrator(req.p.uid)) {
+  if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
@@ -6773,7 +6773,7 @@ function handle_POST_conversation_close(
     });
 }
 
-function handle_POST_conversation_reopen(
+async function handle_POST_conversation_reopen(
   req: { p: { zid: any; uid?: any } },
   res: {
     status: (arg0: number) => {
@@ -6785,7 +6785,7 @@ function handle_POST_conversation_reopen(
 ) {
   let q = "select * from conversations where zid = ($1)";
   let params = [req.p.zid];
-  if (!isAdministrator(req.p.uid)) {
+  if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
     q = q + " and owner = ($2)";
     params.push(req.p.uid);
   }
