@@ -97,7 +97,12 @@ const ConversationsList = ({
     (conversation) =>
       conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
   )
-  const allConversations = openConversations.concat(nonFIPConversations)
+  const allConversations = conversations.filter(
+    (conversation) => !conversation.is_archived && !conversation.is_hidden,
+  )
+  const archivedConversations = conversations.filter(
+    (conversation) => conversation.is_archived && !conversation.is_hidden,
+  )
 
   let conversationsToDisplay: ConversationSummary[]
   if (selectedConversations === "all-fip") {
@@ -113,9 +118,6 @@ const ConversationsList = ({
   } else if (selectedConversations === "non-fip") {
     conversationsToDisplay = nonFIPConversations
   } else if (selectedConversations === "archived") {
-    const archivedConversations = conversations.filter(
-      (conversation) => conversation.is_archived && !conversation.is_hidden,
-    )
     conversationsToDisplay = archivedConversations
   } else if (selectedConversations === "hidden") {
     const hiddenConversations = conversations.filter((conversation) => conversation.is_hidden)
@@ -142,7 +144,7 @@ const ConversationsList = ({
           : selectedConversations === "open-fip"
           ? "Open FIPs"
           : selectedConversations === "non-fip"
-          ? "Discussions"
+          ? "Open Discussions"
           : selectedConversations === "archived"
           ? "Closed"
           : selectedConversations === "hidden"
@@ -159,7 +161,7 @@ const ConversationsList = ({
               </Box>
             </Menu.Button>
             <Menu.Items as={Box}>
-              <Box variant="boxes.menu">
+              <Box variant="boxes.menu" sx={{ width: "180px" }}>
                 <Menu.Item>
                   <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("all-fip")}>
                     All
@@ -175,7 +177,7 @@ const ConversationsList = ({
                 </Menu.Item>
                 <Menu.Item>
                   <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
-                    Discussions ({nonFIPConversations.length})
+                    Open Discussions ({nonFIPConversations.length})
                   </Box>
                 </Menu.Item>
                 <Menu.Item>
@@ -183,7 +185,7 @@ const ConversationsList = ({
                     variant="boxes.menuitem"
                     onClick={() => setSelectedConversations("archived")}
                   >
-                    Closed
+                    Closed ({archivedConversations.length})
                   </Box>
                 </Menu.Item>
                 <Menu.Item>
