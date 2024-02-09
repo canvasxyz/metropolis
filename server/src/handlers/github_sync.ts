@@ -357,6 +357,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       repoCollaboratorIds = new Set(response);
     }
 
+    let fipsUpdated = 0;
+    let fipsCreated = 0;
+
     for (const pull of pulls) {
       if (!pull.user) {
         continue;
@@ -431,6 +434,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
           // update conversation
           await updateConversationPrAndFip({ ...prFields, ...fipFields });
+          fipsUpdated++;
         } else {
           console.log(
             `[${pull.head?.label}] closing conversation with PR #${pull.number}`,
@@ -471,6 +475,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           console.log(
             `[${pull.head?.label}] created polis conversation for PR #${pull.number}`,
           );
+
+          fipsCreated++;
 
           // const welcomeMessage = getWelcomeMessage(
           //   getServerNameWithProtocol(req),
@@ -516,6 +522,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     res.json({
       existingFips: existingFipFilenames.size,
       openPulls: pulls.length,
+      fipsUpdated,
+      fipsCreated,
     });
   } catch (err) {
     console.error(err);

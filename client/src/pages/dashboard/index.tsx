@@ -30,11 +30,14 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
     toast.success("Getting updates from Github...")
     api
       .post("api/v3/github_sync", {})
-      .then(({ existingFips, openPulls }) => {
-        toast.success(`Found ${existingFips} existing FIPs, ${openPulls} new FIPs`)
+      .then(({ existingFips, openPulls, fipsUpdated, fipsCreated }) => {
+        toast.success(`Found ${existingFips} existing FIPs, ${openPulls} open FIP PRs`)
         setTimeout(() => {
-          location.reload()
-        }, 1500)
+          toast.success(`Updated ${fipsUpdated} FIPs, synced ${fipsCreated} new FIPs`)
+          setTimeout(() => {
+            location.reload()
+          }, 2000)
+        }, 2000)
       })
       .fail((error) => {
         toast.error("Sync error")

@@ -209,24 +209,25 @@ const ConversationsList = ({
           />
         ))}
       </Box>
-      {selectedConversations === "open-fip" && (
+      {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
         <Button
           variant={"buttons.outline"}
           sx={{
             px: [2],
             py: [1],
             mr: [1],
-            mb: [1],
+            mb: [2],
             position: "absolute",
-            bottom: [2],
+            bottom: [6],
             right: "11px",
+            width: "calc(100% - 32px)",
             fontSize: "0.94em",
             fontWeight: 500,
           }}
           onClick={() => syncPRs()}
         >
           {syncInProgress ? <Spinner size={25} /> : <TbRefresh />}{" "}
-          {syncInProgress ? "Syncing..." : "Sync PRs"}
+          {syncInProgress ? "Syncing..." : "Sync with Github"}
         </Button>
       )}
       {

@@ -185,9 +185,7 @@ export const DashboardConversation = ({
                   fontWeight: 500,
                 }}
               >
-                {reportComments.length > 0
-                  ? "Here are the top comments so far:"
-                  : "No comments yet. "}
+                {reportComments.length > 0 ? "Here are the top notes so far:" : "No notes yet. "}
               </Text>
             )}
             {!refreshInProgress &&
