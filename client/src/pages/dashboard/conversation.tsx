@@ -183,7 +183,7 @@ export const DashboardConversation = ({
             lineHeight: 1.45,
           }}
         >
-          <Box sx={{ fontWeight: 700 }}>Report</Box>
+          <Box sx={{ fontWeight: 700 }}>Top Notes</Box>
           <Box>
             {!refreshInProgress && (
               <Text sx={{ mb: "10px", fontSize: "0.94em" }}>

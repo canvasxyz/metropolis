@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from "react"
+import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
 import { Link as RouterLink } from "react-router-dom"
@@ -85,10 +86,6 @@ const ConversationsList = ({
     hist.push(`/dashboard/c/${conversationId}`)
   }, [])
 
-  if (data === null) {
-    return <React.Fragment></React.Fragment>
-  }
-
   const nonFIPConversations = conversations.filter(
     (conversation) =>
       !conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
@@ -124,6 +121,20 @@ const ConversationsList = ({
     conversationsToDisplay = hiddenConversations
   } else {
     conversationsToDisplay = []
+  }
+
+  useEffect(() => {
+    if (
+      selectedConversations.length &&
+      selectedConversationId === null &&
+      conversationsToDisplay.length > 0
+    ) {
+      hist.push(`/dashboard/c/${conversationsToDisplay[0].conversation_id}`)
+    }
+  }, [selectedConversationId, selectedConversations.length, conversationsToDisplay.length])
+
+  if (data === null) {
+    return <React.Fragment></React.Fragment>
   }
 
   return (
@@ -198,7 +209,7 @@ const ConversationsList = ({
           </Menu>
         </Box>
       </Box>
-      <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll" }}>
+      <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll", pb: "70px" }}>
         {conversationsToDisplay.map((conversation) => (
           <ConversationListItem
             hist={hist}
