@@ -3,11 +3,12 @@
 import React, { useState } from "react"
 import { Button, Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
+import { useLocalStorage } from "@uidotdev/usehooks"
 
 export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
-  const [supported, setSupported] = useState([])
-  const [opposed, setOpposed] = useState([])
-  const [neutral, setNeutral] = useState([])
+  const [supported, setSupported] = useLocalStorage("sentiment-supported", [])
+  const [opposed, setOpposed] = useLocalStorage("sentiment-opposed", [])
+  const [neutral, setNeutral] = useLocalStorage("sentiment-neutral", [])
 
   const isSupported = supported.find((u) => u === user.githubUsername)
   const isOpposed = opposed.find((u) => u === user.githubUsername)
