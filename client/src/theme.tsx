@@ -227,7 +227,7 @@ export default {
         bg: "primaryActive",
       },
       opacity: 0.4,
-      pointerEvents: "none",
+      pointerEvents: "none" as any,
     },
     secondary: {
       color: "background",

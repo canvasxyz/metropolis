@@ -7,7 +7,7 @@ const Footer = ({ inSurvey }: { inSurvey: boolean }) => {
   return (
     <Box
       sx={{
-        textAlign: inSurvey ? "center" : "",
+        textAlign: inSurvey ? "center" : undefined,
         px: [4, 5],
       }}
     >

@@ -64,7 +64,7 @@ const Collapsible = ({
       {shouldCollapse && (
         <Link
           href="#"
-          onClick={(e) => {
+          onClick={(e: any) => {
             e.target.previousElementSibling.scrollTop = 0
             setCollapsed(!collapsed)
           }}

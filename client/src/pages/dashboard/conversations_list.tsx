@@ -309,7 +309,7 @@ const ConversationListItem = ({
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
     </Text>
-    <Flex sx={{ direction: "row", mt: [1] }}>
+    <Flex sx={{ direction: "ltr", mt: [1] }}>
       <Text sx={{ color: "#84817D", fontSize: "90%" }}>
         {conversation.fip_created && conversation.github_pr_id ? (
           <Text>

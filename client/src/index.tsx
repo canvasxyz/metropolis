@@ -2,8 +2,9 @@
 
 import $ from "jquery"
 
-import React from "react"
-import ReactDOM from "react-dom"
+import React, { FunctionComponent } from "react"
+import { RouteComponentProps } from "react-router"
+import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { BrowserRouter as Router, Route } from "react-router-dom"
 import { IconContext } from "react-icons"
@@ -13,7 +14,6 @@ import theme from "./theme"
 import App from "./app"
 import { store } from "./store"
 
-
 class Root extends React.Component {
   render() {
     return (
@@ -21,7 +21,10 @@ class Root extends React.Component {
         <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
           <Provider store={store}>
             <Router>
-              <Route render={(routeProps) => <App {...routeProps} />}></Route>
+              <Route render={(routeProps) => {
+                const App2 = App as any
+                return <App2 {...routeProps} />
+              }}></Route>
             </Router>
           </Provider>
         </IconContext.Provider>
@@ -33,4 +36,6 @@ class Root extends React.Component {
 // @ts-expect-error global jquery
 window.$ = $
 
-ReactDOM.render(<Root />, document.getElementById("root"))
+const container = document.getElementById("root")
+const root = createRoot(container!)
+root.render(<Root />)

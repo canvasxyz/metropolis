@@ -127,7 +127,7 @@ export const DashboardConversation = ({
           {!zid_metadata.fip_title && !zid_metadata.github_pr_title && (
             <Text sx={{ fontSize: "0.94em" }}>
               Created by{" "}
-              <Text
+              <Link
                 variant="links.a"
                 as="a"
                 target="_blank"
@@ -135,7 +135,7 @@ export const DashboardConversation = ({
                 href={`https://github.com/${zid_metadata.github_username}`}
               >
                 {zid_metadata.github_username}
-              </Text>
+              </Link>
             </Text>
           )}
           <Frontmatter zid_metadata={zid_metadata} />
@@ -229,7 +229,7 @@ export const DashboardConversation = ({
               reportComments.map((c: ReportComment) => (
                 <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
               ))}
-            <Text
+            <Box
               sx={{
                 fontSize: "0.9em",
                 mt: "20px",
@@ -255,7 +255,7 @@ export const DashboardConversation = ({
                   Refresh report
                 </Text>
               )}
-            </Text>
+            </Box>
           </Box>
         </Box>
       </Box>
@@ -273,7 +273,7 @@ const ReportCommentRow = ({
   const { agree_count, disagree_count, pass_count, tid, txt } = reportComment
   const row = { display: "flex" }
   const bar = { px: "1px", py: "2px", lineHeight: 1.2 }
-  const text = { display: "inline-block", fontSize: "0.88em", position: "relative", left: "4px" }
+  const text = { display: "inline-block", fontSize: "0.88em", left: "4px" }
 
   return (
     <Box key={tid}>

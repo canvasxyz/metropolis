@@ -108,7 +108,16 @@ module.exports = (env, options) => {
         },
         {
           test: /\.mdx?$/,
-          use: ["babel-loader", "@mdx-js/loader"],
+          use: [
+            "babel-loader",
+            {
+              loader: "@mdx-js/loader",
+              /** @type {import('@mdx-js/loader').Options} */
+              options: {
+                providerImportSource: "@mdx-js/react",
+              },
+            },
+          ],
         },
       ],
     },

@@ -149,8 +149,8 @@ const Index = ({ user }: { user? }) => {
           <Link
             href="https://forum.effectivealtruism.org/posts/9jxBki5YbS7XTnyQy/polis-why-and-how-to-use-it"
             target="_blank"
-            noreferrer
-            noopener
+            noreferrer="noreferrer"
+            noopener="noopener"
           >
             Polis
           </Link>
@@ -172,8 +172,8 @@ const Index = ({ user }: { user? }) => {
             }}
             href="https://gwern.net/doc/sociology/2021-small.pdf"
             target="_blank"
-            noopener
-            noreferrer
+            noreferrer="noreferrer"
+            noopener="noopener"
           >
             Read the Polis paper
           </Link>
@@ -187,8 +187,8 @@ const Index = ({ user }: { user? }) => {
             }}
             href="https://compdemocracy.org/Case-studies/"
             target="_blank"
-            noopener
-            noreferrer
+            noreferrer="noreferrer"
+            noopener="noopener"
           >
             Polis case studies
           </Link>
