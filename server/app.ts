@@ -122,11 +122,16 @@ import {
   handle_PUT_reports,
   handle_PUT_users,
 } from "./src/server";
+
 import {
   handle_GET_github_init,
   handle_GET_github_oauth_callback,
 } from "./src/handlers/github_auth";
-import { handle_POST_github_sync } from "./src/handlers/github_sync";
+
+import {
+  handle_GET_github_syncs,
+  handle_POST_github_sync,
+} from "./src/handlers/github_sync";
 
 import {
   assignToP,
@@ -996,10 +1001,7 @@ app.post(
   handle_POST_conversations,
 );
 
-app.get(
-  "/api/v3/conversations_summary",
-  handle_GET_conversations_summary
-);
+app.get("/api/v3/conversations_summary", handle_GET_conversations_summary);
 
 app.post(
   "/api/v3/query_participants_by_metadata",
@@ -1041,6 +1043,8 @@ app.post(
   // auth(assignToP),
   handle_POST_github_sync,
 );
+
+app.get("/api/v3/github_syncs", handle_GET_github_syncs);
 
 app.get(
   "/api/v3/locations",

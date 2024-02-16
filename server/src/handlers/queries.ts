@@ -180,3 +180,15 @@ export async function updateConversationPr(data: PrFields) {
   ];
   return await queryP(query, values);
 }
+
+export async function insertSyncRecord() {
+  const query = `INSERT INTO github_syncs (fips_synced, prs_synced, discussions_synced) VALUES ($1, $2, $3);`;
+  const values = [0, 0, 0];
+  return await queryP(query, values);
+}
+
+export async function getLatestSync() {
+  const query = `SELECT * FROM github_syncs ORDER BY ts DESC LIMIT 1;`;
+  const rows = await queryP(query);
+  return rows[0];
+}

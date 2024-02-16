@@ -23,6 +23,8 @@ import {
   insertConversationPrAndFip,
   updateConversationPr,
   updateConversationPrAndFip,
+  insertSyncRecord,
+  getLatestSync,
 } from "./queries";
 
 const getServerNameWithProtocol = Config.getServerNameWithProtocol;
@@ -519,6 +521,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       }
     }
 
+    await insertSyncRecord();
+
     res.json({
       existingFips: existingFipFilenames.size,
       openPulls: pulls.length,
@@ -529,4 +533,13 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     console.error(err);
     res.status(500).send((err as any).message);
   }
+}
+
+export async function handle_GET_github_syncs(req: Request, res: Response) {
+  const latest = await getLatestSync();
+
+  res.json({
+    success: true,
+    latest,
+  });
 }
