@@ -4,7 +4,8 @@
     "node": "18.x"
   },
   "scripts": {
-    "dev": "run-pty % npm run client:dev % npm run server:build:dev % npm run server:start:dev",
+    "dev": "run-pty % npm run client:dev % npm run server:build:dev % npm run server:start:dev % npm run math:dev",
+    "math:dev": "source .env && cd math && clojure -M:run full",
     "client:dev": "npm run dev --workspace=client",
     "server:build:dev": "npm run build:dev --workspace=server",
     "server:start:dev": "npm run start:dev --workspace=server",
