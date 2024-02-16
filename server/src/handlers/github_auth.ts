@@ -21,7 +21,7 @@ export function handle_GET_github_init(
   req: { p: { dest: string; owner: string } },
   res: { redirect: (arg0: string) => void },
 ) {
-  let dest = req.p.dest;
+  let dest = req.p.dest.replace(/\/dashboard\/.*/, "/dashboard");
   const clientId = process.env.GH_APP_CLIENT_ID;
   const redirectUri = `${Config.getServerUrl()}/api/v3/github_oauth_callback?dest=${dest}`;
   const githubAuthorizeUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&redirect_uri=${encodeURIComponent(
