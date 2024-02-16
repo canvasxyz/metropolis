@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
-import { Link as RouterLink } from "react-router-dom"
 import {
   TbChevronDown,
   TbDots,
@@ -33,28 +32,6 @@ import {
   handleCloseConversation,
   handleReopenConversation,
 } from "../../actions"
-
-const Badge = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Box
-      sx={{
-        ml: "2px",
-        display: "inline-block",
-        fontSize: "0.82em",
-        padding: "1px 5px",
-        bg: "primaryActive",
-        borderRadius: 99,
-        color: "#fbf5e9",
-        minWidth: 21,
-        textAlign: "center",
-        position: "relative",
-        top: "-1px",
-      }}
-    >
-      {children}
-    </Box>
-  )
-}
 
 type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
 

@@ -68,8 +68,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 type AppPropTypes = PropsFromRedux & {
   dispatch: AppDispatch
   location: { pathname: string }
-  pending: boolean
-  status: number
+  pending?: boolean
+  status?: number
 }
 
 class App extends React.Component<

@@ -1,18 +1,17 @@
 /** @jsx jsx */
 
-import React, { useState } from "react"
-import { Button, Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
-import { Link as RouterLink, useHistory } from "react-router-dom"
+import React from "react"
+import { Button, Box, Flex, jsx } from "theme-ui"
 import { useLocalStorage } from "@uidotdev/usehooks"
 
-export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
+export const SentimentCheck: React.FC<{ user }> = ({ user }: { user: { githubUsername: string } }) => {
   const [supported, setSupported] = useLocalStorage("sentiment-supported", [])
   const [opposed, setOpposed] = useLocalStorage("sentiment-opposed", [])
   const [neutral, setNeutral] = useLocalStorage("sentiment-neutral", [])
 
-  const isSupported = supported.find((u) => u === user.githubUsername)
-  const isOpposed = opposed.find((u) => u === user.githubUsername)
-  const isNeutral = neutral.find((u) => u === user.githubUsername)
+  const isSupported = supported.find((u: string) => u === user.githubUsername)
+  const isOpposed = opposed.find((u: string) => u === user.githubUsername)
+  const isNeutral = neutral.find((u: string) => u === user.githubUsername)
 
   const activeStyles = { opacity: 0.7, pointerEvents: "none" }
   const supportedStyles = isSupported ? activeStyles : {}
@@ -21,32 +20,32 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }) => {
 
   const voteSupport = (e) => {
     e.preventDefault()
-    if (supported.find((u) => u === user.githubUsername)) {
-      setSupported(supported.filter((u) => u !== user.githubUsername))
+    if (supported.find((u: string) => u === user.githubUsername)) {
+      setSupported(supported.filter((u: string) => u !== user.githubUsername))
     } else {
       setSupported([...supported, user.githubUsername])
-      setOpposed(opposed.filter((u) => u !== user.githubUsername))
-      setNeutral(neutral.filter((u) => u !== user.githubUsername))
+      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
+      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
     }
   }
   const voteOppose = (e) => {
     e.preventDefault()
-    if (opposed.find((u) => u === user.githubUsername)) {
-      setOpposed(opposed.filter((u) => u !== user.githubUsername))
+    if (opposed.find((u: string) => u === user.githubUsername)) {
+      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
     } else {
       setOpposed([...opposed, user.githubUsername])
-      setSupported(supported.filter((u) => u !== user.githubUsername))
-      setNeutral(neutral.filter((u) => u !== user.githubUsername))
+      setSupported(supported.filter((u: string) => u !== user.githubUsername))
+      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
     }
   }
   const voteNeutral = (e) => {
     e.preventDefault()
-    if (neutral.find((u) => u === user.githubUsername)) {
-      setNeutral(neutral.filter((u) => u !== user.githubUsername))
+    if (neutral.find((u: string) => u === user.githubUsername)) {
+      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
     } else {
       setNeutral([...neutral, user.githubUsername])
-      setOpposed(opposed.filter((u) => u !== user.githubUsername))
-      setSupported(supported.filter((u) => u !== user.githubUsername))
+      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
+      setSupported(supported.filter((u: string) => u !== user.githubUsername))
     }
   }
 

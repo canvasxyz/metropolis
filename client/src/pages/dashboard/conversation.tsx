@@ -2,10 +2,8 @@
 
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { Button, Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
+import { Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"

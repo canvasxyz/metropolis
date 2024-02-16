@@ -21,8 +21,7 @@ class Root extends React.Component {
           <Provider store={store}>
             <Router>
               <Route render={(routeProps) => {
-                const App2 = App as any
-                return <App2 {...routeProps} />
+                return <App {...routeProps} />
               }}></Route>
             </Router>
           </Provider>

@@ -15,7 +15,7 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 type CreateUserProps = PropsFromRedux & {
   location: UrlObject
   dispatch: AppDispatch
-  pending: boolean
+  pending?: boolean
   authed: boolean
   signInSuccessful: boolean
 }
