@@ -23,7 +23,7 @@ const splitAuthors = (authorList = "") => {
   return result
 }
 
-const Collapsible = ({
+export const Collapsible = ({
   title,
   content,
   shouldCollapse,

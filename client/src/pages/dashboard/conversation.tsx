@@ -10,7 +10,7 @@ import remarkGfm from "remark-gfm"
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
-import { Frontmatter } from "../Frontmatter"
+import { Frontmatter, Collapsible } from "../Frontmatter"
 import Survey, { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
@@ -138,7 +138,18 @@ export const DashboardConversation = ({
               </Link>
             </Text>
           )}
-          <Frontmatter zid_metadata={zid_metadata} />
+          {zid_metadata.fip_author ? (
+            <Frontmatter zid_metadata={zid_metadata} />
+          ) : (
+            zid_metadata.description && (
+              <Collapsible
+                title={zid_metadata.fip_title}
+                key={zid_metadata.conversation_id}
+                shouldCollapse={zid_metadata.description?.length > 300}
+                content={zid_metadata.description}
+              ></Collapsible>
+            )
+          )}
         </Flex>
         <Box
           sx={{
@@ -175,8 +186,8 @@ export const DashboardConversation = ({
               <SentimentCheck user={user} />
             </Box>
           )}
-          {zid_metadata.fip_author && (
-            <Box>
+          {!zid_metadata.fip_author && (
+            <Box sx={{}}>
               <Box
                 sx={{
                   display: "flex",
@@ -190,73 +201,60 @@ export const DashboardConversation = ({
                 Submit comments or suggestions related to this{" "}
                 {zid_metadata.fip_author ? "FIP" : "discussion"} for the community to vote on:
               </Box>
-            </Box>
-          )}
-          <Survey
-            key={zid_metadata.conversation_id}
-            match={{
-              params: { conversation_id: zid_metadata.conversation_id },
-            }}
-          />
-        </Box>
-      </Box>
-      <Box>
-        <Box
-          sx={{
-            margin: "0 auto",
-            maxWidth: "960px",
-            px: [5],
-            py: [2],
-            pb: [4],
-            lineHeight: 1.45,
-          }}
-        >
-          <Box sx={{ fontWeight: 700 }}>Top Notes</Box>
-          <Box>
-            {!refreshInProgress && report && (
+              <Survey
+                key={zid_metadata.conversation_id}
+                match={{
+                  params: { conversation_id: zid_metadata.conversation_id },
+                }}
+              />
+              <Box sx={{ fontWeight: 700 }}>Top Notes</Box>
               <Box>
-                <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
-                  {reportComments.length === 0 && "See a summary of how people voted on notes:"}
-                </Text>
-                {reportComments.length === 0 && (
-                  <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-                    No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+                {!refreshInProgress && report && (
+                  <Box>
+                    <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
+                      {reportComments.length === 0 && "See a summary of how people voted on notes:"}
+                    </Text>
+                    {reportComments.length === 0 && (
+                      <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+                        No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+                      </Box>
+                    )}
                   </Box>
                 )}
+                {!refreshInProgress &&
+                  reportComments.map((c: ReportComment) => (
+                    <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
+                  ))}
+                <Box
+                  sx={{
+                    fontSize: "0.9em",
+                    mt: "20px",
+                    color: "#9f9e9b",
+                    fontWeight: 500,
+                    textAlign: "center",
+                  }}
+                >
+                  {!report && (
+                    <Text as="span" variant="links.text" onClick={generateReport}>
+                      Generate Report
+                    </Text>
+                  )}
+                  {report && (
+                    <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
+                      <Text as="span" variant="links.text">
+                        View full report
+                      </Text>
+                    </RouterLink>
+                  )}
+                  {report && (
+                    <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
+                      Refresh report
+                    </Text>
+                  )}
+                </Box>
               </Box>
-            )}
-            {!refreshInProgress &&
-              reportComments.map((c: ReportComment) => (
-                <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
-              ))}
-            <Box
-              sx={{
-                fontSize: "0.9em",
-                mt: "20px",
-                color: "#9f9e9b",
-                fontWeight: 500,
-                textAlign: "center",
-              }}
-            >
-              {!report && (
-                <Text as="span" variant="links.text" onClick={generateReport}>
-                  Generate Report
-                </Text>
-              )}
-              {report && (
-                <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
-                  <Text as="span" variant="links.text">
-                    View full report
-                  </Text>
-                </RouterLink>
-              )}
-              {report && (
-                <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
-                  Refresh report
-                </Text>
-              )}
             </Box>
-          </Box>
+          )}
         </Box>
       </Box>
     </Box>
