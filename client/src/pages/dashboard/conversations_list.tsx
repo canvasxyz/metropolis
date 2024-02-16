@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useState, useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
@@ -16,6 +16,8 @@ import {
 } from "react-icons/tb"
 import { Menu } from "@headlessui/react"
 
+import { formatTime } from "../../util/misc"
+import api from "../../util/api"
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
@@ -71,6 +73,15 @@ const ConversationsList = ({
 }) => {
   const dispatch = useAppDispatch()
   const hist = useHistory()
+  const [lastSync, setLastSync] = useState<number>()
+
+  useEffect(() => {
+    api.get("/api/v3/github_syncs", {}).then((result) => {
+      if (!result.success) return
+      const lastSync = Date.parse(result.latest.ts)
+      setLastSync(lastSync)
+    })
+  }, [])
 
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
@@ -240,7 +251,7 @@ const ConversationsList = ({
           onClick={() => syncPRs()}
         >
           {syncInProgress ? <Spinner size={25} /> : <TbRefresh />}{" "}
-          {syncInProgress ? "Syncing..." : "Sync with Github"}
+          {syncInProgress ? "Syncing..." : `Sync FIPs (Last: ${formatTime(lastSync, true)})`}
         </Button>
       )}
       {
