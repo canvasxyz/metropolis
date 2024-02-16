@@ -17,6 +17,7 @@ export type ConversationSummary = {
   github_pr_title: string | null
   github_pr_id: string | null
   participant_count: number
+  comment_count: number | null
   topic: string | null
   is_archived: boolean
   is_hidden: boolean

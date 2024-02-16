@@ -3,6 +3,7 @@ import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text } from "theme-ui"
 import {
+  TbMessage2,
   TbChevronDown,
   TbDots,
   TbPencil,
@@ -276,7 +277,7 @@ const ConversationListItem = ({
       cursor: "pointer",
       userSelect: "none",
       fontSize: "15px",
-      lineHeight: 1.3,
+      lineHeight: 1.2,
       bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
       "&:hover": {
         bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "bgGrayLight",
@@ -288,7 +289,7 @@ const ConversationListItem = ({
     }}
     key={conversation.conversation_id}
   >
-    <Text sx={{ fontWeight: 500, lineHeight: 1.18 }}>
+    <Text sx={{ fontWeight: 500, mb: [2] }}>
       {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
         <Text sx={{ color: "#84817D" }}>Untitled</Text>
       )}
@@ -297,7 +298,7 @@ const ConversationListItem = ({
       <Text sx={{ color: "#84817D", fontSize: "90%" }}>
         {conversation.fip_created && conversation.github_pr_id ? (
           <Text>
-            <TbGitPullRequest color="#3fba50" /> #{conversation.github_pr_id} opened on{" "}
+            <TbGitPullRequest color="#3fba50" />{" "}
             {(() => {
               const date = new Date(conversation.fip_created)
               return date.toLocaleDateString("en-us", {
@@ -310,7 +311,7 @@ const ConversationListItem = ({
           </Text>
         ) : (
           <Text>
-            Discussion created{" "}
+            <TbMessage2 color="#0090ff" />{" "}
             {(() => {
               const date = new Date(conversation.created)
               return date.toLocaleDateString("en-us", {
@@ -319,7 +320,9 @@ const ConversationListItem = ({
                 day: "numeric",
               })
               // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
-            })()}
+            })()}{" "}
+            &middot; {conversation.comment_count || 0} comment
+            {conversation.comment_count === 1 ? "" : "s"}
           </Text>
         )}
       </Text>
