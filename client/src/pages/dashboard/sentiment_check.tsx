@@ -1,13 +1,22 @@
 /** @jsx jsx */
 
-import React from "react"
+import React, { useState } from "react"
 import { Button, Box, Flex, jsx } from "theme-ui"
 import { useLocalStorage } from "@uidotdev/usehooks"
+import { TbChevronDown, TbChevronUp } from "react-icons/tb"
 
-export const SentimentCheck: React.FC<{ user }> = ({ user }: { user: { githubUsername: string } }) => {
+export const SentimentCheck: React.FC<{ user }> = ({
+  user,
+}: {
+  user: { githubUsername: string }
+}) => {
   const [supported, setSupported] = useLocalStorage("sentiment-supported", [])
   const [opposed, setOpposed] = useLocalStorage("sentiment-opposed", [])
   const [neutral, setNeutral] = useLocalStorage("sentiment-neutral", [])
+
+  const [showSupportingUsers, setShowSupportingUsers] = useState(false)
+  const [showNeutralUsers, setShowNeutralUsers] = useState(false)
+  const [showOpposedUsers, setShowOpposedUsers] = useState(false)
 
   const isSupported = supported.find((u: string) => u === user.githubUsername)
   const isOpposed = opposed.find((u: string) => u === user.githubUsername)
@@ -71,7 +80,31 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }: { user: { githubUse
         >
           {isSupported ? "Support (selected)" : "Support"}
         </Button>
-        <Box sx={{ fontSize: "0.94em", mt: [2] }}>{supported.length} supporting</Box>
+        <Box
+          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
+          onClick={() => {
+            setShowSupportingUsers(!showSupportingUsers)
+          }}
+        >
+          {supported.length} supporting
+          <Box
+            sx={{
+              display: "inline",
+              position: "relative",
+              ml: "2px",
+              top: "2px",
+            }}
+          >
+            {showSupportingUsers ? <TbChevronUp /> : <TbChevronDown />}
+          </Box>
+        </Box>
+        {showSupportingUsers && (
+          <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+            {supported.map((u: string) => (
+              <Box>{u}</Box>
+            ))}
+          </Box>
+        )}
       </Box>
       <Box sx={{ flex: 1, textAlign: "center" }}>
         <Button
@@ -92,7 +125,31 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }: { user: { githubUse
         >
           {isOpposed ? "Oppose (selected)" : "Oppose"}
         </Button>
-        <Box sx={{ fontSize: "0.94em", mt: [2] }}>{opposed.length} against</Box>
+        <Box
+          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
+          onClick={() => {
+            setShowOpposedUsers(!showOpposedUsers)
+          }}
+        >
+          {opposed.length} opposed
+          <Box
+            sx={{
+              display: "inline",
+              position: "relative",
+              ml: "2px",
+              top: "2px",
+            }}
+          >
+            {showOpposedUsers ? <TbChevronUp /> : <TbChevronDown />}
+          </Box>
+          {showOpposedUsers && (
+            <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+              {opposed.map((u: string) => (
+                <Box>{u}</Box>
+              ))}
+            </Box>
+          )}
+        </Box>
       </Box>
       <Box sx={{ flex: 1, textAlign: "center" }}>
         <Button
@@ -113,7 +170,31 @@ export const SentimentCheck: React.FC<{ user }> = ({ user }: { user: { githubUse
         >
           {isNeutral ? "Neutral (selected)" : "Neutral"}
         </Button>
-        <Box sx={{ fontSize: "0.94em", mt: [2] }}>{neutral.length} neutral</Box>
+        <Box
+          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
+          onClick={() => {
+            setShowNeutralUsers(!showNeutralUsers)
+          }}
+        >
+          {neutral.length} neutral
+          <Box
+            sx={{
+              display: "inline",
+              position: "relative",
+              ml: "2px",
+              top: "2px",
+            }}
+          >
+            {showNeutralUsers ? <TbChevronUp /> : <TbChevronDown />}
+          </Box>
+        </Box>
+        {showNeutralUsers && (
+          <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+            {neutral.map((u: string) => (
+              <Box>{u}</Box>
+            ))}
+          </Box>
+        )}
       </Box>
     </Flex>
   )

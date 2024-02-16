@@ -140,8 +140,8 @@ const ConversationsList = ({
               userSelect: "none",
               borderBottom: "1px solid #e2ddd5",
               "&:hover": {
-                background: "bgGrayLight"
-              }
+                background: "bgGrayLight",
+              },
             }}
           >
             {selectedConversations === "all-fip"
@@ -171,10 +171,7 @@ const ConversationsList = ({
               </Box>
             </Menu.Item>
             <Menu.Item>
-              <Box
-                variant="boxes.menuitem"
-                onClick={() => setSelectedConversations("open-fip")}
-              >
+              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("open-fip")}>
                 Open FIPs ({openConversations.length})
               </Box>
             </Menu.Item>
@@ -184,10 +181,7 @@ const ConversationsList = ({
               </Box>
             </Menu.Item>
             <Menu.Item>
-              <Box
-                variant="boxes.menuitem"
-                onClick={() => setSelectedConversations("archived")}
-              >
+              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("archived")}>
                 Closed ({archivedConversations.length})
               </Box>
             </Menu.Item>
@@ -283,9 +277,9 @@ const ConversationListItem = ({
       userSelect: "none",
       fontSize: "15px",
       lineHeight: 1.3,
-      bg: conversation.conversation_id === selectedConversationId ? "bgGray !important" : "inherit",
+      bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
       "&:hover": {
-        bg: "bgGrayLight",
+        bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "bgGrayLight",
       },
     }}
     onClick={(e) => {

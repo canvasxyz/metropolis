@@ -44,11 +44,6 @@ export const Collapsible = ({
                 wordBreak: "break-word",
                 maxHeight: "80px",
                 overflow: "hidden",
-                // try to use webkit-line-clamp
-                display: "-webkit-box",
-                "line-clamp": 4,
-                "-webkit-line-clamp": 4,
-                "-webkit-box-orient": "vertical",
               }
             : { wordBreak: "break-word", maxHeight: "300px", overflow: "scroll", mb: [1] }
         }
