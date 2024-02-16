@@ -150,76 +150,78 @@ const ConversationsList = ({
 
   return (
     <React.Fragment>
-      <Box
-        sx={{
-          position: "relative",
-          fontSize: "15px",
-          fontWeight: "500",
-          py: [2],
-          px: [3],
-          userSelect: "none",
-          borderBottom: "1px solid #e2ddd5",
-        }}
-      >
-        {selectedConversations === "all-fip"
-          ? "All"
-          : selectedConversations === "open-fip"
-          ? "Open FIPs"
-          : selectedConversations === "non-fip"
-          ? "Open Discussions"
-          : selectedConversations === "archived"
-          ? "Closed"
-          : selectedConversations === "hidden"
-          ? "Spam"
-          : ""}
-        <Box
-          sx={{ position: "absolute", top: "10px", right: "12px" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <Menu>
-            <Menu.Button as="div">
-              <Box sx={{ cursor: "pointer", position: "relative", top: "-2px" }}>
-                <TbChevronDown />
+      <Menu>
+        <Menu.Button as="div">
+          <Box
+            sx={{
+              position: "relative",
+              cursor: "pointer",
+              fontSize: "15px",
+              fontWeight: "500",
+              py: [2],
+              px: [3],
+              userSelect: "none",
+              borderBottom: "1px solid #e2ddd5",
+              "&:hover": {
+                background: "bgGrayLight"
+              }
+            }}
+          >
+            {selectedConversations === "all-fip"
+              ? "All"
+              : selectedConversations === "open-fip"
+              ? "Open FIPs"
+              : selectedConversations === "non-fip"
+              ? "Open Discussions"
+              : selectedConversations === "archived"
+              ? "Closed"
+              : selectedConversations === "hidden"
+              ? "Spam"
+              : ""}
+            <Box
+              sx={{ position: "absolute", top: "8px", right: "12px" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <TbChevronDown />
+            </Box>
+          </Box>
+        </Menu.Button>
+        <Menu.Items as={Box}>
+          <Box variant="boxes.menu" sx={{ width: "180px" }}>
+            <Menu.Item>
+              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("all-fip")}>
+                All
               </Box>
-            </Menu.Button>
-            <Menu.Items as={Box}>
-              <Box variant="boxes.menu" sx={{ width: "180px" }}>
-                <Menu.Item>
-                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("all-fip")}>
-                    All
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box
-                    variant="boxes.menuitem"
-                    onClick={() => setSelectedConversations("open-fip")}
-                  >
-                    Open FIPs ({openConversations.length})
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
-                    Open Discussions ({nonFIPConversations.length})
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box
-                    variant="boxes.menuitem"
-                    onClick={() => setSelectedConversations("archived")}
-                  >
-                    Closed ({archivedConversations.length})
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("hidden")}>
-                    Spam
-                  </Box>
-                </Menu.Item>
+            </Menu.Item>
+            <Menu.Item>
+              <Box
+                variant="boxes.menuitem"
+                onClick={() => setSelectedConversations("open-fip")}
+              >
+                Open FIPs ({openConversations.length})
               </Box>
-            </Menu.Items>
-          </Menu>
-        </Box>
-      </Box>
+            </Menu.Item>
+            <Menu.Item>
+              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
+                Open Discussions ({nonFIPConversations.length})
+              </Box>
+            </Menu.Item>
+            <Menu.Item>
+              <Box
+                variant="boxes.menuitem"
+                onClick={() => setSelectedConversations("archived")}
+              >
+                Closed ({archivedConversations.length})
+              </Box>
+            </Menu.Item>
+            <Menu.Item>
+              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("hidden")}>
+                Spam
+              </Box>
+            </Menu.Item>
+          </Box>
+        </Menu.Items>
+      </Menu>
       <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll", pb: "70px" }}>
         {conversationsToDisplay.map((conversation) => (
           <ConversationListItem
@@ -304,9 +306,9 @@ const ConversationListItem = ({
       userSelect: "none",
       fontSize: "15px",
       lineHeight: 1.3,
-      bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
+      bg: conversation.conversation_id === selectedConversationId ? "bgGray !important" : "inherit",
       "&:hover": {
-        bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
+        bg: "bgGrayLight",
       },
     }}
     onClick={(e) => {

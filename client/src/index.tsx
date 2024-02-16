@@ -2,8 +2,7 @@
 
 import $ from "jquery"
 
-import React, { FunctionComponent } from "react"
-import { RouteComponentProps } from "react-router"
+import React from "react"
 import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { BrowserRouter as Router, Route } from "react-router-dom"

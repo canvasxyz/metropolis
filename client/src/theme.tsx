@@ -32,8 +32,9 @@ export default {
       py: "5px",
       px: "7px",
       pl: "10px",
+      cursor: "pointer",
       "&:hover": {
-        bg: "bgGray",
+        background: "#f3f0e9 !important",
       },
     },
   },
@@ -46,6 +47,7 @@ export default {
     mediumGray: "#8f8f8f",
     lightGray: "#afafaf",
     lighterGray: "#e2ddd5",
+    bgGrayLight: "#f3f0e9",
     bgGray: "#ede8dd",
     bgGrayActive: "#ede4d1",
     bgOffWhite: "#faf9f6",
