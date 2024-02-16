@@ -90,7 +90,7 @@ export async function createGitHubUser(
     githubUserData.username,
     githubUserData.email,
     githubUserData.isRepoCollaborator,
-    true,
+    false,
   ];
   const createRes = await queryP(createQuery, vals);
   return createRes[0];
