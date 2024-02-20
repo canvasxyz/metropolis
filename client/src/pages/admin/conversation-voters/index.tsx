@@ -5,7 +5,7 @@ import { ConnectedProps, connect } from "react-redux"
 import { Heading, Box, jsx } from "theme-ui"
 import { UrlObject } from "url"
 import ComponentHelpers from "../../../util/component-helpers"
-import { formatTime } from "../../../util/misc"
+import { formatTimeAgo } from "../../../util/misc"
 import { AppDispatch, RootState } from "../../../store"
 import NoPermission from "../no-permission"
 
@@ -49,8 +49,8 @@ class ConversationVoters extends React.Component<ConversationVotersPropTypes> {
             <Box key={index} sx={{ mb: [2] }}>
               <Box>{voter.hname || "Anonymous"}</Box>
               <Box>{voter.vote_count} votes</Box>
-              <Box>First seen {formatTime(+voter.created)} </Box>
-              <Box>Last seen {formatTime(+voter.last_interaction)}</Box>
+              <Box>First seen {formatTimeAgo(+voter.created)} </Box>
+              <Box>Last seen {formatTimeAgo(+voter.last_interaction)}</Box>
             </Box>
           ))}
         </Box>

@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Flex, Text, jsx } from "theme-ui"
+import { Heading, Link, Box, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import api from "../../util/api"
-import { Frontmatter, Collapsible } from "../Frontmatter"
 import Survey, { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
+import { Frontmatter, Collapsible } from "./front_matter"
 
 type ReportComment = {
   active: boolean
@@ -33,6 +33,14 @@ type ReportComment = {
   velocity: number
 }
 
+const dashboardBox = {
+  py: "16px",
+  px: "18px",
+  my: [3],
+  lineHeight: 1.35,
+  border: "1px solid #ddd",
+}
+
 export const DashboardConversation = ({
   selectedConversationId,
   user,
@@ -46,6 +54,7 @@ export const DashboardConversation = ({
     (state: RootState) => state.zid_metadata,
   )
 
+  const [showReport, setShowReport] = useState<boolean>(false)
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
   const [maxCount, setMaxCount] = useState<number>(0)
@@ -107,7 +116,7 @@ export const DashboardConversation = ({
   return (
     <Box>
       <Box sx={{ width: "100%" }}>
-        <Flex
+        <Box
           sx={{
             flexDirection: "column",
             gap: [2],
@@ -119,11 +128,11 @@ export const DashboardConversation = ({
             maxWidth: "960px",
           }}
         >
-          <Heading as="h2">
+          <Heading as="h2" sx={{ mb: [2] }}>
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
-          {!zid_metadata.fip_title && !zid_metadata.github_pr_title && zid_metadata.topic && (
-            <Text sx={{ fontSize: "0.94em" }}>
+          {zid_metadata.github_username && (
+            <Box>
               Created by{" "}
               <Link
                 variant="links.a"
@@ -134,123 +143,123 @@ export const DashboardConversation = ({
               >
                 {zid_metadata.github_username}
               </Link>
-            </Text>
+              <Text> &middot; </Text>
+              {(() => {
+                const date = new Date(zid_metadata.fip_created || +zid_metadata.created)
+                return date.toLocaleDateString("en-us", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+                // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
+              })()}
+            </Box>
           )}
           {zid_metadata.fip_author ? (
-            <Frontmatter zid_metadata={zid_metadata} />
+            <Box sx={{ ...dashboardBox, px: "6px", pt: "10px", pb: "6px" }}>
+              <Frontmatter zid_metadata={zid_metadata} />
+            </Box>
           ) : (
             zid_metadata.description && (
-              <Collapsible
-                title={zid_metadata.fip_title}
-                key={zid_metadata.conversation_id}
-                shouldCollapse={zid_metadata.description?.length > 300}
-                content={zid_metadata.description}
-              ></Collapsible>
+              <Box sx={dashboardBox}>
+                <Collapsible
+                  title={zid_metadata.fip_title}
+                  key={zid_metadata.conversation_id}
+                  shouldCollapse={zid_metadata.description?.length > 300}
+                  content={zid_metadata.description}
+                ></Collapsible>
+              </Box>
             )
           )}
-        </Flex>
-        <Box
-          sx={{
-            margin: "0 auto",
-            maxWidth: "960px",
-            px: [5],
-            py: [2],
-            lineHeight: 1.45,
-          }}
-        >
           {zid_metadata.fip_author && (
-            <Box
-              sx={{
-                overflowX: "scroll",
-                py: [3],
-                px: "19px",
-                mb: [4],
-                lineHeight: 1.35,
-                border: "1px solid #ddd",
-              }}
-            >
+            <Box sx={dashboardBox}>
               <Box
                 sx={{
                   display: "flex",
-                  fontSize: "0.94em",
                   fontWeight: 700,
+                  mb: [2],
                 }}
               >
-                <Text sx={{ flex: 1 }}>Sentiment Check</Text>
-              </Box>
-              <Box sx={{ fontSize: "0.94em", mb: "16px" }}>
-                Indicate your support or opposition to this FIP:
+                Sentiment Check
               </Box>
               <SentimentCheck user={user} zid_metadata={zid_metadata} />
             </Box>
           )}
           {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (
-            <Box sx={{}}>
-              <Box
-                sx={{
-                  display: "flex",
-                  fontSize: "0.94em",
-                  fontWeight: 700,
-                }}
-              >
+            <Box sx={dashboardBox}>
+              <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
                 <Text sx={{ flex: 1 }}>Consensus Check</Text>
-              </Box>
-              <Box sx={{ fontSize: "0.94em", mb: "12px" }}>
-                Submit comments or suggestions related to this{" "}
-                {zid_metadata.fip_author ? "FIP" : "discussion"} for the community to vote on:
-              </Box>
-              <Survey
-                key={zid_metadata.conversation_id}
-                match={{
-                  params: { conversation_id: zid_metadata.conversation_id },
-                }}
-              />
-              <Box sx={{ fontWeight: 700 }}>Top Notes</Box>
-              <Box>
-                {!refreshInProgress && report && (
-                  <Box>
-                    <Text sx={{ mb: "10px", fontSize: "0.94em" }}>
-                      {reportComments.length === 0 && "See a summary of how people voted on notes:"}
-                    </Text>
-                    {reportComments.length === 0 && (
-                      <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-                        No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
-                      </Box>
-                    )}
-                  </Box>
-                )}
-                {!refreshInProgress &&
-                  reportComments.map((c: ReportComment) => (
-                    <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
-                  ))}
-                <Box
-                  sx={{
-                    fontSize: "0.9em",
-                    mt: "20px",
-                    color: "#9f9e9b",
-                    fontWeight: 500,
-                    textAlign: "center",
+                <Link
+                  variant="links.a"
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    setShowReport(!showReport)
                   }}
                 >
-                  {!report && (
-                    <Text as="span" variant="links.text" onClick={generateReport}>
-                      Generate Report
-                    </Text>
-                  )}
-                  {report && (
-                    <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
-                      <Text as="span" variant="links.text">
-                        View full report
-                      </Text>
-                    </RouterLink>
-                  )}
-                  {report && (
-                    <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
-                      Refresh report
-                    </Text>
-                  )}
-                </Box>
+                  {showReport ? "Back to Voting" : "View Results"}
+                </Link>
               </Box>
+              {/*
+              <Box sx={{ mb: "12px" }}>
+                Submit comments or suggestions related to this{" "}
+                {zid_metadata.fip_author ? "FIP" : "discussion"} for the community to vote on:
+                </Box>*/}
+              {!showReport ? (
+                <Survey
+                  key={zid_metadata.conversation_id}
+                  match={{
+                    params: { conversation_id: zid_metadata.conversation_id },
+                  }}
+                />
+              ) : (
+                <Box>
+                  {!refreshInProgress && report && (
+                    <Box>
+                      <Text sx={{ mb: "10px" }}>
+                        {reportComments.length === 0 &&
+                          "See a summary of how people voted on notes:"}
+                      </Text>
+                      {reportComments.length === 0 && (
+                        <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+                          No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+                        </Box>
+                      )}
+                    </Box>
+                  )}
+                  {!refreshInProgress &&
+                    reportComments.map((c: ReportComment) => (
+                      <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
+                    ))}
+                  <Box
+                    sx={{
+                      fontSize: "0.9em",
+                      mt: "20px",
+                      color: "#9f9e9b",
+                      fontWeight: 500,
+                      textAlign: "center",
+                    }}
+                  >
+                    {!report && (
+                      <Text as="span" variant="links.text" onClick={generateReport}>
+                        Generate Report
+                      </Text>
+                    )}
+                    {report && (
+                      <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
+                        <Text as="span" variant="links.text">
+                          View full report
+                        </Text>
+                      </RouterLink>
+                    )}
+                    {report && (
+                      <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
+                        Refresh report
+                      </Text>
+                    )}
+                  </Box>
+                </Box>
+              )}
             </Box>
           )}
         </Box>

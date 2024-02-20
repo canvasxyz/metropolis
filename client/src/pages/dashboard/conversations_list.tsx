@@ -16,7 +16,7 @@ import {
 } from "react-icons/tb"
 import { Menu } from "@headlessui/react"
 
-import { formatTime } from "../../util/misc"
+import { formatTimeAgo } from "../../util/misc"
 import api from "../../util/api"
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
@@ -148,9 +148,9 @@ const ConversationsList = ({
             {selectedConversations === "all-fip"
               ? "All"
               : selectedConversations === "open-fip"
-              ? "Open FIPs"
+              ? "FIPs"
               : selectedConversations === "non-fip"
-              ? "Open Discussions"
+              ? "Discussions"
               : selectedConversations === "archived"
               ? "Closed"
               : selectedConversations === "hidden"
@@ -173,17 +173,27 @@ const ConversationsList = ({
             </Menu.Item>
             <Menu.Item>
               <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("open-fip")}>
-                Open FIPs ({openConversations.length})
+                <Flex>
+                  <Box sx={{ flex: 1 }}>FIPs</Box>
+                  <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                    {openConversations.length}
+                  </Box>
+                </Flex>
               </Box>
             </Menu.Item>
             <Menu.Item>
               <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
-                Open Discussions ({nonFIPConversations.length})
+                <Flex>
+                  <Box sx={{ flex: 1 }}>Discussions</Box>
+                  <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                    {nonFIPConversations.length}
+                  </Box>
+                </Flex>
               </Box>
             </Menu.Item>
             <Menu.Item>
               <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("archived")}>
-                Closed ({archivedConversations.length})
+                Closed
               </Box>
             </Menu.Item>
             <Menu.Item>
@@ -218,7 +228,7 @@ const ConversationsList = ({
             color: "#83817d",
           }}
         >
-          Last sync: {formatTime(lastSync, true)}
+          Last sync: {formatTimeAgo(lastSync, true)}
         </Box>
       )}
       {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
@@ -286,8 +296,7 @@ const ConversationListItem = ({
   <Box
     sx={{
       position: "relative",
-      p: [3],
-      pl: [4],
+      padding: "12px 16px",
       cursor: "pointer",
       userSelect: "none",
       fontSize: "15px",
@@ -303,47 +312,23 @@ const ConversationListItem = ({
     }}
     key={conversation.conversation_id}
   >
-    <Text sx={{ fontWeight: 500, mb: [2] }}>
-      {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
-        <Text sx={{ color: "#84817D" }}>Untitled</Text>
-      )}
-    </Text>
-    <Flex sx={{ direction: "ltr", mt: [1] }}>
-      <Text sx={{ color: "#84817D", fontSize: "90%" }}>
-        {conversation.fip_created && conversation.github_pr_id ? (
-          <Text>
-            <TbGitPullRequest color="#3fba50" />{" "}
-            {(() => {
-              const date = new Date(conversation.fip_created)
-              return date.toLocaleDateString("en-us", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
-              // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
-            })()}
-          </Text>
+    <Flex>
+      <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
+        {conversation.github_pr_id ? (
+          <TbGitPullRequest color="#3fba50" />
         ) : (
-          <Text>
-            <TbMessage2 color="#0090ff" />{" "}
-            {(() => {
-              const date = new Date(conversation.created)
-              return date.toLocaleDateString("en-us", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
-              // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
-            })()}{" "}
-            &middot; {conversation.comment_count || 0} comment
-            {conversation.comment_count === 1 ? "" : "s"}
-          </Text>
+          <TbMessage2 color="#0090ff" />
         )}
-      </Text>
+      </Box>
+      <Box sx={{ fontWeight: 500, flex: 1 }}>
+        {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
+          <Text sx={{ color: "#84817D" }}>Untitled</Text>
+        )}
+      </Box>
     </Flex>
     {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
       <Box
-        sx={{ position: "absolute", top: "10px", right: "12px" }}
+        sx={{ position: "absolute", top: "13px", right: "10px" }}
         onClick={(e) => e.stopPropagation()}
       >
         <Menu>

@@ -1,9 +1,10 @@
 // eslint-disable-next-line no-use-before-define
 import React, { useState } from "react"
 import { Button, Box, Text, Link } from "theme-ui"
-import { ZidMetadata } from "../util/types"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+
+import { ZidMetadata } from "../../util/types"
 
 type FrontmatterProps = { zid_metadata: ZidMetadata }
 
@@ -96,90 +97,77 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
   ))
 
   return (
-    <Box
-      sx={{
-        overflowX: "scroll",
-        mt: [2],
-        px: [2],
-        pt: "10px",
-        pb: "4px",
-        lineHeight: 1.25,
-        fontSize: "0.94em",
-        border: "1px solid #ddd",
-      }}
-    >
-      <table>
-        <tbody className="border">
-          {(conversation.github_pr_url || conversation.github_pr_title) && (
-            <tr>
-              <td>
-                <Text sx={{ fontWeight: "700" }}>PR</Text>
-              </td>
-              <td>
-                {conversation.github_pr_url !== null ? (
-                  <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
-                    {conversation.github_pr_title} (#{conversation.github_pr_id})
-                  </Link>
-                ) : (
-                  conversation.github_pr_title
-                )}
-              </td>
-            </tr>
-          )}
-          {discussions && discussions.length > 0 && (
-            <tr>
-              <td>
-                <Text sx={{ fontWeight: "700" }}>Discussion</Text>
-              </td>
-              <td>{discussions}</td>
-            </tr>
-          )}
-          {conversation.fip_author && (
-            <tr>
-              <td>
-                <Text sx={{ fontWeight: "700" }}>Author</Text>
-              </td>
-              <td>
-                {splitAuthors(conversation.fip_author)?.map((author, i) => {
-                  const matches = author.match(/.*@(\w+)/)
-                  if (!matches) return author
-                  const username = matches[1]
-                  return (
-                    <React.Fragment key={author}>
-                      <Link
-                        href={`https://github.com/${username}`}
-                        target="_blank"
-                        noreferrer="noreferrer"
-                        noopener="noopener"
-                      >
-                        {author}
-                      </Link>
-                      {i < splitAuthors(conversation.fip_author).length - 1 ? ", " : ""}
-                    </React.Fragment>
-                  )
-                })}
-              </td>
-            </tr>
-          )}
+    <table>
+      <tbody className="border">
+        {(conversation.github_pr_url || conversation.github_pr_title) && (
           <tr>
-            {conversation.fip_author && (
-              <td>
-                <Text sx={{ fontWeight: "700" }}>Text</Text>
-              </td>
-            )}
             <td>
-              {conversation.description && (
-                <Collapsible
-                  title={conversation.fip_title}
-                  key={conversation.conversation_id}
-                  shouldCollapse={conversation.description?.length > 300}
-                  content={conversation.description}
-                ></Collapsible>
+              <Text sx={{ fontWeight: "700" }}>PR</Text>
+            </td>
+            <td>
+              {conversation.github_pr_url !== null ? (
+                <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
+                  {conversation.github_pr_title} (#{conversation.github_pr_id})
+                </Link>
+              ) : (
+                conversation.github_pr_title
               )}
             </td>
           </tr>
-        </tbody>
-      </table>
-    </Box>
+        )}
+        {discussions && discussions.length > 0 && (
+          <tr>
+            <td>
+              <Text sx={{ fontWeight: "700" }}>Discussion</Text>
+            </td>
+            <td>{discussions}</td>
+          </tr>
+        )}
+        {conversation.fip_author && (
+          <tr>
+            <td>
+              <Text sx={{ fontWeight: "700" }}>Author</Text>
+            </td>
+            <td>
+              {splitAuthors(conversation.fip_author)?.map((author, i) => {
+                const matches = author.match(/.*@(\w+)/)
+                if (!matches) return author
+                const username = matches[1]
+                return (
+                  <React.Fragment key={author}>
+                    <Link
+                      href={`https://github.com/${username}`}
+                      target="_blank"
+                      noreferrer="noreferrer"
+                      noopener="noopener"
+                    >
+                      {author}
+                    </Link>
+                    {i < splitAuthors(conversation.fip_author).length - 1 ? ", " : ""}
+                  </React.Fragment>
+                )
+              })}
+            </td>
+          </tr>
+        )}
+        <tr>
+          {conversation.fip_author && (
+            <td>
+              <Text sx={{ fontWeight: "700" }}>Text</Text>
+            </td>
+          )}
+          <td>
+            {conversation.description && (
+              <Collapsible
+                title={conversation.fip_title}
+                key={conversation.conversation_id}
+                shouldCollapse={conversation.description?.length > 300}
+                content={conversation.description}
+              ></Collapsible>
+            )}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   )
 }

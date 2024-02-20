@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { Button, Box, Flex, jsx } from "theme-ui"
 import { useLocalStorage } from "@uidotdev/usehooks"
-import { TbChevronDown, TbChevronUp } from "react-icons/tb"
+import { TbCheck, TbChevronDown, TbChevronUp } from "react-icons/tb"
 
 import api from "../../util/api"
 
@@ -121,7 +121,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           }}
           onClick={voteSupport}
         >
-          {isSupported ? "Support (selected)" : "Support"}
+          Support {isSupported && <TbCheck />}
         </Button>
         <Box
           sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
@@ -166,7 +166,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           }}
           onClick={voteOppose}
         >
-          {isOpposed ? "Oppose (selected)" : "Oppose"}
+          Oppose {isOpposed && <TbCheck />}
         </Button>
         <Box
           sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
@@ -211,7 +211,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           }}
           onClick={voteNeutral}
         >
-          {isNeutral ? "Neutral (selected)" : "Neutral"}
+          Neutral {isNeutral && <TbCheck />}
         </Button>
         <Box
           sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}

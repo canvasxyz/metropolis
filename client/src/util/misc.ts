@@ -1,4 +1,4 @@
-export const formatTime = (epochTime: number, short?: boolean) => {
+export const formatTimeAgo = (epochTime: number, short?: boolean) => {
   const date = new Date(epochTime).getTime()
   const diff = Date.now() - date
 
@@ -12,16 +12,22 @@ export const formatTime = (epochTime: number, short?: boolean) => {
   if (diff < minute) {
     return "Just now"
   } else if (diff < hour) {
-    return Math.floor(diff / minute) + (short ? " min" : " minutes ago")
+    const val = Math.floor(diff / minute)
+    return val + (short ? ` min${val === 1 ? "" : "s"}` : ` minute${val === 1 ? "" : "s"} ago`)
   } else if (diff < day) {
-    return Math.floor(diff / hour) + (short ? " hrs" : " hours ago")
+    const val = Math.floor(diff / hour)
+    return val + (short ? ` hour${val === 1 ? "" : "s"}` : ` hour${val === 1 ? "" : "s"} ago`)
   } else if (diff < week) {
-    return Math.floor(diff / day) + (short ? " days" : " days ago")
+    const val = Math.floor(diff / day)
+    return val + (short ? ` day${val === 1 ? "" : "s"}` : ` day${val === 1 ? "" : "s"} ago`)
   } else if (diff < month) {
-    return Math.floor(diff / week) + (short ? " wks" : " weeks ago")
+    const val = Math.floor(diff / week)
+    return val + (short ? ` week${val === 1 ? "" : "s"}` : ` week${val === 1 ? "" : "s"} ago`)
   } else if (diff < year) {
-    return Math.floor(diff / month) + (short ? " mon" : " months ago")
+    const val = Math.floor(diff / month)
+    return val + (short ? ` month${val === 1 ? "" : "s"}` : ` month${val === 1 ? "" : "s"} ago`)
   } else {
-    return Math.floor(diff / year) + (short ? " yrs" : " years ago")
+    const val = Math.floor(diff / year)
+    return val + (short ? ` year${val === 1 ? "" : "s"}` : ` year${val === 1 ? "" : "s"} ago`)
   }
 }
