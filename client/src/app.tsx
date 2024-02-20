@@ -137,120 +137,116 @@ class App extends React.Component<
         />
         <Switch>
           <Redirect from="/:url*(/+)" to={location.pathname.slice(0, -1)} />
-          <Box>
+        </Switch>
+        <Box>
+          <Box
+            sx={{
+              margin: `0 auto`,
+              maxWidth: inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em",
+              pb: inDashboard ? [0] : [4],
+            }}
+          >
+            {document.location.pathname !== "/" &&
+              !document.location.pathname.startsWith("/dashboard") && (
+                <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
+              )}
             <Box
               sx={{
-                margin: `0 auto`,
-                maxWidth: inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em",
-                pb: inDashboard ? [0] : [4],
+                pt: "1px", // prevent margins from spilling over
+                pb: inDashboard ? 0 : "1em",
+                px: inDashboard ? 0 : [4, 5],
+                minHeight: "calc(100vh - 9em - 8px)",
               }}
             >
-              {document.location.pathname !== "/" &&
-                !document.location.pathname.startsWith("/dashboard") && (
-                  <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
-                )}
-              <Box
-                sx={{
-                  pt: "1px", // prevent margins from spilling over
-                  pb: inDashboard ? 0 : "1em",
-                  px: inDashboard ? 0 : [4, 5],
-                  minHeight: "calc(100vh - 9em - 8px)",
+              <Route exact path="/" render={() => <Home user={this.props.user} />} />
+              <Route
+                exact
+                path="/dashboard"
+                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
+              />
+              <Route
+                path="/dashboard/c/:conversation_id"
+                render={({
+                  match: {
+                    params: { conversation_id },
+                  },
+                }) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
+              />
+              <Route exact path="/about" render={() => <About />} />
+              <Route
+                exact
+                path="/signin"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route
+                exact
+                path="/signin/*"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route
+                exact
+                path="/signin/**/*"
+                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
+              />
+              <Route exact path="/signout" component={SignOut} />
+              <Route exact path="/signout/*" component={SignOut} />
+              <Route exact path="/signout/**/*" component={SignOut} />
+              <Route exact path="/createuser" component={CreateUser} />
+              <Route exact path="/createuser/*" component={CreateUser} />
+              <Route exact path="/createuser/**/*" component={CreateUser} />
+
+              <Route exact path="/pwreset" component={PasswordReset} />
+              <Route path="/pwreset/*" component={PasswordReset} />
+              <Route exact path="/pwresetinit" component={PasswordResetInit} />
+
+              <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
+              <Route exact path="/tos" component={TOS} />
+              <Route exact path="/privacy" component={Privacy} />
+
+              <Route
+                render={(routeProps) => {
+                  if (routeProps.location.pathname.split("/")[1] === "m") {
+                    return null
+                  }
+                  return (
+                    <Box>
+                      <Route exact path="/create" component={CreateConversation} />
+                      <PrivateRoute
+                        isLoading={this.isLoading()}
+                        authed={this.isAuthed()}
+                        exact
+                        path="/account"
+                        component={Account}
+                      />
+                      <Route path="/c/:conversation_id" component={SurveyWithLoader} />
+                      <Route path="/r/:conversation_id/:report_id" component={Report} />
+                    </Box>
+                  )
                 }}
-              >
-                <Route exact path="/" render={() => <Home user={this.props.user} />} />
-                <Route
-                  exact
-                  path="/dashboard"
-                  render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
-                />
-                <Route
-                  path="/dashboard/c/:conversation_id"
-                  render={({
-                    match: {
-                      params: { conversation_id },
-                    },
-                  }) => (
-                    <Dashboard selectedConversationId={conversation_id} user={this.props.user} />
-                  )}
-                />
-                <Route exact path="/about" render={() => <About />} />
-                <Route
-                  exact
-                  path="/signin"
-                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-                />
-                <Route
-                  exact
-                  path="/signin/*"
-                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-                />
-                <Route
-                  exact
-                  path="/signin/**/*"
-                  render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-                />
-                <Route exact path="/signout" component={SignOut} />
-                <Route exact path="/signout/*" component={SignOut} />
-                <Route exact path="/signout/**/*" component={SignOut} />
-                <Route exact path="/createuser" component={CreateUser} />
-                <Route exact path="/createuser/*" component={CreateUser} />
-                <Route exact path="/createuser/**/*" component={CreateUser} />
-
-                <Route exact path="/pwreset" component={PasswordReset} />
-                <Route path="/pwreset/*" component={PasswordReset} />
-                <Route exact path="/pwresetinit" component={PasswordResetInit} />
-
-                <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
-                <Route exact path="/tos" component={TOS} />
-                <Route exact path="/privacy" component={Privacy} />
-
-                <Route
-                  render={(routeProps) => {
-                    if (routeProps.location.pathname.split("/")[1] === "m") {
-                      return null
-                    }
-                    return (
-                      <Box>
-                        <Route exact path="/create" component={CreateConversation} />
-                        <PrivateRoute
-                          isLoading={this.isLoading()}
-                          authed={this.isAuthed()}
-                          exact
-                          path="/account"
-                          component={Account}
-                        />
-                        <Route path="/c/:conversation_id" component={SurveyWithLoader} />
-                        <Route path="/r/:conversation_id/:report_id" component={Report} />
-                      </Box>
-                    )
-                  }}
-                />
-                <PrivateRoute
-                  authed={this.isAuthed()}
-                  isLoading={this.isLoading()}
-                  path="/m/:conversation_id"
-                  component={ConversationAdmin}
-                />
-              </Box>
-              {!document.location.pathname.startsWith("/dashboard") && (
-                <Footer inSurvey={inSurvey} />
-              )}
+              />
+              <PrivateRoute
+                authed={this.isAuthed()}
+                isLoading={this.isLoading()}
+                path="/m/:conversation_id"
+                component={ConversationAdmin}
+              />
             </Box>
-            <Box
-              sx={{
-                position: "fixed",
-                width: "100%",
-                bottom: 0,
-                height: "150px",
-                opacity: 0.15,
-                transform: "scaleY(-1)",
-                zIndex: -1,
-                backgroundImage:
-                  "linear-gradient(180deg, #CEC3AB 0%, #D4CAB4 8%, #D9D0BC 15%, #DED6C3 23%, #E3DBCA 29%, #E7E0D0 36%, #EBE4D5 42%, #EEE8DA 48%, #F1EBDE 54%, #F4EEE2 61%, #F6F1E5 68%, #F8F2E7 75%, #F9F4E9 83%, #FAF5EA 91%, #FAF5EA 100%);",
-              }}
-            ></Box>
+            {!document.location.pathname.startsWith("/dashboard") && <Footer inSurvey={inSurvey} />}
           </Box>
-        </Switch>
+          <Box
+            sx={{
+              position: "fixed",
+              width: "100%",
+              bottom: 0,
+              height: "150px",
+              opacity: 0.15,
+              transform: "scaleY(-1)",
+              zIndex: -1,
+              backgroundImage:
+                "linear-gradient(180deg, #CEC3AB 0%, #D4CAB4 8%, #D9D0BC 15%, #DED6C3 23%, #E3DBCA 29%, #E7E0D0 36%, #EBE4D5 42%, #EEE8DA 48%, #F1EBDE 54%, #F4EEE2 61%, #F6F1E5 68%, #F8F2E7 75%, #F9F4E9 83%, #FAF5EA 91%, #FAF5EA 100%);",
+            }}
+          ></Box>
+        </Box>
       </React.Fragment>
     )
   }
