@@ -122,7 +122,7 @@ export const DashboardConversation = ({
           <Heading as="h2">
             {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
           </Heading>
-          {!zid_metadata.fip_title && !zid_metadata.github_pr_title && (
+          {!zid_metadata.fip_title && !zid_metadata.github_pr_title && zid_metadata.topic && (
             <Text sx={{ fontSize: "0.94em" }}>
               Created by{" "}
               <Link
@@ -184,7 +184,7 @@ export const DashboardConversation = ({
               <SentimentCheck user={user} zid_metadata={zid_metadata} />
             </Box>
           )}
-          {!zid_metadata.fip_author && (
+          {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (
             <Box sx={{}}>
               <Box
                 sx={{

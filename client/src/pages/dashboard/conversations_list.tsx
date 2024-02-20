@@ -208,6 +208,20 @@ const ConversationsList = ({
         ))}
       </Box>
       {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "90px",
+            fontSize: "0.88em",
+            textAlign: "center",
+            width: "300px",
+            color: "#83817d",
+          }}
+        >
+          Last sync: {formatTime(lastSync, true)}
+        </Box>
+      )}
+      {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
         <Button
           variant={"buttons.outline"}
           sx={{
@@ -225,7 +239,7 @@ const ConversationsList = ({
           onClick={() => syncPRs()}
         >
           {syncInProgress ? <Spinner size={25} /> : <TbRefresh />}{" "}
-          {syncInProgress ? "Syncing..." : `Sync FIPs (Last: ${formatTime(lastSync, true)})`}
+          {syncInProgress ? "Syncing..." : `Sync FIPs`}
         </Button>
       )}
       {
