@@ -219,7 +219,8 @@ export const DashboardConversation = ({
                     <Box>
                       {reportComments.length === 0 && (
                         <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-                          No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+                          No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"}{" "}
+                          yet.
                         </Box>
                       )}
                     </Box>

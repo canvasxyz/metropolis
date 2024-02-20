@@ -96,14 +96,14 @@ const SurveyCards = ({
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
         <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-          No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+          No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
         </Box>
       )}
 
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
           <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
-            You’ve voted on all {votedComments.length} notes so far.
+            You’ve voted on all {votedComments.length} responses so far.
           </Box>
           {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
             <Button

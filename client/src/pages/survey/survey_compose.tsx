@@ -113,7 +113,7 @@ const SurveyComposeBox = ({
         minRows={1}
         maxRows={9}
         ref={inputRef}
-        placeholder="Add a note"
+        placeholder="Add a response"
         defaultValue={cachedComment}
         onBlur={() => {
           setCachedComment(inputRef.current.value)

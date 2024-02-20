@@ -280,117 +280,123 @@ const ConversationListItem = ({
   selectedConversationId,
   navigateToConversation,
   dispatch,
-}: ConversationListItemProps) => (
-  <Box
-    sx={{
-      position: "relative",
-      padding: "12px 16px",
-      cursor: "pointer",
-      userSelect: "none",
-      fontSize: "15px",
-      lineHeight: 1.2,
-      bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
-      "&:hover": {
-        bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "bgGrayLight",
-      },
-    }}
-    onClick={(e) => {
-      e.preventDefault()
-      navigateToConversation(conversation.conversation_id)
-    }}
-    key={conversation.conversation_id}
-  >
-    <Flex>
-      <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
-        {conversation.github_pr_id ? (
-          <TbGitPullRequest color="#3fba50" />
-        ) : (
-          <TbMessage2 color="#0090ff" />
-        )}
-      </Box>
-      <Box sx={{ fontWeight: 500, flex: 1 }}>
-        {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
-          <Text sx={{ color: "#84817D" }}>Untitled</Text>
-        )}
-      </Box>
-    </Flex>
-    {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
-      <Box
-        sx={{ position: "absolute", top: "13px", right: "10px" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Menu>
-          <Menu.Button as="div">
-            <TbDots />
-          </Menu.Button>
-          <Menu.Items as={Box}>
-            <Box variant="boxes.menu" sx={{ width: "190px" }}>
-              <Menu.Item>
-                <Box
-                  variant="boxes.menuitem"
-                  onClick={() => hist.push(`/m/${conversation.conversation_id}`)}
-                >
-                  <TbPencil /> Edit
-                </Box>
-              </Menu.Item>
+}: ConversationListItemProps) => {
+  const date = new Date(conversation.fip_created || +conversation.created)
+  const timeAgo = formatTimeAgo(+date)
 
-              <Menu.Item>
-                <Box
-                  variant="boxes.menuitem"
-                  onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
-                >
-                  <TbHammer /> Moderate comments
-                </Box>
-              </Menu.Item>
-              {user.githubRepoCollaborator && (
+  return (
+    <Box
+      sx={{
+        position: "relative",
+        padding: "12px 16px",
+        cursor: "pointer",
+        userSelect: "none",
+        fontSize: "15px",
+        lineHeight: 1.2,
+        bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "inherit",
+        "&:hover": {
+          bg: conversation.conversation_id === selectedConversationId ? "bgGray" : "bgGrayLight",
+        },
+      }}
+      onClick={(e) => {
+        e.preventDefault()
+        navigateToConversation(conversation.conversation_id)
+      }}
+      key={conversation.conversation_id}
+    >
+      <Flex>
+        <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
+          {conversation.github_pr_id ? (
+            <TbGitPullRequest color="#3fba50" />
+          ) : (
+            <TbMessage2 color="#0090ff" />
+          )}
+        </Box>
+        <Box sx={{ fontWeight: 500, flex: 1 }}>
+          {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
+            <Text sx={{ color: "#84817D" }}>Untitled</Text>
+          )}
+          <Box sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>{timeAgo}</Box>
+        </Box>
+      </Flex>
+      {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
+        <Box
+          sx={{ position: "absolute", top: "13px", right: "10px" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Menu>
+            <Menu.Button as="div">
+              <TbDots />
+            </Menu.Button>
+            <Menu.Items as={Box}>
+              <Box variant="boxes.menu" sx={{ width: "190px" }}>
                 <Menu.Item>
                   <Box
                     variant="boxes.menuitem"
-                    onClick={() => {
-                      if (conversation.is_hidden) {
-                        if (!confirm("Show this proposal to users again?")) return
-                        dispatch(handleUnmoderateConversation(conversation.conversation_id))
-                        toast.success("Removed from spam")
-                      } else {
-                        if (!confirm("Mark as spam? This will hide the proposal from users."))
-                          return
-                        dispatch(handleModerateConversation(conversation.conversation_id))
-                        toast.success("Moved to spam")
-                      }
-                    }}
+                    onClick={() => hist.push(`/m/${conversation.conversation_id}`)}
                   >
-                    <TbFlame /> {conversation.is_hidden ? "Unmark spam" : "Mark as spam"}
+                    <TbPencil /> Edit
                   </Box>
                 </Menu.Item>
-              )}
-              {user &&
-                (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
+
+                <Menu.Item>
+                  <Box
+                    variant="boxes.menuitem"
+                    onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
+                  >
+                    <TbHammer /> Moderate comments
+                  </Box>
+                </Menu.Item>
+                {user.githubRepoCollaborator && (
                   <Menu.Item>
                     <Box
                       variant="boxes.menuitem"
                       onClick={() => {
-                        if (conversation.is_archived) {
-                          if (!confirm("Reopen this discussion?")) return
-                          dispatch(handleReopenConversation(conversation.conversation_id))
-                          location.reload()
+                        if (conversation.is_hidden) {
+                          if (!confirm("Show this proposal to users again?")) return
+                          dispatch(handleUnmoderateConversation(conversation.conversation_id))
+                          toast.success("Removed from spam")
                         } else {
-                          if (!confirm("Close this discussion?")) return
-                          dispatch(handleCloseConversation(conversation.conversation_id))
-                          location.reload()
+                          if (!confirm("Mark as spam? This will hide the proposal from users."))
+                            return
+                          dispatch(handleModerateConversation(conversation.conversation_id))
+                          toast.success("Moved to spam")
                         }
                       }}
                     >
-                      {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
-                      {conversation.is_archived ? "Reopen" : "Mark as closed"}
+                      <TbFlame /> {conversation.is_hidden ? "Unmark spam" : "Mark as spam"}
                     </Box>
                   </Menu.Item>
                 )}
-            </Box>
-          </Menu.Items>
-        </Menu>
-      </Box>
-    )}
-  </Box>
-)
+                {user &&
+                  (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
+                    <Menu.Item>
+                      <Box
+                        variant="boxes.menuitem"
+                        onClick={() => {
+                          if (conversation.is_archived) {
+                            if (!confirm("Reopen this discussion?")) return
+                            dispatch(handleReopenConversation(conversation.conversation_id))
+                            location.reload()
+                          } else {
+                            if (!confirm("Close this discussion?")) return
+                            dispatch(handleCloseConversation(conversation.conversation_id))
+                            location.reload()
+                          }
+                        }}
+                      >
+                        {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
+                        {conversation.is_archived ? "Reopen" : "Mark as closed"}
+                      </Box>
+                    </Menu.Item>
+                  )}
+              </Box>
+            </Menu.Items>
+          </Menu>
+        </Box>
+      )}
+    </Box>
+  )
+}
 
 export default ConversationsList
