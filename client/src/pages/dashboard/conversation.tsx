@@ -125,7 +125,7 @@ export const DashboardConversation = ({
             pb: [2],
             mt: [3],
             px: [5],
-            maxWidth: "800px",
+            maxWidth: "760px",
           }}
         >
           <Heading as="h2" sx={{ mb: [2] }}>
@@ -161,7 +161,7 @@ export const DashboardConversation = ({
             </Box>
           ) : (
             zid_metadata.description && (
-              <Box sx={{ ...dashboardBox, pb: "6px" }}>
+              <Box sx={{ pt: "18px" }}>
                 <Collapsible
                   title={zid_metadata.fip_title}
                   key={zid_metadata.conversation_id}
