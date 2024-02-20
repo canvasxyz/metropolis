@@ -25,20 +25,16 @@ const CreateConversationInner = () => {
     <Box>
       <Flex>
         <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
-          Open a discussion
+          Create a discussion
         </Heading>
       </Flex>
 
       <Box sx={{ mt: 5 }}>
         <Box>
-          <Label sx={{ display: "block", mb: [5] }}>
-            <Box sx={{ mb: [4] }}>
-              Use this form to create custom sentiment checks and surveys, for topics that don't
-              have a existing FIP or don't fit in one.
-            </Box>
+          <Label sx={{ display: "block", fontWeight: 600, mb: [5] }}>
             <Box sx={{ mb: [1] }}>Title</Box>
             <Input
-              placeholder={"What would you like to ask about?"}
+              placeholder={"e.g. What communications channels should Filecoin use?"}
               onChange={(i) => {
                 setTitle(i.target.value)
               }}
@@ -47,12 +43,16 @@ const CreateConversationInner = () => {
             />
           </Label>
           <form>
-            <Label sx={{ display: "block", mb: [4] }}>
-              <Box sx={{ mb: [1] }}>Description</Box>
+            <Label sx={{ display: "block", fontWeight: 600, mb: [4] }}>
+              <Box sx={{ mb: [1] }}>Description (Markdown)</Box>
               <Textarea
                 id="new_conversation_description"
                 ref={descriptionRef}
-                placeholder="Explain why you’re polling the community for a sentiment check. Ask for ideas or opinions."
+                placeholder={`Explain why this question is important to answer.
+
+Give any context or history that would help people understand.
+
+Be objective as possible in the description. You can add individual opinions later.`}
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)

@@ -16,10 +16,18 @@ type SurveyCardProps = {
   conversationId: string
   onVoted: (commentId: string) => void
   hasVoted: boolean
-  maxHeight?: number
+  cardHeight?: number
+  topCard?: boolean
 }
 
-const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: SurveyCardProps) => {
+const SurveyCard = ({
+  comment,
+  conversationId,
+  onVoted,
+  hasVoted,
+  cardHeight,
+  topCard,
+}: SurveyCardProps) => {
   const { tid: commentId, txt } = comment
 
   const [editingVote, setEditingVote] = useState(false)
@@ -104,24 +112,18 @@ const SurveyCard = ({ comment, conversationId, onVoted, hasVoted, maxHeight }: S
         borderRadius: "2px",
         bg: "bgOffWhite",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
-        maxHeight: maxHeight,
+        minHeight: cardHeight,
+        maxHeight: topCard ? "" : cardHeight,
+        borderRight: topCard ? "5px solid #5d73c9 !important" : "",
         width: "100%",
         px: ["24px", "32px"],
-        pt: ["22px", "20px"],
-        pb: ["46px", "46px"],
+        pt: "16px",
+        pb: "56px",
         overflow: "scroll",
       }}
     >
-      <Box
-        sx={{
-          pb: [4],
-        }}
-      >
-        <Text
-          sx={{
-            wordBreak: "break-word",
-          }}
-        >
+      <Box>
+        <Text sx={{ display: "block", wordBreak: "break-word", pb: [2] }}>
           <Text className="react-markdown-card">
             <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {txt}

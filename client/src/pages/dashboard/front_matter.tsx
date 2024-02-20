@@ -51,9 +51,7 @@ export const Collapsible = ({
       >
         <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
           {collapsed && title
-            ? content
-                .replace(/\#+\ +Simple Summary/i, "")
-                .replace(new RegExp("#+ +" + title.replace(/([^a-zA-Z0-9])/g, "\\$1"), "i"), "")
+            ? content.replace(/\#+ .+/, "").replace(/\#+\ +Simple Summary/i, "")
             : content}
         </ReactMarkdown>
       </Box>

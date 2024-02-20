@@ -161,11 +161,11 @@ export const DashboardConversation = ({
             </Box>
           ) : (
             zid_metadata.description && (
-              <Box sx={dashboardBox}>
+              <Box sx={{ ...dashboardBox, pb: "6px" }}>
                 <Collapsible
                   title={zid_metadata.fip_title}
                   key={zid_metadata.conversation_id}
-                  shouldCollapse={zid_metadata.description?.length > 300}
+                  shouldCollapse={false}
                   content={zid_metadata.description}
                 ></Collapsible>
               </Box>
@@ -188,7 +188,7 @@ export const DashboardConversation = ({
           {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (
             <Box sx={dashboardBox}>
               <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
-                <Text sx={{ flex: 1 }}>Consensus Check</Text>
+                <Text sx={{ flex: 1 }}>Responses</Text>
                 <Link
                   variant="links.a"
                   href="#"
@@ -196,8 +196,9 @@ export const DashboardConversation = ({
                     e.preventDefault()
                     setShowReport(!showReport)
                   }}
+                  sx={{ fontSize: "0.96em" }}
                 >
-                  {showReport ? "Back to Voting" : "View Results"}
+                  {showReport ? "Back to voting" : "View results"}
                 </Link>
               </Box>
               {/*
@@ -216,10 +217,6 @@ export const DashboardConversation = ({
                 <Box>
                   {!refreshInProgress && report && (
                     <Box>
-                      <Text sx={{ mb: "10px" }}>
-                        {reportComments.length === 0 &&
-                          "See a summary of how people voted on notes:"}
-                      </Text>
                       {reportComments.length === 0 && (
                         <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
                           No notes on this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.

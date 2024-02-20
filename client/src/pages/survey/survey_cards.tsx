@@ -26,20 +26,22 @@ const SurveyCards = ({
   user
 }) => {
   const cardsBoxRef = useRef<HTMLElement>()
-  const [maxHeight, setMaxHeight] = useState<number>()
+  const [cardHeight, setCardHeight] = useState<number>()
 
   useLayoutEffect(() => {
     if (!cardsBoxRef.current) return
-    const maxh =
+    const h =
       Math.max(
         cardsBoxRef.current.children[0].scrollHeight,
         cardsBoxRef.current.children[0].clientHeight,
       ) + 4
-    setMaxHeight(maxh)
+    setCardHeight(h)
   }, [votedComments.length])
 
+  const commentStack = _.reverse(unvotedComments.slice(1, 5))
+
   return (
-    <Box sx={{ position: "relative", minHeight: "120px" }}>
+    <Box sx={{ position: "relative", minHeight: Math.max(120, (cardHeight ?? 100) + 10) }}>
       {unvotedComments.length > 0 && (
         <Box sx={{ position: "relative" }}>
           <Box sx={{ position: "relative" }} ref={cardsBoxRef}>
@@ -50,11 +52,11 @@ const SurveyCards = ({
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
-                maxHeight={maxHeight}
+                cardHeight={cardHeight}
               />
             )}
             {unvotedComments.length > 1 &&
-              _.reverse(unvotedComments.slice(1, 5)).map((comment, index) => {
+              commentStack.map((comment, index) => {
                 return (
                   <Box
                     key={comment.tid}
@@ -83,24 +85,12 @@ const SurveyCards = ({
                       conversationId={conversation_id}
                       onVoted={onVoted}
                       hasVoted={false}
-                      maxHeight={maxHeight}
+                      cardHeight={cardHeight}
+                      topCard={index === commentStack.length - 1}
                     />
                   </Box>
                 )
               })}
-          </Box>
-          <Box
-            sx={{
-              position: "absolute",
-              top: [3],
-              right: [4],
-              fontSize: "0.91em",
-              color: "mediumGray",
-            }}
-          >
-            {unvotedComments.length > 0 && (
-              <Box>{unvotedComments.length > 25 ? "25+" : unvotedComments.length} remaining</Box>
-            )}
           </Box>
         </Box>
       )}
