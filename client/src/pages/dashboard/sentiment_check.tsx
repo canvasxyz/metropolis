@@ -5,22 +5,38 @@ import { Button, Box, Flex, jsx } from "theme-ui"
 import { useLocalStorage } from "@uidotdev/usehooks"
 import { TbChevronDown, TbChevronUp } from "react-icons/tb"
 
-export const SentimentCheck: React.FC<{ user }> = ({
+import api from "../../util/api"
+
+const SUPPORT_VOTE = "support"
+const OPPOSE_VOTE = "oppose"
+const NEUTRAL_VOTE = "neutral"
+
+export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   user,
+  zid_metadata,
 }: {
   user: { githubUsername: string }
+  zid_metadata
 }) => {
-  const [supported, setSupported] = useLocalStorage("sentiment-supported", [])
-  const [opposed, setOpposed] = useLocalStorage("sentiment-opposed", [])
-  const [neutral, setNeutral] = useLocalStorage("sentiment-neutral", [])
+  const [supported, setSupported] = useState(() =>
+    zid_metadata.sentiment.filter((v) => v.vote === SUPPORT_VOTE).map((v) => v.github_username),
+  )
+  const [opposed, setOpposed] = useState(() =>
+    zid_metadata.sentiment.filter((v) => v.vote === OPPOSE_VOTE).map((v) => v.github_username),
+  )
+  const [neutral, setNeutral] = useState(() =>
+    zid_metadata.sentiment.filter((v) => v.vote === NEUTRAL_VOTE).map((v) => v.github_username),
+  )
+
+  const [updating, setUpdating] = useState(false)
 
   const [showSupportingUsers, setShowSupportingUsers] = useState(false)
   const [showNeutralUsers, setShowNeutralUsers] = useState(false)
   const [showOpposedUsers, setShowOpposedUsers] = useState(false)
 
-  const isSupported = supported.find((u: string) => u === user.githubUsername)
-  const isOpposed = opposed.find((u: string) => u === user.githubUsername)
-  const isNeutral = neutral.find((u: string) => u === user.githubUsername)
+  const isSupported = supported.find((u: string) => u === user?.githubUsername)
+  const isOpposed = opposed.find((u: string) => u === user?.githubUsername)
+  const isNeutral = neutral.find((u: string) => u === user?.githubUsername)
 
   const activeStyles = { opacity: 0.7, pointerEvents: "none" }
   const supportedStyles = isSupported ? activeStyles : {}
@@ -31,31 +47,58 @@ export const SentimentCheck: React.FC<{ user }> = ({
     e.preventDefault()
     if (supported.find((u: string) => u === user.githubUsername)) {
       setSupported(supported.filter((u: string) => u !== user.githubUsername))
-    } else {
-      setSupported([...supported, user.githubUsername])
-      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
-      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
+      return
     }
+    setUpdating(true)
+    api
+      .post("/api/v3/conversation/sentiment", {
+        conversation_id: zid_metadata.conversation_id,
+        vote: SUPPORT_VOTE,
+      })
+      .then(() => {
+        setSupported([...supported, user.githubUsername])
+        setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
+        setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
+      })
+      .always(() => setUpdating(false))
   }
   const voteOppose = (e) => {
     e.preventDefault()
     if (opposed.find((u: string) => u === user.githubUsername)) {
       setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
-    } else {
-      setOpposed([...opposed, user.githubUsername])
-      setSupported(supported.filter((u: string) => u !== user.githubUsername))
-      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
+      return
     }
+    setUpdating(true)
+    api
+      .post("/api/v3/conversation/sentiment", {
+        conversation_id: zid_metadata.conversation_id,
+        vote: OPPOSE_VOTE,
+      })
+      .then(() => {
+        setOpposed([...opposed, user.githubUsername])
+        setSupported(supported.filter((u: string) => u !== user.githubUsername))
+        setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
+      })
+      .always(() => setUpdating(false))
   }
   const voteNeutral = (e) => {
     e.preventDefault()
     if (neutral.find((u: string) => u === user.githubUsername)) {
       setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
-    } else {
-      setNeutral([...neutral, user.githubUsername])
-      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
-      setSupported(supported.filter((u: string) => u !== user.githubUsername))
+      return
     }
+    setUpdating(true)
+    api
+      .post("/api/v3/conversation/sentiment", {
+        conversation_id: zid_metadata.conversation_id,
+        vote: NEUTRAL_VOTE,
+      })
+      .then(() => {
+        setNeutral([...neutral, user.githubUsername])
+        setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
+        setSupported(supported.filter((u: string) => u !== user.githubUsername))
+      })
+      .always(() => setUpdating(false))
   }
 
   return (
@@ -101,7 +144,7 @@ export const SentimentCheck: React.FC<{ user }> = ({
         {showSupportingUsers && (
           <Box sx={{ fontSize: "0.9em", mt: [1] }}>
             {supported.map((u: string) => (
-              <Box>{u}</Box>
+              <Box key={u}>{u}</Box>
             ))}
           </Box>
         )}
@@ -145,7 +188,7 @@ export const SentimentCheck: React.FC<{ user }> = ({
           {showOpposedUsers && (
             <Box sx={{ fontSize: "0.9em", mt: [1] }}>
               {opposed.map((u: string) => (
-                <Box>{u}</Box>
+                <Box key={u}>{u}</Box>
               ))}
             </Box>
           )}
@@ -191,7 +234,7 @@ export const SentimentCheck: React.FC<{ user }> = ({
         {showNeutralUsers && (
           <Box sx={{ fontSize: "0.9em", mt: [1] }}>
             {neutral.map((u: string) => (
-              <Box>{u}</Box>
+              <Box key={u}>{u}</Box>
             ))}
           </Box>
         )}

@@ -90,6 +90,7 @@ import {
   handle_POST_conversation_reopen,
   handle_POST_conversation_moderate,
   handle_POST_conversation_unmoderate,
+  handle_POST_conversation_sentiment,
   handle_POST_conversations,
   handle_POST_convSubscriptions,
   handle_POST_domainWhitelist,
@@ -770,6 +771,15 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_unmoderate as any,
+);
+
+app.post(
+  "/api/v3/conversation/sentiment",
+  moveToBody,
+  auth(assignToP),
+  need("vote", getStringLimitLength(10), assignToP),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_POST_conversation_sentiment as any,
 );
 
 app.put(

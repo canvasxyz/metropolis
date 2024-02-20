@@ -181,7 +181,7 @@ export const DashboardConversation = ({
               <Box sx={{ fontSize: "0.94em", mb: "16px" }}>
                 Indicate your support or opposition to this FIP:
               </Box>
-              <SentimentCheck user={user} />
+              <SentimentCheck user={user} zid_metadata={zid_metadata} />
             </Box>
           )}
           {!zid_metadata.fip_author && (

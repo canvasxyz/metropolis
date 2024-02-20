@@ -2168,7 +2168,7 @@ async function handle_POST_auth_pwresettoken(
 }
 
 function sendPasswordResetEmailFailure(email: any, server: any) {
-  let body = `We were unable to find a pol.is account registered with the email address: ${email}
+  let body = `We were unable to find an account registered with the email address: ${email}
 
 You may have used another email address to create your account.
 
@@ -6895,6 +6895,38 @@ async function handle_POST_conversation_unmoderate(
     });
 }
 
+async function handle_POST_conversation_sentiment(
+  req: { p: { zid: any; uid: any; vote: any } },
+  res: {
+    status: (arg0: number) => {
+      (): any;
+      new (): any;
+      json: { (arg0: any): void; new (): any };
+    };
+  },
+) {
+  const results = await queryP_readOnly(
+    "SELECT github_username from users where uid = $1",
+    [req.p.uid],
+  );
+  if (results.length === 0 || !results[0].github_username) {
+    fail(res, 500, "polis_err_conversation_sentiment_missing_github", err);
+    return;
+  }
+
+  queryP(
+    "insert into conversation_sentiment_votes (zid, uid, vote) values " +
+      "($1, $2, $3) on conflict (zid, uid) do update set vote = $3;",
+    [req.p.zid, req.p.uid, req.p.vote],
+  )
+    .then(function () {
+      res.status(200).json({ vote: req.p.vote });
+    })
+    .catch(function (err: any) {
+      fail(res, 500, "polis_err_conversation_sentiment", err);
+    });
+}
+
 function handle_PUT_users(
   req: { p: { uid?: any; uid_of_user: any; email: any; hname: any } },
   res: { json: (arg0: any) => void },
@@ -7734,10 +7766,20 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
 
 async function getOneConversation(zid: any, uid?: number, lang?: null) {
   const conversationRows = await queryP_readOnly(
-    "select *, u.github_username from conversations left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid where conversations.zid = ($1);",
+    `select *, u.github_username from conversations
+left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
+where conversations.zid = ($1);`,
     [zid],
   );
   const conv = conversationRows[0];
+
+  const sentimentVoterRows = await queryP_readOnly(
+    `select users.github_username, conversation_sentiment_votes.vote from conversation_sentiment_votes
+left join users on conversation_sentiment_votes.uid = users.uid
+where conversation_sentiment_votes.zid = ($1);`,
+    [zid],
+  );
+  conv.sentiment = sentimentVoterRows;
 
   if (conv.github_pr_id !== null) {
     conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
@@ -7765,9 +7807,6 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
   let ownername = ownerInfo.hname;
   if (convHasMetadata) {
     conv.hasMetadata = true;
-  }
-  if (!_.isUndefined(ownername) && conv.context !== "hongkong2014") {
-    conv.ownername = ownername;
   }
   conv.is_mod = uid && isAdministrator(uid);
   conv.is_owner = uid && (await isOwner(zid, uid));
@@ -9565,6 +9604,7 @@ export {
   handle_POST_conversation_reopen,
   handle_POST_conversation_moderate,
   handle_POST_conversation_unmoderate,
+  handle_POST_conversation_sentiment,
   handle_POST_conversations,
   handle_POST_convSubscriptions,
   handle_POST_domainWhitelist,
