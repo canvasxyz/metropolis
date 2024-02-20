@@ -154,7 +154,7 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
               <Text sx={{ fontWeight: "700" }}>Text</Text>
             </td>
           )}
-          <td>
+          <td style={{ display: "grid" }}>
             {conversation.description && (
               <Collapsible
                 title={conversation.fip_title}
