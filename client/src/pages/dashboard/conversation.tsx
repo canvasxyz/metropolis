@@ -125,7 +125,7 @@ export const DashboardConversation = ({
             pb: [2],
             mt: [3],
             px: [5],
-            maxWidth: "960px",
+            maxWidth: "800px",
           }}
         >
           <Heading as="h2" sx={{ mb: [2] }}>

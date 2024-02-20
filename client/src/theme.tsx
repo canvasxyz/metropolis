@@ -218,6 +218,18 @@ export default {
         bg: "primaryActive",
       },
     },
+    black: {
+      color: "background",
+      bg: "#373737",
+      fontFamily: "body",
+      borderRadius: [8],
+      cursor: "pointer",
+      border: "1px solid",
+      borderColor: "#373737",
+      "&:hover": {
+        bg: "#444",
+      },
+    },
     disabled: {
       color: "background",
       bg: "primary",

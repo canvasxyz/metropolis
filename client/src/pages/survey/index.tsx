@@ -205,7 +205,7 @@ const Survey = ({
       )}
 
       {state === "voting" && (
-        <Box sx={{ mb: [5] }}>
+        <Box>
           {!zid_metadata.auth_needed_to_write ||
           !!user?.email ||
           !!user?.githubUserId ||

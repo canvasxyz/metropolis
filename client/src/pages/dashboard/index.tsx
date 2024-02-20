@@ -74,7 +74,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             }}
           >
             <Box sx={{ flexGrow: "1" }}>
-              <RouterLink to="/">
+              <RouterLink to="/dashboard">
                 <img
                   src="/filecoin.png"
                   width="25"

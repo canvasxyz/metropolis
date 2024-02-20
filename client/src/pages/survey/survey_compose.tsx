@@ -136,7 +136,7 @@ const SurveyComposeBox = ({
           }
         }}
       />
-      <Box sx={{ mb: [3] }}>
+      <Box sx={{ mb: [2] }}>
         <Button
           variant="primary"
           sx={{

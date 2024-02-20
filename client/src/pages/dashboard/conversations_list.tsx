@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Flex, Text } from "theme-ui"
+import { Button, Box, Flex, Text, Link } from "theme-ui"
 import {
   TbMessage2,
   TbChevronDown,
@@ -221,40 +221,22 @@ const ConversationsList = ({
         <Box
           sx={{
             position: "absolute",
-            bottom: "90px",
+            bottom: "56px",
             fontSize: "0.88em",
             textAlign: "center",
             width: "300px",
             color: "#83817d",
           }}
         >
-          Last sync: {formatTimeAgo(lastSync, true)}
+          Last sync: {formatTimeAgo(lastSync, true)} &nbsp;
+          <Link variant="links.a" onClick={() => syncPRs()}>
+            {syncInProgress ? <Spinner size={20} /> : `Sync now`}
+          </Link>
         </Box>
-      )}
-      {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
-        <Button
-          variant={"buttons.outline"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [2],
-            position: "absolute",
-            bottom: [6],
-            right: "11px",
-            width: "calc(100% - 32px)",
-            fontSize: "0.94em",
-            fontWeight: 500,
-          }}
-          onClick={() => syncPRs()}
-        >
-          {syncInProgress ? <Spinner size={25} /> : <TbRefresh />}{" "}
-          {syncInProgress ? "Syncing..." : `Sync FIPs`}
-        </Button>
       )}
       {
         <Button
-          variant={"buttons.primary"}
+          variant={user ? "buttons.primary" : "buttons.black"}
           sx={{
             px: [2],
             py: [1],
@@ -267,9 +249,15 @@ const ConversationsList = ({
             width: "calc(100% - 32px)",
             fontWeight: 500,
           }}
-          onClick={() => setCreateConversationModalIsOpen(true)}
+          onClick={() => {
+            if (user) {
+              setCreateConversationModalIsOpen(true)
+            } else {
+              document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
+            }
+          }}
         >
-          Open a discussion
+          <TbMessage2 /> {user ? "Create a discussion" : "Sign in to create discussions"}
         </Button>
       }
     </React.Fragment>
