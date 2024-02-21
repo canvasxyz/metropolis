@@ -6910,7 +6910,7 @@ async function handle_POST_conversation_sentiment(
     [req.p.uid],
   );
   if (results.length === 0 || !results[0].github_username) {
-    fail(res, 500, "polis_err_conversation_sentiment_missing_github", err);
+    fail(res, 500, "polis_err_conversation_sentiment_missing_github");
     return;
   }
 
