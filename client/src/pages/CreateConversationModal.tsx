@@ -52,7 +52,7 @@ const CreateConversationInner = () => {
 
 Provde any relevant context or history.
 
-Be objective as possible in the description. You can add specific views or ideas as responses later.`}
+Be objective in the description. You can add specific opinions as responses later.`}
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)
@@ -96,11 +96,8 @@ export const CreateConversationModal = ({
       isOpen={isOpen}
       onRequestClose={() => setIsOpen(false)}
       style={{
-        overlay: {
-          backgroundColor: "#FBF5E9A0",
-        },
         content: {
-          backgroundColor: "#FAF5EA",
+          backgroundColor: "#fffcf5",
           border: "1px #EDEBE3",
           boxShadow: "4px 4px 8px 2px #E6E0D4",
           borderRadius: "8px",
@@ -110,7 +107,6 @@ export const CreateConversationModal = ({
           bottom: "auto",
           marginRight: "-50%",
           transform: "translate(-50%, -50%)",
-          // minHeight: "200px",
           width: "96vw", // for mobile
           maxWidth: "540px",
           overflow: "visible",
