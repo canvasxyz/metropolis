@@ -10,7 +10,8 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600&display=swap" rel="stylesheet">
   <style>
     html {
       margin: 0;
@@ -115,7 +116,7 @@
     .ReactModal__Overlay {
         opacity: 0;
         transition: opacity 75ms ease-in-out;
-        background-color: rgb(192 186 174 / 63%) !important;
+        background-color: rgb(192 190 186 / 63%) !important;
     }
 
     .ReactModal__Overlay--after-open{
@@ -135,13 +136,8 @@
         animation-direction: reverse;
     }
   </style>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body class="viewport">
-  <% if (enableTwitterWidgets) { %>
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-  <% } %>
-
   <div id="root"></div>
 </body>
 </html>

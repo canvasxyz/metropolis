@@ -34,7 +34,7 @@ const CreateConversationInner = () => {
           <Label sx={{ display: "block", fontWeight: 600, mb: [5] }}>
             <Box sx={{ mb: [1] }}>Title</Box>
             <Input
-              placeholder={"e.g. What communications channels should Filecoin use?"}
+              placeholder={"e.g. What communications channels should we use?"}
               onChange={(i) => {
                 setTitle(i.target.value)
               }}
