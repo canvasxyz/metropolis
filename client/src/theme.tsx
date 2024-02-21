@@ -2,7 +2,7 @@ export default {
   space: [0, 4, 8, 16, 24, 32, 42, 56, 72, 96, 128, 256, 512],
   fonts: {
     heading: "'Instrument Sans', sans-serif",
-    body: "'Instrument Sans', sans-serif",
+    body: "Inter, 'Instrument Sans', sans-serif",
     monospace: "monospace",
   },
   fontSizes: [12, 14, 16, 20, 24, 36, 40, 64, 96],
