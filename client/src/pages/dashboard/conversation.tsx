@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Text, jsx } from "theme-ui"
+import { Heading, Link, Box, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
+import { TbExclamationCircle } from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
@@ -34,8 +35,8 @@ type ReportComment = {
 }
 
 const dashboardBox = {
-  py: "16px",
-  px: "18px",
+  py: "18px",
+  px: "22px",
   my: [3],
   lineHeight: 1.35,
   border: "1px solid #ddd",
@@ -52,6 +53,11 @@ export const DashboardConversation = ({
   const dispatch = useAppDispatch()
   const { zid_metadata, error: zidMetadataError } = useAppSelector(
     (state: RootState) => state.zid_metadata,
+  )
+
+  const summaryData = useAppSelector(
+    (state: RootState) =>
+      state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
   )
 
   const [showReport, setShowReport] = useState<boolean>(false)
@@ -185,6 +191,17 @@ export const DashboardConversation = ({
               <SentimentCheck user={user} zid_metadata={zid_metadata} />
             </Box>
           )}
+          {!zid_metadata.fip_author &&
+            (zid_metadata.topic || zid_metadata.fip_title) &&
+            summaryData?.comment_count < 10 && (
+              <Box sx={{ ...surveyBox, p: "16px 18px", my: [3], borderLeft: "4px solid #eb4b4c" }}>
+                <Box sx={{ fontWeight: 600, mb: [1] }}>
+                  <TbExclamationCircle /> Needs Seed Responses
+                </Box>
+                Fill in some example responses for readers to vote on. <strong>10 responses</strong>{" "}
+                are required for this survey to be visible to others.
+              </Box>
+            )}
           {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (
             <Box sx={dashboardBox}>
               <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
@@ -198,14 +215,9 @@ export const DashboardConversation = ({
                   }}
                   sx={{ fontSize: "0.96em" }}
                 >
-                  {showReport ? "Back to voting" : "View results"}
+                  {showReport ? "Back to voting" : "Preview results"}
                 </Link>
               </Box>
-              {/*
-              <Box sx={{ mb: "12px" }}>
-                Submit comments or suggestions related to this{" "}
-                {zid_metadata.fip_author ? "FIP" : "discussion"} for the community to vote on:
-                </Box>*/}
               {!showReport ? (
                 <Survey
                   key={zid_metadata.conversation_id}
@@ -218,7 +230,7 @@ export const DashboardConversation = ({
                   {!refreshInProgress && report && (
                     <Box>
                       {reportComments.length === 0 && (
-                        <Box sx={{ ...surveyBox, padding: "70px 32px 70px", fontWeight: 500 }}>
+                        <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
                           No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"}{" "}
                           yet.
                         </Box>
@@ -239,9 +251,9 @@ export const DashboardConversation = ({
                     }}
                   >
                     {!report && (
-                      <Text as="span" variant="links.text" onClick={generateReport}>
-                        Generate Report
-                      </Text>
+                      <Button variant="buttons.black" onClick={generateReport}>
+                        Click to Generate Report
+                      </Button>
                     )}
                     {report && (
                       <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>

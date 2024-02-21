@@ -381,21 +381,21 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
 
       <CheckboxField
         field="write_type"
-        label="Enable comments"
-        subtitle="Participants can add comments (Recommended: ON)"
+        label="Enable user-submitted responses"
+        subtitle="Recommended: ON"
         isIntegerBool
       />
 
       <CheckboxField
         field="auth_needed_to_write"
-        label="Email required for comments"
-        subtitle="Require email to submit comments (Recommended: OFF)"
+        label="Login required to submit responses"
+        subtitle="Recommended: ON"
       />
 
       <CheckboxField
         field="strict_moderation"
-        label="Moderator approval required for comments"
-        subtitle="Require moderators to approve submitted comments before voters can see them (Recommended: OFF)"
+        label="Moderator approval required for responses"
+        subtitle="Moderators must approve responses before they are displayed (Recommended: OFF)"
       />
 
       {/*
@@ -408,6 +408,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         </CheckboxField>
           */}
 
+      {/*
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Embed
       </Heading>
@@ -427,8 +428,8 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           label="Show importance on embeds"
           subtitle={`Show "This comment is important" checkbox on the embed interface`}
         />
-     */}
       </Box>
+     */}
 
       {/*
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>

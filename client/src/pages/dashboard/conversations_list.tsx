@@ -3,6 +3,7 @@ import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text, Link } from "theme-ui"
 import {
+  TbExclamationCircle,
   TbCards,
   TbThumbUp,
   TbThumbDown,
@@ -291,6 +292,11 @@ const ConversationListItem = ({
   const date = new Date(conversation.fip_created || +conversation.created)
   const timeAgo = formatTimeAgo(+date)
 
+  const shouldHideDiscussion =
+    !conversation.fip_title && !conversation.github_pr_title && conversation.comment_count < 10
+
+  if (shouldHideDiscussion && conversation.owner !== user?.uid) return
+
   return (
     <Box
       sx={{
@@ -311,6 +317,11 @@ const ConversationListItem = ({
       }}
       key={conversation.conversation_id}
     >
+      {shouldHideDiscussion && (
+        <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "20px" }}>
+          <TbExclamationCircle color="#eb4b4c" /> Needs Seed Responses
+        </Box>
+      )}
       <Flex>
         <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
           {conversation.github_pr_id ? (

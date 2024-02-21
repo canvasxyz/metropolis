@@ -48,11 +48,11 @@ const CreateConversationInner = () => {
               <Textarea
                 id="new_conversation_description"
                 ref={descriptionRef}
-                placeholder={`Explain why this question is important to answer.
+                placeholder={`Explain why this question matters to the community.
 
-Give any context or history that would help people understand.
+Provde any relevant context or history.
 
-Be objective as possible in the description. You can add individual opinions later.`}
+Be objective as possible in the description. You can add specific views or ideas as responses later.`}
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)

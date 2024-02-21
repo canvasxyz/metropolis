@@ -114,7 +114,6 @@ const SurveyCard = ({
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
         minHeight: cardHeight,
         maxHeight: topCard ? "" : cardHeight,
-        borderRight: topCard ? "5px solid #5d73c9 !important" : "",
         width: "100%",
         px: ["24px", "32px"],
         pt: "16px",

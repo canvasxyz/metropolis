@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import React, { useCallback, useEffect, useState } from "react"
-import { Box, Link, jsx } from "theme-ui"
+import { Box, Button, Link, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -10,7 +10,8 @@ import SurveyCards from "./survey_cards"
 import SurveyCompose from "./survey_compose"
 import PostSurvey from "./survey_post"
 import { RootState } from "../../store"
-import { useAppSelector } from "../../hooks"
+import { useAppSelector, useAppDispatch } from "../../hooks"
+import { handleSubmitNewComment } from "../../actions"
 
 // TODO: enforce comment too long on backend
 
@@ -62,8 +63,9 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
     })
 }
 
-type SurveyProps = { match: { params: { conversation_id: string } } }
+type SurveyProps = { updateCommentCount?: Function; match: { params: { conversation_id: string } } }
 const Survey = ({
+  updateCommentCount,
   match: {
     params: { conversation_id },
   },
@@ -80,6 +82,7 @@ const Survey = ({
 
   const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
   const { user } = useAppSelector((state: RootState) => state.user)
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     if (!zid_metadata || Object.keys(zid_metadata).length === 0) return
@@ -211,7 +214,12 @@ const Survey = ({
           !!user?.githubUserId ||
           !!user?.xInfo ? (
             <Box sx={{ pt: [3] }}>
+              <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
+                This is a collective response survey where anyone can vote on responses by others.
+                If you have a comment or suggestion, please add it here:
+              </Box>
               <SurveyCompose
+                user={user}
                 key={zid_metadata.conversation_id}
                 zid_metadata={zid_metadata}
                 votedComments={votedComments}
@@ -221,29 +229,22 @@ const Survey = ({
                 setSubmittedComments={setSubmittedComments}
                 setState={setState}
                 showAsModal={false}
+                onSubmit={() => {
+                  dispatch(handleSubmitNewComment(zid_metadata))
+                }}
               />
             </Box>
           ) : (
-            <Box>
-              <Link
-                variant="links.buttonBlack"
-                sx={{ display: "block", textAlign: "center", width: "100%" }}
-                href={`/api/v3/github_oauth_init?dest=${window.location.href}`}
-              >
-                Login with Github to comment
-              </Link>
-              {/*
+            <Box sx={{ mt: "12px" }}>
               <Button
-                variant="outlineGray"
-                sx={{ width: "100%" }}
+                variant="buttons.black"
+                sx={{ py: "6px", fontSize: "0.94em", fontWeight: 500, width: "100%" }}
                 onClick={() =>
-                  (document.location = `/createuser?from=${encodeURIComponent(
-                    document.location.pathname,
-                  )}`)
+                  (document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`)
                 }
               >
-                Create an account to add comments
-                </Button> */}
+                Sign in with Github to respond
+              </Button>
             </Box>
           )}
         </Box>

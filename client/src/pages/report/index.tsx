@@ -434,7 +434,10 @@ class Report extends React.Component<
           <Heading as="h2" sx={{ my: [3] }}>
             Error Generating Report
           </Heading>
-          <Box sx={{ my: [1] }}>Not enough data</Box>
+          <Box sx={{ my: [1] }}>Maybe there hasn't been enough data yet?</Box>
+          <Box sx={{ my: [1] }}>
+            Reports need have at least 3 voters with different preferences to be generated.
+          </Box>
           <Box as="pre" sx={{ my: [3] }}>
             <code>{this.state.errorText}</code>
           </Box>

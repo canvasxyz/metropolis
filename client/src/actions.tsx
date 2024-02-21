@@ -8,6 +8,8 @@ import { populateConversationsSummary } from "./reducers/conversations_summary"
 export type Action = any
 
 /* ======= Types ======= */
+export const SUBMIT_NEW_COMMENT = "SUBMIT_NEW_COMMENT"
+
 export const REQUEST_USER = "REQUEST_USER"
 export const RECEIVE_USER = "RECEIVE_USER"
 export const USER_FETCH_ERROR = "USER_FETCH_ERROR"
@@ -563,6 +565,13 @@ export const handleZidMetadataUpdate = (zm, field, value) => {
     return updateZidMetadata(zm, field, value)
       .then((res) => dispatch(updateZidMetadataSuccess(res)))
       .fail((err) => dispatch(updateZidMetadataError(err)))
+  }
+}
+
+export const handleSubmitNewComment = (zid_metadata) => {
+  return {
+    type: SUBMIT_NEW_COMMENT,
+    conversation_id: zid_metadata.conversation_id,
   }
 }
 

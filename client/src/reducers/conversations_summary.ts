@@ -1,3 +1,4 @@
+import * as types from "../actions"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 const populateConversationsSummary = createAsyncThunk(
@@ -71,6 +72,13 @@ const conversationsSummarySlice = createSlice({
         state.status = "failed"
         state.data = null
         state.error = action.error.message
+      })
+      .addDefaultCase((state, action) => {
+        if (action.type === types.SUBMIT_NEW_COMMENT) {
+          const conversation = state.data.find((d) => d.conversation_id === (action as any).conversation_id)
+          conversation.comment_count = conversation.comment_count + 1
+        }
+        return state
       })
   },
 })

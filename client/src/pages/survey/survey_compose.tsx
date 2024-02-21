@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
-import { Box, Heading, Button, Text } from "theme-ui"
+import { Link, Box, Heading, Button, Text } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"
@@ -13,19 +13,23 @@ import { surveyHeadingMini } from "./index"
 Modal.setAppElement("#root")
 
 const SurveyComposeBox = ({
+  user,
   zid_metadata,
   votedComments,
   setVotedComments,
   submittedComments,
   setSubmittedComments,
   setState,
+  onSubmit,
 }: {
+  user
   zid_metadata
   votedComments
   setVotedComments
   submittedComments
   setSubmittedComments
   setState
+  onSubmit
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>()
   const [cachedComment, setCachedComment] = useLocalStorage(
@@ -51,11 +55,11 @@ const SurveyComposeBox = ({
         .post("api/v3/comments", params)
         .fail((xhr: XMLHttpRequest, evt: string, err: string) => {
           if (err.toString() === "Conflict") {
-            setError("Someone has already submitted this comment")
+            setError("Someone has already submitted this response")
             toast.error("Already exists")
           } else if (finalTxt === "") {
-            setError("Could not add empty statement")
-            toast.error("Invalid statement")
+            setError("Could not add empty response")
+            toast.error("Invalid response")
           } else {
             setError(err.toString())
             toast.error(err.toString())
@@ -76,7 +80,7 @@ const SurveyComposeBox = ({
           }
           setVotedComments([...votedComments, comment])
           setSubmittedComments([...submittedComments, comment])
-          toast.success("Statement added")
+          toast.success("Response added")
 
           if (
             (!zid_metadata.postsurvey_limit ||
@@ -95,79 +99,95 @@ const SurveyComposeBox = ({
   }
 
   return (
-    <form onSubmit={(e) => e.preventDefault()}>
-      <TextareaAutosize
+    <form onSubmit={(e) => e.preventDefault()} style={{ display: "flex" }}>
+      <img
+        src={user && "https://github.com/" + user.githubUsername + ".png"}
+        width="34"
+        height="34"
         style={{
-          fontFamily: "inherit",
-          fontSize: "1em",
-          width: "100%",
-          borderRadius: "3px",
-          padding: "8px",
-          border: "1px solid",
-          borderColor: "lightGray",
-          marginTop: "0px",
-          background: loading ? "#eee" : undefined,
-        }}
-        disabled={!!loading}
-        rows={1}
-        minRows={1}
-        maxRows={9}
-        ref={inputRef}
-        placeholder="Add a response"
-        defaultValue={cachedComment}
-        onBlur={() => {
-          setCachedComment(inputRef.current.value)
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && e.metaKey) {
-            e.preventDefault()
-            setCachedComment("")
-            submitComment(inputRef.current.value, 1)
-              .then(() => {
-                inputRef.current.value = ""
-                setError("")
-              })
-              .finally(() => {
-                setLoading(false)
-                inputRef.current.focus()
-              })
-          } else {
-            setCachedComment(inputRef.current.value)
-          }
+          borderRadius: 6,
+          marginRight: "8px",
+          background: "#ccc",
+          marginTop: "2px",
         }}
       />
-      <Box sx={{ mb: [2] }}>
-        <Button
-          variant="primary"
-          sx={{
-            mt: [1],
-            py: "4px",
-            px: "10px",
-            minWidth: "100px",
-            fontSize: "0.98em",
-            fontWeight: 500,
+      <Box sx={{ flex: 1 }}>
+        <TextareaAutosize
+          style={{
+            fontFamily: "inherit",
+            fontSize: "1em",
+            width: "100%",
+            borderRadius: "3px",
+            padding: "8px",
+            border: "1px solid",
+            borderColor: "lightGray",
+            marginTop: "0px",
+            background: loading ? "#eee" : undefined,
           }}
-          onClick={() => {
-            submitComment(inputRef.current.value, 1)
-              .then(() => {
-                inputRef.current.value = ""
-                setError("")
-              })
-              .finally(() => {
-                setLoading(false)
-                inputRef.current.focus()
-              })
+          disabled={!!loading}
+          rows={2}
+          minRows={2}
+          maxRows={9}
+          ref={inputRef}
+          placeholder="Your response here"
+          defaultValue={cachedComment}
+          onBlur={() => {
+            setCachedComment(inputRef.current.value)
           }}
-        >
-          Submit
-        </Button>
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && e.metaKey) {
+              e.preventDefault()
+              setCachedComment("")
+              submitComment(inputRef.current.value, 1)
+                .then(() => {
+                  inputRef.current.value = ""
+                  setError("")
+                  onSubmit()
+                })
+                .finally(() => {
+                  setLoading(false)
+                  inputRef.current.focus()
+                })
+            } else {
+              setCachedComment(inputRef.current.value)
+            }
+          }}
+        />
+        <Box sx={{ mb: [2] }}>
+          <Button
+            variant="primary"
+            sx={{
+              mt: [1],
+              py: "4px",
+              px: "10px",
+              minWidth: "100px",
+              fontSize: "0.98em",
+              fontWeight: 500,
+            }}
+            onClick={() => {
+              submitComment(inputRef.current.value, 1)
+                .then(() => {
+                  inputRef.current.value = ""
+                  setError("")
+                  onSubmit()
+                })
+                .finally(() => {
+                  setLoading(false)
+                  inputRef.current.focus()
+                })
+            }}
+          >
+            Submit {!user && "anonymously"}
+          </Button>
+        </Box>
+        <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
       </Box>
-      <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
     </form>
   )
 }
 
 const SurveyCompose = ({
+  user,
   zid_metadata,
   votedComments,
   unvotedComments,
@@ -176,7 +196,9 @@ const SurveyCompose = ({
   setSubmittedComments,
   setState,
   showAsModal = false,
+  onSubmit,
 }: {
+  user
   zid_metadata
   votedComments
   unvotedComments
@@ -185,6 +207,7 @@ const SurveyCompose = ({
   setSubmittedComments
   setState
   showAsModal
+  onSubmit
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -198,18 +221,20 @@ const SurveyCompose = ({
             setIsOpen(true)
           }}
         >
-          Add new statement
+          Add new response
           <TbMessageDots style={{ marginLeft: "6px", position: "relative", top: "2px" }} />
         </Button>
       )}
       {!showAsModal ? (
         <SurveyComposeBox
+          user={user}
           zid_metadata={zid_metadata}
           votedComments={votedComments}
           setVotedComments={setVotedComments}
           submittedComments={submittedComments}
           setSubmittedComments={setSubmittedComments}
           setState={setState}
+          onSubmit={onSubmit}
         />
       ) : (
         <Modal
@@ -234,15 +259,15 @@ const SurveyCompose = ({
               padding: "32px 28px 28px",
             },
           }}
-          contentLabel="Add new statement"
+          contentLabel="Add new response"
         >
           <Heading as="h4" sx={surveyHeadingMini}>
-            Add new statement
+            Add new response
           </Heading>
 
           {zid_metadata.help_type !== 0 && (
             <Text sx={{ mb: [4] }}>
-              <p>Add your perspectives, experiences, or ideas here. Good statements should:</p>
+              <p>Add your perspectives, experiences, or ideas here. Good responses should:</p>
               <ul>
                 <li>Raise new perspectives</li>
                 <li>Be clear & concise</li>
@@ -252,12 +277,14 @@ const SurveyCompose = ({
           )}
 
           <SurveyComposeBox
+            user={user}
             zid_metadata={zid_metadata}
             votedComments={votedComments}
             setVotedComments={setVotedComments}
             submittedComments={submittedComments}
             setSubmittedComments={setSubmittedComments}
             setState={setState}
+            onSubmit={onSubmit}
           />
         </Modal>
       )}
