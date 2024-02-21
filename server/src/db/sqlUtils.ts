@@ -104,7 +104,7 @@ const sql_participants_extended = sql.define({
 //first we define our tables
 const sql_users = sql.define({
   name: "users",
-  columns: ["uid", "hname", "email", "created"],
+  columns: ["uid", "hname", "email", "created", "github_username"],
 });
 
 const sql_reports = sql.define({

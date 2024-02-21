@@ -123,6 +123,17 @@ const SurveyCard = ({
     >
       <Box>
         <Text sx={{ display: "block", wordBreak: "break-word", pb: [2] }}>
+          <Box sx={{ fontSize: "0.93em", opacity: 0.8, mb: "12px" }}>
+            <img
+              src={`https://github.com/${comment.github_username}.png`}
+              width="20"
+              height="20"
+              style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 6 }}
+            />
+            <Text sx={{ position: "relative", top: "-4px", ml: "6px" }}>
+              {comment.github_username ?? "Anonymous"}
+            </Text>
+          </Box>
           <Text className="react-markdown-card">
             <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {txt}

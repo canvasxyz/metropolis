@@ -66,6 +66,7 @@ function getComments(o: CommentType) {
         "is_meta",
         "lang",
         "pid",
+        "github_username",
       ];
       if (o.moderation) {
         cols.push("velocity");
@@ -211,7 +212,12 @@ function _getCommentsList(o: {
       };
 
       let q = SQL.sql_comments
-        .select(SQL.sql_comments.star())
+        .select(SQL.sql_comments.star(), SQL.sql_users.github_username)
+        .from(
+          SQL.sql_comments
+            .join(SQL.sql_users)
+            .on(SQL.sql_comments.uid.equals(SQL.sql_users.uid)),
+        )
         .where(SQL.sql_comments.zid.equals(o.zid));
       if (!_.isUndefined(o.pid)) {
         q = q.and(SQL.sql_comments.pid.equals(o.pid));

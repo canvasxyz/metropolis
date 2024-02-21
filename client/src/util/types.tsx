@@ -15,6 +15,7 @@ export type Comment = {
   is_meta: boolean
   lang: null | string
   pid: string
+  github_username: null | string
 }
 
 export type ZidMetadata = {
