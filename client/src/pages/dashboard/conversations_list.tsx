@@ -3,6 +3,13 @@ import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text, Link } from "theme-ui"
 import {
+  TbCards,
+  TbThumbUp,
+  TbThumbDown,
+  TbUser,
+  TbUsers,
+  TbChecks,
+  TbMessage,
   TbMessage2,
   TbChevronDown,
   TbDots,
@@ -316,12 +323,21 @@ const ConversationListItem = ({
           {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
             <Text sx={{ color: "#84817D" }}>Untitled</Text>
           )}
-          <Box sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>{timeAgo}</Box>
+          <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
+            <Text sx={{ flex: 1 }}>{timeAgo}</Text>
+            {conversation.fip_title || conversation.github_pr_title ? (
+              <Text>{/* {conversation.sentiment_count ?? 0} <TbUsers /> */}</Text>
+            ) : (
+              <Text>
+                {conversation.comment_count} <TbCards />
+              </Text>
+            )}
+          </Flex>
         </Box>
       </Flex>
       {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
         <Box
-          sx={{ position: "absolute", top: "13px", right: "10px" }}
+          sx={{ position: "absolute", top: "13px", right: "15px" }}
           onClick={(e) => e.stopPropagation()}
         >
           <Menu>

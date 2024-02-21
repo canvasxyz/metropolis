@@ -7871,7 +7871,9 @@ async function handle_GET_conversations(
 
 async function handle_GET_conversations_summary(req: Request, res: Response) {
   const query = `
-  WITH comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid)
+  WITH
+    comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid),
+    sentiment_counts AS (SELECT zid, count(*) as sentiment_count FROM conversation_sentiment_votes GROUP BY zid)
   SELECT
     conversations.created,
     conversations.topic,
@@ -7886,6 +7888,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.is_hidden,
     conversations.participant_count,
     cast(comment_counts.comment_count as INTEGER),
+    cast(sentiment_counts.sentiment_count as INTEGER),
     conversations.owner,
     users.hname,
     users.github_username,
@@ -7893,6 +7896,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   FROM
     conversations
   LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
+  LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
   JOIN users ON conversations.owner = users.uid
   JOIN zinvites ON conversations.zid = zinvites.zid;
   `;
