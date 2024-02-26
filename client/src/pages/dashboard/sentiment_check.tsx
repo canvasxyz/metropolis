@@ -7,9 +7,8 @@ import { TbCheck, TbChevronDown, TbChevronUp } from "react-icons/tb"
 
 import api from "../../util/api"
 
-const SUPPORT_VOTE = "support"
-const OPPOSE_VOTE = "oppose"
-const NEUTRAL_VOTE = "neutral"
+const LIKE_VOTE = "like"
+const DISLIKE_VOTE = "dislike"
 
 export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   user,
@@ -18,85 +17,58 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   user: { githubUsername: string }
   zid_metadata
 }) => {
-  const [supported, setSupported] = useState(() =>
-    zid_metadata.sentiment.filter((v) => v.vote === SUPPORT_VOTE).map((v) => v.github_username),
+  const [liked, setLiked] = useState(() =>
+    zid_metadata.sentiment.filter((v) => v.vote === LIKE_VOTE).map((v) => v.github_username),
   )
-  const [opposed, setOpposed] = useState(() =>
-    zid_metadata.sentiment.filter((v) => v.vote === OPPOSE_VOTE).map((v) => v.github_username),
-  )
-  const [neutral, setNeutral] = useState(() =>
-    zid_metadata.sentiment.filter((v) => v.vote === NEUTRAL_VOTE).map((v) => v.github_username),
+  const [disliked, setDisliked] = useState(() =>
+    zid_metadata.sentiment.filter((v) => v.vote === DISLIKE_VOTE).map((v) => v.github_username),
   )
 
   const [updating, setUpdating] = useState(false)
 
-  const [showSupportingUsers, setShowSupportingUsers] = useState(false)
-  const [showNeutralUsers, setShowNeutralUsers] = useState(false)
-  const [showOpposedUsers, setShowOpposedUsers] = useState(false)
+  const [showLikedUsers, setShowLikedUsers] = useState(false)
+  const [showDislikedUsers, setShowDislikedUsers] = useState(false)
 
-  const isSupported = supported.find((u: string) => u === user?.githubUsername)
-  const isOpposed = opposed.find((u: string) => u === user?.githubUsername)
-  const isNeutral = neutral.find((u: string) => u === user?.githubUsername)
+  const isLiked = liked.find((u: string) => u === user?.githubUsername)
+  const isDisliked = disliked.find((u: string) => u === user?.githubUsername)
 
   const activeStyles = { opacity: 0.7, pointerEvents: "none" }
-  const supportedStyles = isSupported ? activeStyles : {}
-  const opposedStyles = isOpposed ? activeStyles : {}
-  const neutralStyles = isNeutral ? activeStyles : {}
+  const likedStyles = isLiked ? activeStyles : {}
+  const dislikedStyles = isDisliked ? activeStyles : {}
 
-  const voteSupport = (e) => {
+  const voteLike = (e) => {
     e.preventDefault()
-    if (supported.find((u: string) => u === user.githubUsername)) {
-      setSupported(supported.filter((u: string) => u !== user.githubUsername))
+    if (liked.find((u: string) => u === user.githubUsername)) {
+      setLiked(liked.filter((u: string) => u !== user.githubUsername))
       return
     }
     setUpdating(true)
     api
       .post("/api/v3/conversation/sentiment", {
         conversation_id: zid_metadata.conversation_id,
-        vote: SUPPORT_VOTE,
+        vote: LIKE_VOTE,
       })
       .then(() => {
-        setSupported([...supported, user.githubUsername])
-        setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
-        setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
+        setLiked([...liked, user.githubUsername])
+        setDisliked(disliked.filter((u: string) => u !== user.githubUsername))
       })
       .always(() => setUpdating(false))
   }
-  const voteOppose = (e) => {
+  const voteDislike = (e) => {
     e.preventDefault()
-    if (opposed.find((u: string) => u === user.githubUsername)) {
-      setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
+    if (disliked.find((u: string) => u === user.githubUsername)) {
+      setDisliked(disliked.filter((u: string) => u !== user.githubUsername))
       return
     }
     setUpdating(true)
     api
       .post("/api/v3/conversation/sentiment", {
         conversation_id: zid_metadata.conversation_id,
-        vote: OPPOSE_VOTE,
+        vote: DISLIKE_VOTE,
       })
       .then(() => {
-        setOpposed([...opposed, user.githubUsername])
-        setSupported(supported.filter((u: string) => u !== user.githubUsername))
-        setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
-      })
-      .always(() => setUpdating(false))
-  }
-  const voteNeutral = (e) => {
-    e.preventDefault()
-    if (neutral.find((u: string) => u === user.githubUsername)) {
-      setNeutral(neutral.filter((u: string) => u !== user.githubUsername))
-      return
-    }
-    setUpdating(true)
-    api
-      .post("/api/v3/conversation/sentiment", {
-        conversation_id: zid_metadata.conversation_id,
-        vote: NEUTRAL_VOTE,
-      })
-      .then(() => {
-        setNeutral([...neutral, user.githubUsername])
-        setOpposed(opposed.filter((u: string) => u !== user.githubUsername))
-        setSupported(supported.filter((u: string) => u !== user.githubUsername))
+        setDisliked([...disliked, user.githubUsername])
+        setLiked(liked.filter((u: string) => u !== user.githubUsername))
       })
       .always(() => setUpdating(false))
   }
@@ -117,19 +89,19 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
             bg: "mediumGreen",
             "&:hover": { bg: "mediumGreenActive" },
             mr: "8px",
-            ...supportedStyles,
+            ...likedStyles,
           }}
-          onClick={voteSupport}
+          onClick={voteLike}
         >
-          Support {isSupported && <TbCheck />}
+          Like {isLiked && <TbCheck />}
         </Button>
         <Box
           sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
           onClick={() => {
-            setShowSupportingUsers(!showSupportingUsers)
+            setShowLikedUsers(!showLikedUsers)
           }}
         >
-          {supported.length} supporting
+          {liked.length} liked
           <Box
             sx={{
               display: "inline",
@@ -138,12 +110,12 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
               top: "2px",
             }}
           >
-            {showSupportingUsers ? <TbChevronUp /> : <TbChevronDown />}
+            {showLikedUsers ? <TbChevronUp /> : <TbChevronDown />}
           </Box>
         </Box>
-        {showSupportingUsers && (
+        {showLikedUsers && (
           <Box sx={{ fontSize: "0.9em", mt: [1] }}>
-            {supported.map((u: string) => (
+            {liked.map((u: string) => (
               <Box key={u}>{u}</Box>
             ))}
           </Box>
@@ -162,19 +134,19 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
             fontWeight: 500,
             bg: "mediumRed",
             "&:hover": { bg: "mediumRedActive" },
-            ...opposedStyles,
+            ...dislikedStyles,
           }}
-          onClick={voteOppose}
+          onClick={voteDislike}
         >
-          Oppose {isOpposed && <TbCheck />}
+          Dislike {isDisliked && <TbCheck />}
         </Button>
         <Box
           sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
           onClick={() => {
-            setShowOpposedUsers(!showOpposedUsers)
+            setShowDislikedUsers(!showDislikedUsers)
           }}
         >
-          {opposed.length} opposed
+          {disliked.length} disliked
           <Box
             sx={{
               display: "inline",
@@ -183,61 +155,16 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
               top: "2px",
             }}
           >
-            {showOpposedUsers ? <TbChevronUp /> : <TbChevronDown />}
+            {showDislikedUsers ? <TbChevronUp /> : <TbChevronDown />}
           </Box>
-          {showOpposedUsers && (
+          {showDislikedUsers && (
             <Box sx={{ fontSize: "0.9em", mt: [1] }}>
-              {opposed.map((u: string) => (
+              {disliked.map((u: string) => (
                 <Box key={u}>{u}</Box>
               ))}
             </Box>
           )}
         </Box>
-      </Box>
-      <Box sx={{ flex: 1, textAlign: "center" }}>
-        <Button
-          variant="primary"
-          sx={{
-            border: "transparent",
-            color: "white",
-            py: "6px",
-            px: "10px",
-            width: "100%",
-            fontSize: "0.98em",
-            fontWeight: 500,
-            bg: "mediumGray",
-            "&:hover": { bg: "mediumGrayActive" },
-            ...neutralStyles,
-          }}
-          onClick={voteNeutral}
-        >
-          Neutral {isNeutral && <TbCheck />}
-        </Button>
-        <Box
-          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
-          onClick={() => {
-            setShowNeutralUsers(!showNeutralUsers)
-          }}
-        >
-          {neutral.length} neutral
-          <Box
-            sx={{
-              display: "inline",
-              position: "relative",
-              ml: "2px",
-              top: "2px",
-            }}
-          >
-            {showNeutralUsers ? <TbChevronUp /> : <TbChevronDown />}
-          </Box>
-        </Box>
-        {showNeutralUsers && (
-          <Box sx={{ fontSize: "0.9em", mt: [1] }}>
-            {neutral.map((u: string) => (
-              <Box key={u}>{u}</Box>
-            ))}
-          </Box>
-        )}
       </Box>
     </Flex>
   )
