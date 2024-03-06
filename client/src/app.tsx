@@ -238,7 +238,10 @@ class App extends React.Component<
                 component={ConversationAdmin}
               />
             </Box>
-            {!document.location.pathname.startsWith("/dashboard") && <Footer inSurvey={inSurvey} />}
+            {document.location.pathname !== "/" &&
+              !document.location.pathname.startsWith("/dashboard") && (
+                <Footer inSurvey={inSurvey} />
+              )}
           </Box>
           <Box
             sx={{
