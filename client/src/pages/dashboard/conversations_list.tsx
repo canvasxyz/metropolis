@@ -120,16 +120,6 @@ const ConversationsList = ({
     conversationsToDisplay = []
   }
 
-  useEffect(() => {
-    if (
-      selectedConversations.length &&
-      selectedConversationId === null &&
-      conversationsToDisplay.length > 0
-    ) {
-      hist.replace(`/dashboard/c/${conversationsToDisplay[0].conversation_id}`)
-    }
-  }, [selectedConversationId, selectedConversations.length, conversationsToDisplay.length])
-
   if (data === null) {
     return <React.Fragment></React.Fragment>
   }

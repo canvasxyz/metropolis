@@ -124,8 +124,9 @@ class App extends React.Component<
     const { location } = this.props
     const inReport = document.location.pathname?.startsWith("/r/")
     const inSurvey = document.location.pathname?.startsWith("/c/")
-    const inHomepage = document.location.pathname === "/"
-    const inDashboard = document.location.pathname.startsWith("/dashboard")
+    const inHomepage = document.location.pathname === "/about"
+    const inDashboard =
+      document.location.pathname.startsWith("/dashboard") || document.location.pathname === "/"
 
     return (
       <React.Fragment>
@@ -146,7 +147,7 @@ class App extends React.Component<
               pb: inDashboard ? [0] : [4],
             }}
           >
-            {document.location.pathname !== "/" &&
+            {document.location.pathname !== "/about" &&
               !document.location.pathname.startsWith("/dashboard") && (
                 <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
               )}
@@ -158,7 +159,11 @@ class App extends React.Component<
                 minHeight: "calc(100vh - 9em - 8px)",
               }}
             >
-              <Route exact path="/" render={() => <Home user={this.props.user} />} />
+              <Route
+                exact
+                path="/"
+                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
+              />
               <Route
                 exact
                 path="/dashboard"
@@ -172,7 +177,8 @@ class App extends React.Component<
                   },
                 }) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
               />
-              <Route exact path="/about" render={() => <About />} />
+              <Route exact path="/about" render={() => <Home user={this.props.user} />} />
+              <Route exact path="/about2" render={() => <About />} />
               <Route
                 exact
                 path="/signin"

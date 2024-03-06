@@ -20,9 +20,11 @@ class Root extends React.Component {
         <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
           <Provider store={store}>
             <Router>
-              <Route render={(routeProps) => {
-                return <App {...routeProps} />
-              }}></Route>
+              <Route
+                render={(routeProps) => {
+                  return <App {...routeProps} />
+                }}
+              ></Route>
             </Router>
           </Provider>
         </IconContext.Provider>

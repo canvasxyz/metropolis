@@ -2,9 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { Link as RouterLink } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { Box, Flex, Text, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
+import { TbHelp, TbGitPullRequest, TbMessage, TbMessage2 } from "react-icons/tb"
 
+import { formatTimeAgo } from "../../util/misc"
+import { useAppDispatch, useAppSelector } from "../../hooks"
+import { RootState } from "../../store"
 import api from "../../util/api"
 import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
@@ -21,6 +26,11 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
+
+  const hist = useHistory()
+
+  const { data } = useAppSelector((state: RootState) => state.conversations_summary)
+  const conversations = data || []
 
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
   const [syncInProgress, setSyncInProgress] = useState(false)
@@ -98,6 +108,11 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
                 </Text>
               </RouterLink>
             </Box>
+            <Box>
+              <RouterLink to="/about">
+                <TbHelp style={{ height: 20, width: 20, marginTop: 10, color: "#8a8b8b" }} />
+              </RouterLink>
+            </Box>
           </Flex>
           <ConversationsList
             selectedConversationId={selectedConversationId}
@@ -112,9 +127,69 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
           {selectedConversationId ? (
             <DashboardConversation selectedConversationId={selectedConversationId} user={user} />
           ) : (
-            <Flex sx={{ justifyContent: "center", alignItems: "center", height: "100%" }}>
-              <h3 sx={{ fontWeight: 500, mt: [4], opacity: 0.4 }}>Select a survey</h3>
-            </Flex>
+            <Box sx={{ maxWidth: "540px", px: [3], py: [3], pt: [8], margin: "0 auto" }}>
+              <Box>
+                Welcome to Metropolis, a nonbinding sentiment check tool for the Filecoin community.
+                You can:
+              </Box>
+              <Box sx={{ pt: [3] }}>
+                <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
+                <Text sx={{ fontWeight: 700 }}>Signal your position</Text> on FIPs before they go to
+                onchain voting.
+                <br />
+                <TbMessage2 color="#0090ff" style={{ marginRight: "6px" }} />
+                <Text sx={{ fontWeight: 700 }}>Collect comments</Text> on open-ended issues.
+              </Box>
+              <Box sx={{ pt: [3] }}>These are the most recently active sentiment checks:</Box>
+              <Box sx={{ pt: [3] }}>
+                {conversations.length === 0 && (
+                  <Box sx={{ fontWeight: 500, mt: [4], opacity: 0.5 }}>None found</Box>
+                )}
+                {conversations
+                  .filter((c) => !c.is_archived && !c.is_hidden)
+                  .slice(0, 5)
+                  .map((c) => {
+                    const date = new Date(c.fip_created || +c.created)
+                    const timeAgo = formatTimeAgo(+date)
+
+                    console.log(c)
+                    return (
+                      <Flex
+                        sx={{
+                          border: "1px solid #e2ddd599",
+                          borderRadius: "8px",
+                          px: [3],
+                          py: "12px",
+                          mb: [2],
+                          lineHeight: 1.3,
+                          cursor: "pointer",
+                          "&:hover": {
+                            border: "1px solid #e2ddd5",
+                          },
+                        }}
+                        key={c.created}
+                        onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
+                      >
+                        <Box sx={{ pr: "13px", pt: "1px" }}>
+                          {c.fip_title ? (
+                            <TbGitPullRequest color="#3fba50" />
+                          ) : (
+                            <TbMessage2 color="#0090ff" />
+                          )}
+                        </Box>
+                        <Box>
+                          <Box>{c.fip_title || c.topic}</Box>
+                          <Box
+                            sx={{ opacity: 0.6, fontSize: "0.94em", mt: "3px", fontWeight: 400 }}
+                          >
+                            Created {timeAgo}
+                          </Box>
+                        </Box>
+                      </Flex>
+                    )
+                  })}
+              </Box>
+            </Box>
           )}
         </Box>
       </Flex>
