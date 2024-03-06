@@ -14,7 +14,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   user,
   zid_metadata,
 }: {
-  user: { isAdmin: boolean; isRepoCollaborator: boolean; githubUsername: string }
+  user?: { isAdmin: boolean; isRepoCollaborator: boolean; githubUsername: string; uid?: number }
   zid_metadata
 }) => {
   const [liked, setLiked] = useState(() =>
@@ -38,8 +38,8 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
 
   const voteLike = (e) => {
     e.preventDefault()
-    if (liked.find((u: string) => u === user.githubUsername)) {
-      setLiked(liked.filter((u: string) => u !== user.githubUsername))
+    if (liked.find((u: string) => u === user?.githubUsername)) {
+      setLiked(liked.filter((u: string) => u !== user?.githubUsername))
       return
     }
     setUpdating(true)
@@ -49,15 +49,15 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
         vote: LIKE_VOTE,
       })
       .then(() => {
-        setLiked([...liked, user.githubUsername])
-        setDisliked(disliked.filter((u: string) => u !== user.githubUsername))
+        setLiked([...liked, user?.githubUsername])
+        setDisliked(disliked.filter((u: string) => u !== user?.githubUsername))
       })
       .always(() => setUpdating(false))
   }
   const voteDislike = (e) => {
     e.preventDefault()
-    if (disliked.find((u: string) => u === user.githubUsername)) {
-      setDisliked(disliked.filter((u: string) => u !== user.githubUsername))
+    if (disliked.find((u: string) => u === user?.githubUsername)) {
+      setDisliked(disliked.filter((u: string) => u !== user?.githubUsername))
       return
     }
     setUpdating(true)
@@ -67,8 +67,8 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
         vote: DISLIKE_VOTE,
       })
       .then(() => {
-        setDisliked([...disliked, user.githubUsername])
-        setLiked(liked.filter((u: string) => u !== user.githubUsername))
+        setDisliked([...disliked, user?.githubUsername])
+        setLiked(liked.filter((u: string) => u !== user?.githubUsername))
       })
       .always(() => setUpdating(false))
   }
@@ -89,10 +89,13 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
             bg: "mediumGreen",
             "&:hover": { bg: "mediumGreenActive" },
             mr: "8px",
+            opacity: !user?.uid ? "0.5" : 1,
+            pointerEvents: !user?.uid ? "none" : undefined,
             ...likedStyles,
           }}
           onClick={voteLike}
         >
+          {!user?.uid && "Sign in to "}
           Like {isLiked && <TbCheck />}
         </Button>
         <Box
@@ -136,10 +139,13 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
             fontWeight: 500,
             bg: "mediumRed",
             "&:hover": { bg: "mediumRedActive" },
+            opacity: !user?.uid ? "0.5" : 1,
+            pointerEvents: !user?.uid ? "none" : undefined,
             ...dislikedStyles,
           }}
           onClick={voteDislike}
         >
+          {!user?.uid && "Sign in to "}
           Dislike {isDisliked && <TbCheck />}
         </Button>
         <Box
