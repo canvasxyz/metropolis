@@ -148,6 +148,7 @@ class App extends React.Component<
             }}
           >
             {document.location.pathname !== "/about" &&
+              document.location.pathname !== "/" &&
               !document.location.pathname.startsWith("/dashboard") && (
                 <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
               )}
