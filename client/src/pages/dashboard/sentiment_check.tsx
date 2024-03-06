@@ -14,7 +14,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   user,
   zid_metadata,
 }: {
-  user: { githubUsername: string }
+  user: { isAdmin: boolean; isRepoCollaborator: boolean; githubUsername: string }
   zid_metadata
 }) => {
   const [liked, setLiked] = useState(() =>
@@ -96,24 +96,26 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           Like {isLiked && <TbCheck />}
         </Button>
         <Box
-          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
+          sx={{ fontSize: "0.94em", mt: [2] }}
           onClick={() => {
             setShowLikedUsers(!showLikedUsers)
           }}
         >
           {liked.length} liked
-          <Box
-            sx={{
-              display: "inline",
-              position: "relative",
-              ml: "2px",
-              top: "2px",
-            }}
-          >
-            {showLikedUsers ? <TbChevronUp /> : <TbChevronDown />}
-          </Box>
+          {user && (user.isRepoCollaborator || user.isAdmin) && (
+            <Box
+              sx={{
+                display: "inline",
+                position: "relative",
+                ml: "2px",
+                top: "2px",
+              }}
+            >
+              {showLikedUsers ? <TbChevronUp /> : <TbChevronDown />}
+            </Box>
+          )}
         </Box>
-        {showLikedUsers && (
+        {user && (user.isRepoCollaborator || user.isAdmin) && showLikedUsers && (
           <Box sx={{ fontSize: "0.9em", mt: [1] }}>
             {liked.map((u: string) => (
               <Box key={u}>{u}</Box>
@@ -141,30 +143,32 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           Dislike {isDisliked && <TbCheck />}
         </Button>
         <Box
-          sx={{ fontSize: "0.94em", mt: [2], cursor: "pointer" }}
+          sx={{ fontSize: "0.94em", mt: [2] }}
           onClick={() => {
             setShowDislikedUsers(!showDislikedUsers)
           }}
         >
           {disliked.length} disliked
-          <Box
-            sx={{
-              display: "inline",
-              position: "relative",
-              ml: "2px",
-              top: "2px",
-            }}
-          >
-            {showDislikedUsers ? <TbChevronUp /> : <TbChevronDown />}
-          </Box>
-          {showDislikedUsers && (
-            <Box sx={{ fontSize: "0.9em", mt: [1] }}>
-              {disliked.map((u: string) => (
-                <Box key={u}>{u}</Box>
-              ))}
+          {user && (user.isRepoCollaborator || user.isAdmin) && (
+            <Box
+              sx={{
+                display: "inline",
+                position: "relative",
+                ml: "2px",
+                top: "2px",
+              }}
+            >
+              {showDislikedUsers ? <TbChevronUp /> : <TbChevronDown />}
             </Box>
           )}
         </Box>
+        {user && (user.isRepoCollaborator || user.isAdmin) && showDislikedUsers && (
+          <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+            {disliked.map((u: string) => (
+              <Box key={u}>{u}</Box>
+            ))}
+          </Box>
+        )}
       </Box>
     </Flex>
   )
