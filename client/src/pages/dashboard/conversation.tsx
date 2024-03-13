@@ -55,9 +55,8 @@ export const DashboardConversation = ({
     (state: RootState) => state.zid_metadata,
   )
 
-  const summaryData = useAppSelector(
-    (state: RootState) =>
-      state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
+  const summaryData = useAppSelector((state: RootState) =>
+    state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
   )
 
   const [showReport, setShowReport] = useState<boolean>(false)
@@ -194,12 +193,20 @@ export const DashboardConversation = ({
           {!zid_metadata.fip_author &&
             (zid_metadata.topic || zid_metadata.fip_title) &&
             summaryData?.comment_count < 10 && (
-              <Box sx={{ ...surveyBox, p: "16px 18px", my: [3], borderLeft: "4px solid #eb4b4c" }}>
+              <Box
+                sx={{
+                  ...surveyBox,
+                  p: "16px 18px",
+                  my: [3],
+                  borderLeft: "4px solid #eb4b4c",
+                  lineHeight: 1.325,
+                }}
+              >
                 <Box sx={{ fontWeight: 600, mb: [1] }}>
                   <TbExclamationCircle /> Needs Seed Responses
                 </Box>
                 Fill in some example responses for readers to vote on. <strong>10 responses</strong>{" "}
-                are required for this survey to be visible to others.
+                are required for this survey to be public.
               </Box>
             )}
           {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (

@@ -601,6 +601,8 @@ const postCreateConversation = (topic, description) => {
   return api.post("/api/v3/conversations", {
     topic,
     description,
+    auth_needed_to_vote: true,
+    auth_needed_to_write: true,
   })
 }
 

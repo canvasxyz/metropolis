@@ -18,6 +18,7 @@ type SurveyCardProps = {
   hasVoted: boolean
   cardHeight?: number
   topCard?: boolean
+  zid_metadata
 }
 
 const SurveyCard = ({
@@ -27,6 +28,7 @@ const SurveyCard = ({
   hasVoted,
   cardHeight,
   topCard,
+  zid_metadata,
 }: SurveyCardProps) => {
   const { tid: commentId, txt } = comment
 
@@ -163,12 +165,16 @@ const SurveyCard = ({
         <Box
           sx={{ position: "absolute", bottom: ["10px", "20px"], marginLeft: "-2px", pb: [2, 0] }}
         >
-          <Button variant="vote" onClick={(e: any) => agree(commentId, e.target)} sx={{ mr: [2] }}>
+          <Button
+            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
+            onClick={(e: any) => agree(commentId, e.target)}
+            sx={{ mr: [2] }}
+          >
             <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
             Agree
           </Button>
           <Button
-            variant="vote"
+            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
             onClick={(e: any) => disagree(commentId, e.target)}
             sx={{ mr: [2] }}
           >
@@ -179,7 +185,11 @@ const SurveyCard = ({
             />
             Disagree
           </Button>
-          <Button variant="vote" onClick={(e: any) => skip(commentId, e.target)} sx={{ mr: [2] }}>
+          <Button
+            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
+            onClick={(e: any) => skip(commentId, e.target)}
+            sx={{ mr: [2] }}
+          >
             Skip
           </Button>
         </Box>

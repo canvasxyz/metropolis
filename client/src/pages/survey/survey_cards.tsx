@@ -53,6 +53,7 @@ const SurveyCards = ({
                 onVoted={onVoted}
                 hasVoted={false}
                 cardHeight={cardHeight}
+                zid_metadata={zid_metadata}
               />
             )}
             {unvotedComments.length > 1 &&
@@ -70,14 +71,14 @@ const SurveyCards = ({
                         index === 0
                           ? "rotate(-0.15deg)"
                           : index === 1
-                          ? "rotate(0.15deg) translate(2px, 0)"
-                          : index === 2
-                          ? "rotate(-0.25deg)"
-                          : index === 3
-                          ? "rotate(0.25deg translate(-3px, 0))"
-                          : index === 4
-                          ? "rotate(-0.5deg translate(-1px, 0))"
-                          : "rotate(0.5deg)",
+                            ? "rotate(0.15deg) translate(2px, 0)"
+                            : index === 2
+                              ? "rotate(-0.25deg)"
+                              : index === 3
+                                ? "rotate(0.25deg translate(-3px, 0))"
+                                : index === 4
+                                  ? "rotate(-0.5deg translate(-1px, 0))"
+                                  : "rotate(0.5deg)",
                     }}
                   >
                     <SurveyCard
@@ -87,6 +88,7 @@ const SurveyCards = ({
                       hasVoted={false}
                       cardHeight={cardHeight}
                       topCard={index === commentStack.length - 1}
+                      zid_metadata={zid_metadata}
                     />
                   </Box>
                 )

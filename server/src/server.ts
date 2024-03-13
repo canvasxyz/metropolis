@@ -8208,6 +8208,8 @@ async function handle_POST_conversations(
       uid: number;
       topic: string;
       description: string;
+      auth_needed_to_vote: boolean;
+      auth_needed_to_write: boolean;
     };
   },
   res: any,
@@ -8219,6 +8221,8 @@ async function handle_POST_conversations(
       description: req.p.description,
       github_sync_enabled: false,
       is_active: true,
+      auth_needed_to_vote: req.p.auth_needed_to_vote,
+      auth_needed_to_write: req.p.auth_needed_to_write,
     };
     const insertData = Object.entries(insertObject);
     const fields = insertData.map(([field, _]) => field);

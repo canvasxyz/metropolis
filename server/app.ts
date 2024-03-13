@@ -1008,6 +1008,8 @@ app.post(
   auth(assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP, ""),
   want("description", getOptionalStringLimitLength(500000), assignToP, ""),
+  want("auth_needed_to_vote", getBool, assignToP, false),
+  want("auth_needed_to_write", getBool, assignToP, false),
   handle_POST_conversations,
 );
 

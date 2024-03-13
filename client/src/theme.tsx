@@ -206,6 +206,23 @@ export default {
       pb: [0, 1],
       pt: [0, 1],
     },
+    voteDisabled: {
+      bg: "bgGray",
+      color: "text",
+      cursor: "pointer",
+      fontFamily: "body",
+      fontSize: "0.96em",
+      fontWeight: 500,
+      borderRadius: 8,
+      "&:hover": {
+        backgroundColor: "bgGrayActive",
+        color: "textDark",
+      },
+      pb: [0, 1],
+      pt: [0, 1],
+      opacity: 0.6,
+      pointerEvents: "none" as any,
+    },
     primary: {
       color: "background",
       bg: "primary",

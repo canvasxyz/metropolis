@@ -195,7 +195,6 @@ const Survey = ({
           />
         </React.Fragment>
       )}
-
       {state === "postsurvey" && (
         <PostSurvey
           votedComments={votedComments}
@@ -237,7 +236,7 @@ const Survey = ({
           ) : (
             <Box sx={{ mt: "12px" }}>
               <Button
-                variant="buttons.black"
+                variant="buttons.outlineSecondary"
                 sx={{ py: "6px", fontSize: "0.94em", fontWeight: 500, width: "100%" }}
                 onClick={() =>
                   (document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`)

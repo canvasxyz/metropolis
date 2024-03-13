@@ -77,7 +77,7 @@ const SurveyComposeBox = ({
             is_meta: false,
             lang: null,
             pid: currentPid,
-            github_username: user.githubUsername ?? null,
+            github_username: user?.githubUsername ?? null,
           }
           setVotedComments([...votedComments, comment])
           setSubmittedComments([...submittedComments, comment])
@@ -102,7 +102,7 @@ const SurveyComposeBox = ({
   return (
     <form onSubmit={(e) => e.preventDefault()} style={{ display: "flex" }}>
       <img
-        src={user && `https://github.com/${user.githubUsername}.png`}
+        src={user && `https://github.com/${user?.githubUsername}.png`}
         width="34"
         height="34"
         style={{
