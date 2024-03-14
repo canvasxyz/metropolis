@@ -146,14 +146,14 @@ const ConversationsList = ({
             {selectedConversations === "all-fip"
               ? "All"
               : selectedConversations === "open-fip"
-              ? "FIPs"
-              : selectedConversations === "non-fip"
-              ? "Discussions"
-              : selectedConversations === "archived"
-              ? "Closed"
-              : selectedConversations === "hidden"
-              ? "Spam"
-              : ""}
+                ? "FIPs"
+                : selectedConversations === "non-fip"
+                  ? "Discussions"
+                  : selectedConversations === "archived"
+                    ? "Closed"
+                    : selectedConversations === "hidden"
+                      ? "Spam"
+                      : ""}
             <Box
               sx={{ position: "absolute", top: "8px", right: "12px" }}
               onClick={(e) => e.stopPropagation()}
@@ -219,11 +219,14 @@ const ConversationsList = ({
         <Box
           sx={{
             position: "absolute",
-            bottom: "56px",
+            bottom: "0px",
+            pb: "56px",
             fontSize: "0.88em",
             textAlign: "center",
             width: "300px",
             color: "#83817d",
+            background:
+              "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
           }}
         >
           Last sync: {formatTimeAgo(lastSync, true)} &nbsp;
@@ -364,27 +367,6 @@ const ConversationListItem = ({
                     <TbHammer /> Moderate comments
                   </Box>
                 </Menu.Item>
-                {user.githubRepoCollaborator && (
-                  <Menu.Item>
-                    <Box
-                      variant="boxes.menuitem"
-                      onClick={() => {
-                        if (conversation.is_hidden) {
-                          if (!confirm("Show this proposal to users again?")) return
-                          dispatch(handleUnmoderateConversation(conversation.conversation_id))
-                          toast.success("Removed from spam")
-                        } else {
-                          if (!confirm("Mark as spam? This will hide the proposal from users."))
-                            return
-                          dispatch(handleModerateConversation(conversation.conversation_id))
-                          toast.success("Moved to spam")
-                        }
-                      }}
-                    >
-                      <TbFlame /> {conversation.is_hidden ? "Unmark spam" : "Mark as spam"}
-                    </Box>
-                  </Menu.Item>
-                )}
                 {user &&
                   (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
                     <Menu.Item>
@@ -403,10 +385,33 @@ const ConversationListItem = ({
                         }}
                       >
                         {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
-                        {conversation.is_archived ? "Reopen" : "Mark as closed"}
+                        {conversation.is_archived ? "Reopen" : "Close"}
                       </Box>
                     </Menu.Item>
                   )}
+                {user.githubRepoCollaborator && (
+                  <Box sx={{ mt: "3px", pt: "3px", borderTop: "1px solid #e2ddd5" }}>
+                    <Menu.Item>
+                      <Box
+                        variant="boxes.menuitem"
+                        onClick={() => {
+                          if (conversation.is_hidden) {
+                            if (!confirm("Show this proposal to users again?")) return
+                            dispatch(handleUnmoderateConversation(conversation.conversation_id))
+                            toast.success("Removed from spam")
+                          } else {
+                            if (!confirm("Mark as spam? This will hide the proposal from users."))
+                              return
+                            dispatch(handleModerateConversation(conversation.conversation_id))
+                            toast.success("Moved to spam")
+                          }
+                        }}
+                      >
+                        <TbFlame /> {conversation.is_hidden ? "Unmark spam" : "Mark as spam"}
+                      </Box>
+                    </Menu.Item>
+                  </Box>
+                )}
               </Box>
             </Menu.Items>
           </Menu>
