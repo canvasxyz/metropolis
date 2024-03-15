@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { toast } from "react-hot-toast"
 import { Box, Button, Text, jsx } from "theme-ui"
+import { TbThumbUp, TbThumbDown } from "react-icons/tb"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -126,7 +127,7 @@ const SurveyCard = ({
       <Box>
         <Text sx={{ display: "block", wordBreak: "break-word", pb: [2] }}>
           <Box sx={{ fontSize: "0.93em", opacity: 0.8, mb: "12px" }}>
-            <img
+            {/*<img
               src={`https://github.com/${comment.github_username}.png`}
               width="20"
               height="20"
@@ -134,7 +135,7 @@ const SurveyCard = ({
             />
             <Text sx={{ position: "relative", top: "-4px", ml: "6px" }}>
               {comment.github_username ?? "Anonymous"}
-            </Text>
+              </Text>*/}
           </Box>
           <Text className="react-markdown-card">
             <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
@@ -170,7 +171,7 @@ const SurveyCard = ({
             onClick={(e: any) => agree(commentId, e.target)}
             sx={{ mr: [2] }}
           >
-            <img src="/agree.svg" width="18" sx={{ position: "relative", top: "3px", mr: [2] }} />
+            <TbThumbUp style={{ width: 18, color: "#2fcc71", position: "relative", top: 1 }} />{" "}
             Agree
           </Button>
           <Button
@@ -178,11 +179,7 @@ const SurveyCard = ({
             onClick={(e: any) => disagree(commentId, e.target)}
             sx={{ mr: [2] }}
           >
-            <img
-              src="/disagree.svg"
-              width="18"
-              sx={{ position: "relative", top: "2px", mr: [2] }}
-            />
+            <TbThumbDown style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
             Disagree
           </Button>
           <Button

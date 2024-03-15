@@ -3,7 +3,7 @@
 import React, { useState } from "react"
 import { Button, Box, Flex, jsx } from "theme-ui"
 import { useLocalStorage } from "@uidotdev/usehooks"
-import { TbCheck, TbChevronDown, TbChevronUp } from "react-icons/tb"
+import { TbCheck, TbChevronDown, TbChevronUp, TbThumbUp, TbThumbDown } from "react-icons/tb"
 
 import api from "../../util/api"
 
@@ -32,7 +32,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
   const isLiked = liked.find((u: string) => u === user?.githubUsername)
   const isDisliked = disliked.find((u: string) => u === user?.githubUsername)
 
-  const activeStyles = { opacity: 0.7, pointerEvents: "none" }
+  const activeStyles = { opacity: 0.7 }
   const likedStyles = isLiked ? activeStyles : {}
   const dislikedStyles = isDisliked ? activeStyles : {}
 
@@ -77,17 +77,11 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
     <Flex sx={{ gap: [2] }}>
       <Box sx={{ flex: 1, textAlign: "center" }}>
         <Button
-          variant="primary"
+          variant="vote"
           sx={{
-            border: "transparent",
-            color: "white",
-            py: "6px",
-            px: "10px",
             width: "100%",
             fontSize: "0.98em",
             fontWeight: 500,
-            bg: "mediumGreen",
-            "&:hover": { bg: "mediumGreenActive" },
             mr: "8px",
             opacity: !user?.uid ? "0.5" : 1,
             pointerEvents: !user?.uid ? "none" : undefined,
@@ -95,6 +89,7 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
           }}
           onClick={voteLike}
         >
+          <TbThumbUp style={{ width: 18, color: "#2fcc71", position: "relative", top: 1 }} />{" "}
           {!user?.uid && "Sign in to "}
           Like {isLiked && <TbCheck />}
         </Button>
@@ -128,23 +123,18 @@ export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
       </Box>
       <Box sx={{ flex: 1, textAlign: "center" }}>
         <Button
-          variant="primary"
+          variant="vote"
           sx={{
-            border: "transparent",
-            color: "white",
-            py: "6px",
-            px: "10px",
             width: "100%",
             fontSize: "0.98em",
             fontWeight: 500,
-            bg: "mediumRed",
-            "&:hover": { bg: "mediumRedActive" },
             opacity: !user?.uid ? "0.5" : 1,
             pointerEvents: !user?.uid ? "none" : undefined,
             ...dislikedStyles,
           }}
           onClick={voteDislike}
         >
+          <TbThumbDown style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
           {!user?.uid && "Sign in to "}
           Dislike {isDisliked && <TbCheck />}
         </Button>

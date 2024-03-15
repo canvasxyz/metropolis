@@ -34,7 +34,7 @@ const CreateConversationInner = () => {
           <Label sx={{ display: "block", fontWeight: 600, mb: [5] }}>
             <Box sx={{ mb: [1] }}>Title</Box>
             <Input
-              placeholder={"e.g. What communications channels should we use?"}
+              placeholder={"e.g. What communications channels should our group use?"}
               onChange={(i) => {
                 setTitle(i.target.value)
               }}
@@ -48,11 +48,9 @@ const CreateConversationInner = () => {
               <Textarea
                 id="new_conversation_description"
                 ref={descriptionRef}
-                placeholder={`Explain why this question matters to the community.
+                placeholder={`Explain why this question matters to the community, and provide any relevant context or history.
 
-Provde any relevant context or history.
-
-Be objective in the description. You can add specific opinions as responses later.`}
+Try to be objective in the description. You can add specific opinions as responses later.`}
                 rows={8}
                 onChange={(i) => {
                   setDescription(i.target.value)

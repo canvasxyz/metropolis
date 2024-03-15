@@ -101,6 +101,19 @@ const SurveyCards = ({
           No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
         </Box>
       )}
+      {unvotedComments.length > 0 && (
+        <Box
+          sx={{
+            fontSize: "0.94em",
+            position: "absolute",
+            top: [3],
+            right: "24px",
+            color: "lightGrayActive",
+          }}
+        >
+          {unvotedComments.length} remaining
+        </Box>
+      )}
 
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
