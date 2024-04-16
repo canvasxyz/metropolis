@@ -229,9 +229,9 @@ const ConversationsList = ({
               "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
           }}
         >
-          Last sync: {formatTimeAgo(lastSync, true)} &nbsp;
+          Last sync: {isNaN(lastSync) ? "n/a" : formatTimeAgo(lastSync, true)} &nbsp;
           <Link variant="links.a" onClick={() => syncPRs()}>
-            {syncInProgress ? <Spinner size={20} /> : `Sync now`}
+            {syncInProgress ? <Spinner size={26} /> : `Sync now`}
           </Link>
         </Box>
       )}
