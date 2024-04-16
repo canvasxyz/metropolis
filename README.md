@@ -16,7 +16,7 @@ In the near future, we expect to implement:
 - Support for multiple authenticated-data standards, SSO providers,
   and decentralized identity providers.
 
-### Setup
+## Development
 
 Setting up dependencies:
 
@@ -51,29 +51,18 @@ create user "polis-dev";
 alter role "polis-dev" superuser;
 ```
 
-3. Run migrations ([️see also](docs/migrations.md))
-
-```
-psql -d polis-dev -f postgres/migrations/000000_initial.sql
-psql -d polis-dev -f postgres/migrations/000001_update_pwreset_table.sql
-psql -d polis-dev -f postgres/migrations/000002_add_xid_constraint.sql
-psql -d polis-dev -f postgres/migrations/000003_add_origin_permanent_cookie_columns.sql
-psql -d polis-dev -f postgres/migrations/000004_drop_waitinglist_table.sql
-psql -d polis-dev -f postgres/migrations/000005_drop_slack_stripe_canvas.sql
-psql -d polis-dev -f postgres/migrations/000006_update_votes_rule.sql
-psql -d polis-dev -f postgres/migrations/000007_add_new_columns.sql
-psql -d polis-dev -f postgres/migrations/000008_add_encrypted_ip.sql
-psql -d polis-dev -f postgres/migrations/000009_add_postsurvey_text_and_limit.sql
-psql -d polis-dev -f postgres/migrations/000010_add_survey_caption_and_redirect.sql
-psql -d polis-dev -f postgres/migrations/000011_add_postsurvey_submissions.sql
-```
-
-4. Setup environment variables:
+3. Setup environment variables:
 
 ```
 cp example.env .env
 cd server
 cp example.env .env
+```
+
+4. Run all database migrations before starting:
+
+```
+cat server/postgres/migrations/* | psql polis-dev
 ```
 
 5. Install dependencies and run. This will start the client on port 8080, server on port 8040, and run the math worker:
@@ -83,17 +72,13 @@ npm install
 npm run dev
 ```
 
-6. Run all database migrations before starting:
+6. To access the site in development mode: http://localhost:8080/createuser
 
-```
-cat server/postgres/migrations/* | psql polis-dev
-```
+## Production Deployment
 
-7. Create user: http://localhost:8080/createuser
+1. To run the app in production mode locally, use *npm run start*, and go to http://localhost:8040.
 
-8. To run in production mode locally, use *npm run start*, and access the site at http://localhost:8040.
-
-9. To run in production mode on Heroku, set up the Heroku CLI and then set up plugins:
+2. To run the app on Heroku, set up the Heroku CLI and then set up plugins:
 
 ```
 heroku buildpacks:add heroku/clojure
@@ -115,22 +100,22 @@ Sendgrid API key in `server/.env`.
 
 To enable login with Github, configure a Github application at https://github.com/settings/apps and provide the client ID and client secret at `server/.env`. For a development environment, the callback should be: http://localhost:8080/api/v3/github_oauth_callback
 
-10. To run all migrations on production, or to run one specific migration:
+3. To run all migrations on production, or to run one specific migration:
 
 ```
 cat server/postgres/migrations/* | heroku psql
 cat server/postgres/migrations/000000_initial.sql | heroku psql
 ```
 
-11. You may wish to set a custom domain name and Heroku SSL on
+4. You may wish to set a custom domain name and Heroku SSL on
 production. This can be done in the Heroku control panel.
 
-12. To analyze bundle size:
+5. To analyze bundle size:
 - `cd client`
 - `npx webpack --profile --json > stats.json`
 - `npx webpack-bundle-analyzer ./stats.json`
 
-### Terminology
+## Terminology
 
 - uid: User ID
 - xid: External ID (for a user)
@@ -139,13 +124,13 @@ production. This can be done in the Heroku control panel.
 - tid: Statement ID
 - bid: Base Cluster ID
 
-### Troubleshooting
+## Troubleshooting
 
 In case a server isn't starting on the right port, check your
 currently running processes (`ps`) and make sure those ports
 aren't taken by other services.
 
-### Acknowledgements
+## Acknowledgements
 
 This platform is based on the Polis platform developed by the
 Computational Democracy Project. For the Polis codebase, see
