@@ -12,6 +12,7 @@ export async function handle_GET_conversation_sentiment_comments (req: Request &
     scc.created,
     scc.id,
     scc.uid,
+    scc.is_deleted,
     u.github_username
   FROM
     sentiment_check_comments as scc
@@ -20,8 +21,7 @@ export async function handle_GET_conversation_sentiment_comments (req: Request &
   ON
     u.uid = scc.uid
   WHERE
-    scc.zid = $1 AND
-    scc.is_deleted = false
+    scc.zid = $1
   ORDER BY
     scc.created ASC;
   `;
@@ -37,6 +37,12 @@ export async function handle_GET_conversation_sentiment_comments (req: Request &
   const userIsAdministrator = isAdministrator(req.p.uid);
   for(const comment of result) {
     comment.can_delete = comment.uid === req.p.uid || userIsAdministrator;
+
+    // redact the content of comments that have been deleted, unless the user is an admin
+    if(comment.is_deleted && !userIsAdministrator) {
+      comment.comment = "[deleted]";
+      comment.github_username = "[deleted]";
+    }
   }
 
   res.status(200).json(result);
