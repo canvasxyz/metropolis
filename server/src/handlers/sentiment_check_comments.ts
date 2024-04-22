@@ -49,5 +49,35 @@ export async function handle_POST_conversation_sentiment_check_comments (req: Re
   res.status(201).json(result);
 }
 
-// export async function handle_PUT_conversation_sentiment_check_comments (req: Request, res: Response) {}
-// export async function handle_DELETE_conversation_sentiment_check_comments (req: Request, res: Response) {}
+export async function handle_DELETE_conversation_sentiment_check_comments (req: Request, res: Response) {
+  const selectQuery = "SELECT zid, uid, comment FROM sentiment_check_comments WHERE id = $1;";
+
+  let comments;
+  try {
+    comments = await queryP_readOnly(selectQuery.toString(), [req.p.comment_id]);
+  } catch (err) {
+    fail(res, 500, "polis_err_delete_conversation_sentiment_check_comments", err);
+    return;
+  }
+
+  if(comments.length == 0) {
+    fail(res, 404, "polis_err_delete_conversation_sentiment_check_comments", "sentiment check comment not found");
+    return;
+  }
+  const comment = comments[0]
+
+  if(comment.uid !== req.p.uid) {
+    fail(res, 403, "polis_err_delete_conversation_sentiment_check_comments", "user not authorized to delete this comment");
+    return;
+  }
+
+  const deleteQuery = "DELETE FROM sentiment_check_comments WHERE id = $1;";
+  try {
+    await queryP_readOnly(deleteQuery.toString(), [req.p.comment_id]);
+  } catch (err) {
+    fail(res, 500, "polis_err_delete_conversation_sentiment_check_comments", err);
+    return;
+  }
+
+  res.status(200).json(`comment with id ${req.p.comment_id} deleted`);
+}

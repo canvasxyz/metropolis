@@ -1,10 +1,8 @@
 import React, { useCallback, useState } from "react"
 import { Box, Flex, Image, Link, Text } from "theme-ui";
 import useSWR from "swr";
-import { formatTimeAgo } from "../../util/misc";
 
 const fetcher = url => fetch(url).then(r => r.json())
-
 
 export const SentimentCheckComments: React.FC<{ user; conversationId: string }> = ({
   user,
@@ -30,7 +28,15 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
       mutate()
       setComment("")
     })
-  }, [conversationId, user])
+  }, [conversationId])
+
+  const deleteComment = useCallback((commentId: number) => {
+    fetch(`/api/v3/conversation/sentiment_comments?comment_id=${commentId}`, {
+      method: "DELETE",
+    }).then(() => {
+      mutate()
+    })
+  }, [])
 
   return (
     <Flex sx={{flexDirection:"column", gap: "8px"}}>
@@ -77,7 +83,8 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
                       }}
                     />
                   </Link>
-                  <Text>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
+                  <Text sx={{flexGrow: 1}}>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
+                  <Text sx={{cursor: "pointer"}} onClick={() => deleteComment(comment.id)}>Delete</Text>
                 </Flex>
                 <Box>{comment.comment}</Box>
               </Flex>
