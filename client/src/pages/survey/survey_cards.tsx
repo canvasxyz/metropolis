@@ -4,7 +4,6 @@ import _ from "lodash"
 import React, { Fragment, useState, useRef, useLayoutEffect } from "react"
 import { Box, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
-
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
 
@@ -25,80 +24,48 @@ const SurveyCards = ({
   zid_metadata
   user
 }) => {
-  const cardsBoxRef = useRef<HTMLElement>()
-  const [cardHeight, setCardHeight] = useState<number>()
-
-  useLayoutEffect(() => {
-    if (!cardsBoxRef.current) return
-    const h =
-      Math.max(
-        cardsBoxRef.current.children[0].scrollHeight,
-        cardsBoxRef.current.children[0].clientHeight,
-      ) + 4
-    setCardHeight(h)
-  }, [votedComments.length])
-
-  const commentStack = _.reverse(unvotedComments.slice(1, 5))
+  // className={collapsed ? "react-markdown css-fade" : "react-markdown"}
+  const [collapsed, setCollapsed] = useState(true)
 
   return (
-    <Box sx={{ position: "relative", minHeight: Math.max(120, (cardHeight ?? 100) + 10) }}>
+    <Box>
       {unvotedComments.length > 0 && (
-        <Box sx={{ position: "relative" }}>
-          <Box sx={{ position: "relative" }} ref={cardsBoxRef}>
-            {unvotedComments[0] && (
+        <Box
+          className={collapsed ? "css-fade-more" : ""}
+          sx={collapsed ? { maxHeight: "400px", overflow: "hidden" } : {}}
+        >
+          {unvotedComments.map((comment, index) => (
+            <Box
+              key={comment.tid}
+              sx={{
+                mb: "12px",
+                transition: "0.2s ease-in-out",
+              }}
+            >
               <SurveyCard
-                key={unvotedComments[0].tid}
-                comment={unvotedComments[0]}
+                comment={comment}
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
-                cardHeight={cardHeight}
                 zid_metadata={zid_metadata}
               />
-            )}
-            {unvotedComments.length > 1 &&
-              commentStack.map((comment, index) => {
-                return (
-                  <Box
-                    key={comment.tid}
-                    sx={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      transition: "0.2s ease-in-out",
-                      transform:
-                        index === 0
-                          ? "rotate(-0.15deg)"
-                          : index === 1
-                            ? "rotate(0.15deg) translate(2px, 0)"
-                            : index === 2
-                              ? "rotate(-0.25deg)"
-                              : index === 3
-                                ? "rotate(0.25deg translate(-3px, 0))"
-                                : index === 4
-                                  ? "rotate(-0.5deg translate(-1px, 0))"
-                                  : "rotate(0.5deg)",
-                    }}
-                  >
-                    <SurveyCard
-                      comment={comment}
-                      conversationId={conversation_id}
-                      onVoted={onVoted}
-                      hasVoted={false}
-                      cardHeight={cardHeight}
-                      topCard={index === commentStack.length - 1}
-                      zid_metadata={zid_metadata}
-                    />
-                  </Box>
-                )
-              })}
-          </Box>
+            </Box>
+          ))}
         </Box>
+      )}
+      {unvotedComments.length > 0 && (
+        <Text
+          as="div"
+          sx={{ textAlign: "center", fontWeight: 600, width: "100%", my: "12px" }}
+          variant="links.a"
+          onClick={() => setCollapsed(!collapsed)}
+        >
+          {collapsed ? "Show more cards" : "Show fewer cards"}
+        </Text>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
         <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500, fontSize: "0.94em" }}>
-          No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"} yet.
+          No comments on this {zid_metadata.github_pr_title ? "FIP" : "poll"} yet.
         </Box>
       )}
       {unvotedComments.length > 0 && (

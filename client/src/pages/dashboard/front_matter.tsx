@@ -43,10 +43,15 @@ export const Collapsible = ({
           collapsed
             ? {
                 wordBreak: "break-word",
-                maxHeight: "80px",
+                maxHeight: "140px",
                 overflow: "hidden",
               }
-            : { wordBreak: "break-word", maxHeight: "300px", overflow: "scroll", mb: [1] }
+            : {
+                wordBreak: "break-word",
+                maxHeight: "calc(100vh - 260px)",
+                overflow: "scroll",
+                mb: [1],
+              }
         }
       >
         <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
@@ -149,19 +154,21 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
           </tr>
         )}
         <tr>
-          {conversation.fip_author && (
-            <td>
-              <Text sx={{ fontWeight: "700" }}>Text</Text>
-            </td>
-          )}
-          <td style={{ display: "grid" }}>
-            {conversation.description && (
+          <td style={{ paddingTop: 8 }}>
+            <Text sx={{ fontWeight: "700" }}>Text</Text>
+          </td>
+          <td style={{ display: "grid", paddingTop: 8 }}>
+            {conversation.description ? (
               <Collapsible
                 title={conversation.fip_title}
                 key={conversation.conversation_id}
                 shouldCollapse={conversation.description?.length > 300}
                 content={conversation.description}
               ></Collapsible>
+            ) : (
+              <Box sx={{ pb: [1] }}>
+                Could not parse FIP text. Refer to the linked Github PR for more information.
+              </Box>
             )}
           </td>
         </tr>

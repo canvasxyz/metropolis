@@ -25,7 +25,7 @@ const CreateConversationInner = () => {
     <Box>
       <Flex>
         <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
-          Create a discussion
+          Create a community poll
         </Heading>
       </Flex>
 

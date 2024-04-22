@@ -13,6 +13,7 @@ import Survey, { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 import { Frontmatter, Collapsible } from "./front_matter"
+import { MIN_SEED_RESPONSES } from "./index"
 
 type ReportComment = {
   active: boolean
@@ -35,6 +36,7 @@ type ReportComment = {
 }
 
 const dashboardBox = {
+  bg: "bgWhite",
   py: "18px",
   px: "22px",
   my: [3],
@@ -158,9 +160,20 @@ export const DashboardConversation = ({
                 })
                 // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
               })()}
+              {zid_metadata.github_username === user?.githubUsername && (
+                <Text>
+                  <Text> &middot; </Text>
+                  <RouterLink
+                    sx={{ fontWeight: 600, "&:hover": { textDecoration: "underline" } }}
+                    to={`/m/${zid_metadata?.conversation_id}`}
+                  >
+                    Edit
+                  </RouterLink>
+                </Text>
+              )}
             </Box>
           )}
-          {zid_metadata.fip_author ? (
+          {zid_metadata.github_pr_id ? (
             <Box sx={{ ...dashboardBox, px: "6px", pt: "10px", pb: "6px" }}>
               <Frontmatter zid_metadata={zid_metadata} />
             </Box>
@@ -176,7 +189,7 @@ export const DashboardConversation = ({
               </Box>
             )
           )}
-          {zid_metadata.fip_author && (
+          {zid_metadata.github_pr_title && (
             <Box sx={dashboardBox}>
               <Box
                 sx={{
@@ -187,12 +200,16 @@ export const DashboardConversation = ({
               >
                 Sentiment Check
               </Box>
-              <SentimentCheck user={user} zid_metadata={zid_metadata} />
+              <SentimentCheck
+                user={user}
+                zid_metadata={zid_metadata}
+                key={zid_metadata.conversation_id}
+              />
             </Box>
           )}
-          {!zid_metadata.fip_author &&
-            (zid_metadata.topic || zid_metadata.fip_title) &&
-            summaryData?.comment_count < 10 && (
+          {!zid_metadata.github_pr_title &&
+            (zid_metadata.topic || zid_metadata.fip_title || zid_metadata.github_pr_title) &&
+            summaryData?.comment_count < MIN_SEED_RESPONSES && (
               <Box
                 sx={{
                   ...surveyBox,
@@ -200,85 +217,92 @@ export const DashboardConversation = ({
                   my: [3],
                   borderLeft: "4px solid #eb4b4c",
                   lineHeight: 1.325,
+                  bg: "bgWhite",
                 }}
               >
                 <Box sx={{ fontWeight: 600, mb: [1] }}>
-                  <TbExclamationCircle /> Needs Seed Responses
+                  <TbExclamationCircle /> Example Responses Required
                 </Box>
-                Fill in some example responses for readers to vote on. <strong>10 responses</strong>{" "}
-                are required for this survey to be public.
+                You should fill in at least {MIN_SEED_RESPONSES} example responses for readers to
+                vote on. This poll will be hidden from other viewers until then.
               </Box>
             )}
-          {!zid_metadata.fip_author && (zid_metadata.topic || zid_metadata.fip_title) && (
-            <Box sx={dashboardBox}>
-              <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
-                <Text sx={{ flex: 1 }}>Responses</Text>
-                <Link
-                  variant="links.a"
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setShowReport(!showReport)
-                  }}
-                  sx={{ fontSize: "0.96em" }}
-                >
-                  {showReport ? "Back to voting" : "Preview results"}
-                </Link>
-              </Box>
-              {!showReport ? (
-                <Survey
-                  key={zid_metadata.conversation_id}
-                  match={{
-                    params: { conversation_id: zid_metadata.conversation_id },
-                  }}
-                />
-              ) : (
-                <Box>
-                  {!refreshInProgress && report && (
-                    <Box>
-                      {reportComments.length === 0 && (
-                        <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
-                          No responses for this {zid_metadata.fip_author ? "FIP" : "discussion"}{" "}
-                          yet.
-                        </Box>
+          {!zid_metadata.github_pr_title &&
+            (zid_metadata.topic || zid_metadata.fip_title || zid_metadata.github_pr_title) && (
+              <Box sx={{ ...dashboardBox, bg: "bgOffWhite" }}>
+                <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
+                  <Text sx={{ flex: 1 }}>Polls for this discussion thread</Text>
+                  <Link
+                    variant="links.a"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault()
+                      setShowReport(!showReport)
+                    }}
+                    sx={{ fontSize: "0.96em" }}
+                  >
+                    {showReport ? "Back to voting" : "Preview results"}
+                  </Link>
+                </Box>
+                {!showReport ? (
+                  <Survey
+                    key={zid_metadata.conversation_id}
+                    match={{
+                      params: { conversation_id: zid_metadata.conversation_id },
+                    }}
+                  />
+                ) : (
+                  <Box>
+                    {!refreshInProgress && report && (
+                      <Box>
+                        {reportComments.length === 0 && (
+                          <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
+                            No responses for this{" "}
+                            {zid_metadata.github_pr_title ? "FIP" : "discussion"} yet.
+                          </Box>
+                        )}
+                      </Box>
+                    )}
+                    {!refreshInProgress &&
+                      reportComments.map((c: ReportComment) => (
+                        <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
+                      ))}
+                    <Box
+                      sx={{
+                        fontSize: "0.9em",
+                        mt: "20px",
+                        color: "#9f9e9b",
+                        fontWeight: 500,
+                        textAlign: "center",
+                      }}
+                    >
+                      {!report && (
+                        <Button variant="buttons.black" onClick={generateReport}>
+                          Click to Generate Report
+                        </Button>
+                      )}
+                      {report && (
+                        <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
+                          <Text as="span" variant="links.text">
+                            View full report
+                          </Text>
+                        </RouterLink>
+                      )}
+                      {report && (
+                        <Text
+                          as="span"
+                          variant="links.text"
+                          onClick={refreshReport}
+                          sx={{ ml: [2] }}
+                        >
+                          Refresh report
+                        </Text>
                       )}
                     </Box>
-                  )}
-                  {!refreshInProgress &&
-                    reportComments.map((c: ReportComment) => (
-                      <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
-                    ))}
-                  <Box
-                    sx={{
-                      fontSize: "0.9em",
-                      mt: "20px",
-                      color: "#9f9e9b",
-                      fontWeight: 500,
-                      textAlign: "center",
-                    }}
-                  >
-                    {!report && (
-                      <Button variant="buttons.black" onClick={generateReport}>
-                        Click to Generate Report
-                      </Button>
-                    )}
-                    {report && (
-                      <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
-                        <Text as="span" variant="links.text">
-                          View full report
-                        </Text>
-                      </RouterLink>
-                    )}
-                    {report && (
-                      <Text as="span" variant="links.text" onClick={refreshReport} sx={{ ml: [2] }}>
-                        Refresh report
-                      </Text>
-                    )}
                   </Box>
-                </Box>
-              )}
-            </Box>
-          )}
+                )}
+              </Box>
+            )}
         </Box>
       </Box>
     </Box>

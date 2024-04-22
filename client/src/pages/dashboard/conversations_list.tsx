@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from "react"
 import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Flex, Text, Link } from "theme-ui"
+import { Button, Box, Flex, Text, Link, ThemeUIStyleObject } from "theme-ui"
+import { Link as RouterLink } from "react-router-dom"
 import {
   TbExclamationCircle,
   TbCards,
@@ -10,10 +11,9 @@ import {
   TbUser,
   TbUsers,
   TbChecks,
-  TbMessage,
-  TbMessage2,
   TbChevronDown,
   TbDots,
+  TbDotsVertical,
   TbPencil,
   TbRefresh,
   TbGitPullRequest,
@@ -22,7 +22,8 @@ import {
   TbArchiveOff,
   TbArchive,
 } from "react-icons/tb"
-import { Menu } from "@headlessui/react"
+import { BiSolidBarChartAlt2 } from "react-icons/bi"
+import { Menu, Tab } from "@headlessui/react"
 
 import { formatTimeAgo } from "../../util/misc"
 import api from "../../util/api"
@@ -34,6 +35,7 @@ import {
   populateConversationsSummary,
 } from "../../reducers/conversations_summary"
 import { useHistory } from "react-router-dom"
+import { MIN_SEED_RESPONSES } from "./index"
 
 import {
   handleModerateConversation,
@@ -85,11 +87,14 @@ const ConversationsList = ({
 
   const nonFIPConversations = conversations.filter(
     (conversation) =>
-      !conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
+      !conversation.github_pr_title &&
+      !conversation.is_archived &&
+      !conversation.is_hidden &&
+      conversation.comment_count >= MIN_SEED_RESPONSES,
   )
   const openConversations = conversations.filter(
     (conversation) =>
-      conversation.fip_title && !conversation.is_archived && !conversation.is_hidden,
+      conversation.github_pr_title && !conversation.is_archived && !conversation.is_hidden,
   )
   const allConversations = conversations.filter(
     (conversation) => !conversation.is_archived && !conversation.is_hidden,
@@ -124,85 +129,160 @@ const ConversationsList = ({
     return <React.Fragment></React.Fragment>
   }
 
+  const tab: ThemeUIStyleObject = {
+    mr: "6px",
+    px: "8px",
+    pt: "6px",
+    textAlign: "center",
+    color: "primary",
+    borderRadius: "10px",
+    border: "1px solid lightGray",
+    fontSize: "0.92em",
+    cursor: "pointer",
+    "&:hover": {
+      bg: "bgGrayLight",
+    },
+  }
+
+  const tabSelected: ThemeUIStyleObject = {
+    ...tab,
+    border: "1px solid primary",
+    bg: "primary",
+    color: "#fff",
+    "&:hover": {},
+  }
+
+  const tabCount: ThemeUIStyleObject = {
+    background: "primaryActive",
+    color: "#fff",
+    fontSize: "0.84em",
+    borderRadius: "99px",
+    px: "6px",
+    py: "3px",
+    ml: "2px",
+    top: "-1px",
+    position: "relative",
+  }
+
   return (
     <React.Fragment>
-      <Menu>
-        <Menu.Button as="div">
-          <Box
-            sx={{
-              position: "relative",
-              cursor: "pointer",
-              fontSize: "15px",
-              fontWeight: "500",
-              py: [2],
-              px: [3],
-              userSelect: "none",
-              borderBottom: "1px solid #e2ddd5",
-              "&:hover": {
-                background: "bgGrayLight",
-              },
-            }}
-          >
-            {selectedConversations === "all-fip"
-              ? "All"
-              : selectedConversations === "open-fip"
-                ? "FIPs"
-                : selectedConversations === "non-fip"
-                  ? "Discussions"
-                  : selectedConversations === "archived"
-                    ? "Closed"
-                    : selectedConversations === "hidden"
-                      ? "Spam"
-                      : ""}
-            <Box
-              sx={{ position: "absolute", top: "8px", right: "12px" }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <TbChevronDown />
-            </Box>
-          </Box>
-        </Menu.Button>
-        <Menu.Items as={Box}>
-          <Box variant="boxes.menu" sx={{ width: "180px" }}>
-            <Menu.Item>
-              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("all-fip")}>
-                All
+      <Flex sx={{ pt: "9px", pb: "8px", pl: "13px" }}>
+        <Box
+          sx={selectedConversations === "all-fip" ? tabSelected : tab}
+          onClick={() => setSelectedConversations("all-fip")}
+        >
+          All <Text sx={tabCount}>{openConversations.length + nonFIPConversations.length}</Text>
+        </Box>
+        <Box
+          sx={selectedConversations === "open-fip" ? tabSelected : tab}
+          onClick={() => setSelectedConversations("open-fip")}
+        >
+          FIPs <Text sx={tabCount}>{openConversations.length}</Text>
+        </Box>
+        <Box
+          sx={selectedConversations === "non-fip" ? tabSelected : tab}
+          onClick={() => setSelectedConversations("non-fip")}
+        >
+          Polls <Text sx={tabCount}>{nonFIPConversations.length}</Text>
+        </Box>
+        <Box sx={{ flex: 1 }}></Box>
+        <Box>
+          <Menu>
+            <Menu.Button as="div">
+              <Box sx={{ px: "10px", py: "3px", my: "3px", mr: "5px", cursor: "pointer" }}>
+                <TbDotsVertical />
               </Box>
-            </Menu.Item>
-            <Menu.Item>
-              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("open-fip")}>
-                <Flex>
-                  <Box sx={{ flex: 1 }}>FIPs</Box>
-                  <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                    {openConversations.length}
+            </Menu.Button>
+            <Menu.Items as={Box}>
+              <Box variant="boxes.menu" sx={{ width: "180px" }}>
+                {/*
+                <Menu.Item>
+                  <Box
+                    variant={
+                      selectedConversations === "all-fip"
+                        ? "boxes.menuitemactive"
+                        : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("all-fip")}
+                  >
+                    All
                   </Box>
-                </Flex>
-              </Box>
-            </Menu.Item>
-            <Menu.Item>
-              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("non-fip")}>
-                <Flex>
-                  <Box sx={{ flex: 1 }}>Discussions</Box>
-                  <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                    {nonFIPConversations.length}
+                </Menu.Item>
+                <Menu.Item>
+                  <Box
+                    variant={
+                      selectedConversations === "open-fip"
+                        ? "boxes.menuitemactive"
+                        : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("open-fip")}
+                  >
+                    <Flex>
+                      <Box sx={{ flex: 1 }}>FIPs</Box>
+                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                        {openConversations.length}
+                      </Box>
+                    </Flex>
                   </Box>
-                </Flex>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box
+                    variant={
+                      selectedConversations === "non-fip"
+                        ? "boxes.menuitemactive"
+                        : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("non-fip")}
+                  >
+                    <Flex>
+                      <Box sx={{ flex: 1 }}>Polls</Box>
+                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                        {nonFIPConversations.length}
+                      </Box>
+                    </Flex>
+                  </Box>
+                </Menu.Item>
+                 */}
+                <Menu.Item>
+                  <Box
+                    variant={
+                      selectedConversations === "archived"
+                        ? "boxes.menuitemactive"
+                        : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("archived")}
+                  >
+                    <Flex>
+                      <Box sx={{ flex: 1 }}> Closed</Box>
+                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                        {archivedConversations.length}
+                      </Box>
+                    </Flex>
+                  </Box>
+                </Menu.Item>
+                {/*
+                <Menu.Item>
+                  <Box
+                    variant={
+                      selectedConversations === "hidden" ? "boxes.menuitemactive" : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("hidden")}
+                  >
+                    <Flex>
+                      <Box sx={{ flex: 1 }}> Spam</Box>
+                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                        {hiddenConversations.length}
+                      </Box>
+                    </Flex>
+                  </Box>
+                </Menu.Item>
+                 */}
               </Box>
-            </Menu.Item>
-            <Menu.Item>
-              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("archived")}>
-                Closed
-              </Box>
-            </Menu.Item>
-            <Menu.Item>
-              <Box variant="boxes.menuitem" onClick={() => setSelectedConversations("hidden")}>
-                Spam
-              </Box>
-            </Menu.Item>
-          </Box>
-        </Menu.Items>
-      </Menu>
-      <Box sx={{ height: "calc(100vh - 120px)", overflow: "scroll", pb: "70px" }}>
+            </Menu.Items>
+          </Menu>
+        </Box>
+      </Flex>
+      <Box sx={{ height: "calc(100vh - 150px)", overflow: "scroll", pb: "100px" }}>
         {conversationsToDisplay.map((conversation) => (
           <ConversationListItem
             hist={hist}
@@ -220,10 +300,10 @@ const ConversationsList = ({
           sx={{
             position: "absolute",
             bottom: "0px",
-            pb: "56px",
+            pb: "86px",
             fontSize: "0.88em",
             textAlign: "center",
-            width: "300px",
+            width: "100%",
             color: "#83817d",
             background:
               "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
@@ -235,32 +315,43 @@ const ConversationsList = ({
           </Link>
         </Box>
       )}
-      {
-        <Button
-          variant={user ? "buttons.primary" : "buttons.black"}
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            position: "absolute",
-            bottom: [2],
-            right: "11px",
-            fontSize: "0.94em",
-            width: "calc(100% - 32px)",
-            fontWeight: 500,
-          }}
-          onClick={() => {
-            if (user) {
-              setCreateConversationModalIsOpen(true)
-            } else {
-              document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
-            }
-          }}
-        >
-          <TbMessage2 /> {user ? "Create a discussion" : "Sign in to create discussions"}
-        </Button>
-      }
+      <Button
+        variant={user ? "buttons.primary" : "buttons.black"}
+        sx={{
+          px: [2],
+          py: [1],
+          mr: [1],
+          mb: [1],
+          position: "absolute",
+          bottom: "40px",
+          right: "11px",
+          fontSize: "0.94em",
+          width: "calc(100% - 32px)",
+          fontWeight: 500,
+        }}
+        onClick={() => {
+          if (user) {
+            setCreateConversationModalIsOpen(true)
+          } else {
+            document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
+          }
+        }}
+      >
+        {user ? <BiSolidBarChartAlt2 /> : null} {user ? "Create a poll" : "Sign in with Github"}
+      </Button>
+      <Box
+        sx={{
+          textAlign: "center",
+          position: "absolute",
+          bottom: "12px",
+          width: "100%",
+          fontSize: "0.88em",
+          fontWeight: "600",
+          borderTop: "1px solid lighterGray",
+        }}
+      >
+        <RouterLink to="/about">About this platform</RouterLink>
+      </Box>
     </React.Fragment>
   )
 }
@@ -286,7 +377,9 @@ const ConversationListItem = ({
   const timeAgo = formatTimeAgo(+date)
 
   const shouldHideDiscussion =
-    !conversation.fip_title && !conversation.github_pr_title && conversation.comment_count < 10
+    !conversation.fip_title &&
+    !conversation.github_pr_title &&
+    conversation.comment_count < MIN_SEED_RESPONSES
 
   if (shouldHideDiscussion && conversation.owner !== user?.uid) return
 
@@ -311,8 +404,9 @@ const ConversationListItem = ({
       key={conversation.conversation_id}
     >
       {shouldHideDiscussion && (
-        <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "20px" }}>
-          <TbExclamationCircle color="#eb4b4c" /> Needs Seed Responses
+        <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "1px", mb: "2px" }}>
+          <TbExclamationCircle color="#eb4b4c" />
+          &nbsp; Needs Seed Responses
         </Box>
       )}
       <Flex>
@@ -320,7 +414,7 @@ const ConversationListItem = ({
           {conversation.github_pr_id ? (
             <TbGitPullRequest color="#3fba50" />
           ) : (
-            <TbMessage2 color="#0090ff" />
+            <BiSolidBarChartAlt2 color="#0090ff" />
           )}
         </Box>
         <Box sx={{ fontWeight: 500, flex: 1 }}>
@@ -329,13 +423,6 @@ const ConversationListItem = ({
           )}
           <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
             <Text sx={{ flex: 1 }}>{timeAgo}</Text>
-            {conversation.fip_title || conversation.github_pr_title ? (
-              <Text>{/* {conversation.sentiment_count ?? 0} <TbUsers /> */}</Text>
-            ) : (
-              <Text>
-                {conversation.comment_count} <TbCards />
-              </Text>
-            )}
           </Flex>
         </Box>
       </Flex>
@@ -389,7 +476,7 @@ const ConversationListItem = ({
                       </Box>
                     </Menu.Item>
                   )}
-                {user.githubRepoCollaborator && (
+                {/* user.githubRepoCollaborator && (
                   <Box sx={{ mt: "3px", pt: "3px", borderTop: "1px solid #e2ddd5" }}>
                     <Menu.Item>
                       <Box
@@ -411,7 +498,7 @@ const ConversationListItem = ({
                       </Box>
                     </Menu.Item>
                   </Box>
-                )}
+                ) */}
               </Box>
             </Menu.Items>
           </Menu>
