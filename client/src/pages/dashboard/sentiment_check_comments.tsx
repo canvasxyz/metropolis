@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react"
-import { Box, Text } from "theme-ui";
+import { Box, Flex, Image, Link, Text } from "theme-ui";
 import useSWR from "swr";
+import { formatTimeAgo } from "../../util/misc";
 
 const fetcher = url => fetch(url).then(r => r.json())
 
@@ -32,15 +33,61 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
   }, [conversationId, user])
 
   return (
-    <Box>
-      <Text>Comments</Text><br/>
-      {sentimentComments.length > 0 ? <ul>
-        {sentimentComments.map((comment) => (
-          <li key={comment.id}>
-            {comment.comment} by {comment.uid} on {comment.created}
-          </li>
-        ))}
-      </ul> : <>No comments yet</>}
+    <Flex sx={{flexDirection:"column", gap: "8px"}}>
+      <Text
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
+        Comments
+      </Text>
+      {
+        sentimentComments.length > 0 ?
+          <Flex
+            sx={{
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            {sentimentComments.map((comment) => (
+              <Flex
+                sx={{
+                  flexDirection: "column",
+                  padding: "8px",
+                  gap: "6px"
+                }}
+                key={comment.id}
+              >
+                <Flex
+                  sx={{
+                    flexDirection: "row",
+                    alignItems: "center"
+                  }}
+                >
+                  <Link href={`https://github.com/${comment.github_username}`} target="_blank">
+                    <Image
+                      src={`https://github.com/${comment.github_username}.png`}
+                      width="34"
+                      height="34"
+                      style={{
+                        borderRadius: 6,
+                        marginRight: "8px",
+                        background: "#ccc",
+                        marginTop: "2px",
+                      }}
+                    />
+                  </Link>
+                  <Text>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
+                </Flex>
+                <Box>{comment.comment}</Box>
+              </Flex>
+            ))}
+          </Flex>
+        :
+          <>
+            No comments yet
+          </>
+      }
 
       <input
         type="text"
@@ -49,6 +96,6 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
         value={comment}
       />
       <button onClick={() => submitComment(comment)}>Submit</button>
-    </Box>
+    </Flex>
   )
 }

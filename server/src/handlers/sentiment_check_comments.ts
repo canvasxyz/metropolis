@@ -5,7 +5,24 @@ import fail from "../utils/fail";
 
 export async function handle_GET_conversation_sentiment_comments (req: Request, res: Response) {
   // make sure that this query does not return the zid
-  const query = "SELECT id, comment, uid, created FROM sentiment_check_comments WHERE zid = $1 ORDER BY created ASC;";
+  const query = `
+  SELECT
+    scc.comment,
+    scc.created,
+    scc.id,
+    scc.uid,
+    u.github_username
+  FROM
+    sentiment_check_comments as scc
+  JOIN
+    users u
+  ON
+    u.uid = scc.uid
+  WHERE
+    scc.zid = $1
+  ORDER BY
+    scc.created ASC;
+  `;
 
   let result;
   try {
