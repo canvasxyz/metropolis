@@ -208,8 +208,7 @@ export const DashboardConversation = ({
               />
               <SentimentCheckComments
                 user={user}
-                zid_metadata={zid_metadata}
-                key={zid_metadata.conversation_id}
+                conversationId={zid_metadata.conversation_id}
               />
             </Box>
           )}

@@ -5,18 +5,19 @@ import useSWR from "swr";
 const fetcher = url => fetch(url).then(r => r.json())
 
 
-export const SentimentCheckComments: React.FC<{ user; zid_metadata }> = ({
+export const SentimentCheckComments: React.FC<{ user; conversationId: string }> = ({
   user,
-  zid_metadata,
+  conversationId,
 }) => {
-  const { data } = useSWR(
-    `/api/v3/conversation/sentiment_comments?conversation_id=${zid_metadata.conversation_id}`,
+  const { data, mutate } = useSWR(
+    `/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`,
     fetcher
   )
+  const sentimentComments = data || []
   const [comment, setComment] = useState("")
 
   const submitComment = useCallback((comment: string) => {
-    fetch(`/api/v3/conversation/sentiment_comments?conversation_id=${zid_metadata.conversation_id}`, {
+    fetch(`/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -25,16 +26,22 @@ export const SentimentCheckComments: React.FC<{ user; zid_metadata }> = ({
         comment,
       }),
     }).then(() => {
+      mutate()
       setComment("")
     })
-  }, [zid_metadata])
+  }, [conversationId, user])
 
   return (
     <Box>
       <Text>Comments</Text><br/>
-      list comments here<br/>
+      {sentimentComments.length > 0 ? <ul>
+        {sentimentComments.map((comment) => (
+          <li key={comment.id}>
+            {comment.comment} by {comment.uid} on {comment.created}
+          </li>
+        ))}
+      </ul> : <>No comments yet</>}
 
-      submit comment form here <br/>
       <input
         type="text"
         placeholder="Comment"
