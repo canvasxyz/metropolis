@@ -84,7 +84,7 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
                     />
                   </Link>
                   <Text sx={{flexGrow: 1}}>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
-                  <Text sx={{cursor: "pointer"}} onClick={() => deleteComment(comment.id)}>Delete</Text>
+                  {comment.can_delete && <Text sx={{cursor: "pointer"}} onClick={() => deleteComment(comment.id)}>Delete</Text>}
                 </Flex>
                 <Box>{comment.comment}</Box>
               </Flex>

@@ -849,7 +849,7 @@ app.put(
 app.get(
   "/api/v3/conversation/sentiment_comments",
   moveToBody,
-  auth(assignToP),
+  authOptional(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_conversation_sentiment_comments as any
 )
