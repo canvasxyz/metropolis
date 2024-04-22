@@ -64,29 +64,32 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
                 }}
                 key={comment.id}
               >
-                <Flex
-                  sx={{
-                    flexDirection: "row",
-                    alignItems: "center"
-                  }}
-                >
-                  <Link href={`https://github.com/${comment.github_username}`} target="_blank">
-                    <Image
-                      src={`https://github.com/${comment.github_username}.png`}
-                      width="34"
-                      height="34"
-                      style={{
-                        borderRadius: 6,
-                        marginRight: "8px",
-                        background: "#ccc",
-                        marginTop: "2px",
-                      }}
-                    />
-                  </Link>
-                  <Text sx={{flexGrow: 1}}>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
-                  {comment.can_delete && <Text sx={{cursor: "pointer"}} onClick={() => deleteComment(comment.id)}>Delete</Text>}
-                </Flex>
-                <Box>{comment.comment}</Box>
+                {comment.is_deleted ? <Text>[deleted]</Text> :
+                <>
+                  <Flex
+                    sx={{
+                      flexDirection: "row",
+                      alignItems: "center"
+                    }}
+                  >
+                    <Link href={`https://github.com/${comment.github_username}`} target="_blank">
+                      <Image
+                        src={`https://github.com/${comment.github_username}.png`}
+                        width="34"
+                        height="34"
+                        style={{
+                          borderRadius: 6,
+                          marginRight: "8px",
+                          background: "#ccc",
+                          marginTop: "2px",
+                        }}
+                      />
+                    </Link>
+                    <Text sx={{flexGrow: 1}}>{comment.github_username} - {new Date(parseInt(comment.created)).toLocaleString()}</Text>
+                    {comment.can_delete && <Text sx={{cursor: "pointer"}} onClick={() => deleteComment(comment.id)}>Delete</Text>}
+                  </Flex>
+                  <Box>{comment.comment}</Box>
+                </>}
               </Flex>
             ))}
           </Flex>

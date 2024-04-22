@@ -26,24 +26,31 @@ export async function handle_GET_conversation_sentiment_comments (req: Request &
     scc.created ASC;
   `;
 
-  let result;
+  let queryResult;
   try {
-    result = await queryP_readOnly(query.toString(), [req.p.zid]);
+    queryResult = await queryP_readOnly(query.toString(), [req.p.zid]);
   } catch (err) {
     fail(res, 500, "polis_err_get_conversation_sentiment_comments", err);
     return;
   }
 
   const userIsAdministrator = isAdministrator(req.p.uid);
-  for(const comment of result) {
-    comment.can_delete = comment.uid === req.p.uid || userIsAdministrator;
 
+  const result = queryResult.map((comment) => {
     // redact the content of comments that have been deleted, unless the user is an admin
-    if(comment.is_deleted && !userIsAdministrator) {
-      comment.comment = "[deleted]";
-      comment.github_username = "[deleted]";
+    if(comment.is_deleted) {
+      return {
+        id: comment.id,
+        comment: "[deleted]",
+        github_username: "[deleted]",
+        created: comment.created,
+        can_delete: false,
+        is_deleted: true
+      };
+    } else {
+      return {...comment, can_delete: comment.uid === req.p.uid || userIsAdministrator}
     }
-  }
+  });
 
   res.status(200).json(result);
 }
