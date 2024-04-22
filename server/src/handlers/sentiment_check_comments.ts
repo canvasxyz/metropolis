@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { queryP_readOnly } from "../db/pg-query";
 import fail from "../utils/fail";
+import { isAdministrator } from "../user";
 
 
-export async function handle_GET_conversation_sentiment_comments (req: Request, res: Response) {
+export async function handle_GET_conversation_sentiment_comments (req: Request & {p: any}, res: Response) {
   // make sure that this query does not return the zid
   const query = `
   SELECT
@@ -19,7 +20,8 @@ export async function handle_GET_conversation_sentiment_comments (req: Request, 
   ON
     u.uid = scc.uid
   WHERE
-    scc.zid = $1
+    scc.zid = $1 AND
+    scc.is_deleted = false
   ORDER BY
     scc.created ASC;
   `;
@@ -32,10 +34,15 @@ export async function handle_GET_conversation_sentiment_comments (req: Request, 
     return;
   }
 
+  const userIsAdministrator = isAdministrator(req.p.uid);
+  for(const comment of result) {
+    comment.can_delete = comment.uid === req.p.uid || userIsAdministrator;
+  }
+
   res.status(200).json(result);
 }
 
-export async function handle_POST_conversation_sentiment_check_comments (req: Request, res: Response) {
+export async function handle_POST_conversation_sentiment_check_comments (req: Request & {p: any}, res: Response) {
   const query = "INSERT INTO sentiment_check_comments (zid, uid, comment) VALUES ($1, $2, $3) RETURNING *;";
 
   let result;
@@ -49,7 +56,7 @@ export async function handle_POST_conversation_sentiment_check_comments (req: Re
   res.status(201).json(result);
 }
 
-export async function handle_DELETE_conversation_sentiment_check_comments (req: Request, res: Response) {
+export async function handle_DELETE_conversation_sentiment_check_comments (req: Request & {p: any}, res: Response) {
   const selectQuery = "SELECT zid, uid, comment FROM sentiment_check_comments WHERE id = $1;";
 
   let comments;
@@ -71,7 +78,7 @@ export async function handle_DELETE_conversation_sentiment_check_comments (req: 
     return;
   }
 
-  const deleteQuery = "DELETE FROM sentiment_check_comments WHERE id = $1;";
+  const deleteQuery = "UPDATE sentiment_check_comments SET is_deleted = true WHERE id = $1;";
   try {
     await queryP_readOnly(deleteQuery.toString(), [req.p.comment_id]);
   } catch (err) {
