@@ -69,9 +69,9 @@ export async function handle_POST_conversation_sentiment_check_comments(
 
   const MAX_COMMENT_LENGTH = 150;
   if (req.p.comment.length > 150) {
-    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments", err);
+    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments");
   } else if (req.p.comment.length === 0 || req.p.comment.trim().length === 0) {
-    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments", err);
+    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments");
   }
 
   let result;
