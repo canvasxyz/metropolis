@@ -16,6 +16,8 @@ import {
   TbDotsVertical,
   TbPencil,
   TbRefresh,
+  TbGitMerge,
+  TbGitPullRequestClosed,
   TbGitPullRequest,
   TbHammer,
   TbFlame,
@@ -365,6 +367,27 @@ type ConversationListItemProps = {
   dispatch
 }
 
+
+const getIconForConversation = (conversation: ConversationSummary) => {
+  if(conversation.github_pr_id) {
+    // conversation is a github pr
+    if (conversation.github_pr_merged_at) {
+      // pr is merged
+      return <TbGitMerge color="#9C73EF" />
+    } else if(conversation.github_pr_closed_at) {
+      // pr is closed
+      return <TbGitPullRequestClosed color="#E55E51" />
+    } else {
+      // pr is open
+      return <TbGitPullRequest color="#64B75D" />
+    }
+    // TODO: drafts?
+  } else {
+    // conversation is not a pr
+    return <BiSolidBarChartAlt2 color="#0090ff" />
+  }
+}
+
 const ConversationListItem = ({
   hist,
   user,
@@ -411,11 +434,7 @@ const ConversationListItem = ({
       )}
       <Flex>
         <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
-          {conversation.github_pr_id ? (
-            <TbGitPullRequest color="#3fba50" />
-          ) : (
-            <BiSolidBarChartAlt2 color="#0090ff" />
-          )}
+          {getIconForConversation(conversation)}
         </Box>
         <Box sx={{ fontWeight: 500, flex: 1 }}>
           {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
