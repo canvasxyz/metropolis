@@ -18,6 +18,7 @@ import {
   TbRefresh,
   TbGitMerge,
   TbGitPullRequestClosed,
+  TbGitPullRequestDraft,
   TbGitPullRequest,
   TbHammer,
   TbFlame,
@@ -379,9 +380,13 @@ const getIconForConversation = (conversation: ConversationSummary) => {
       return <TbGitPullRequestClosed color="#E55E51" />
     } else {
       // pr is open
-      return <TbGitPullRequest color="#64B75D" />
+      if(conversation.github_pr_is_draft) {
+        // pr is a draft
+        return <TbGitPullRequestDraft color="#868D96" />
+      } else {
+        return <TbGitPullRequest color="#64B75D" />
+      }
     }
-    // TODO: drafts?
   } else {
     // conversation is not a pr
     return <BiSolidBarChartAlt2 color="#0090ff" />
