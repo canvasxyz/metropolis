@@ -18,6 +18,7 @@ export type ConversationSummary = {
   github_pr_updated_at: string | null
   github_pr_closed_at: string | null
   github_pr_merged_at: string | null
+  github_pr_is_draft: boolean
   github_pr_title: string | null
   github_pr_id: string | null
   participant_count: number

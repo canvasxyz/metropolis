@@ -7885,6 +7885,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.github_pr_updated_at,
     conversations.github_pr_closed_at,
     conversations.github_pr_merged_at,
+    conversations.github_pr_is_draft,
     conversations.github_pr_title,
     conversations.github_pr_id,
     conversations.is_archived,
