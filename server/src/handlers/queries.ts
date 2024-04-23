@@ -24,6 +24,7 @@ export type PrFields = {
   github_pr_updated_at: string;
   github_pr_closed_at: string;
   github_pr_merged_at: string;
+  github_pr_is_draft: boolean;
 };
 
 const PR_FIELDS: (keyof PrFields)[] = [
@@ -39,6 +40,7 @@ const PR_FIELDS: (keyof PrFields)[] = [
   "github_pr_updated_at",
   "github_pr_closed_at",
   "github_pr_merged_at",
+  "github_pr_is_draft",
 ];
 
 // fields that come from the FIP
