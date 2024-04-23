@@ -1,7 +1,9 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useState, useRef } from "react"
 import { Box, Flex, Image, Link, Text, Button, Textarea } from "theme-ui"
 import useSWR from "swr"
 import { formatTimeAgo } from "../../util/misc"
+
+const MAX_COMMENT_LENGTH = 150
 
 const fetcher = (url) => fetch(url).then((r) => r.json())
 
@@ -16,9 +18,12 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
   const sentimentComments = data || []
   const [comment, setComment] = useState("")
 
+  const commentTextareaRef = useRef()
+  const [remainingCharCount, setRemainingCharCount] = useState(MAX_COMMENT_LENGTH)
+
   const submitComment = useCallback(
     (comment: string) => {
-      fetch(`/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`, {
+      return fetch(`/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,16 +31,22 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
         body: JSON.stringify({
           comment,
         }),
-      }).then(() => {
+      }).then((response) => {
+        if (response.status === 500) {
+          return
+        }
         mutate()
         setComment("")
+        if (commentTextareaRef) {
+          ;(commentTextareaRef.current as any).value = ""
+        }
       })
     },
     [conversationId],
   )
 
   const deleteComment = useCallback((commentId: number) => {
-    fetch(`/api/v3/conversation/sentiment_comments?comment_id=${commentId}`, {
+    return fetch(`/api/v3/conversation/sentiment_comments?comment_id=${commentId}`, {
       method: "DELETE",
     }).then(() => {
       mutate()
@@ -44,13 +55,6 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
 
   return (
     <Flex sx={{ flexDirection: "column", gap: "8px" }}>
-      <Text
-        sx={{
-          fontWeight: "bold",
-        }}
-      >
-        Comments
-      </Text>
       {sentimentComments.length > 0 ? (
         <Flex
           sx={{
@@ -74,12 +78,8 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
                 }}
               >
                 <Link
-                  href={
-                    comment.is_deleted
-                      ? "javascript:"
-                      : `https://github.com/${comment.github_username}`
-                  }
-                  target="_blank"
+                  href={comment.is_deleted ? "#" : `https://github.com/${comment.github_username}`}
+                  target={comment.is_deleted ? undefined : "_blank"}
                 >
                   {comment.is_deleted ? (
                     <Box
@@ -122,21 +122,38 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
                   </Text>
                 )}
               </Flex>
-              <Box sx={{ mt: "5px" }}>{comment.comment}</Box>
+              <Box sx={{ mt: "5px", "white-space": "pre-line" }}>{comment.comment}</Box>
             </Flex>
           ))}
         </Flex>
-      ) : (
-        <>No comments yet</>
-      )}
+      ) : null}
 
       <Box sx={{ px: "8px", pb: "8px" }}>
         <Textarea
+          sx={{ borderColor: "lightGray" }}
           placeholder="Add a comment..."
-          onChange={(e) => setComment(e.target.value)}
+          onChange={(e) => {
+            setComment(e.target.value)
+            setRemainingCharCount(MAX_COMMENT_LENGTH - e.target.value.length)
+          }}
           rows={2}
+          ref={commentTextareaRef}
         />
-        <Button onClick={() => submitComment(comment)}>Submit</Button>
+        <Flex>
+          <Box sx={{ flex: 1 }}>
+            <Button
+              onClick={() => {
+                if (!comment || comment.trim() === "") return
+                submitComment(comment)
+              }}
+            >
+              Submit
+            </Button>
+          </Box>
+          <Box sx={{ mt: "8px", color: remainingCharCount >= 0 ? "mediumGray" : "mediumRed" }}>
+            {remainingCharCount}
+          </Box>
+        </Flex>
       </Box>
     </Flex>
   )

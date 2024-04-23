@@ -83,7 +83,15 @@ const SurveyCards = ({
 
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
-          <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500, fontSize: "0.94em" }}>
+          <Box
+            sx={{
+              ...surveyBox,
+              bg: "bgWhite",
+              padding: "50px 32px",
+              fontWeight: 500,
+              fontSize: "0.94em",
+            }}
+          >
             You’ve voted on all {votedComments.length} responses so far.
             <br />
             Come back later for more to vote on, or add your own.
