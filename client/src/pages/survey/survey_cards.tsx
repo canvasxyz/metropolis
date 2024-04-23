@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
-import _ from "lodash"
-import React, { Fragment, useState, useRef, useLayoutEffect } from "react"
+import React, { useState } from "react"
 import { Box, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"

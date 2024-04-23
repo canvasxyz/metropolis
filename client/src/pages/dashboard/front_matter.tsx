@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-use-before-define
 import React, { useState } from "react"
-import { Button, Box, Text, Link } from "theme-ui"
+import { Box, Text, Link } from "theme-ui"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -56,7 +56,7 @@ export const Collapsible = ({
       >
         <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
           {collapsed && title
-            ? content.replace(/\#+ .+/, "").replace(/\#+\ +Simple Summary/i, "")
+            ? content.replace(/#+ .+/, "").replace(/#+ +Simple Summary/i, "")
             : content}
         </ReactMarkdown>
       </Box>
@@ -77,9 +77,9 @@ export const Collapsible = ({
 }
 
 export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
-  const matches = conversation["fip_discussions_to"]?.match(/\[.+\]\((.+)\)/)
+  const matches = conversation.fip_discussions_to?.match(/\[.+\]\((.+)\)/)
   const links =
-    matches && matches[1] ? [matches[1]] : conversation["fip_discussions_to"]?.split(", ")
+    matches && matches[1] ? [matches[1]] : conversation.fip_discussions_to?.split(", ")
   const discussions = (links || []).map((link) => (
     <Link
       key={link}

@@ -12,12 +12,11 @@ import {
   TbGitPullRequestDraft,
   TbGitPullRequest,
   TbHammer,
-  TbFlame,
   TbArchiveOff,
   TbArchive,
 } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
-import { Menu, Tab } from "@headlessui/react"
+import { Menu } from "@headlessui/react"
 
 import { formatTimeAgo } from "../../util/misc"
 import api from "../../util/api"
@@ -31,8 +30,8 @@ import {
 import { MIN_SEED_RESPONSES } from "./index"
 
 import {
-  handleModerateConversation,
-  handleUnmoderateConversation,
+  // handleModerateConversation,
+  // handleUnmoderateConversation,
   handleCloseConversation,
   handleReopenConversation,
 } from "../../actions"

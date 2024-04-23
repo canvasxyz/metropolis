@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import React, { useCallback, useEffect, useState } from "react"
-import { Box, Button, Link, jsx } from "theme-ui"
+import { Box, Button, jsx } from "theme-ui"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -63,7 +63,7 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
     })
 }
 
-type SurveyProps = { updateCommentCount?: Function; match: { params: { conversation_id: string } } }
+type SurveyProps = { updateCommentCount?: () => void; match: { params: { conversation_id: string } } }
 const Survey = ({
   updateCommentCount,
   match: {

@@ -2,12 +2,10 @@
 
 import React, { useState } from "react"
 import { Button, Box, Text, Flex, jsx } from "theme-ui"
-import { useLocalStorage } from "@uidotdev/usehooks"
 import {
   TbCheck,
   TbChevronDown,
   TbChevronUp,
-  TbMoodSmile,
   TbMoodSmileBeam,
   TbMoodSad,
 } from "react-icons/tb"

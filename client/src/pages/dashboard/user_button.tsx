@@ -1,5 +1,5 @@
 import React from "react"
-import { Link, Text, Button } from "theme-ui"
+import { Text, Button } from "theme-ui"
 
 import { useAppSelector } from "../../hooks"
 import { RootState } from "../../store"

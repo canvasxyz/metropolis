@@ -1,15 +1,14 @@
 /** @jsx jsx */
 
 import { useEffect, useState } from "react"
-import { Link as RouterLink } from "react-router-dom"
-import { useHistory } from "react-router-dom"
+import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Box, Flex, Text, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
-import { TbHelp, TbGitPullRequest } from "react-icons/tb"
+import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 
 import { formatTimeAgo } from "../../util/misc"
-import { useAppDispatch, useAppSelector } from "../../hooks"
+import { useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
 import api from "../../util/api"
 import { User } from "../../util/types"
@@ -17,10 +16,11 @@ import { CreateConversationModal } from "../CreateConversationModal"
 import { DashboardConversation } from "./conversation"
 import { DashboardUserButton } from "./user_button"
 import ConversationsList, { getIconForConversation } from "./conversations_list"
+import { ConversationSummary } from "../../reducers/conversations_summary"
 
 export const MIN_SEED_RESPONSES = 5
 
-const ConversationsPreview = ({ conversations }) => {
+const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
 
   return (
