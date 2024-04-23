@@ -206,10 +206,11 @@ export const DashboardConversation = ({
                 zid_metadata={zid_metadata}
                 key={zid_metadata.conversation_id}
               />
-              <SentimentCheckComments
-                user={user}
-                conversationId={zid_metadata.conversation_id}
-              />
+            </Box>
+          )}
+          {zid_metadata.github_pr_title && (
+            <Box sx={dashboardBox}>
+              <SentimentCheckComments user={user} conversationId={zid_metadata.conversation_id} />
             </Box>
           )}
           {!zid_metadata.github_pr_title &&
