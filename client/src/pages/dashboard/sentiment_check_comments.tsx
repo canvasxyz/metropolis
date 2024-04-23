@@ -130,8 +130,9 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
 
       <Box sx={{ px: "8px", pb: "8px" }}>
         <Textarea
+          disabled={!user}
           sx={{ borderColor: "lightGray" }}
-          placeholder="Add a comment..."
+          placeholder={user ? "Add a comment..." : "Sign in to comment..."}
           onChange={(e) => {
             setComment(e.target.value)
             setRemainingCharCount(MAX_COMMENT_LENGTH - e.target.value.length)
@@ -142,6 +143,7 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
         <Flex>
           <Box sx={{ flex: 1 }}>
             <Button
+              variant={user ? "buttons.primary" : "buttons.disabled"}
               onClick={() => {
                 if (!comment || comment.trim() === "") return
                 submitComment(comment)

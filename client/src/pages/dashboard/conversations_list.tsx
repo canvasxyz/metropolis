@@ -293,6 +293,7 @@ const ConversationsList = ({
             position: "absolute",
             bottom: "0px",
             pb: "86px",
+            pt: "20px",
             fontSize: "0.88em",
             textAlign: "center",
             width: "100%",
