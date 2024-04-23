@@ -12,6 +12,7 @@ import api from "../../util/api"
 import Survey, { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
+import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
 import { MIN_SEED_RESPONSES } from "./index"
 
@@ -204,6 +205,10 @@ export const DashboardConversation = ({
                 user={user}
                 zid_metadata={zid_metadata}
                 key={zid_metadata.conversation_id}
+              />
+              <SentimentCheckComments
+                user={user}
+                conversationId={zid_metadata.conversation_id}
               />
             </Box>
           )}

@@ -159,6 +159,11 @@ import {
   wantCookie,
   wantHeader,
 } from "./src/utils/parameter";
+import {
+  handle_DELETE_conversation_sentiment_check_comments,
+  handle_GET_conversation_sentiment_comments,
+  handle_POST_conversation_sentiment_check_comments
+} from "./src/handlers/sentiment_check_comments";
 
 const app = express();
 
@@ -840,6 +845,31 @@ app.put(
   want("subscribe_type", getInt, assignToP),
   handle_PUT_conversations,
 );
+
+app.get(
+  "/api/v3/conversation/sentiment_comments",
+  moveToBody,
+  authOptional(assignToP),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_conversation_sentiment_comments as any
+)
+
+app.post(
+  "/api/v3/conversation/sentiment_comments",
+  moveToBody,
+  auth(assignToP),
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  need("comment", getStringLimitLength(999), assignToP),
+  handle_POST_conversation_sentiment_check_comments as any
+)
+
+app.delete(
+  "/api/v3/conversation/sentiment_comments",
+  moveToBody,
+  auth(assignToP),
+  need("comment_id", getInt, assignToP),
+  handle_DELETE_conversation_sentiment_check_comments as any
+)
 
 app.put(
   "/api/v3/users",
