@@ -1,21 +1,15 @@
 import React, { useState, useCallback, useEffect } from "react"
-import toast from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text, Link, ThemeUIStyleObject } from "theme-ui"
-import { Link as RouterLink } from "react-router-dom"
+import { useHistory, Link as RouterLink } from "react-router-dom"
 import {
   TbExclamationCircle,
-  TbCards,
-  TbThumbUp,
-  TbThumbDown,
-  TbUser,
-  TbUsers,
-  TbChecks,
-  TbChevronDown,
   TbDots,
   TbDotsVertical,
   TbPencil,
-  TbRefresh,
+  TbGitMerge,
+  TbGitPullRequestClosed,
+  TbGitPullRequestDraft,
   TbGitPullRequest,
   TbHammer,
   TbFlame,
@@ -34,7 +28,6 @@ import {
   ConversationSummary,
   populateConversationsSummary,
 } from "../../reducers/conversations_summary"
-import { useHistory } from "react-router-dom"
 import { MIN_SEED_RESPONSES } from "./index"
 
 import {
@@ -365,6 +358,30 @@ type ConversationListItemProps = {
   dispatch
 }
 
+export const getIconForConversation = (conversation: ConversationSummary) => {
+  if (conversation.github_pr_id) {
+    // conversation is a github pr
+    if (conversation.github_pr_merged_at) {
+      // pr is merged
+      return <TbGitMerge color="#9C73EF" />
+    } else if (conversation.github_pr_closed_at) {
+      // pr is closed
+      return <TbGitPullRequestClosed color="#E55E51" />
+    } else {
+      // pr is open
+      if (conversation.github_pr_is_draft) {
+        // pr is a draft
+        return <TbGitPullRequestDraft color="#868D96" />
+      } else {
+        return <TbGitPullRequest color="#64B75D" />
+      }
+    }
+  } else {
+    // conversation is not a pr
+    return <BiSolidBarChartAlt2 color="#0090ff" />
+  }
+}
+
 const ConversationListItem = ({
   hist,
   user,
@@ -411,11 +428,7 @@ const ConversationListItem = ({
       )}
       <Flex>
         <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
-          {conversation.github_pr_id ? (
-            <TbGitPullRequest color="#3fba50" />
-          ) : (
-            <BiSolidBarChartAlt2 color="#0090ff" />
-          )}
+          {getIconForConversation(conversation)}
         </Box>
         <Box sx={{ fontWeight: 500, flex: 1 }}>
           {conversation.fip_title || conversation.github_pr_title || conversation.topic || (

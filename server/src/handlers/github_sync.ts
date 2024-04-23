@@ -311,7 +311,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     // get existing fips on master
     const { data: pulls } = await installationOctokit.request(
-      "GET /repos/{owner}/{repo}/pulls?state=open",
+      "GET /repos/{owner}/{repo}/pulls?state=all",
       {
         repo: process.env.FIP_REPO_NAME,
         owner: process.env.FIP_REPO_OWNER,
@@ -401,6 +401,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_pr_closed_at: pull.closed_at,
         github_pr_updated_at: pull.updated_at,
         github_pr_merged_at: pull.merged_at,
+        github_pr_is_draft: pull.draft
       };
 
       // check if there is a conversation with this PR id already
