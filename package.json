@@ -11,6 +11,7 @@
     "server:start:dev": "npm run start:dev --workspace=server",
     "start": "npm run build && npm run serve:prod",
     "build": "rimraf client/build server/dist && npm run build:prod --workspace=metropolis-client && copyfiles -E -u 2 \"client/build/**/*\" server/dist/client && npm run build --workspace=metropolis-server",
+    "lint": "npm run lint --workspace=client",
     "serve:prod": "npm run serve:prod --workspace=metropolis-server"
   },
   "workspaces": [
