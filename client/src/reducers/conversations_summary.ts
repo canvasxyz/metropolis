@@ -15,6 +15,9 @@ export type ConversationSummary = {
   fip_number: number
   fip_status: string
   github_pr_opened_at: string | null
+  github_pr_updated_at: string | null
+  github_pr_closed_at: string | null
+  github_pr_merged_at: string | null
   github_pr_title: string | null
   github_pr_id: string | null
   participant_count: number
