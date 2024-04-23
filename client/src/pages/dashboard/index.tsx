@@ -16,7 +16,7 @@ import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
 import { DashboardConversation } from "./conversation"
 import { DashboardUserButton } from "./user_button"
-import ConversationsList from "./conversations_list"
+import ConversationsList, { getIconForConversation } from "./conversations_list"
 
 export const MIN_SEED_RESPONSES = 5
 
@@ -32,7 +32,6 @@ const ConversationsPreview = ({ conversations }) => {
         const date = new Date(c.fip_created || +c.created)
         const timeAgo = formatTimeAgo(+date)
 
-        console.log(c)
         return (
           <Flex
             sx={{
@@ -53,7 +52,7 @@ const ConversationsPreview = ({ conversations }) => {
           >
             <Box sx={{ pr: "13px", pt: "1px" }}>
               {c.github_pr_title ? (
-                <TbGitPullRequest color="#3fba50" />
+                getIconForConversation(c)
               ) : (
                 <BiSolidBarChartAlt2 color="#0090ff" />
               )}
