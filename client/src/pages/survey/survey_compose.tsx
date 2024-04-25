@@ -15,8 +15,8 @@ Modal.setAppElement("#root")
 const SurveyComposeBox = ({
   user,
   zid_metadata,
-  votedComments,
-  setVotedComments,
+  unvotedComments,
+  setUnvotedComments,
   submittedComments,
   setSubmittedComments,
   setState,
@@ -24,8 +24,8 @@ const SurveyComposeBox = ({
 }: {
   user
   zid_metadata
-  votedComments
-  setVotedComments
+  unvotedComments
+  setUnvotedComments
   submittedComments
   setSubmittedComments
   setState
@@ -79,20 +79,9 @@ const SurveyComposeBox = ({
             pid: currentPid,
             github_username: user?.githubUsername ?? null,
           }
-          setVotedComments([...votedComments, comment])
-          setSubmittedComments([...submittedComments, comment])
+          setUnvotedComments([comment, ...unvotedComments])
+          setSubmittedComments([comment, ...submittedComments])
           toast.success("Response added")
-
-          if (
-            (!zid_metadata.postsurvey_limit ||
-              votedComments.length - submittedComments.length + 1 >=
-                zid_metadata.postsurvey_limit) &&
-            zid_metadata.postsurvey_submissions &&
-            submittedComments.length + 1 >= zid_metadata.postsurvey_submissions
-          ) {
-            setState("postsurvey")
-            history.replaceState({}, "", document.location.pathname + "#postsurvey")
-          }
 
           resolve()
         }),
@@ -192,7 +181,7 @@ const SurveyCompose = ({
   zid_metadata,
   votedComments,
   unvotedComments,
-  setVotedComments,
+  setUnvotedComments,
   submittedComments,
   setSubmittedComments,
   setState,
@@ -203,7 +192,7 @@ const SurveyCompose = ({
   zid_metadata
   votedComments
   unvotedComments
-  setVotedComments
+  setUnvotedComments
   submittedComments
   setSubmittedComments
   setState
@@ -230,8 +219,8 @@ const SurveyCompose = ({
         <SurveyComposeBox
           user={user}
           zid_metadata={zid_metadata}
-          votedComments={votedComments}
-          setVotedComments={setVotedComments}
+          unvotedComments={unvotedComments}
+          setUnvotedComments={setUnvotedComments}
           submittedComments={submittedComments}
           setSubmittedComments={setSubmittedComments}
           setState={setState}
@@ -280,8 +269,8 @@ const SurveyCompose = ({
           <SurveyComposeBox
             user={user}
             zid_metadata={zid_metadata}
-            votedComments={votedComments}
-            setVotedComments={setVotedComments}
+            unvotedComments={unvotedComments}
+            setUnvotedComments={setUnvotedComments}
             submittedComments={submittedComments}
             setSubmittedComments={setSubmittedComments}
             setState={setState}

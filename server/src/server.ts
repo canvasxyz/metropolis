@@ -5383,7 +5383,6 @@ function handle_POST_comments(
       uid?: any;
       txt?: any;
       pid?: any;
-      vote?: any;
       quote_txt?: any;
       quote_src_url?: any;
       anon?: any;
@@ -5401,7 +5400,6 @@ function handle_POST_comments(
   let txt = req.p.txt;
   let pid = req.p.pid; // PID_FLOW may be undefined
   let currentPid = pid;
-  let vote = req.p.vote;
   let quote_txt = req.p.quote_txt;
   let quote_src_url = req.p.quote_src_url;
   let anon = req.p.anon;
@@ -5422,8 +5420,8 @@ function handle_POST_comments(
     return;
   }
 
+  // get participant id
   function doGetPid() {
-    // PID_FLOW
     if (_.isUndefined(pid)) {
       return getPidPromise(req.p.zid, req.p.uid, true).then((pid: number) => {
         if (pid === -1) {
@@ -5470,10 +5468,13 @@ function handle_POST_comments(
 
   let shouldCreateXidRecord = false;
 
+  // get external user id
   let xidUserPromise =
     !_.isUndefined(xid) && !_.isNull(xid)
       ? getXidStuff(xid, zid)
       : Promise.resolve();
+
+  // get participant id based on external id
   const pidPromise = xidUserPromise.then(
     (xidUser: UserType | "noXidRecord") => {
       shouldCreateXidRecord = xidUser === "noXidRecord";
@@ -5499,6 +5500,7 @@ function handle_POST_comments(
 
   let commentExistsPromise = commentExists(zid, txt);
 
+  // main logic
   return Promise.all([
     pidPromise,
     conversationInfoPromise,
@@ -5584,6 +5586,7 @@ function handle_POST_comments(
             let lang = detection.language;
             let lang_confidence = detection.confidence;
 
+            // actually create comment
             return queryP(
               "INSERT INTO COMMENTS " +
                 "(pid, zid, txt, velocity, active, mod, uid, tweet_id, quote_src_url, anon, is_seed, created, tid, lang, lang_confidence) VALUES " +
@@ -5644,45 +5647,17 @@ function handle_POST_comments(
                   addNotificationTask(zid);
                 }
 
-                // It should be safe to delete this. Was added to postpone the no-auto-vote change for old conversations.
-                if (is_seed && _.isUndefined(vote) && zid <= 17037) {
-                  vote = 0;
-                }
-
                 let createdTime = comment.created;
-                let votePromise = _.isUndefined(vote)
-                  ? Promise.resolve()
-                  : votesPost(uid, pid, zid, tid, vote, 0, false);
 
-                return (
-                  votePromise
-                    // This expression is not callable.
-                    //Each member of the union type '{ <U>(onFulfill?: ((value: void) => Resolvable<U>) | undefined, onReject?: ((error: any) => Resolvable<U>) | undefined): Bluebird<U>; <TResult1 = void, TResult2 = never>(onfulfilled?: ((value: void) => Resolvable<...>) | ... 1 more ... | undefined, onrejected?: ((reason: any) => Resolvable<...>) | ... 1 more ... | u...' has signatures, but none of those signatures are compatible with each other.ts(2349)
-                    // @ts-ignore
-                    .then(
-                      function (o) {
-                        if (o && o.vote && o.vote.created) {
-                          createdTime = o.vote.created;
-                        }
+                setTimeout(function () {
+                  updateConversationModifiedTime(zid, createdTime);
+                  updateLastInteractionTimeForConversation(zid, uid);
+                }, 100);
 
-                        setTimeout(function () {
-                          updateConversationModifiedTime(zid, createdTime);
-                          updateLastInteractionTimeForConversation(zid, uid);
-                          if (!_.isUndefined(vote)) {
-                            updateVoteCount(zid, pid);
-                          }
-                        }, 100);
-
-                        res.json({
-                          tid: tid,
-                          currentPid: currentPid,
-                        });
-                      },
-                      function (err: any) {
-                        fail(res, 500, "polis_err_vote_on_create", err);
-                      },
-                    )
-                );
+                res.json({
+                  tid: tid,
+                  currentPid: currentPid,
+                });
               },
               function (err: { code: string | number }) {
                 if (err.code === "23505" || err.code === 23505) {

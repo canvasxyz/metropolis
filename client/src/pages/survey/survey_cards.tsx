@@ -27,11 +27,11 @@ const SurveyCards = ({
   const [collapsed, setCollapsed] = useState(true)
 
   return (
-    <Box>
+    <Box sx={{ position: "relative" }}>
       {unvotedComments.length > 0 && (
         <Box
-          className={collapsed ? "css-fade-more" : ""}
-          sx={collapsed ? { maxHeight: "400px", overflow: "hidden" } : {}}
+          className={collapsed && unvotedComments.length > 2 ? "css-fade-more" : ""}
+          sx={collapsed ? { maxHeight: "420px", overflow: "hidden" } : {}}
         >
           {unvotedComments.map((comment, index) => (
             <Box
@@ -42,6 +42,7 @@ const SurveyCards = ({
               }}
             >
               <SurveyCard
+                user={user}
                 comment={comment}
                 conversationId={conversation_id}
                 onVoted={onVoted}
@@ -52,35 +53,23 @@ const SurveyCards = ({
           ))}
         </Box>
       )}
-      {unvotedComments.length > 0 && (
+      {unvotedComments.length > 2 && (
         <Text
           as="div"
-          sx={{ textAlign: "center", fontWeight: 600, width: "100%", my: "12px" }}
+          sx={{ textAlign: "center", fontWeight: 600, width: "100%", mt: "16px", mb: "10px" }}
           variant="links.a"
           onClick={() => setCollapsed(!collapsed)}
         >
-          {collapsed ? "Show more cards" : "Show fewer cards"}
+          {collapsed
+            ? `Show more comments (${unvotedComments.length} total)`
+            : "Show fewer comments"}
         </Text>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
         <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500, fontSize: "0.94em" }}>
-          No comments on this {zid_metadata.github_pr_title ? "FIP" : "poll"} yet.
+          No comments on this poll yet.
         </Box>
       )}
-      {unvotedComments.length > 0 && (
-        <Box
-          sx={{
-            fontSize: "0.94em",
-            position: "absolute",
-            top: [3],
-            right: "24px",
-            color: "lightGrayActive",
-          }}
-        >
-          {unvotedComments.length} remaining
-        </Box>
-      )}
-
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
         <React.Fragment>
           <Box

@@ -162,7 +162,7 @@ import {
 import {
   handle_DELETE_conversation_sentiment_check_comments,
   handle_GET_conversation_sentiment_comments,
-  handle_POST_conversation_sentiment_check_comments
+  handle_POST_conversation_sentiment_check_comments,
 } from "./src/handlers/sentiment_check_comments";
 
 const app = express();
@@ -563,7 +563,6 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("txt", getOptionalStringLimitLength(997), assignToP),
-  want("vote", getIntInRange(-1, 1), assignToP),
   want("quote_txt", getStringLimitLength(999), assignToP),
   want("quote_src_url", getUrlLimitLength(999), assignToP),
   want("anon", getBool, assignToP),
@@ -851,8 +850,8 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
-  handle_GET_conversation_sentiment_comments as any
-)
+  handle_GET_conversation_sentiment_comments as any,
+);
 
 app.post(
   "/api/v3/conversation/sentiment_comments",
@@ -860,16 +859,16 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("comment", getStringLimitLength(999), assignToP),
-  handle_POST_conversation_sentiment_check_comments as any
-)
+  handle_POST_conversation_sentiment_check_comments as any,
+);
 
 app.delete(
   "/api/v3/conversation/sentiment_comments",
   moveToBody,
   auth(assignToP),
   need("comment_id", getInt, assignToP),
-  handle_DELETE_conversation_sentiment_check_comments as any
-)
+  handle_DELETE_conversation_sentiment_check_comments as any,
+);
 
 app.put(
   "/api/v3/users",

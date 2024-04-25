@@ -20,6 +20,7 @@ type SurveyCardProps = {
   cardHeight?: number
   topCard?: boolean
   zid_metadata
+  user
 }
 
 const SurveyCard = ({
@@ -30,8 +31,11 @@ const SurveyCard = ({
   cardHeight,
   topCard,
   zid_metadata,
+  user,
 }: SurveyCardProps) => {
   const { tid: commentId, txt } = comment
+
+  const voteDisabled = zid_metadata.auth_needed_to_write && !user
 
   const [editingVote, setEditingVote] = useState(false)
 
@@ -119,9 +123,8 @@ const SurveyCard = ({
         maxHeight: topCard ? "" : cardHeight,
         width: "100%",
         px: ["24px", "32px"],
-        pt: "16px",
-        pb: "56px",
-        overflow: "scroll",
+        py: ["16px"],
+        pb: ["24px"],
       }}
     >
       <Box>
@@ -144,7 +147,7 @@ const SurveyCard = ({
           </Text>
         </Text>
         {hasVoted && (
-          <Box sx={{ position: "absolute", top: [3], right: [3] }}>
+          <Box>
             <DropdownMenu
               rightAlign
               options={
@@ -163,29 +166,27 @@ const SurveyCard = ({
             />
           </Box>
         )}
-        <Box
-          sx={{ position: "absolute", bottom: ["10px", "20px"], marginLeft: "-2px", pb: [2, 0] }}
-        >
+        <Box sx={{ pt: [2] }}>
           <Button
-            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
+            variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => agree(commentId, e.target)}
-            sx={{ mr: [2] }}
+            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbUp style={{ width: 18, color: "#2fcc71", position: "relative", top: 1 }} />{" "}
             Agree
           </Button>
           <Button
-            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
+            variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => disagree(commentId, e.target)}
-            sx={{ mr: [2] }}
+            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbDown style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
             Disagree
           </Button>
           <Button
-            variant={zid_metadata.auth_needed_to_write ? "voteDisabled" : "vote"}
+            variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => skip(commentId, e.target)}
-            sx={{ mr: [2] }}
+            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             Skip
           </Button>

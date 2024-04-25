@@ -56,14 +56,18 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
         console.warn("Unexpected: nextComment not found in unvoted comments")
       }
       setUnvotedComments(
-        trimmedUnvotedComments.length === unvotedComments.length - 1
+        trimmedUnvotedComments.length === unvotedComments.length - 1 &&
+          trimmedUnvotedComments.length > 0
           ? [trimmedUnvotedComments[0], nextComment, ...trimmedUnvotedComments.slice(1)]
           : [...unvotedComments],
       )
     })
 }
 
-type SurveyProps = { updateCommentCount?: () => void; match: { params: { conversation_id: string } } }
+type SurveyProps = {
+  updateCommentCount?: () => void
+  match: { params: { conversation_id: string } }
+}
 const Survey = ({
   updateCommentCount,
   match: {
@@ -223,7 +227,7 @@ const Survey = ({
                 zid_metadata={zid_metadata}
                 votedComments={votedComments}
                 unvotedComments={unvotedComments}
-                setVotedComments={setVotedComments}
+                setUnvotedComments={setUnvotedComments}
                 submittedComments={submittedComments}
                 setSubmittedComments={setSubmittedComments}
                 setState={setState}
