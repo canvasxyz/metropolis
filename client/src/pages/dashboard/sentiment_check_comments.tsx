@@ -132,7 +132,7 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
         <Textarea
           disabled={!user}
           sx={{ borderColor: "lightGray" }}
-          placeholder={user ? "Add a comment..." : "Sign in to comment..."}
+          placeholder={user ? "Add a comment..." : "Must be signed in to comment"}
           onChange={(e) => {
             setComment(e.target.value)
             setRemainingCharCount(MAX_COMMENT_LENGTH - e.target.value.length)

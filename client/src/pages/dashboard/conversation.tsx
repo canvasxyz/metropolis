@@ -281,7 +281,7 @@ export const DashboardConversation = ({
                       ))}
                     <Box
                       sx={{
-                        fontSize: "0.9em",
+                        fontSize: "0.94em",
                         mt: "20px",
                         color: "#9f9e9b",
                         fontWeight: 500,
@@ -289,9 +289,15 @@ export const DashboardConversation = ({
                       }}
                     >
                       {!report && (
-                        <Button variant="buttons.black" onClick={generateReport}>
-                          Click to Generate Report
-                        </Button>
+                        <Box>
+                          <Box sx={{ pt: [2], pb: [3] }}>
+                            <Box>A report is only generated once a user has requested it.</Box>
+                            <Box>Click continue to generate a report:</Box>
+                          </Box>
+                          <Button variant="buttons.black" onClick={generateReport} sx={{ mb: [3] }}>
+                            Continue to report...
+                          </Button>
+                        </Box>
                       )}
                       {report && (
                         <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>

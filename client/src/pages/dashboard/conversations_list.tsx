@@ -423,7 +423,7 @@ const ConversationListItem = ({
       {shouldHideDiscussion && (
         <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "1px", mb: "2px" }}>
           <TbExclamationCircle color="#eb4b4c" />
-          &nbsp; Needs Seed Responses
+          &nbsp; Needs Responses
         </Box>
       )}
       <Flex>

@@ -246,7 +246,7 @@ const Survey = ({
                   (document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`)
                 }
               >
-                Sign in with Github to respond
+                Sign in to respond
               </Button>
             </Box>
           )}
