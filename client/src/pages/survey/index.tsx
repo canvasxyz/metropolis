@@ -218,8 +218,9 @@ const Survey = ({
           !!user?.xInfo ? (
             <Box sx={{ pt: [3] }}>
               <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
-                This is a collective response survey where anyone can vote on responses by others.
-                If you have a comment or suggestion, please add it here:
+                This is a collective response poll where anyone can contribute additional questions
+                or statements to the discussion thread. If you have one to add, you can submit it
+                here:
               </Box>
               <SurveyCompose
                 user={user}
@@ -238,7 +239,11 @@ const Survey = ({
               />
             </Box>
           ) : (
-            <Box sx={{ mt: "12px" }}>
+            <Box sx={{ mt: "24px" }}>
+              <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
+                This is a collective response poll where anyone can contribute additional questions
+                or statements to the discussion thread. If you have one to add, log in here:
+              </Box>
               <Button
                 variant="buttons.outlineSecondary"
                 sx={{ py: "6px", fontWeight: 500, width: "100%" }}

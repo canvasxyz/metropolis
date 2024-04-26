@@ -208,17 +208,6 @@ export const DashboardConversation = ({
               />
             </Box>
           )}
-          {zid_metadata.github_pr_title && (
-            <Box sx={dashboardBox}>
-              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
-              <Box sx={{ color: "mediumGray", pb: [1] }}>
-                Have more to say? You can leave a short comment here.
-              </Box>
-              <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <SentimentCheckComments user={user} conversationId={zid_metadata.conversation_id} />
-              </Box>
-            </Box>
-          )}
           {!zid_metadata.github_pr_title &&
             (zid_metadata.topic || zid_metadata.fip_title || zid_metadata.github_pr_title) &&
             summaryData?.comment_count < MIN_SEED_RESPONSES && (
@@ -321,6 +310,17 @@ export const DashboardConversation = ({
                 )}
               </Box>
             )}
+          {
+            <Box sx={dashboardBox}>
+              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
+              {/*<Box sx={{ color: "mediumGray", pb: [1] }}>
+                Have more to say? You can leave a short comment here.
+                </Box>*/}
+              <Box sx={{ mx: "-8px", pt: "8px" }}>
+                <SentimentCheckComments user={user} conversationId={zid_metadata.conversation_id} />
+              </Box>
+            </Box>
+          }
         </Box>
       </Box>
     </Box>
