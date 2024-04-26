@@ -1,10 +1,11 @@
 /** @jsx jsx */
 
 import React, { useEffect, useState } from "react"
+import { usePopper } from "react-popper"
 import { toast } from "react-hot-toast"
 import { Heading, Link, Box, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { TbExclamationCircle } from "react-icons/tb"
+import { TbExclamationCircle, TbInfoCircle } from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
@@ -43,6 +44,55 @@ const dashboardBox = {
   my: [3],
   lineHeight: 1.35,
   border: "1px solid #ddd",
+}
+
+const SentimentTooltip = () => {
+  const [referenceElement, setReferenceElement] = useState(null)
+  const [popperElement, setPopperElement] = useState(null)
+  const { styles, attributes } = usePopper(referenceElement, popperElement, {
+    modifiers: [
+      {
+        name: "offset",
+        enabled: true,
+        options: {
+          offset: [0, 6],
+        },
+      },
+    ],
+  })
+
+  const [visible, setVisible] = useState(false)
+
+  return (
+    <Box>
+      <Box
+        ref={setReferenceElement}
+        sx={{ ml: "6px" }}
+        onMouseEnter={() => setVisible(true)}
+        onMouseLeave={() => setVisible(false)}
+      >
+        <TbInfoCircle />
+      </Box>
+      <div
+        ref={setPopperElement}
+        style={{
+          background: "#fff",
+          borderRadius: "4px",
+          border: "1px solid #ddd",
+          padding: "8px 14px 9px",
+          maxWidth: "260px",
+          zIndex: 10,
+          fontWeight: 600,
+          visibility: visible ? "visible" : "hidden",
+          fontSize: "0.94em",
+          ...styles.popper,
+        }}
+        {...attributes.popper}
+      >
+        A non-binding indication of your position on this FIP.
+      </div>
+    </Box>
+  )
 }
 
 export const DashboardConversation = ({
@@ -200,6 +250,7 @@ export const DashboardConversation = ({
                 }}
               >
                 Sentiment Check
+                <SentimentTooltip />
               </Box>
               <SentimentCheck
                 user={user}
