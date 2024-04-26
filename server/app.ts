@@ -832,8 +832,8 @@ app.put(
   want("help_color", getOptionalStringLimitLength(20), assignToP),
   want("help_bgcolor", getOptionalStringLimitLength(20), assignToP),
   want("style_btn", getOptionalStringLimitLength(500), assignToP),
-  want("auth_needed_to_vote", getBool, assignToP),
-  want("auth_needed_to_write", getBool, assignToP),
+  want("auth_needed_to_vote", getBool, assignToP, true),
+  want("auth_needed_to_write", getBool, assignToP, true),
   want("auth_opt_fb", getBool, assignToP),
   want("auth_opt_tw", getBool, assignToP),
   want("auth_opt_allow_3rdparty", getBool, assignToP),
@@ -1037,8 +1037,8 @@ app.post(
   auth(assignToP),
   want("topic", getOptionalStringLimitLength(400), assignToP, ""),
   want("description", getOptionalStringLimitLength(500000), assignToP, ""),
-  want("auth_needed_to_vote", getBool, assignToP, false),
-  want("auth_needed_to_write", getBool, assignToP, false),
+  want("auth_needed_to_vote", getBool, assignToP, true),
+  want("auth_needed_to_write", getBool, assignToP, true),
   handle_POST_conversations,
 );
 
