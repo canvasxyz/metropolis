@@ -50,13 +50,14 @@ sudo ./linux-install-${clojure_version}.sh
 sudo apt install leiningen -y
 ```
 
-## Install nvm and packages
+## Install packages
+
+Install Node.js 20:
 
 ```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
 ```
-
-Restart your session by ssh-ing in again, or run the provided commands to enable nvm on your current shell.
 
 ```
 git clone https://github.com/canvasxyz/metropolis.git
@@ -66,8 +67,7 @@ cd metropolis
 From inside the metropolis directory, install Node:
 
 ```
-nvm install
-nvm use
+sudo apt install nodejs
 ```
 
 ## Build the source code
@@ -129,8 +129,15 @@ You should turn the webhook option off.
 
 Once you've created it, it will let you generate a client secret.
 
-(This part is optional) Then, install it on your Metropolis repo.
-This will give you an installation ID and private key.
+Then, install it on your Metropolis repo. This will give you an installation ID,
+which you can get from the **URL** which will be of the form:
+
+https://github.com/organizations/canvasxyz/settings/installations/50523267
+
+The string at the end of the URL is the installation ID.
+
+Finally, request a private key. Open the .pem file in an editor and include the contents
+(as one line) in the environment variables under private key.
 
 ## Set up environment variables
 
@@ -184,7 +191,7 @@ Description=Metropolis Server
 [Service]
 User=ubuntu
 WorkingDirectory=/home/ubuntu/metropolis
-ExecStart=export $(cat .env | xargs) && foreman start
+ExecStart=foreman start
 Restart=always
 RestartSec=3
 Environment="PORT=80"
@@ -207,6 +214,12 @@ Reload systemd and start the service on every boot:
 sudo systemctl daemon-reload
 sudo systemctl start metropolis.service
 sudo systemctl enable metropolis.service
+```
+
+To view logs:
+
+```
+journalctl -u metropolis.service
 ```
 
 ## Set up HTTPS/SSL
