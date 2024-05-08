@@ -31,6 +31,25 @@ Assuming you saved it as metropolis.pem, the command should look like:
 ssh -i metropolis.pem ubuntu@44.201.179.198
 ```
 
+## Setting up Clojure and Lein
+
+Clojure and Leiningen are used to run the math jobs.
+
+```
+sudo apt install openjdk-11-jdk rlwrap -y
+```
+
+```
+clojure_version="1.11.1.1149"
+curl -O https://download.clojure.org/install/linux-install-${clojure_version}.sh
+chmod +x ./linux-install-${clojure_version}.sh
+sudo ./linux-install-${clojure_version}.sh
+```
+
+```
+sudo apt install leiningen -y
+```
+
 ## Install nvm and packages
 
 ```
@@ -65,6 +84,12 @@ npm run build
 ```
 sudo apt update
 sudo apt install ruby-foreman
+```
+
+or
+
+```
+npm install -g foreman
 ```
 
 ## Set up the database
@@ -162,9 +187,17 @@ WorkingDirectory=/home/ubuntu/metropolis
 ExecStart=export $(cat .env | xargs) && foreman start
 Restart=always
 RestartSec=3
+Environment="PORT=80"
 
 [Install]
 WantedBy=multi-user.target
+```
+
+## Allow Node.js to bind to port 80
+
+```
+sudo apt install libcap2-bin
+sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
 ```
 
 ## Starting the application
@@ -175,3 +208,16 @@ sudo systemctl daemon-reload
 sudo systemctl start metropolis.service
 sudo systemctl enable metropolis.service
 ```
+
+## Set up HTTPS/SSL
+
+By default, Metropolis runs on port 80 in production, but the app will
+not work without SSL. If you attempt to access a production instance
+via its domain name without SSL, the server will redirect to the same
+path with an https:// prefix, resulting in an error.
+
+To fix this, set up an SSL proxy using a service like Cloudflare. You
+will need to configure DNS for the domain that you've set up above
+inside Cloudflare DNS and the service will automatically issue and
+provide a certificate for you. Requests will be proxied through
+Cloudflare to your application instance at port 80.
