@@ -2855,7 +2855,7 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
   // Overload 3 of 3, '(options: RequiredUriUrl & RequestPromiseOptions, callback?: RequestCallback | undefined): RequestPromise<any>', gave the following error.
   //   Argument of type 'string' is not assignable to parameter of type 'RequiredUriUrl & RequestPromiseOptions'.ts(2769)
   // @ts-ignore
-  return request
+  return (request as any)
     .get(url + ipAddress, {
       method: "GET",
       contentType: contentType,

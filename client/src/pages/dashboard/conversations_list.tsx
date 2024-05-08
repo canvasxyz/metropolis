@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Flex, Text, Link, ThemeUIStyleObject } from "theme-ui"
+import { Button, Box, Flex, Text, Link } from "theme-ui"
 import { useHistory, Link as RouterLink } from "react-router-dom"
 import {
   TbExclamationCircle,
@@ -121,7 +121,7 @@ const ConversationsList = ({
     return <React.Fragment></React.Fragment>
   }
 
-  const tab: ThemeUIStyleObject = {
+  const tab = {
     mr: "6px",
     px: "8px",
     pt: "6px",
@@ -136,7 +136,7 @@ const ConversationsList = ({
     },
   }
 
-  const tabSelected: ThemeUIStyleObject = {
+  const tabSelected = {
     ...tab,
     border: "1px solid primary",
     bg: "primary",
@@ -144,7 +144,7 @@ const ConversationsList = ({
     "&:hover": {},
   }
 
-  const tabCount: ThemeUIStyleObject = {
+  const tabCount = {
     background: "primaryActive",
     color: "#fff",
     fontSize: "0.84em",
@@ -423,7 +423,7 @@ const ConversationListItem = ({
       {shouldHideDiscussion && (
         <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "1px", mb: "2px" }}>
           <TbExclamationCircle color="#eb4b4c" />
-          &nbsp; Needs Responses
+          &nbsp; Needs Example Responses
         </Box>
       )}
       <Flex>

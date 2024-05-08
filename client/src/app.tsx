@@ -1,5 +1,7 @@
 /** @jsx jsx */
 
+import "./types.d.ts"
+
 import React from "react"
 import PropTypes from "prop-types"
 import { ConnectedProps, connect } from "react-redux"

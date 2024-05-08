@@ -1,4 +1,5 @@
-import fs from "fs/promises";
+import fsPromises from "fs/promises";
+import fs from "fs";
 import os from "os";
 import path from "path";
 import child_process from "child_process";
@@ -127,9 +128,9 @@ async function getFipFilenames(repoDir: string) {
     let dir;
 
     try {
-      dir = await fs.readdir(path.join(repoDir, dirName));
+      dir = await fsPromises.readdir(path.join(repoDir, dirName));
     } catch (err) {
-      return;
+      continue;
     }
 
     for (const file of dir) {
@@ -183,6 +184,7 @@ async function getFipFromPR(
     .map((fn) => fn.slice(1).trim())
     .filter(
       (filename) =>
+        filename.toLowerCase().startsWith("fip0001v2") ||
         filename.toLowerCase().startsWith("fips/") ||
         filename.toLowerCase().startsWith("frcs/"),
     );
@@ -202,7 +204,10 @@ async function getFipFromPR(
   const filename = updatedFilenames[updatedFilenames.length - 1];
 
   // get the contents of the new FIP
-  const content = await fs.readFile(path.join(repoDir, filename), "utf8");
+  const content = await fsPromises.readFile(
+    path.join(repoDir, filename),
+    "utf8",
+  );
 
   // try to extract fip number
   const fipNumberMatch = filename.match(/fip-([0-9]*)/);
@@ -275,7 +280,7 @@ async function addDiscussionComment(
     repository: {
       discussion: { id: discussionId },
     },
-  } = await graphqlWithAuth(
+  } = (await graphqlWithAuth(
     `query {
       repository(owner: "${target.repoOwner}", name: "${target.repoName}") {
         discussion(number: ${target.discussionNumber}) {
@@ -283,7 +288,7 @@ async function addDiscussionComment(
         }
       }
     }`,
-  );
+  )) as any;
 
   await graphqlWithAuth(
     `mutation {
@@ -310,19 +315,17 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
     const mainBranchName = "master";
 
     // get existing fips on master
-    const { data: pulls } = await installationOctokit.request(
-      "GET /repos/{owner}/{repo}/pulls?state=all",
+    const pulls = await installationOctokit.paginate(
+      installationOctokit.rest.pulls.list,
       {
         repo: process.env.FIP_REPO_NAME,
         owner: process.env.FIP_REPO_OWNER,
-        headers: {
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
+        per_page: 100,
       },
     );
 
     const workingDir = path.join(os.tmpdir(), uuidv4());
-    await fs.mkdir(workingDir);
+    await fsPromises.mkdir(workingDir);
 
     // clone the repo
     console.log(`Cloning into ${workingDir}...`);
@@ -401,7 +404,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         github_pr_closed_at: pull.closed_at,
         github_pr_updated_at: pull.updated_at,
         github_pr_merged_at: pull.merged_at,
-        github_pr_is_draft: pull.draft
+        github_pr_is_draft: pull.draft,
       };
 
       // check if there is a conversation with this PR id already
@@ -464,7 +467,9 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               mainBranchName,
             );
           } catch (err) {
-            console.log(`[${pull.head?.label}] skipping PR #${pull.number}`);
+            console.log(
+              `[${pull.head?.label}] skipping PR #${pull.number}: ${err}`,
+            );
             continue;
           }
 

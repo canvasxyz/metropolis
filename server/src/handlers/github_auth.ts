@@ -71,7 +71,7 @@ async function handleGithubOauthCallback(
     }
   } catch (err) {
     console.log("Could not get collaborators, is the app connected to Github");
-    console.log(err.message);
+    console.log((err as any).message);
     if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {
       isRepoCollaborator = true;
     }

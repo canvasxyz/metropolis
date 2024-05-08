@@ -22,9 +22,9 @@ export type PrFields = {
   github_pr_submitter: string;
   github_pr_opened_at: string;
   github_pr_updated_at: string;
-  github_pr_closed_at: string;
-  github_pr_merged_at: string;
-  github_pr_is_draft: boolean;
+  github_pr_closed_at: string | null;
+  github_pr_merged_at: string | null;
+  github_pr_is_draft: boolean | undefined;
 };
 
 const PR_FIELDS: (keyof PrFields)[] = [

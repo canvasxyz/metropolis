@@ -31,7 +31,7 @@ const pgConnection = Object.assign(
         logger.info("pool.primary." + level + " " + str);
       }
     },
-  }
+  },
 );
 const readsPgConnection = Object.assign(
   parsePgConnectionString(Config.readOnlyDatabaseURL),
@@ -43,7 +43,7 @@ const readsPgConnection = Object.assign(
         logger.info("pool.readonly." + level + " " + str);
       }
     },
-  }
+  },
 );
 
 // split requests into centralized read/write transactor pool vs read pool for scalability concerns in keeping
@@ -86,12 +86,13 @@ function queryImpl(pool: Pool, queryString?: any, ...args: undefined[]) {
         query: (
           arg0: any,
           arg1: any,
-          arg2: (err: any, results: any) => void
+          arg2: (err: any, results: any) => void,
         ) => void;
       },
-      release: (arg0?: undefined) => void
+      release: (arg0?: undefined) => void,
     ) => {
       if (err) {
+        // @ts-ignore
         if (callback) callback(err);
         // force the pool to destroy and remove a client by passing an instance of Error (or anything truthy, actually) to the done() callback
         release(err);
@@ -106,9 +107,10 @@ function queryImpl(pool: Pool, queryString?: any, ...args: undefined[]) {
         } else {
           release();
         }
+        // @ts-ignore
         if (callback) callback(err, results);
       });
-    }
+    },
   );
 }
 
@@ -169,7 +171,7 @@ function queryP_metered_impl(
   isReadOnly: boolean,
   name?: string,
   queryString?: undefined,
-  params?: undefined
+  params?: undefined,
 ) {
   let f = isReadOnly ? queryP_readOnly : queryP;
   if (isUndefined(name) || isUndefined(queryString) || isUndefined(params)) {

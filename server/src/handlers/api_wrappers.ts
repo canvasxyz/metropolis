@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { Octokit as OctokitRest } from "@octokit/rest";
 import { Octokit } from "@octokit/core";
 import { graphql } from "@octokit/graphql";
 import { createAppAuth } from "@octokit/auth-app";
@@ -68,7 +69,7 @@ export async function getOctoKitForInstallation() {
     throw Error("GH_APP_PRIVATE_KEY and GH_APP_PRIVATE_KEY_PATH not set");
   }
 
-  return new Octokit({
+  return new OctokitRest({
     authStrategy: createAppAuth,
     auth: {
       appId: process.env.GH_APP_ID,

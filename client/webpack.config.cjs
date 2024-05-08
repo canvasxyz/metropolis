@@ -84,12 +84,16 @@ module.exports = (env, options) => {
     module: {
       rules: [
         {
+          test: /\.(d.ts)$/,
+          use: ["null-loader"],
+        },
+        {
           test: /\.css$/i,
           use: ["style-loader", "css-loader"],
         },
         {
           test: /\.tsx?$/,
-          exclude: [/node_modules/, path.resolve(__dirname, "build")],
+          exclude: [/node_modules|\.d\.ts$/, path.resolve(__dirname, "build")],
           use: "ts-loader",
         },
         {
