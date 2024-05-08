@@ -1,7 +1,7 @@
 {
   "private": true,
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "scripts": {
     "dev": "run-pty % npm run client:dev % npm run server:build:dev % npm run server:start:dev % npm run math:dev",
