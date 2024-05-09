@@ -45,7 +45,7 @@ const PR_FIELDS: (keyof PrFields)[] = [
 
 // fields that come from the FIP
 export type FipFields = {
-  description: string;
+  description?: string;
   fip_number?: number;
   fip_title?: string;
   fip_author?: string;

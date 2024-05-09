@@ -13,21 +13,21 @@ export const formatTimeAgo = (epochTime: number, short?: boolean) => {
     return "Just now"
   } else if (diff < hour) {
     const val = Math.floor(diff / minute)
-    return val + (short ? ` min${val === 1 ? "" : "s"}` : ` minute${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `min` : ` minute${val === 1 ? "" : "s"} ago`)
   } else if (diff < day) {
     const val = Math.floor(diff / hour)
-    return val + (short ? ` hour${val === 1 ? "" : "s"}` : ` hour${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `h` : ` hour${val === 1 ? "" : "s"} ago`)
   } else if (diff < week) {
     const val = Math.floor(diff / day)
-    return val + (short ? ` day${val === 1 ? "" : "s"}` : ` day${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `d` : ` day${val === 1 ? "" : "s"} ago`)
   } else if (diff < month) {
     const val = Math.floor(diff / week)
-    return val + (short ? ` week${val === 1 ? "" : "s"}` : ` week${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `w` : ` week${val === 1 ? "" : "s"} ago`)
   } else if (diff < year) {
     const val = Math.floor(diff / month)
-    return val + (short ? ` month${val === 1 ? "" : "s"}` : ` month${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `mo` : ` month${val === 1 ? "" : "s"} ago`)
   } else {
     const val = Math.floor(diff / year)
-    return val + (short ? ` year${val === 1 ? "" : "s"}` : ` year${val === 1 ? "" : "s"} ago`)
+    return val + (short ? `y` : ` year${val === 1 ? "" : "s"} ago`)
   }
 }

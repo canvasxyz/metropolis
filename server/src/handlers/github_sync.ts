@@ -189,11 +189,11 @@ async function getFipFromPR(
         filename.toLowerCase().startsWith("frcs/"),
     );
 
-  if (updatedFilenames.length === 0) {
-    throw Error(
-      `[${pull.head?.label}] no FIP-XXXX.md files created in PR #${pull.number}`,
-    );
-  }
+  // if (updatedFilenames.length === 0) {
+  //   throw Error(
+  //     `[${pull.head?.label}] no FIP-XXXX.md files created in PR #${pull.number}`,
+  //   );
+  // }
 
   if (updatedFilenames.length > 1) {
     console.error(
@@ -201,63 +201,73 @@ async function getFipFromPR(
     );
   }
 
-  const filename = updatedFilenames[updatedFilenames.length - 1];
+  if (updatedFilenames.length > 0) {
+    const filename = updatedFilenames[updatedFilenames.length - 1];
 
-  // get the contents of the new FIP
-  const content = await fsPromises.readFile(
-    path.join(repoDir, filename),
-    "utf8",
-  );
+    // get the contents of the new FIP
+    const content = await fsPromises.readFile(
+      path.join(repoDir, filename),
+      "utf8",
+    );
 
-  // try to extract fip number
-  const fipNumberMatch = filename.match(/fip-([0-9]*)/);
-  let fipNumber = fipNumberMatch ? parseInt(fipNumberMatch[1], 10) : 0;
+    // try to extract fip number
+    const fipNumberMatch = filename.match(/fip-([0-9]*)/);
+    let fipNumber = fipNumberMatch ? parseInt(fipNumberMatch[1], 10) : 0;
 
-  // try to extract frontmatter
-  const contentParts = content.split("---");
-  const frontmatterSource = contentParts[1];
-  const description = contentParts[2];
+    // try to extract frontmatter
+    const contentParts = content.split("---");
+    const frontmatterSource = contentParts[1];
+    const description = contentParts[2];
 
-  let frontmatterData;
-  try {
-    frontmatterData = parseFrontmatter(frontmatterSource);
-  } catch (err) {
-    console.error(err);
-    frontmatterData = {};
-  }
-
-  // try to extract fip number again
-  if (!fipNumber || isNaN(fipNumber)) {
-    const frontmatterFipNumberMatch =
-      frontmatterData.fip?.match(/(fip-)?([0-9]*)/);
-    fipNumber = frontmatterFipNumberMatch
-      ? parseInt(frontmatterFipNumberMatch[2], 10)
-      : 0;
-  }
-
-  let fipTitle;
-  try {
-    if (
-      frontmatterData.title &&
-      typeof JSON.parse(frontmatterData.title) === "string"
-    ) {
-      fipTitle = JSON.parse(frontmatterData.title);
+    let frontmatterData;
+    try {
+      frontmatterData = parseFrontmatter(frontmatterSource);
+    } catch (err) {
+      console.error(err);
+      frontmatterData = {};
     }
-  } catch (err) {
-    fipTitle = frontmatterData.title;
-  }
 
-  return {
-    description,
-    fip_number: isNaN(fipNumber) ? undefined : fipNumber,
-    fip_title: fipTitle,
-    fip_author: frontmatterData.author,
-    fip_discussions_to: frontmatterData["discussions-to"],
-    fip_status: frontmatterData.status,
-    fip_type: frontmatterData.type,
-    fip_category: frontmatterData.category,
-    fip_created: frontmatterData.created,
-  };
+    // try to extract fip number again
+    if (!fipNumber || isNaN(fipNumber)) {
+      const frontmatterFipNumberMatch =
+        frontmatterData.fip?.match(/(fip-)?([0-9]*)/);
+      fipNumber = frontmatterFipNumberMatch
+        ? parseInt(frontmatterFipNumberMatch[2], 10)
+        : 0;
+    }
+
+    let fipTitle;
+    try {
+      if (
+        frontmatterData.title &&
+        typeof JSON.parse(frontmatterData.title) === "string"
+      ) {
+        fipTitle = JSON.parse(frontmatterData.title);
+      }
+    } catch (err) {
+      fipTitle = frontmatterData.title;
+    }
+
+    return {
+      description,
+      fip_number: isNaN(fipNumber) ? undefined : fipNumber,
+      fip_title: fipTitle,
+      fip_author: frontmatterData.author,
+      fip_discussions_to: frontmatterData["discussions-to"],
+      fip_status: frontmatterData.status,
+      fip_type: frontmatterData.type,
+      fip_category: frontmatterData.category,
+      fip_created: pull.created_at,
+    };
+  } else {
+    // fip that only changed a file
+    return {
+      fip_number: undefined,
+      fip_title: pull.title,
+      fip_author: pull.user?.login,
+      fip_created: pull.created_at,
+    };
+  }
 }
 
 function getWelcomeMessage(serverNameWithProtocol: string, zinvite: string) {

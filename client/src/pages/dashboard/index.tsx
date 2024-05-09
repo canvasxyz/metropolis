@@ -91,13 +91,13 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
   const syncPRs = () => {
     // github sync
     setSyncInProgress(true)
-    toast.success("Getting updates from Github...")
+    toast.success("Connecting to Github...")
     api
       .post("api/v3/github_sync", {})
       .then(({ existingFips, openPulls, fipsUpdated, fipsCreated }) => {
-        toast.success(`Found ${existingFips} existing FIPs, ${openPulls} open FIP PRs`)
+        toast.success(`Downloading ${existingFips} FIPs, ${openPulls} open PRs...`)
         setTimeout(() => {
-          toast.success(`Updated ${fipsUpdated} FIPs, synced ${fipsCreated} new FIPs`)
+          toast.success(`Updating ${fipsUpdated} FIPs, creating ${fipsCreated} new FIPs...`)
           setTimeout(() => {
             location.reload()
           }, 2000)

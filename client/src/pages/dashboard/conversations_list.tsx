@@ -302,7 +302,7 @@ const ConversationsList = ({
               "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
           }}
         >
-          Last sync: {isNaN(lastSync) ? "n/a" : formatTimeAgo(lastSync, true)} &nbsp;
+          Last sync: {isNaN(lastSync) ? "n/a" : formatTimeAgo(lastSync)} &nbsp;
           <Link variant="links.a" onClick={() => syncPRs()}>
             {syncInProgress ? <Spinner size={26} /> : `Sync now`}
           </Link>
@@ -391,7 +391,7 @@ const ConversationListItem = ({
   dispatch,
 }: ConversationListItemProps) => {
   const date = new Date(conversation.fip_created || +conversation.created)
-  const timeAgo = formatTimeAgo(+date)
+  const timeAgo = formatTimeAgo(+date, true)
 
   const shouldHideDiscussion =
     !conversation.fip_title &&
@@ -435,7 +435,7 @@ const ConversationListItem = ({
             <Text sx={{ color: "#84817D" }}>Untitled</Text>
           )}
           <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
-            <Text sx={{ flex: 1 }}>{timeAgo}</Text>
+            <Text sx={{ flex: 1 }}>Created {timeAgo} ago</Text>
           </Flex>
         </Box>
       </Flex>

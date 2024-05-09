@@ -78,8 +78,7 @@ export const Collapsible = ({
 
 export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
   const matches = conversation.fip_discussions_to?.match(/\[.+\]\((.+)\)/)
-  const links =
-    matches && matches[1] ? [matches[1]] : conversation.fip_discussions_to?.split(", ")
+  const links = matches && matches[1] ? [matches[1]] : conversation.fip_discussions_to?.split(", ")
   const discussions = (links || []).map((link) => (
     <Link
       key={link}
@@ -153,25 +152,32 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
             </td>
           </tr>
         )}
-        <tr>
-          <td style={{ paddingTop: 8 }}>
-            <Text sx={{ fontWeight: "700" }}>Text</Text>
-          </td>
-          <td style={{ display: "grid", paddingTop: 8 }}>
-            {conversation.description ? (
-              <Collapsible
-                title={conversation.fip_title}
-                key={conversation.conversation_id}
-                shouldCollapse={conversation.description?.length > 300}
-                content={conversation.description}
-              ></Collapsible>
-            ) : (
-              <Box sx={{ pb: [1] }}>
-                Could not parse FIP text. Refer to the linked Github PR for more information.
-              </Box>
-            )}
-          </td>
-        </tr>
+        {!conversation.description &&
+        !conversation.fip_number &&
+        !conversation.fip_status &&
+        !conversation.fip_type ? (
+          <tr style={{ height: 3 }}></tr>
+        ) : (
+          <tr>
+            <td style={{ paddingTop: 8 }}>
+              <Text sx={{ fontWeight: "700" }}>Text</Text>
+            </td>
+            <td style={{ display: "grid", paddingTop: 8 }}>
+              {conversation.description ? (
+                <Collapsible
+                  title={conversation.fip_title}
+                  key={conversation.conversation_id}
+                  shouldCollapse={conversation.description?.length > 300}
+                  content={conversation.description}
+                ></Collapsible>
+              ) : (
+                <Box sx={{ pb: [1] }}>
+                  Could not parse FIP text. Refer to the linked Github PR for more information.
+                </Box>
+              )}
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   )
