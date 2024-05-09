@@ -24,6 +24,8 @@ const sql_conversations: any = sql.define({
     "fip_type",
     "fip_category",
     "fip_created",
+    "fip_files_created",
+    "fip_files_updated",
     "fip_title",
     "profanity_filter",
     "spam_filter",

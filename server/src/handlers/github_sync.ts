@@ -177,7 +177,7 @@ async function getFipFromPR(
     }`,
     { cwd: repoDir },
   );
-  const updatedFilenames = updatedFilenamesText
+  const createdFilenames = updatedFilenamesText
     .trim()
     .split("\n")
     .filter((fn) => fn.startsWith("A"))
@@ -189,20 +189,26 @@ async function getFipFromPR(
         filename.toLowerCase().startsWith("frcs/"),
     );
 
-  // if (updatedFilenames.length === 0) {
-  //   throw Error(
-  //     `[${pull.head?.label}] no FIP-XXXX.md files created in PR #${pull.number}`,
-  //   );
-  // }
+  const updatedFilenames = updatedFilenamesText
+    .trim()
+    .split("\n")
+    .filter((fn) => fn.startsWith("M"))
+    .map((fn) => fn.slice(1).trim())
+    .filter(
+      (filename) =>
+        filename.toLowerCase().startsWith("fip0001v2") ||
+        filename.toLowerCase().startsWith("fips/") ||
+        filename.toLowerCase().startsWith("frcs/"),
+    );
 
-  if (updatedFilenames.length > 1) {
+  if (createdFilenames.length > 1) {
     console.error(
       `[${pull.head?.label}] multiple FIP-XXXX.md files changed in PR #${pull.number}, using the last one`,
     );
   }
 
-  if (updatedFilenames.length > 0) {
-    const filename = updatedFilenames[updatedFilenames.length - 1];
+  if (createdFilenames.length > 0) {
+    const filename = createdFilenames[createdFilenames.length - 1];
 
     // get the contents of the new FIP
     const content = await fsPromises.readFile(
@@ -258,6 +264,8 @@ async function getFipFromPR(
       fip_type: frontmatterData.type,
       fip_category: frontmatterData.category,
       fip_created: pull.created_at,
+      fip_files_created: createdFilenames.join("\n"),
+      fip_files_updated: updatedFilenames.join("\n"),
     };
   } else {
     // fip that only changed a file
@@ -266,6 +274,8 @@ async function getFipFromPR(
       fip_title: pull.title,
       fip_author: pull.user?.login,
       fip_created: pull.created_at,
+      fip_files_created: createdFilenames.join("\n"),
+      fip_files_updated: updatedFilenames.join("\n"),
     };
   }
 }

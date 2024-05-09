@@ -132,6 +132,8 @@ export type ConversationType = {
   fip_type?: any;
   fip_category?: any;
   fip_created?: any;
+  fip_files_created?: any;
+  fip_files_updated?: any;
   profanity_filter?: any;
   spam_filter?: any;
   strict_moderation?: any;

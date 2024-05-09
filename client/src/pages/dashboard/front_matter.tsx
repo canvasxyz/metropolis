@@ -156,7 +156,19 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
         !conversation.fip_number &&
         !conversation.fip_status &&
         !conversation.fip_type ? (
-          <tr style={{ height: 3 }}></tr>
+          <React.Fragment>
+            <tr>
+              <td>
+                <Text sx={{ fontWeight: "700" }}>Files Updated</Text>
+              </td>
+              <td>
+                <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
+                  {conversation.fip_files_updated}
+                </Link>
+              </td>
+            </tr>
+            <td style={{ height: 3 }}></td>
+          </React.Fragment>
         ) : (
           <tr>
             <td style={{ paddingTop: 8 }}>

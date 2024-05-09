@@ -38,6 +38,8 @@ export type ZidMetadata = {
   fip_category: string | null
   fip_created: string | null
   fip_discussions_to: string | null
+  fip_files_created: string | null
+  fip_files_updated: string | null
   fip_number: string | number | null // ?
   fip_status: string | null
   fip_title: string | null

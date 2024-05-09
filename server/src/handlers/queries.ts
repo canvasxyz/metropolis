@@ -54,6 +54,8 @@ export type FipFields = {
   fip_type?: string;
   fip_category?: string;
   fip_created?: string;
+  fip_files_created?: string;
+  fip_files_updated?: string;
 };
 
 const FIP_FIELDS: (keyof FipFields)[] = [
@@ -66,6 +68,8 @@ const FIP_FIELDS: (keyof FipFields)[] = [
   "fip_type",
   "fip_category",
   "fip_created",
+  "fip_files_created",
+  "fip_files_updated",
 ];
 
 export async function updateOrCreateGitHubUser(
