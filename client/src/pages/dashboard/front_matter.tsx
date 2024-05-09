@@ -99,11 +99,11 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
   ))
 
   return (
-    <table>
+    <table style={{ tableLayout: "fixed", width: "100%" }}>
       <tbody className="border">
         {(conversation.github_pr_url || conversation.github_pr_title) && (
           <tr>
-            <td>
+            <td width="100">
               <Text sx={{ fontWeight: "700" }}>PR</Text>
             </td>
             <td>

@@ -108,8 +108,9 @@ export const DashboardConversation = ({
     (state: RootState) => state.zid_metadata,
   )
 
-  const summaryData = useAppSelector((state: RootState) =>
-    state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
+  const summaryData = useAppSelector(
+    (state: RootState) =>
+      state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
   )
 
   const [showReport, setShowReport] = useState<boolean>(false)
@@ -173,7 +174,7 @@ export const DashboardConversation = ({
 
   return (
     <Box>
-      <Box sx={{ width: "100%" }}>
+      <Box sx={{ mt: [6, "none"], width: "100%" }}>
         <Box
           sx={{
             flexDirection: "column",
@@ -182,7 +183,7 @@ export const DashboardConversation = ({
             pt: [5],
             pb: [2],
             mt: [3],
-            px: [5],
+            px: [3, 5],
             maxWidth: "760px",
           }}
         >

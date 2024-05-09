@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
-import { useEffect, useState } from "react"
-import { Link as RouterLink, useHistory } from "react-router-dom"
+import React, { useEffect, useState } from "react"
+import { Link as RouterLink, useHistory, useLocation } from "react-router-dom"
 import { Box, Flex, Text, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
 import { TbGitPullRequest } from "react-icons/tb"
@@ -20,13 +20,41 @@ import { ConversationSummary } from "../../reducers/conversations_summary"
 
 export const MIN_SEED_RESPONSES = 5
 
+const LogoBlock = () => {
+  return (
+    <React.Fragment>
+      <img
+        src="/filecoin.png"
+        width="25"
+        height="25"
+        sx={{
+          position: "relative",
+          top: "6px",
+          mr: [2],
+        }}
+      />
+      <Text
+        variant="links.text"
+        sx={{
+          color: "text",
+          "&:hover": { color: "text" },
+          fontWeight: 700,
+          display: "inline",
+        }}
+      >
+        Metropolis
+      </Text>
+    </React.Fragment>
+  )
+}
+
 const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
 
   return (
     <Box sx={{ pt: [3], ml: "26px" }}>
       {conversations.length === 0 && (
-        <Box sx={{ fontWeight: 500, mt: [4], opacity: 0.5 }}>None found</Box>
+        <Box sx={{ fontWeight: 500, mt: [3], mb: [3], opacity: 0.5 }}>None found</Box>
       )}
       {conversations.map((c) => {
         const date = new Date(c.fip_created || +c.created)
@@ -83,6 +111,12 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
     window.scrollTo(0, 0)
   }, [])
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const location = useLocation()
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [location])
+
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
@@ -99,7 +133,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
         setTimeout(() => {
           toast.success(`Updating ${fipsUpdated} FIPs, creating ${fipsCreated} new FIPs...`)
           setTimeout(() => {
-            location.reload()
+            document.location.reload()
           }, 2000)
         }, 2000)
       })
@@ -117,7 +151,8 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
       <Flex sx={{ display: "flex", height: "100%" }}>
         <Box
           sx={{
-            width: ["40%", null, "340px"],
+            display: mobileMenuOpen ? null : ["none", "block"],
+            width: ["100%", "40%", null, "340px"],
             borderRight: "1px solid #e2ddd5",
             bg: "bgOffWhite",
             maxHeight: "100vh",
@@ -138,27 +173,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
           >
             <Box sx={{ flexGrow: "1" }}>
               <RouterLink to="/dashboard">
-                <img
-                  src="/filecoin.png"
-                  width="25"
-                  height="25"
-                  sx={{
-                    position: "relative",
-                    top: "6px",
-                    mr: [2],
-                  }}
-                />
-                <Text
-                  variant="links.text"
-                  sx={{
-                    color: "text",
-                    "&:hover": { color: "text" },
-                    fontWeight: 700,
-                    display: "inline",
-                  }}
-                >
-                  Metropolis
-                </Text>
+                <LogoBlock />
               </RouterLink>
             </Box>
           </Flex>
@@ -170,12 +185,26 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             user={user}
           />
         </Box>
-        <Box sx={{ overflowY: "scroll", flex: 1, position: "relative", bg: "bgDarkWhite" }}>
+        <Box
+          sx={{
+            display: [mobileMenuOpen ? "none" : "block", "block"],
+            overflowY: "scroll",
+            flex: 1,
+            position: "relative",
+            bg: "bgDarkWhite",
+          }}
+        >
+          <Box
+            sx={{ display: ["block", "none"], position: "fixed", top: [2], left: "18px" }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <LogoBlock />
+          </Box>
           <DashboardUserButton />
           {selectedConversationId ? (
             <DashboardConversation selectedConversationId={selectedConversationId} user={user} />
           ) : (
-            <Box sx={{ maxWidth: "540px", px: [3], py: [3], pt: [8], margin: "0 auto" }}>
+            <Box sx={{ maxWidth: [null, "540px"], px: [3], py: [3], pt: [8], margin: "0 auto" }}>
               <Box>
                 Welcome to Metropolis, a nonbinding sentiment check tool for the Filecoin community.
                 You can:
