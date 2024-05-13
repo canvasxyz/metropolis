@@ -245,7 +245,13 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
               </Box>
               <ConversationsPreview
                 conversations={conversations
-                  .filter((c) => !c.is_archived && !c.is_hidden && !c.github_pr_title)
+                  .filter(
+                    (c) =>
+                      !c.is_archived &&
+                      !c.is_hidden &&
+                      !c.github_pr_title &&
+                      c.comment_count >= MIN_SEED_RESPONSES,
+                  )
                   .slice(0, 5)}
               />
             </Box>

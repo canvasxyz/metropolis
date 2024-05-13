@@ -88,7 +88,7 @@ const ConversationsList = ({
       !conversation.github_pr_title &&
       !conversation.is_archived &&
       !conversation.is_hidden &&
-      conversation.comment_count >= MIN_SEED_RESPONSES,
+      (conversation.comment_count >= MIN_SEED_RESPONSES || conversation.owner === user?.uid),
   )
   const emptyFIPConversations = conversations.filter(
     (conversation) =>
@@ -106,7 +106,11 @@ const ConversationsList = ({
   )
   const allConversations = conversations.filter(
     (conversation) =>
-      !conversation.is_archived && !conversation.is_hidden && conversation.fip_files_created,
+      !conversation.is_archived &&
+      !conversation.is_hidden &&
+      (conversation.github_pr_title
+        ? conversation.fip_files_created
+        : conversation.comment_count >= MIN_SEED_RESPONSES || conversation.owner === user?.uid),
   )
   const archivedConversations = conversations.filter(
     (conversation) => conversation.is_archived && !conversation.is_hidden,
