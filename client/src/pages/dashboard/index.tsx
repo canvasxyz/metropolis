@@ -222,7 +222,10 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
               </Flex>
               <ConversationsPreview
                 conversations={conversations
-                  .filter((c) => !c.is_archived && !c.is_hidden && c.github_pr_title)
+                  .filter(
+                    (c) =>
+                      !c.is_archived && !c.is_hidden && c.github_pr_title && c.fip_files_created,
+                  )
                   .slice(0, 5)}
               />
               {/* discussions */}
