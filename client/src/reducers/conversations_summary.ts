@@ -21,6 +21,7 @@ export type ConversationSummary = {
   github_pr_is_draft: boolean
   github_pr_title: string | null
   github_pr_id: string | null
+  fip_files_created: string | null
   participant_count: number
   comment_count: number | null
   sentiment_count: number | null
@@ -79,7 +80,9 @@ const conversationsSummarySlice = createSlice({
       })
       .addDefaultCase((state, action) => {
         if (action.type === types.SUBMIT_NEW_COMMENT) {
-          const conversation = state.data.find((d) => d.conversation_id === (action as any).conversation_id)
+          const conversation = state.data.find(
+            (d) => d.conversation_id === (action as any).conversation_id,
+          )
           conversation.comment_count = conversation.comment_count + 1
         }
         return state

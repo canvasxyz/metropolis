@@ -7863,6 +7863,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.github_pr_is_draft,
     conversations.github_pr_title,
     conversations.github_pr_id,
+    conversations.fip_files_created,
     conversations.is_archived,
     conversations.is_hidden,
     conversations.participant_count,

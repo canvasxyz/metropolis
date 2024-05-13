@@ -36,7 +36,13 @@ import {
   handleReopenConversation,
 } from "../../actions"
 
-type ConversationListSelection = "all-fip" | "open-fip" | "non-fip" | "archived" | "hidden"
+type ConversationListSelection =
+  | "all-fip"
+  | "open-fip"
+  | "non-fip"
+  | "empty-fip"
+  | "archived"
+  | "hidden"
 
 const ConversationsList = ({
   user,
@@ -84,12 +90,23 @@ const ConversationsList = ({
       !conversation.is_hidden &&
       conversation.comment_count >= MIN_SEED_RESPONSES,
   )
+  const emptyFIPConversations = conversations.filter(
+    (conversation) =>
+      conversation.github_pr_title &&
+      !conversation.is_archived &&
+      !conversation.is_hidden &&
+      !conversation.fip_files_created,
+  )
   const openConversations = conversations.filter(
     (conversation) =>
-      conversation.github_pr_title && !conversation.is_archived && !conversation.is_hidden,
+      conversation.github_pr_title &&
+      !conversation.is_archived &&
+      !conversation.is_hidden &&
+      conversation.fip_files_created,
   )
   const allConversations = conversations.filter(
-    (conversation) => !conversation.is_archived && !conversation.is_hidden,
+    (conversation) =>
+      !conversation.is_archived && !conversation.is_hidden && conversation.fip_files_created,
   )
   const archivedConversations = conversations.filter(
     (conversation) => conversation.is_archived && !conversation.is_hidden,
@@ -109,6 +126,8 @@ const ConversationsList = ({
     conversationsToDisplay = openConversations
   } else if (selectedConversations === "non-fip") {
     conversationsToDisplay = nonFIPConversations
+  } else if (selectedConversations === "empty-fip") {
+    conversationsToDisplay = emptyFIPConversations
   } else if (selectedConversations === "archived") {
     conversationsToDisplay = archivedConversations
   } else if (selectedConversations === "hidden") {
@@ -238,6 +257,23 @@ const ConversationsList = ({
                 <Menu.Item>
                   <Box
                     variant={
+                      selectedConversations === "empty-fip"
+                        ? "boxes.menuitemactive"
+                        : "boxes.menuitem"
+                    }
+                    onClick={() => setSelectedConversations("empty-fip")}
+                  >
+                    <Flex>
+                      <Box sx={{ flex: 1 }}> FIPs (edits)</Box>
+                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
+                        {emptyFIPConversations.length}
+                      </Box>
+                    </Flex>
+                  </Box>
+                </Menu.Item>
+                <Menu.Item>
+                  <Box
+                    variant={
                       selectedConversations === "archived"
                         ? "boxes.menuitemactive"
                         : "boxes.menuitem"
@@ -275,6 +311,20 @@ const ConversationsList = ({
         </Box>
       </Flex>
       <Box sx={{ height: "calc(100vh - 150px)", overflow: "scroll", pb: "100px" }}>
+        {selectedConversations === "empty-fip" && (
+          <Box
+            sx={{
+              px: 2,
+              py: 2,
+              fontSize: "80%",
+              textAlign: "center",
+              lineHeight: 1.3,
+            }}
+          >
+            These PRs only edit existing FIPs so <br />
+            they cannot be voted on right now.
+          </Box>
+        )}
         {conversationsToDisplay.map((conversation) => (
           <ConversationListItem
             hist={hist}
@@ -398,12 +448,16 @@ const ConversationListItem = ({
     !conversation.github_pr_title &&
     conversation.comment_count < MIN_SEED_RESPONSES
 
+  const emptyFIP = conversation.github_pr_title && !conversation.fip_files_created
+
   if (shouldHideDiscussion && conversation.owner !== user?.uid) return
 
   return (
     <Box
       sx={{
         position: "relative",
+        opacity: emptyFIP ? 0.7 : null,
+        pointerEvents: emptyFIP ? "none" : null,
         padding: "12px 16px",
         cursor: "pointer",
         userSelect: "none",
