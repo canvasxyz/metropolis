@@ -3,6 +3,7 @@ import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text, Link } from "theme-ui"
 import { useHistory, Link as RouterLink } from "react-router-dom"
 import {
+  TbExternalLink,
   TbExclamationCircle,
   TbDots,
   TbDotsVertical,
@@ -397,7 +398,29 @@ const ConversationsList = ({
           borderTop: "1px solid lighterGray",
         }}
       >
-        <RouterLink to="/about">About this platform</RouterLink>
+        <RouterLink to="/about">
+          <Text variant="links.a">About</Text>
+        </RouterLink>{" "}
+        &middot;{" "}
+        <Link
+          variant="links.a"
+          as="a"
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/filecoin-project/FIPs"
+        >
+          FIPs <TbExternalLink style={{ position: "relative", top: 1, left: -1 }} />
+        </Link>{" "}
+        &middot;{" "}
+        <Link
+          variant="links.a"
+          as="a"
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/canvasxyz/metropolis/issues/new/choose"
+        >
+          Bugs & Feedback <TbExternalLink style={{ position: "relative", top: 1, left: -1 }} />
+        </Link>
       </Box>
     </React.Fragment>
   )
