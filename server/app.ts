@@ -1208,6 +1208,7 @@ const fetchIndexForAdminPage = (
 };
 
 app.get("^/$", fetchIndexForAdminPage);
+app.get(/^\/about(\/.*)?/, fetchIndexForAdminPage);
 app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
 app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
 app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
