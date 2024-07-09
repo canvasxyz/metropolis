@@ -7918,21 +7918,6 @@ function createReport(zid: any) {
   });
 }
 
-async function handle_GET_conversation_view_count(
-  req: { p: { zid: any } },
-  res: { json: (arg0: any) => void }
-) {
-  let zid = req.p.zid;
-  const result = await queryP("select view_count from conversation_view_counts where zid = ($1)", [zid]);
-
-  if(result.length == 0) {
-    res.json(0);
-  } else {
-    res.json(result[0].view_count);
-  }
-}
-
-
 async function handle_POST_increment_conversation_view_count(
   req: { p: { zid: any } },
   res: { json: (arg0: any) => void }
@@ -9582,7 +9567,6 @@ export {
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
   handle_GET_conversations_summary,
-  handle_GET_conversation_view_count,
   handle_POST_increment_conversation_view_count,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
