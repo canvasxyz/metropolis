@@ -1,12 +1,10 @@
 // Copyright (C) 2024-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import api from "../util/api"
-import { useSelector } from "react-redux"
 import { useAppSelector } from "../hooks"
 
 /* conversation view counts */
-export const incrementViewCountRequest = createAsyncThunk(
+const incrementViewCountRequest = createAsyncThunk(
   'view_counts/increment_view_count',
   async (conversation_id: string) => {
     const response = await fetch(`/api/v3/increment_conversation_view_count?conversation_id=${conversation_id}`, {
@@ -16,7 +14,7 @@ export const incrementViewCountRequest = createAsyncThunk(
   }
 )
 
-export type ViewCountsState = {
+type ViewCountsState = {
   seen_conversation_ids: Record<string, boolean>,
   view_counts: Record<string, number>,
 }
