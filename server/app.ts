@@ -46,6 +46,7 @@ import {
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
   handle_GET_conversations_summary,
+  handle_GET_conversation_view_count,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
@@ -1043,6 +1044,14 @@ app.post(
 );
 
 app.get("/api/v3/conversations_summary", handle_GET_conversations_summary);
+
+app.get(
+  "/api/v3/conversation_view_count",
+  authOptional(assignToP),
+  moveToBody,
+  need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
+  handle_GET_conversation_view_count as any,
+);
 
 app.post(
   "/api/v3/query_participants_by_metadata",
