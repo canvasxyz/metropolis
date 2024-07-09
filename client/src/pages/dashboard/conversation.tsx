@@ -16,6 +16,7 @@ import { SentimentCheck } from "./sentiment_check"
 import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
 import { MIN_SEED_RESPONSES } from "./index"
+import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
 
 type ReportComment = {
   active: boolean
@@ -118,11 +119,13 @@ export const DashboardConversation = ({
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
   const [maxCount, setMaxCount] = useState<number>(0)
   const [refreshInProgress, setRefreshInProgress] = useState(false)
+  const viewCount = useViewCount(zid_metadata.conversation_id)
 
   useEffect(() => {
     setReport(undefined)
     setReportComments([])
     if (!zid_metadata.conversation_id) return
+    dispatch(incrementViewCount(zid_metadata.conversation_id))
     refreshReport()
   }, [zid_metadata.conversation_id])
 
@@ -212,6 +215,8 @@ export const DashboardConversation = ({
                 })
                 // return `${date.getMonth() + 1}/${date.getUTCDate()}/${date.getFullYear()}`
               })()}
+              <Text> &middot; </Text>
+              {viewCount || "..."} views
               {zid_metadata.github_username === user?.githubUsername && (
                 <Text>
                   <Text> &middot; </Text>
