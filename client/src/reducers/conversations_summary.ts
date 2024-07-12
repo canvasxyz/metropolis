@@ -25,6 +25,7 @@ export type ConversationSummary = {
   participant_count: number
   comment_count: number | null
   sentiment_count: number | null
+  view_count: number | null
   topic: string | null
   is_archived: boolean
   is_hidden: boolean

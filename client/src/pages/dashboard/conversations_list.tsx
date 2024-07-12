@@ -24,6 +24,7 @@ import api from "../../util/api"
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
+import { useViewCount } from "../../reducers/view_counts"
 import {
   ConversationSummary,
   populateConversationsSummary,
@@ -44,6 +45,11 @@ type ConversationListSelection =
   | "empty-fip"
   | "archived"
   | "hidden"
+
+const ViewCount = ({ initialViewCount, conversation }) => {
+  const viewCount = useViewCount(conversation.conversation_id)
+  return <Text>{Math.max(viewCount, initialViewCount)}</Text>
+}
 
 const ConversationsList = ({
   user,
@@ -338,6 +344,7 @@ const ConversationsList = ({
             selectedConversationId={selectedConversationId}
             navigateToConversation={navigateToConversation}
             key={conversation.conversation_id}
+            initialViewCount={conversation.view_count}
             dispatch={dispatch}
           />
         ))}
@@ -430,6 +437,7 @@ type ConversationListItemProps = {
   hist
   user
   conversation: ConversationSummary
+  initialViewCount: number
   selectedConversationId: string | null
   navigateToConversation: (conversationId: string) => void
   dispatch
@@ -463,6 +471,7 @@ const ConversationListItem = ({
   hist,
   user,
   conversation,
+  initialViewCount,
   selectedConversationId,
   navigateToConversation,
   dispatch,
@@ -516,7 +525,10 @@ const ConversationListItem = ({
             <Text sx={{ color: "#84817D" }}>Untitled</Text>
           )}
           <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
-            <Text sx={{ flex: 1 }}>Created {timeAgo} ago</Text>
+            <Text sx={{ flex: 1 }}>
+              Created {timeAgo} ago &middot;{" "}
+              <ViewCount initialViewCount={initialViewCount} conversation={conversation} /> views
+            </Text>
           </Flex>
         </Box>
       </Flex>
