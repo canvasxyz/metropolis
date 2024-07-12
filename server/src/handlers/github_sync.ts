@@ -341,6 +341,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         repo: process.env.FIP_REPO_NAME,
         owner: process.env.FIP_REPO_OWNER,
         per_page: 100,
+        state: "all"
       },
     );
 
