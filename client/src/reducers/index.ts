@@ -20,12 +20,14 @@ import comments from "./comments"
 import math from "./math"
 import participants from "./participants"
 import conversation_voters from "./voters"
+import view_counts from "./view_counts"
 
 const rootReducer = combineReducers({
   conversations,
   conversations_summary,
   user,
   zid_metadata,
+  view_counts,
   math,
   comments,
   participants,

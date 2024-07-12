@@ -7917,6 +7917,25 @@ function createReport(zid: any) {
     ]);
   });
 }
+
+async function handle_POST_increment_conversation_view_count(
+  req: { p: { zid: any } },
+  res: { json: (arg0: any) => void }
+) {
+  let zid = req.p.zid;
+  const result = await queryP(
+    `
+    INSERT INTO conversation_view_counts (zid, view_count)
+    VALUES ($1, 1)
+    ON CONFLICT (zid)
+    DO UPDATE SET view_count = conversation_view_counts.view_count + 1
+    RETURNING view_count;
+    `,
+    [zid]
+  );
+  res.json(result[0].view_count);
+}
+
 function handle_POST_reports(
   req: { p: { zid: any } },
   res: { json: (arg0: any) => void },
@@ -9548,6 +9567,7 @@ export {
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
   handle_GET_conversations_summary,
+  handle_POST_increment_conversation_view_count,
   handle_GET_math_correlationMatrix,
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
