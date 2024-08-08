@@ -73,10 +73,7 @@ async function handleGithubOauthCallback(
     if (collaborators.map((c) => c.id).indexOf(githubUserId) !== -1) {
       isRepoCollaborator = true;
     }
-    if (
-      DEFAULT_REPO_COLLABORATORS.map((c) => c.login).indexOf(githubUserId) !==
-      -1
-    ) {
+    if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {
       isRepoCollaborator = true;
     }
   } catch (err) {
