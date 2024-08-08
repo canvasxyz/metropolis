@@ -66,11 +66,23 @@ async function handleGithubOauthCallback(
   let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
   try {
     const collaborators = await getRepoCollaborators();
+    console.log(
+      "Got repo collaborators:",
+      collaborators.map((c) => c.login),
+    );
     if (collaborators.map((c) => c.id).indexOf(githubUserId) !== -1) {
       isRepoCollaborator = true;
     }
+    if (
+      DEFAULT_REPO_COLLABORATORS.map((c) => c.login).indexOf(githubUserId) !==
+      -1
+    ) {
+      isRepoCollaborator = true;
+    }
   } catch (err) {
-    console.log("Could not get collaborators, is the app connected to Github");
+    console.log(
+      "Could not get collaborators, is Metropolis installed on your Github repo?",
+    );
     console.log((err as any).message);
     if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {
       isRepoCollaborator = true;
