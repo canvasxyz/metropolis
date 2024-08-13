@@ -6,7 +6,6 @@ import {
   TbExternalLink,
   TbExclamationCircle,
   TbDots,
-  TbDotsVertical,
   TbPencil,
   TbGitMerge,
   TbGitPullRequestClosed,
@@ -37,6 +36,7 @@ import {
   handleCloseConversation,
   handleReopenConversation,
 } from "../../actions"
+import { ListSelector } from "./list_selector"
 
 type ConversationListSelection =
   | "all-fip"
@@ -79,8 +79,10 @@ const ConversationsList = ({
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const [selectedConversations, setSelectedConversations] =
-    useLocalStorage<ConversationListSelection>("selectedConversations", "all-fip")
+  const [
+    selectedConversations,
+    setSelectedConversations,
+  ] = useLocalStorage<ConversationListSelection>("selectedConversations", "all-fip")
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
@@ -151,176 +153,41 @@ const ConversationsList = ({
     return <React.Fragment></React.Fragment>
   }
 
-  const tab = {
-    mr: "6px",
-    px: "8px",
-    pt: "6px",
-    textAlign: "center",
-    color: "primary",
-    borderRadius: "10px",
-    border: "1px solid lightGray",
-    fontSize: "0.92em",
-    cursor: "pointer",
-    "&:hover": {
-      bg: "bgGrayLight",
-    },
-  }
-
-  const tabSelected = {
-    ...tab,
-    border: "1px solid primary",
-    bg: "primary",
-    color: "#fff",
-    "&:hover": {},
-  }
-
-  const tabCount = {
-    background: "primaryActive",
-    color: "#fff",
-    fontSize: "0.84em",
-    borderRadius: "99px",
-    px: "6px",
-    py: "3px",
-    ml: "2px",
-    top: "-1px",
-    position: "relative",
-  }
-
   return (
     <React.Fragment>
-      <Flex sx={{ pt: "9px", pb: "8px", pl: "13px" }}>
-        <Box
-          sx={selectedConversations === "all-fip" ? tabSelected : tab}
-          onClick={() => setSelectedConversations("all-fip")}
-        >
-          All <Text sx={tabCount}>{openConversations.length + nonFIPConversations.length}</Text>
-        </Box>
-        <Box
-          sx={selectedConversations === "open-fip" ? tabSelected : tab}
-          onClick={() => setSelectedConversations("open-fip")}
-        >
-          FIPs <Text sx={tabCount}>{openConversations.length}</Text>
-        </Box>
-        <Box
-          sx={selectedConversations === "non-fip" ? tabSelected : tab}
-          onClick={() => setSelectedConversations("non-fip")}
-        >
-          Polls <Text sx={tabCount}>{nonFIPConversations.length}</Text>
-        </Box>
-        <Box sx={{ flex: 1 }}></Box>
-        <Box>
-          <Menu>
-            <Menu.Button as="div">
-              <Box sx={{ px: "10px", py: "3px", my: "3px", mr: "5px", cursor: "pointer" }}>
-                <TbDotsVertical />
-              </Box>
-            </Menu.Button>
-            <Menu.Items as={Box}>
-              <Box variant="boxes.menu" sx={{ width: "180px" }}>
-                {/*
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "all-fip"
-                        ? "boxes.menuitemactive"
-                        : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("all-fip")}
-                  >
-                    All
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "open-fip"
-                        ? "boxes.menuitemactive"
-                        : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("open-fip")}
-                  >
-                    <Flex>
-                      <Box sx={{ flex: 1 }}>FIPs</Box>
-                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                        {openConversations.length}
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "non-fip"
-                        ? "boxes.menuitemactive"
-                        : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("non-fip")}
-                  >
-                    <Flex>
-                      <Box sx={{ flex: 1 }}>Polls</Box>
-                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                        {nonFIPConversations.length}
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Menu.Item>
-                 */}
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "empty-fip"
-                        ? "boxes.menuitemactive"
-                        : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("empty-fip")}
-                  >
-                    <Flex>
-                      <Box sx={{ flex: 1 }}> FIPs (edits)</Box>
-                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                        {emptyFIPConversations.length}
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Menu.Item>
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "archived"
-                        ? "boxes.menuitemactive"
-                        : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("archived")}
-                  >
-                    <Flex>
-                      <Box sx={{ flex: 1 }}> Closed</Box>
-                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                        {archivedConversations.length}
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Menu.Item>
-                {/*
-                <Menu.Item>
-                  <Box
-                    variant={
-                      selectedConversations === "hidden" ? "boxes.menuitemactive" : "boxes.menuitem"
-                    }
-                    onClick={() => setSelectedConversations("hidden")}
-                  >
-                    <Flex>
-                      <Box sx={{ flex: 1 }}> Spam</Box>
-                      <Box sx={{ pr: [1], opacity: 0.6, fontSize: "0.93em", top: "1px" }}>
-                        {hiddenConversations.length}
-                      </Box>
-                    </Flex>
-                  </Box>
-                </Menu.Item>
-                 */}
-              </Box>
-            </Menu.Items>
-          </Menu>
-        </Box>
-      </Flex>
+      <ListSelector<ConversationListSelection>
+        selectedEntryId={selectedConversations}
+        setSelectedEntryId={setSelectedConversations}
+        visibleEntries={[
+          {
+            id: "all-fip",
+            label: "All",
+            count: allConversations.length,
+          },
+          {
+            id: "open-fip",
+            label: "FIPs",
+            count: openConversations.length,
+          },
+          {
+            id: "non-fip",
+            label: "Polls",
+            count: nonFIPConversations.length,
+          },
+        ]}
+        dropdownEntries={[
+          {
+            id: "empty-fip",
+            label: "FIPs (edits)",
+            count: emptyFIPConversations.length,
+          },
+          {
+            id: "archived",
+            label: "Closed",
+            count: archivedConversations.length,
+          },
+        ]}
+      />
       <Box sx={{ height: "calc(100vh - 150px)", overflow: "scroll", pb: "100px" }}>
         {selectedConversations === "empty-fip" && (
           <Box
