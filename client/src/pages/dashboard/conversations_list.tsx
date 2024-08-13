@@ -14,6 +14,8 @@ import {
   TbHammer,
   TbArchiveOff,
   TbArchive,
+  TbQuestionMark,
+  TbFocus,
 } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Menu } from "@headlessui/react"
@@ -37,6 +39,7 @@ import {
   handleReopenConversation,
 } from "../../actions"
 import { ListSelector } from "./list_selector"
+import { ListingSelector } from "./listing_selector"
 
 type ConversationListSelection =
   | "all-fip"
@@ -155,6 +158,19 @@ const ConversationsList = ({
 
   return (
     <React.Fragment>
+      <ListingSelector
+        iconType={TbQuestionMark}
+        label="Sentiment Checks"
+        isSelected={true}
+        onClick={() => {}}
+      />
+      <ListingSelector
+        iconType={TbFocus}
+        label="FIP Tracker"
+        isSelected={false}
+        onClick={() => {}}
+      />
+
       <ListSelector<ConversationListSelection>
         selectedEntryId={selectedConversations}
         setSelectedEntryId={setSelectedConversations}
