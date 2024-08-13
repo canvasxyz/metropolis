@@ -15,8 +15,8 @@ import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
-import { MIN_SEED_RESPONSES } from "./index"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
+import { MIN_SEED_RESPONSES } from "../../util/misc"
 
 type ReportComment = {
   active: boolean
@@ -109,9 +109,8 @@ export const DashboardConversation = ({
     (state: RootState) => state.zid_metadata,
   )
 
-  const summaryData = useAppSelector(
-    (state: RootState) =>
-      state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
+  const summaryData = useAppSelector((state: RootState) =>
+    state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
   )
 
   const [showReport, setShowReport] = useState<boolean>(false)

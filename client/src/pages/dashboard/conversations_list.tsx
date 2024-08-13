@@ -20,7 +20,7 @@ import {
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Menu } from "@headlessui/react"
 
-import { formatTimeAgo } from "../../util/misc"
+import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import api from "../../util/api"
 import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
@@ -30,7 +30,6 @@ import {
   ConversationSummary,
   populateConversationsSummary,
 } from "../../reducers/conversations_summary"
-import { MIN_SEED_RESPONSES } from "./index"
 
 import {
   // handleModerateConversation,
