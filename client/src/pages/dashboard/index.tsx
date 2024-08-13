@@ -116,7 +116,6 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             </Box>
           </Flex>
           <ConversationsList
-            selectedConversationId={selectedConversationId}
             setCreateConversationModalIsOpen={setCreateConversationModalIsOpen}
             syncPRs={syncPRs}
             syncInProgress={syncInProgress}
