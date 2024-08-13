@@ -157,17 +157,11 @@ const ConversationsList = ({
   return (
     <React.Fragment>
       <ListingSelector
-        iconType={TbQuestionMark}
+        to="/dashboard/sentiment_checks"
+        iconType={BiSolidBarChartAlt2}
         label="Sentiment Checks"
-        isSelected={true}
-        onClick={() => {}}
       />
-      <ListingSelector
-        iconType={TbFocus}
-        label="FIP Tracker"
-        isSelected={false}
-        onClick={() => {}}
-      />
+      <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
 
       <ListSelector<ConversationListSelection>
         selectedEntryId={selectedConversations}

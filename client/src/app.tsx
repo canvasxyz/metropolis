@@ -36,6 +36,8 @@ import Account from "./pages/account"
 import SurveyWithLoader from "./pages/survey/survey_with_loader"
 import { Placeholder } from "./pages/dashboard/placeholder"
 import { DashboardConversation } from "./pages/dashboard/conversation"
+import { SentimentChecks } from "./pages/dashboard/sentiment_checks"
+import { FipTracker } from "./pages/dashboard/fip_tracker"
 
 /* report */
 import Report from "./pages/report"
@@ -179,6 +181,24 @@ class App extends React.Component<
                 render={() => (
                   <Dashboard user={this.props.user}>
                     <Placeholder />
+                  </Dashboard>
+                )}
+              />
+              <Route
+                exact
+                path="/dashboard/sentiment_checks"
+                render={() => (
+                  <Dashboard user={this.props.user}>
+                    <SentimentChecks />
+                  </Dashboard>
+                )}
+              />
+              <Route
+                exact
+                path="/dashboard/fip_tracker"
+                render={() => (
+                  <Dashboard user={this.props.user}>
+                    <FipTracker />
                   </Dashboard>
                 )}
               />
