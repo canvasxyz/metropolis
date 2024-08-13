@@ -12,6 +12,7 @@ import { ThemeProvider } from "theme-ui"
 import theme from "./theme"
 import App from "./app"
 import { store } from "./store"
+import { CompatRouter } from "react-router-dom-v5-compat"
 
 class Root extends React.Component {
   render() {
@@ -20,11 +21,13 @@ class Root extends React.Component {
         <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
           <Provider store={store}>
             <Router>
-              <Route
-                render={(routeProps) => {
-                  return <App {...routeProps} />
-                }}
-              ></Route>
+              <CompatRouter>
+                <Route
+                  render={(routeProps) => {
+                    return <App {...routeProps} />
+                  }}
+                ></Route>
+              </CompatRouter>
             </Router>
           </Provider>
         </IconContext.Provider>
