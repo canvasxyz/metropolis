@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useEffect, useState } from "react"
+import React, { PropsWithChildren, useEffect, useState } from "react"
 import { Link as RouterLink, useLocation } from "react-router-dom"
 import { Box, Flex, Text, jsx } from "theme-ui"
 import { toast } from "react-hot-toast"
@@ -8,11 +8,8 @@ import { toast } from "react-hot-toast"
 import api from "../../util/api"
 import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
-import { DashboardConversation } from "./conversation"
 import { DashboardUserButton } from "./user_button"
 import ConversationsList from "./conversations_list"
-
-import { Placeholder } from "./placeholder"
 
 const LogoBlock = () => {
   return (
@@ -44,10 +41,9 @@ const LogoBlock = () => {
 
 type DashboardProps = {
   user: User
-  selectedConversationId: string | null
 }
 
-const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
+const Dashboard = ({ children, user }: PropsWithChildren<DashboardProps>) => {
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -138,11 +134,7 @@ const Dashboard = ({ user, selectedConversationId }: DashboardProps) => {
             <LogoBlock />
           </Box>
           <DashboardUserButton />
-          {selectedConversationId ? (
-            <DashboardConversation selectedConversationId={selectedConversationId} user={user} />
-          ) : (
-            <Placeholder />
-          )}
+          {children}
         </Box>
       </Flex>
       <CreateConversationModal

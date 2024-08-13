@@ -34,6 +34,8 @@ import CreateConversation from "./pages/create_conversation"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import SurveyWithLoader from "./pages/survey/survey_with_loader"
+import { Placeholder } from "./pages/dashboard/placeholder"
+import { DashboardConversation } from "./pages/dashboard/conversation"
 
 /* report */
 import Report from "./pages/report"
@@ -165,12 +167,20 @@ class App extends React.Component<
               <Route
                 exact
                 path="/"
-                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
+                render={() => (
+                  <Dashboard user={this.props.user}>
+                    <Placeholder />
+                  </Dashboard>
+                )}
               />
               <Route
                 exact
                 path="/dashboard"
-                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
+                render={() => (
+                  <Dashboard user={this.props.user}>
+                    <Placeholder />
+                  </Dashboard>
+                )}
               />
               <Route
                 path="/dashboard/c/:conversation_id"
@@ -178,7 +188,14 @@ class App extends React.Component<
                   match: {
                     params: { conversation_id },
                   },
-                }) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
+                }) => (
+                  <Dashboard user={this.props.user}>
+                    <DashboardConversation
+                      selectedConversationId={conversation_id}
+                      user={this.props.user}
+                    />
+                  </Dashboard>
+                )}
               />
               <Route exact path="/about" render={() => <Home user={this.props.user} />} />
               <Route exact path="/about2" render={() => <About />} />
