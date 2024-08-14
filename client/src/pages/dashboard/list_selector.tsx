@@ -59,6 +59,7 @@ export const ListSelector = <T,>({
     <Flex sx={{ pt: "9px", pb: "8px", pl: "13px" }}>
       {visibleEntries.map((entry) => (
         <Box
+          key={entry.id.toString()}
           sx={selectedEntryId === entry.id ? tabSelected : tab}
           onClick={() => setSelectedEntryId(entry.id)}
         >
@@ -76,7 +77,7 @@ export const ListSelector = <T,>({
           <Menu.Items as={Box}>
             <Box variant="boxes.menu" sx={{ width: "180px" }}>
               {dropdownEntries.map((entry) => (
-                <Menu.Item>
+                <Menu.Item key={entry.id.toString()}>
                   <Box
                     variant={
                       selectedEntryId === entry.id ? "boxes.menuitemactive" : "boxes.menuitem"
