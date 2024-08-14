@@ -74,8 +74,8 @@ export const FipTracker = () => {
             gap: [1],
           }}
         >
-          <BiFilter />
-          <Text>Filters</Text>
+          <BiFilter size="1.1em" style={{ color: "#B6B8C4", top: "-1px" }} />
+          <Text sx={{ color: "#4E525B" }}>Filters</Text>
         </Button>
         <Button
           sx={{
@@ -90,8 +90,8 @@ export const FipTracker = () => {
             gap: [1],
           }}
         >
-          <TbAdjustmentsHorizontal />
-          <Text>Display</Text>
+          <TbAdjustmentsHorizontal style={{ color: "#B6B8C4", top: "-1px" }} />
+          <Text sx={{ color: "#4E525B" }}>Display</Text>
         </Button>
       </Flex>
     </Flex>
