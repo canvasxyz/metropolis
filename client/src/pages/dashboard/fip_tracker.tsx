@@ -14,6 +14,7 @@ import { useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { Link } from "react-router-dom-v5-compat"
+import { MIN_SEED_RESPONSES } from "../../util/misc"
 
 const Lozenge = ({
   text,
@@ -92,7 +93,11 @@ const FipEntry = ({ conversation }: { conversation: ConversationSummary }) => {
         </Flex>
         <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
           <Text>{conversation.fip_number}</Text>
-          <Text>{conversation.topic}</Text>
+          <Text>
+            {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
+              <Text sx={{ color: "#84817D" }}>Untitled</Text>
+            )}
+          </Text>
           <Box sx={{ flexGrow: "1" }}></Box>
           <Lozenge
             bg={colors.bg}
@@ -129,11 +134,21 @@ const FipEntry = ({ conversation }: { conversation: ConversationSummary }) => {
   )
 }
 
-export const FipTracker = () => {
+export const FipTracker = ({ user }: { user: any }) => {
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const fips = conversations.filter((conversation) => conversation.fip_created !== null)
+  const fips = conversations.filter((conversation) => {
+    if (!conversation.fip_created) return false
+
+    const shouldHideDiscussion =
+      !conversation.fip_title &&
+      !conversation.github_pr_title &&
+      conversation.comment_count < MIN_SEED_RESPONSES
+
+    if (shouldHideDiscussion && conversation.owner !== user?.uid) return false
+    return true
+  })
 
   return (
     <Flex

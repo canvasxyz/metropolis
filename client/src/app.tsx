@@ -198,7 +198,7 @@ class App extends React.Component<
                 path="/dashboard/fip_tracker"
                 render={() => (
                   <Dashboard user={this.props.user}>
-                    <FipTracker />
+                    <FipTracker user={this.props.user} />
                   </Dashboard>
                 )}
               />
