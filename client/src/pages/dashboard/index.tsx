@@ -88,7 +88,7 @@ const Dashboard = ({ children, user }: PropsWithChildren<DashboardProps>) => {
             display: mobileMenuOpen ? null : ["none", "block"],
             width: ["100%", "40%", null, "340px"],
             borderRight: "1px solid #e2ddd5",
-            bg: "bgOffWhite",
+            bg: "#FFFFFF",
             maxHeight: "100vh",
             overflow: "hidden",
             position: "relative",
@@ -124,7 +124,7 @@ const Dashboard = ({ children, user }: PropsWithChildren<DashboardProps>) => {
             overflowY: "scroll",
             flex: 1,
             position: "relative",
-            bg: "bgDarkWhite",
+            bg: "#F9F9FB",
           }}
         >
           <Box
