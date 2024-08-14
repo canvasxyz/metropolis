@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Button, Box, Flex, Text, Link } from "theme-ui"
 import { useHistory, Link as RouterLink } from "react-router-dom"
@@ -14,7 +14,6 @@ import {
   TbHammer,
   TbArchiveOff,
   TbArchive,
-  TbQuestionMark,
   TbFocus,
 } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
@@ -87,10 +86,6 @@ const ConversationsList = ({
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
-  }, [])
-
-  const navigateToConversation = useCallback((conversationId) => {
-    hist.push(`/dashboard/c/${conversationId}`)
   }, [])
 
   const nonFIPConversations = conversations.filter(
