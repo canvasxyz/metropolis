@@ -1,10 +1,140 @@
-import React from "react"
+import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
-import { TbAdjustmentsHorizontal, TbSearch } from "react-icons/tb"
+import {
+  TbAdjustmentsHorizontal,
+  TbArrowUpRight,
+  TbCalendar,
+  TbCaretDown,
+  TbCaretRight,
+  TbSearch,
+} from "react-icons/tb"
 
-import { Box, Button, Flex, Input, Text } from "theme-ui"
+import { Box, Button, Flex, Grid, Input, Text } from "theme-ui"
+import { useAppSelector } from "../../hooks"
+import { RootState } from "../../store"
+import { ConversationSummary } from "../../reducers/conversations_summary"
+import { Link } from "react-router-dom-v5-compat"
+
+const Lozenge = ({
+  text,
+  color,
+  bg,
+  borderColor,
+}: {
+  text: string
+  color: string
+  bg: string
+  borderColor: string
+}) => {
+  return (
+    <Box sx={{ bg, borderStyle: "solid", borderColor, borderRadius: "16px", p: [1], color }}>
+      {text}
+    </Box>
+  )
+}
+
+const colorOptions = {
+  "last call": {
+    bg: "#FFF1D9",
+    borderColor: "#FFE4B7",
+    color: "#BD8520",
+  },
+  draft: {
+    bg: "#D5EFFF",
+    borderColor: "#B0D6FF",
+    color: "#006BCA",
+  },
+  accepted: {
+    bg: "#D9F7D1",
+    borderColor: "#BCE7A7",
+    color: "#007A3D",
+  },
+  final: {
+    bg: "#F9D9D9",
+    borderColor: "#F0B0B0",
+    color: "#C30000",
+  },
+}
+
+const FipEntry = ({ conversation }: { conversation: ConversationSummary }) => {
+  const [isOpen, setIsOpen] = useState(false)
+
+  const fipStatusKey = conversation.fip_status ? conversation.fip_status.toLowerCase() : "draft"
+  const colors = colorOptions[fipStatusKey] || colorOptions.draft
+
+  return (
+    <Flex
+      key={conversation.conversation_id}
+      sx={{
+        bg: "white",
+        padding: [3],
+        borderStyle: "solid",
+        borderRadius: "8px",
+        borderColor: colors.borderColor,
+        width: "100%",
+        flexDirection: "row",
+        gap: [3],
+        cursor: "pointer",
+      }}
+      onClick={() => setIsOpen(!isOpen)}
+    >
+      <Grid
+        sx={{
+          gridTemplateColumns: "20px 1fr",
+          gridRow: "auto auto",
+          gridColumnGap: "20px",
+          gridRowGap: "20px",
+          width: "100%",
+        }}
+      >
+        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
+          {isOpen ? <TbCaretDown /> : <TbCaretRight />}
+        </Flex>
+        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
+          <Text>{conversation.fip_number}</Text>
+          <Text>{conversation.topic}</Text>
+          <Box sx={{ flexGrow: "1" }}></Box>
+          <Lozenge
+            bg={colors.bg}
+            borderColor={colors.borderColor}
+            color={colors.color}
+            text={conversation.fip_status}
+          />
+          <Link
+            to={conversation.github_pr_url}
+            target="_blank"
+            noreferrer="noreferrer"
+            noopener="noopener"
+            sx={{
+              display: "block",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              width: "calc(100% - 20px)",
+            }}
+          >
+            GitHub <TbArrowUpRight />
+          </Link>
+        </Flex>
+        <Box></Box>
+        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center" }}>
+          <Lozenge bg="white" borderColor="#ECECEF" color="#4E525B" text="Technical" />
+          <Lozenge bg="white" borderColor="#ECECEF" color="#4E525B" text="Core" /> |
+          <TbCalendar style={{ top: "0px" }} />
+          {new Date(conversation.created).toLocaleDateString()} | 1 author
+          <Box sx={{ flexGrow: "1" }}></Box>
+        </Flex>
+      </Grid>
+    </Flex>
+  )
+}
 
 export const FipTracker = () => {
+  const { data } = useAppSelector((state: RootState) => state.conversations_summary)
+  const conversations = data || []
+
+  const fips = conversations.filter((conversation) => conversation.fip_created !== null)
+
   return (
     <Flex
       sx={{
@@ -93,6 +223,11 @@ export const FipTracker = () => {
           <TbAdjustmentsHorizontal style={{ color: "#B6B8C4", top: "-1px" }} />
           <Text sx={{ color: "#4E525B" }}>Display</Text>
         </Button>
+      </Flex>
+      <Flex sx={{ flexDirection: "column", gap: [3] }}>
+        {fips.map((conversation) => (
+          <FipEntry conversation={conversation} />
+        ))}
       </Flex>
     </Flex>
   )
