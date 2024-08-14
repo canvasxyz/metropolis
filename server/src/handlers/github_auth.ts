@@ -64,6 +64,7 @@ async function handleGithubOauthCallback(
   // the user is now authenticated
   // check if the user is a proposals repo collaborator/owner
   let isRepoCollaborator = githubUsername === process.env.FIP_REPO_OWNER;
+  console.log("Login from", githubUsername);
   try {
     const collaborators = await getRepoCollaborators();
     console.log(
