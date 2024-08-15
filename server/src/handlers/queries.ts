@@ -105,16 +105,15 @@ export async function createGitHubUser(
 export async function updateGitHubUserData(
   githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
-  const createQuery =
-    "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4" +
-    " returning uid;";
+  const updateQuery =
+    "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4 returning uid;";
   const vals = [
     githubUserData.username,
     githubUserData.email,
     githubUserData.isRepoCollaborator,
     githubUserData.id,
   ];
-  const updateRes = await queryP(createQuery, vals);
+  const updateRes = await queryP(updateQuery, vals);
   return updateRes[0];
 }
 

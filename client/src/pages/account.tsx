@@ -38,7 +38,7 @@ function Account() {
               </a>
             </Box>
           )}
-          {!user.githubRepoCollaborator ? (
+          {!user.isRepoCollaborator ? (
             <Box sx={{ mt: [3], opacity: 0.7, fontWeight: 600 }}>Not a FIP repo collaborator</Box>
           ) : (
             <>

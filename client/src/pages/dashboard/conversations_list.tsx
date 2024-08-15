@@ -582,7 +582,7 @@ const ConversationListItem = ({
                       </Box>
                     </Menu.Item>
                   )}
-                {/* user.githubRepoCollaborator && (
+                {/* user.isRepoCollaborator && (
                   <Box sx={{ mt: "3px", pt: "3px", borderTop: "1px solid #e2ddd5" }}>
                     <Menu.Item>
                       <Box
