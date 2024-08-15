@@ -87,12 +87,14 @@ async function handleGithubOauthCallback(
     }
   }
 
-  const { uid } = await updateOrCreateGitHubUser({
+  const updateParams = {
     username: githubUsername,
     id: githubUserId,
     email: githubUserEmail,
     isRepoCollaborator,
-  });
+  };
+  console.log("Update or create Github user", updateParams);
+  const { uid } = await updateOrCreateGitHubUser(updateParams);
 
   const token = await startSession(uid);
 
