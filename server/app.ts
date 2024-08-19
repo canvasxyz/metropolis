@@ -1250,6 +1250,12 @@ app.use(
       if (path.endsWith(".svg")) {
         res.setHeader("Content-Type", "image/svg+xml")
       }
+      if (path.endsWith(".js")) {
+        res.setHeader("Content-Type", "application/javascript")
+      }
+      if (path.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css")
+      }
     },
   }),
 )

@@ -108,12 +108,7 @@ cat server/postgres/migrations/000000_initial.sql | heroku psql
 ```
 
 4. You may wish to set a custom domain name and Heroku SSL on
-production. This can be done in the Heroku control panel.
-
-5. To analyze bundle size:
-- `cd client`
-- `npx webpack --profile --json > stats.json`
-- `npx webpack-bundle-analyzer ./stats.json`
+   production. This can be done in the Heroku control panel.
 
 ## Terminology
 
