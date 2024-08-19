@@ -1,13 +1,13 @@
-import crypto from "crypto";
-import LruCache from "lru-cache";
+import crypto from "crypto"
+import LruCache from "lru-cache"
 
-import Config from "./config";
-import pg from "./db/pg-query";
-import logger from "./utils/logger";
+import Config from "./config"
+import pg from "./db/pg-query"
+import logger from "./utils/logger"
 
 function encrypt(text: string | null) {
-  const algorithm = "aes-256-ctr";
-  const password = Config.encryptionPassword;
+  const algorithm = "aes-256-ctr"
+  const password = Config.encryptionPassword
   //
   // TODO replace deprecated createCipher method with current createCipheriv method
   //
@@ -24,7 +24,7 @@ function encrypt(text: string | null) {
   //     Argument of type 'string | undefined' is not assignable to parameter of type 'BinaryLike'.
   //       Type 'undefined' is not assignable to type 'BinaryLike'.ts(2769)
   // @ts-ignore
-  const cipher = crypto.createCipher(algorithm, password);
+  const cipher = crypto.createCipher(algorithm, password)
   // No overload matches this call.
   // Overload 1 of 4, '(data: ArrayBufferView, input_encoding: undefined, output_encoding: Encoding): string', gave the following error.
   //   Argument of type 'string | null' is not assignable to parameter of type 'ArrayBufferView'.
@@ -33,17 +33,17 @@ function encrypt(text: string | null) {
   //   Argument of type 'string | null' is not assignable to parameter of type 'string'.
   //   Type 'null' is not assignable to type 'string'.ts(2769)
   // @ts-ignore
-  let crypted = cipher.update(text, "utf8", "hex");
+  let crypted = cipher.update(text, "utf8", "hex")
   // Type 'string' is not assignable to type 'Buffer & string'.
   // Type 'string' is not assignable to type 'Buffer'.ts(2322)
   // @ts-ignore
-  crypted += cipher.final("hex");
-  return crypted;
+  crypted += cipher.final("hex")
+  return crypted
 }
 
 function decrypt(text: string) {
-  const algorithm = "aes-256-ctr";
-  const password = Config.encryptionPassword;
+  const algorithm = "aes-256-ctr"
+  const password = Config.encryptionPassword
   //
   // TODO replace deprecated createDecipher method with current createDecipheriv method
   //
@@ -59,19 +59,19 @@ function decrypt(text: string) {
   //   Overload 2 of 3, '(algorithm: string, password: BinaryLike, options?: TransformOptions | undefined): Decipher', gave the following error.
   //     Argument of type 'string | undefined' is not assignable to parameter of type 'BinaryLike'.ts(2769)
   // @ts-ignore
-  const decipher = crypto.createDecipher(algorithm, password);
-  let dec = decipher.update(text, "hex", "utf8");
-  dec += decipher.final("utf8");
-  return dec;
+  const decipher = crypto.createDecipher(algorithm, password)
+  let dec = decipher.update(text, "hex", "utf8")
+  dec += decipher.final("utf8")
+  return dec
 }
-decrypt; // appease linter
+decrypt // appease linter
 function makeSessionToken() {
   // These can probably be shortened at some point.
   return crypto
     .randomBytes(32)
     .toString("base64")
     .replace(/[^A-Za-z0-9]/g, "")
-    .substr(0, 20);
+    .substr(0, 20)
 }
 
 // But we need to squeeze a bit more out of the db right now,
@@ -80,49 +80,47 @@ function makeSessionToken() {
 // adds a lot of variability across the board.
 const userTokenCache = new LruCache({
   max: 9000,
-});
+})
 
 async function getUserInfoForSessionToken(sessionToken: unknown) {
-  let cachedUid = userTokenCache.get(sessionToken);
+  let cachedUid = userTokenCache.get(sessionToken)
   if (cachedUid) {
-    return cachedUid;
+    return cachedUid
   }
 
-  let results;
+  let results
   try {
     results = await pg.queryP(
       "select uid from auth_tokens where token = ($1);",
-      [sessionToken]
-    );
+      [sessionToken],
+    )
   } catch (err) {
-    logger.error("token_fetch_error", err);
-    throw new Error("token_fetch_error");
+    logger.error("token_fetch_error", err)
+    throw new Error("token_fetch_error")
   }
 
   if (results.length == 0) {
-    logger.error("token_expired_or_missing");
-    throw new Error("token_expired_or_missing");
+    logger.error("token_expired_or_missing")
+    throw new Error("token_expired_or_missing")
   }
 
-  let uid = results[0].uid;
-  userTokenCache.set(sessionToken, uid);
-  return uid;
+  let uid = results[0].uid
+  userTokenCache.set(sessionToken, uid)
+  return uid
 }
 
 async function startSession(uid: any) {
-  let token = makeSessionToken();
-  logger.info("startSession");
+  let token = makeSessionToken()
+  logger.info("startSession")
   await pg.queryP(
     "insert into auth_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token]
-  );
-  return token;
+    [uid, token],
+  )
+  return token
 }
 
 async function endSession(sessionToken: any) {
-  await pg.queryP("delete from auth_tokens where token = ($1);", [
-    sessionToken,
-  ]);
+  await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken])
 }
 
 async function setupPwReset(uid: any) {
@@ -132,35 +130,35 @@ async function setupPwReset(uid: any) {
       .randomBytes(140)
       .toString("base64")
       .replace(/[^A-Za-z0-9]/g, "")
-      .substr(0, 100);
+      .substr(0, 100)
   }
-  let token = makePwResetToken();
+  let token = makePwResetToken()
   await pg.queryP(
     "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token]
-  );
+    [uid, token],
+  )
 }
 
 async function getUidForPwResetToken(pwresettoken: any) {
-  let results;
+  let results
   try {
     // TODO "and created > timestamp - x"
     results = await pg.queryP(
       "select uid from pwreset_tokens where token = ($1);",
-      [pwresettoken]
-    );
+      [pwresettoken],
+    )
   } catch (err) {
-    logger.error("pwresettoken_fetch_error", err);
-    throw new Error("pwresettoken_fetch_error");
+    logger.error("pwresettoken_fetch_error", err)
+    throw new Error("pwresettoken_fetch_error")
   }
 
   if (results.length == 0) {
-    logger.error("token_expired_or_missing");
-    throw new Error("token_expired_or_missing");
+    logger.error("token_expired_or_missing")
+    throw new Error("token_expired_or_missing")
   }
 
-  let uid = results[0].uid;
-  return { uid };
+  let uid = results[0].uid
+  return { uid }
 }
 
 function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
@@ -169,12 +167,12 @@ function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
     [pwresettoken],
     function (errDelToken: any) {
       if (errDelToken) {
-        cb(errDelToken);
-        return;
+        cb(errDelToken)
+        return
       }
-      cb(null);
-    }
-  );
+      cb(null)
+    },
+  )
 }
 
 export {
@@ -187,4 +185,4 @@ export {
   setupPwReset,
   getUidForPwResetToken,
   clearPwResetToken,
-};
+}

@@ -1,4 +1,4 @@
-import sql from "sql"; // see here for useful syntax: https://github.com/brianc/node-sql/blob/bbd6ed15a02d4ab8fbc5058ee2aff1ad67acd5dc/lib/node/valueExpression.js
+import sql from "sql" // see here for useful syntax: https://github.com/brianc/node-sql/blob/bbd6ed15a02d4ab8fbc5058ee2aff1ad67acd5dc/lib/node/valueExpression.js
 
 const sql_conversations: any = sql.define({
   name: "conversations",
@@ -53,7 +53,7 @@ const sql_conversations: any = sql.define({
     "auth_opt_tw",
     "auth_opt_allow_3rdparty",
   ],
-});
+})
 
 // 'sql_comments' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.ts(7022)
 // @ts-ignore
@@ -72,17 +72,17 @@ const sql_comments = sql.define({
     "quote_src_url",
     "anon",
   ],
-});
+})
 
 const sql_votes_latest_unique = sql.define({
   name: "votes_latest_unique",
   columns: ["zid", "tid", "pid", "modified", "vote", "weight", "high_priority"],
-});
+})
 
 const sql_participant_metadata_answers = sql.define({
   name: "participant_metadata_answers",
   columns: ["pmaid", "pmqid", "zid", "value", "alive"],
-});
+})
 
 const sql_participants_extended = sql.define({
   name: "participants_extended",
@@ -101,13 +101,13 @@ const sql_participants_extended = sql.define({
     "encrypted_ip_address",
     "encrypted_x_forwarded_for",
   ],
-});
+})
 
 //first we define our tables
 const sql_users = sql.define({
   name: "users",
   columns: ["uid", "hname", "email", "created", "github_username"],
-});
+})
 
 const sql_reports = sql.define({
   name: "reports",
@@ -133,7 +133,7 @@ const sql_reports = sql.define({
     "label_group_8",
     "label_group_9",
   ],
-});
+})
 
 export {
   sql_conversations,
@@ -143,4 +143,4 @@ export {
   sql_participants_extended,
   sql_reports,
   sql_users,
-};
+}

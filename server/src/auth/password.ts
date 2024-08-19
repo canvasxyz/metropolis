@@ -1,79 +1,79 @@
-import bcrypt from "bcryptjs";
-import crypto from "crypto";
-import _ from "underscore";
+import bcrypt from "bcryptjs"
+import crypto from "crypto"
+import _ from "underscore"
 
-import pg from "../db/pg-query";
+import pg from "../db/pg-query"
 
 function generateHashedPassword(
   password: any,
-  callback: (arg0: string | null, arg1?: string) => void
+  callback: (arg0: string | null, arg1?: string) => void,
 ) {
   bcrypt.genSalt(12, function (errSalt: any, salt: any) {
     if (errSalt) {
-      return callback("polis_err_salt");
+      return callback("polis_err_salt")
     }
     bcrypt.hash(password, salt, function (errHash: any, hashedPassword: any) {
       if (errHash) {
-        return callback("polis_err_hash");
+        return callback("polis_err_hash")
       }
-      callback(null, hashedPassword);
-    });
-  });
+      callback(null, hashedPassword)
+    })
+  })
 }
 
 function checkPassword(uid: any, password: any) {
   return pg
     .queryP_readOnly_wRetryIfEmpty(
       "select pwhash from jianiuevyew where uid = ($1);",
-      [uid]
+      [uid],
     )
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        return null;
+        return null
       } else if (!rows[0].pwhash) {
-        return void 0;
+        return void 0
       }
-      let hashedPassword = rows[0].pwhash;
+      let hashedPassword = rows[0].pwhash
       return new Promise(function (resolve, reject) {
         bcrypt.compare(
           password,
           hashedPassword,
           function (errCompare: any, result: any) {
             if (errCompare) {
-              reject(errCompare);
+              reject(errCompare)
             } else {
-              resolve(result ? "ok" : 0);
+              resolve(result ? "ok" : 0)
             }
-          }
-        );
-      });
-    });
+          },
+        )
+      })
+    })
 }
 
 function generateToken(
   len: any,
   pseudoRandomOk: any,
   callback: {
-    (err: any, token: string): void;
-    (arg0: number, longStringOfTokens?: string): void;
-  }
+    (err: any, token: string): void
+    (arg0: number, longStringOfTokens?: string): void
+  },
 ) {
   // TODO store up a buffer of random bytes sampled at random times to reduce predictability. (or see if crypto module does this for us)
   // TODO if you want more readable tokens, see ReadableIds
-  let gen;
+  let gen
   if (pseudoRandomOk) {
-    gen = crypto.pseudoRandomBytes;
+    gen = crypto.pseudoRandomBytes
   } else {
-    gen = crypto.randomBytes;
+    gen = crypto.randomBytes
   }
   gen(
     len,
     function (
       err: any,
-      buf: { toString: (arg0: BufferEncoding | undefined) => string }
+      buf: { toString: (arg0: BufferEncoding | undefined) => string },
     ) {
       if (err) {
-        return callback(err);
+        return callback(err)
       }
 
       let prettyToken = buf
@@ -90,34 +90,34 @@ function generateToken(
         .replace(/g/g, "K") // looks like 'g'
         .replace(/G/g, "M") // looks like 'g'
         .replace(/q/g, "N") // looks like 'q'
-        .replace(/Q/g, "R"); // looks like 'q'
+        .replace(/Q/g, "R") // looks like 'q'
       // replace first character with a number between 2 and 9 (avoiding 0 and 1 since they look like l and O)
-      prettyToken = _.random(2, 9) + prettyToken.slice(1);
-      prettyToken = prettyToken.toLowerCase();
-      prettyToken = prettyToken.slice(0, len); // in case it's too long
+      prettyToken = _.random(2, 9) + prettyToken.slice(1)
+      prettyToken = prettyToken.toLowerCase()
+      prettyToken = prettyToken.slice(0, len) // in case it's too long
 
-      callback(0, prettyToken);
-    }
-  );
+      callback(0, prettyToken)
+    },
+  )
 }
 
 function generateTokenP(len: any, pseudoRandomOk: any) {
   return new Promise<string>(function (resolve, reject) {
     generateToken(len, pseudoRandomOk, function (err, token) {
       if (err) {
-        reject(err);
+        reject(err)
       } else {
-        resolve(token as string);
+        resolve(token as string)
       }
-    });
-  });
+    })
+  })
 }
 
-export { generateHashedPassword, checkPassword, generateToken, generateTokenP };
+export { generateHashedPassword, checkPassword, generateToken, generateTokenP }
 
 export default {
   generateHashedPassword,
   checkPassword,
   generateToken,
   generateTokenP,
-};
+}

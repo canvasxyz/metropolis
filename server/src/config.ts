@@ -1,17 +1,17 @@
-import fs from "fs";
-import isTrue from "boolean";
+import fs from "fs"
+import isTrue from "boolean"
 
-const devHostname = process.env.API_DEV_HOSTNAME || "localhost:8040";
-const devMode = isTrue(process.env.DEV_MODE) as boolean;
-const domainOverride = process.env.DOMAIN_OVERRIDE || null;
-const prodHostname = process.env.API_PROD_HOSTNAME || "metropolis.vote";
+const devHostname = process.env.API_DEV_HOSTNAME || "localhost:8040"
+const devMode = isTrue(process.env.DEV_MODE) as boolean
+const domainOverride = process.env.DOMAIN_OVERRIDE || null
+const prodHostname = process.env.API_PROD_HOSTNAME || "metropolis.vote"
 const serverPort = parseInt(
   process.env.API_SERVER_PORT || process.env.PORT || "8040",
-  10
-) as number;
+  10,
+) as number
 const shouldUseTranslationAPI = isTrue(
-  process.env.SHOULD_USE_TRANSLATION_API
-) as boolean;
+  process.env.SHOULD_USE_TRANSLATION_API,
+) as boolean
 
 export default {
   domainOverride: domainOverride as string | null,
@@ -21,33 +21,33 @@ export default {
   getServerNameWithProtocol: (req: any): string => {
     if (devMode) {
       // usually localhost:8040
-      return `${req.protocol}://${req.headers.host}`;
+      return `${req.protocol}://${req.headers.host}`
     }
     if (domainOverride) {
-      return `${req.protocol}://${domainOverride}`;
+      return `${req.protocol}://${domainOverride}`
     }
     if (req.headers.host.includes("metropolis.vote")) {
-      return "https://metropolis.vote";
+      return "https://metropolis.vote"
     }
 
-    return `https://${prodHostname}`;
+    return `https://${prodHostname}`
   },
 
   getServerHostname: (): string => {
     if (devMode) {
-      return devHostname;
+      return devHostname
     }
     if (domainOverride) {
-      return domainOverride;
+      return domainOverride
     }
-    return prodHostname;
+    return prodHostname
   },
 
   getServerUrl: (): string => {
     if (devMode) {
-      return `http://${devHostname}`;
+      return `http://${devHostname}`
     } else {
-      return `https://${prodHostname}`;
+      return `https://${prodHostname}`
     }
   },
 
@@ -60,7 +60,7 @@ export default {
     process.env.AKISMET_ANTISPAM_API_KEY || (null as string | null),
   awsRegion: process.env.AWS_REGION as string,
   backfillCommentLangDetection: isTrue(
-    process.env.BACKFILL_COMMENT_LANG_DETECTION
+    process.env.BACKFILL_COMMENT_LANG_DETECTION,
   ) as boolean,
   cacheMathResults: isTrueOrBlank(process.env.CACHE_MATH_RESULTS) as boolean,
   databaseURL: process.env.DATABASE_URL as string,
@@ -78,7 +78,7 @@ export default {
   readOnlyDatabaseURL:
     process.env.READ_ONLY_DATABASE_URL || (process.env.DATABASE_URL as string),
   runPeriodicExportTests: isTrue(
-    process.env.RUN_PERIODIC_EXPORT_TESTS
+    process.env.RUN_PERIODIC_EXPORT_TESTS,
   ) as boolean,
   shouldUseTranslationAPI: setGoogleApplicationCredentials() as boolean,
   twitterConsumerKey:
@@ -98,44 +98,44 @@ export default {
     process.env.DOMAIN_WHITELIST_ITEM_07 || null,
     process.env.DOMAIN_WHITELIST_ITEM_08 || null,
   ].filter((item) => item !== null) as string[],
-};
+}
 
 // Use this function when a value shuould default to true if not set.
 function isTrueOrBlank(val: string | boolean | undefined): boolean {
-  return val === undefined || val === "" || isTrue(val);
+  return val === undefined || val === "" || isTrue(val)
 }
 
 function setGoogleApplicationCredentials(): boolean {
   if (!shouldUseTranslationAPI) {
-    return false;
+    return false
   }
 
   const googleCredentialsBase64: string | undefined =
-    process.env.GOOGLE_CREDENTIALS_BASE64;
+    process.env.GOOGLE_CREDENTIALS_BASE64
   const googleCredsStringified: string | undefined =
-    process.env.GOOGLE_CREDS_STRINGIFIED;
+    process.env.GOOGLE_CREDS_STRINGIFIED
 
   try {
     // TODO: Consider deprecating GOOGLE_CREDS_STRINGIFIED in future.
     if (!googleCredentialsBase64 && !googleCredsStringified) {
       throw new Error(
-        "Missing Google credentials. Translation API will be disabled."
-      );
+        "Missing Google credentials. Translation API will be disabled.",
+      )
     }
 
     const creds_string = googleCredentialsBase64
       ? Buffer.from(googleCredentialsBase64, "base64").toString("ascii")
-      : (googleCredsStringified as string);
+      : (googleCredsStringified as string)
 
     // Tell translation library where to find credentials, and write them to disk.
-    const credentialsFilePath = ".google_creds_temp";
-    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsFilePath;
-    fs.writeFileSync(credentialsFilePath, creds_string);
+    const credentialsFilePath = ".google_creds_temp"
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credentialsFilePath
+    fs.writeFileSync(credentialsFilePath, creds_string)
 
-    return true;
+    return true
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(error);
-    return false;
+    console.error(error)
+    return false
   }
 }

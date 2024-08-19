@@ -1,14 +1,14 @@
-import { createLogger, format, transports } from "winston";
-import Config from "../config";
+import { createLogger, format, transports } from "winston"
+import Config from "../config"
 
 // See https://github.com/winstonjs/winston#logging-levels
-const logLevel = Config.logLevel || "info";
-const logToFile = Config.logToFile;
+const logLevel = Config.logLevel || "info"
+const logToFile = Config.logToFile
 
 const consoleTransport = new transports.Console({
   format: format.combine(format.colorize(), format.simple()),
   level: logLevel,
-});
+})
 
 const logger = createLogger({
   level: logLevel,
@@ -18,12 +18,12 @@ const logger = createLogger({
       format: "YYYY-MM-DD HH:mm:ss Z",
     }),
     format.errors({ stack: true }),
-    format.json()
+    format.json(),
   ),
   defaultMeta: { service: "polis-api-server" },
   // Write only to console by default, unless the logToFile config is set.
   transports: [consoleTransport],
-});
+})
 
 if (logToFile) {
   logger.configure({
@@ -48,7 +48,7 @@ if (logToFile) {
     rejectionHandlers: [
       new transports.File({ filename: "./logs/rejections.log" }),
     ],
-  });
+  })
 }
 
-export default logger;
+export default logger
