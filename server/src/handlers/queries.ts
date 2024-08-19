@@ -73,7 +73,7 @@ const FIP_FIELDS: (keyof FipFields)[] = [
 ];
 
 export async function updateOrCreateGitHubUser(
-  githubUserData: GitHubUserData,
+  githubUserData: GitHubUserData
 ): Promise<{ uid: number }> {
   const existingUser = await updateGitHubUserData(githubUserData);
   if (existingUser) {
@@ -84,7 +84,7 @@ export async function updateOrCreateGitHubUser(
 }
 
 export async function createGitHubUser(
-  githubUserData: GitHubUserData,
+  githubUserData: GitHubUserData
 ): Promise<{ uid: number }> {
   const createQuery =
     "insert into users " +
@@ -103,7 +103,7 @@ export async function createGitHubUser(
 }
 
 export async function updateGitHubUserData(
-  githubUserData: GitHubUserData,
+  githubUserData: GitHubUserData
 ): Promise<{ uid: number }> {
   const updateQuery =
     "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4 returning uid;";
@@ -118,7 +118,7 @@ export async function updateGitHubUserData(
 }
 
 export async function getUserUidByGithubUserId(
-  githubUserId: number,
+  githubUserId: number
 ): Promise<{ uid: number } | undefined> {
   const query = "SELECT uid FROM users WHERE github_user_id = $1";
   const rows = await queryP(query, [githubUserId]);
@@ -129,7 +129,7 @@ export async function getUserUidByGithubUserId(
 }
 
 export async function getConversationByPrId(
-  prId: number,
+  prId: number
 ): Promise<
   (PrFields & { github_sync_enabled: boolean; zinvite: string }) | undefined
 > {
@@ -138,19 +138,19 @@ export async function getConversationByPrId(
     "github_sync_enabled",
     "zinvites.zinvite",
   ].join(
-    ", ",
+    ", "
   )} FROM conversations LEFT JOIN zinvites ON conversations.zid = zinvites.zid WHERE github_pr_id = $1;`;
   const rows = await queryP(query, [prId]);
   return rows[0];
 }
 
 export async function insertConversationPrAndFip(
-  data: PrFields & FipFields,
+  data: PrFields & FipFields
 ): Promise<{ zid: number }[]> {
   const fields = [...PR_FIELDS, ...FIP_FIELDS];
   const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ");
   const query = `INSERT INTO conversations (${fields.join(
-    ", ",
+    ", "
   )}) VALUES (${fieldPlaceholders}) RETURNING zid;`;
   const values = fields.map((field) => data[field] ?? null);
   return await queryP(query, values);

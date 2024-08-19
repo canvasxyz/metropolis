@@ -19,20 +19,20 @@ export const DEFAULT_REPO_COLLABORATORS = [
 
 export function handle_GET_github_init(
   req: { p: { dest: string; owner: string } },
-  res: { redirect: (arg0: string) => void },
+  res: { redirect: (arg0: string) => void }
 ) {
   let dest = req.p.dest.replace(/\/dashboard\/.*/, "/dashboard");
   const clientId = process.env.GH_APP_CLIENT_ID;
   const redirectUri = `${Config.getServerUrl()}/api/v3/github_oauth_callback?dest=${dest}`;
   const githubAuthorizeUrl = `https://github.com/login/oauth/authorize?scope=user:email&client_id=${clientId}&redirect_uri=${encodeURIComponent(
-    redirectUri,
+    redirectUri
   )}`;
   res.redirect(githubAuthorizeUrl);
 }
 
 export function handle_GET_github_oauth_callback(
   req: { p: { uid?: any; code: any; dest?: any } },
-  res: any, // { redirect: (arg0: any) => void }
+  res: any // { redirect: (arg0: any) => void }
 ) {
   handleGithubOauthCallback(req, res).catch((err) => {
     fail(res, 500, err.message);
@@ -41,7 +41,7 @@ export function handle_GET_github_oauth_callback(
 
 async function handleGithubOauthCallback(
   req: { p: { uid?: any; code: string; dest?: any } },
-  res: Response,
+  res: Response
 ) {
   const octokit = new Octokit({
     authStrategy: createOAuthUserAuth,
@@ -69,7 +69,7 @@ async function handleGithubOauthCallback(
     const collaborators = await getRepoCollaborators();
     console.log(
       "Got repo collaborators:",
-      collaborators.map((c) => c.login),
+      collaborators.map((c) => c.login)
     );
     if (collaborators.map((c) => c.id).indexOf(githubUserId) !== -1) {
       isRepoCollaborator = true;
@@ -79,7 +79,7 @@ async function handleGithubOauthCallback(
     }
   } catch (err) {
     console.log(
-      "Could not get collaborators, is Metropolis installed on your Github repo?",
+      "Could not get collaborators, is Metropolis installed on your Github repo?"
     );
     console.log((err as any).message);
     if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {

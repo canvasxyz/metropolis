@@ -47,7 +47,7 @@ function want(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal?: any,
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -73,7 +73,7 @@ function wantCookie(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal?: any,
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -89,7 +89,7 @@ function needHeader(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal: any,
+  defaultVal: any
 ) {
   return buildCallback({
     name: name,
@@ -105,7 +105,7 @@ function wantHeader(
   name: any,
   parserWhichReturnsPromise: any,
   assigner: any,
-  defaultVal?: any,
+  defaultVal?: any
 ) {
   return buildCallback({
     name: name,
@@ -126,7 +126,7 @@ function extractFromBody(req: Req, name: string | number) {
 
 function extractFromCookie(
   req: { cookies: { [x: string]: any } },
-  name: string | number,
+  name: string | number
 ) {
   if (!req.cookies) {
     return void 0;
@@ -136,7 +136,7 @@ function extractFromCookie(
 
 function extractFromHeader(
   req: { headers: { [x: string]: any } },
-  name: string,
+  name: string
 ) {
   if (!req.headers) {
     return void 0;
@@ -169,7 +169,7 @@ function buildCallback(config: {
   return function (
     req: any,
     res: { status: (arg0: number) => void },
-    next: (arg0?: string) => void,
+    next: (arg0?: string) => void
   ) {
     let val = extractor(req, name);
     if (!_.isUndefined(val) && !_.isNull(val)) {
@@ -185,7 +185,7 @@ function buildCallback(config: {
             res.status(400);
             next(s);
             return;
-          },
+          }
         )
         .catch(function (err: any) {
           fail(res, 400, "polis_err_misc", err);
@@ -351,7 +351,7 @@ function getRidFromReportId(report_id: string) {
         function (err: any, results: { rows: string | any[] }) {
           logger.error(
             "polis_err_fetching_rid_for_report_id " + report_id,
-            err,
+            err
           );
           if (err) {
             return reject(err);
@@ -362,9 +362,9 @@ function getRidFromReportId(report_id: string) {
             reportIdToRidCache.set(report_id, rid);
             return resolve(rid);
           }
-        },
+        }
       );
-    }),
+    })
   );
 }
 
@@ -416,7 +416,7 @@ function getNumberInRange(min: number, max: number) {
 function getArrayOfString(
   a: string,
   maxStrings?: undefined,
-  maxLength?: undefined,
+  maxLength?: undefined
 ): Promise<string[]> {
   return new Promise(function (resolve, reject) {
     let result;
@@ -480,7 +480,7 @@ function assignToPCustom(name: any) {
 function resolve_pidThing(
   pidThingStringName: any,
   assigner: (arg0: any, arg1: any, arg2: number) => void,
-  loggingString?: string,
+  loggingString?: string
 ) {
   if (_.isUndefined(loggingString)) {
     loggingString = "";

@@ -14,7 +14,7 @@ export function sendTextEmail(
   sender: any,
   recipient: any,
   subject: any,
-  text: any,
+  text: any
 ) {
   const transporter = nodemailer.createTransport({
     host: "smtp.sendgrid.net",

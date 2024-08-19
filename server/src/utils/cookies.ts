@@ -61,7 +61,7 @@ function setCookie(
   res: { cookie: (arg0: any, arg1: any, arg2: any) => void },
   name: string,
   value: number,
-  options: Options,
+  options: Options
 ) {
   const opts: Options = _.clone(options || {});
   opts.path = _.isUndefined(opts.path) ? "/" : opts.path;
@@ -133,7 +133,7 @@ async function addCookies(
   req: { cookies: { [x: string]: any } },
   res: { header: (arg0: string, arg1: any) => void },
   token: any,
-  uid: any,
+  uid: any
 ) {
   const opts = await getUserInfoForUid2(uid);
   let email = opts.email;
@@ -153,7 +153,7 @@ async function addCookies(
 
 function getPermanentCookieAndEnsureItIsSet(
   req: { cookies: { [x: string]: any } },
-  res: any,
+  res: any
 ) {
   if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
     let token = makeSessionToken();

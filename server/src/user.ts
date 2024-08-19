@@ -19,7 +19,7 @@ const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
 async function getUserInfoForUid(uid: any) {
   const results = await pg.queryP_readOnly(
     "SELECT email, hname from users where uid = $1",
-    [uid],
+    [uid]
   );
   // what is the point of this????
   if (results.length == 0) {
@@ -35,13 +35,13 @@ function getUserInfoForUid2(uid: any) {
     (async () => {
       const results = (await pg.queryP_readOnly(
         "SELECT * from users where uid = $1",
-        [uid],
+        [uid]
       )) as string | any[];
       if (!results || !results.length) {
         throw Error();
       }
       return results[0];
-    })(),
+    })()
   );
 }
 
@@ -49,7 +49,7 @@ async function getUser(
   uid: number,
   zid_optional: any,
   xid_optional: any,
-  owner_uid_optional: any,
+  owner_uid_optional: any
 ) {
   if (!uid) {
     // this api may be called by a new user, so we don't want to trigger a failure here.
@@ -63,7 +63,7 @@ async function getUser(
     xidInfoPromise = getXidRecordByXidOwnerId(
       xid_optional,
       owner_uid_optional,
-      zid_optional,
+      zid_optional
     );
   }
 
@@ -103,7 +103,7 @@ function createDummyUser() {
       try {
         results = await pg.queryP(
           "INSERT INTO users (created) VALUES (default) RETURNING uid;",
-          [],
+          []
         );
       } catch (err) {
         throw new Error("polis_err_create_empty_user");
@@ -114,7 +114,7 @@ function createDummyUser() {
       }
 
       return results[0].uid;
-    })(),
+    })()
   );
 }
 
@@ -149,18 +149,18 @@ function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
           resolve(pid);
         })
         .catch((err) => reject(err));
-    }),
+    })
   );
 }
 
 // must follow auth and need('zid'...) middleware
 function getPidForParticipant(
-  assigner: (arg0: any, arg1: string, arg2: any) => void,
+  assigner: (arg0: any, arg1: string, arg2: any) => void
 ) {
   return function (
     req: { p: { zid: any; uid: any } },
     res: any,
-    next: (arg0?: string) => void,
+    next: (arg0?: string) => void
   ) {
     let zid = req.p.zid;
     let uid = req.p.uid;
@@ -185,7 +185,7 @@ function getPidForParticipant(
       function (err: any) {
         logger.error("polis_err_get_pid_for_participant", err);
         next(err);
-      },
+      }
     );
   };
 }
@@ -197,7 +197,7 @@ function getXidRecordByXidOwnerId(
   x_profile_image_url?: string,
   x_name?: string,
   x_email?: string,
-  createIfMissing?: boolean,
+  createIfMissing?: boolean
 ) {
   return pg
     .queryP("select * from xids where xid = ($1) and owner = ($2);", [
@@ -218,7 +218,7 @@ function getXidRecordByXidOwnerId(
                 return conv.use_xid_whitelist
                   ? isXidWhitelisted(owner, xid)
                   : Promise.resolve(true);
-              },
+              }
             );
 
         return shouldCreateXidEntryPromise.then((should: any) => {
@@ -232,7 +232,7 @@ function getXidRecordByXidOwnerId(
               xid,
               x_profile_image_url || null,
               x_name || null,
-              x_email || null,
+              x_email || null
             ).then(() => {
               return [
                 {
@@ -263,7 +263,7 @@ function getXidStuff(xid: any, zid: any) {
         (pidForXid: any) => {
           xidRecordForPtpt.pid = pidForXid;
           return xidRecordForPtpt;
-        },
+        }
       );
     }
     return xidRecordForPtpt;

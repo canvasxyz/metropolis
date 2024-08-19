@@ -92,7 +92,7 @@ async function getUserInfoForSessionToken(sessionToken: unknown) {
   try {
     results = await pg.queryP(
       "select uid from auth_tokens where token = ($1);",
-      [sessionToken],
+      [sessionToken]
     );
   } catch (err) {
     logger.error("token_fetch_error", err);
@@ -114,7 +114,7 @@ async function startSession(uid: any) {
   logger.info("startSession");
   await pg.queryP(
     "insert into auth_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
+    [uid, token]
   );
   return token;
 }
@@ -137,7 +137,7 @@ async function setupPwReset(uid: any) {
   let token = makePwResetToken();
   await pg.queryP(
     "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
+    [uid, token]
   );
 }
 
@@ -147,7 +147,7 @@ async function getUidForPwResetToken(pwresettoken: any) {
     // TODO "and created > timestamp - x"
     results = await pg.queryP(
       "select uid from pwreset_tokens where token = ($1);",
-      [pwresettoken],
+      [pwresettoken]
     );
   } catch (err) {
     logger.error("pwresettoken_fetch_error", err);
@@ -173,7 +173,7 @@ function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
         return;
       }
       cb(null);
-    },
+    }
   );
 }
 

@@ -199,7 +199,7 @@ async function generateAndRegisterZinvite(zid: any, generateShort: any) {
   const zinvite = await generateTokenP(len, false);
   await pg.queryP(
     "INSERT INTO zinvites (zid, zinvite, created) VALUES ($1, $2, default);",
-    [zid, zinvite],
+    [zid, zinvite]
   );
   return zinvite;
 }

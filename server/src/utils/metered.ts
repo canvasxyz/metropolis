@@ -40,45 +40,47 @@ export function meteredPromise<P>(
     // @ts-ignore                        ~~~~~
     addInRamMetric(name + ".go", 1, start);
   }, 100);
-  promise.then(
-    function () {
+  promise
+    .then(
+      function () {
+        let end = Date.now();
+        let duration = end - start;
+        setTimeout(function () {
+          // TODO either add this arg to the function definition
+          // TODO or remove this arg from the function call
+          //  TS2554: Expected 2 arguments, but got 3.
+          // 45         addInRamMetric(name + ".ok", duration, end);
+          // @ts-ignore
+          addInRamMetric(name + ".ok", duration, end);
+        }, 100);
+      },
+      function () {
+        let end = Date.now();
+        let duration = end - start;
+        setTimeout(function () {
+          // TODO either add this arg to the function definition
+          // TODO or remove this arg from the function call
+          // TS2554: Expected 2 arguments, but got 3.
+          // 59         addInRamMetric(name + ".fail", duration, end);
+          // @ts-ignore
+          addInRamMetric(name + ".fail", duration, end);
+        }, 100);
+      }
+    )
+    .catch(function (err) {
+      logger.error("meteredPromise internal error", err);
       let end = Date.now();
       let duration = end - start;
       setTimeout(function () {
         // TODO either add this arg to the function definition
         // TODO or remove this arg from the function call
-        //  TS2554: Expected 2 arguments, but got 3.
-        // 45         addInRamMetric(name + ".ok", duration, end);
-        // @ts-ignore
-        addInRamMetric(name + ".ok", duration, end);
-      }, 100);
-    },
-    function () {
-      let end = Date.now();
-      let duration = end - start;
-      setTimeout(function () {
-        // TODO either add this arg to the function definition
-        // TODO or remove this arg from the function call
-        // TS2554: Expected 2 arguments, but got 3.
-        // 59         addInRamMetric(name + ".fail", duration, end);
+        //       TS2554: Expected 2 arguments, but got 3.
+        // 73       addInRamMetric(name + ".fail", duration, end);
         // @ts-ignore
         addInRamMetric(name + ".fail", duration, end);
+        logger.error("meteredPromise internal error", err);
       }, 100);
-    }
-  ).catch(function (err) {
-    logger.error("meteredPromise internal error", err);
-    let end = Date.now();
-    let duration = end - start;
-    setTimeout(function () {
-      // TODO either add this arg to the function definition
-      // TODO or remove this arg from the function call
-      //       TS2554: Expected 2 arguments, but got 3.
-      // 73       addInRamMetric(name + ".fail", duration, end);
-      // @ts-ignore
-      addInRamMetric(name + ".fail", duration, end);
-      logger.error("meteredPromise internal error", err);
-    }, 100);
-  });
+    });
   return promise;
 }
 

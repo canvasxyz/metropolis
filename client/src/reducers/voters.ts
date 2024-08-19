@@ -7,7 +7,7 @@ const conversation_voters = (
     loading: false,
     voters: {},
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_CONVERSATION_VOTERS:

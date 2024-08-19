@@ -6,7 +6,7 @@ const conversation_config = (
     conversation_config: null,
     update_error: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     default:

@@ -98,7 +98,7 @@ export async function getRepoCollaborators() {
       headers: {
         "X-GitHub-Api-Version": "2022-11-28",
       },
-    },
+    }
   );
 
   return data;

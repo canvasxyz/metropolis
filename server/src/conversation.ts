@@ -10,7 +10,7 @@ function createXidRecord(
   xid: any,
   x_profile_image_url: any,
   x_name: any,
-  x_email: any,
+  x_email: any
 ) {
   return pg.queryP(
     "insert into xids (owner, uid, xid, x_profile_image_url, x_name, x_email) values ($1, $2, $3, $4, $5, $6) " +
@@ -22,7 +22,7 @@ function createXidRecord(
       x_profile_image_url || null,
       x_name || null,
       x_email || null,
-    ],
+    ]
   );
 }
 
@@ -32,7 +32,7 @@ async function createXidRecordByZid(
   xid: any,
   x_profile_image_url: any,
   x_name: any,
-  x_email: any,
+  x_email: any
 ) {
   const conv = (await getConversationInfo(zid)) as {
     use_xid_whitelist: any;
@@ -58,14 +58,14 @@ async function createXidRecordByZid(
       x_profile_image_url || null,
       x_name || null,
       x_email || null,
-    ],
+    ]
   );
 }
 
 function getXidRecord(xid: any, zid: any) {
   return pg.queryP(
     "select * from xids where xid = ($1) and owner = (select org_id from conversations where zid = ($2));",
-    [xid, zid],
+    [xid, zid]
   );
 }
 
@@ -86,10 +86,10 @@ async function getConversationInfo(zid: any) {
     (async () => {
       const rows = await pg.queryP(
         "SELECT * FROM conversations WHERE zid = ($1);",
-        [zid],
+        [zid]
       );
       return rows[0];
-    })(),
+    })()
   );
 }
 
@@ -99,10 +99,10 @@ function getConversationInfoByConversationId(conversation_id: any) {
     (async () => {
       const rows = await pg.queryP(
         "SELECT * FROM conversations WHERE zid = (select zid from zinvites where zinvite = ($1));",
-        [conversation_id],
+        [conversation_id]
       );
       return rows[0];
-    })(),
+    })()
   );
 }
 
@@ -122,12 +122,12 @@ function getZidFromConversationId(conversation_id: string) {
 
       const results = await pg.queryP_readOnly(
         "select zid from zinvites where zinvite = ($1);",
-        [conversation_id],
+        [conversation_id]
       );
 
       if (results.length == 0) {
         logger.error(
-          "polis_err_fetching_zid_for_conversation_id " + conversation_id,
+          "polis_err_fetching_zid_for_conversation_id " + conversation_id
         );
         throw Error("polis_err_fetching_zid_for_conversation_id");
       } else {
@@ -135,7 +135,7 @@ function getZidFromConversationId(conversation_id: string) {
         conversationIdToZidCache.set(conversation_id, zid);
         return zid;
       }
-    })(),
+    })()
   );
 }
 

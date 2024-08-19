@@ -5,7 +5,7 @@ import { isAdministrator } from "../user";
 
 export async function handle_GET_conversation_sentiment_comments(
   req: Request & { p: any },
-  res: Response,
+  res: Response
 ) {
   // make sure that this query does not return the zid
   const query = `
@@ -62,7 +62,7 @@ export async function handle_GET_conversation_sentiment_comments(
 
 export async function handle_POST_conversation_sentiment_check_comments(
   req: Request & { p: any },
-  res: Response,
+  res: Response
 ) {
   const query =
     "INSERT INTO sentiment_check_comments (zid, uid, comment) VALUES ($1, $2, $3) RETURNING *;";
@@ -91,7 +91,7 @@ export async function handle_POST_conversation_sentiment_check_comments(
 
 export async function handle_DELETE_conversation_sentiment_check_comments(
   req: Request & { p: any },
-  res: Response,
+  res: Response
 ) {
   const selectQuery =
     "SELECT zid, uid, comment FROM sentiment_check_comments WHERE id = $1;";
@@ -106,7 +106,7 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       res,
       500,
       "polis_err_delete_conversation_sentiment_check_comments",
-      err,
+      err
     );
     return;
   }
@@ -116,7 +116,7 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       res,
       404,
       "polis_err_delete_conversation_sentiment_check_comments",
-      "sentiment check comment not found",
+      "sentiment check comment not found"
     );
     return;
   }
@@ -127,7 +127,7 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       res,
       403,
       "polis_err_delete_conversation_sentiment_check_comments",
-      "user not authorized to delete this comment",
+      "user not authorized to delete this comment"
     );
     return;
   }
@@ -141,7 +141,7 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       res,
       500,
       "polis_err_delete_conversation_sentiment_check_comments",
-      err,
+      err
     );
     return;
   }

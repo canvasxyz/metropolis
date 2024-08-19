@@ -7,10 +7,10 @@ const domainOverride = process.env.DOMAIN_OVERRIDE || null;
 const prodHostname = process.env.API_PROD_HOSTNAME || "metropolis.vote";
 const serverPort = parseInt(
   process.env.API_SERVER_PORT || process.env.PORT || "8040",
-  10,
+  10
 ) as number;
 const shouldUseTranslationAPI = isTrue(
-  process.env.SHOULD_USE_TRANSLATION_API,
+  process.env.SHOULD_USE_TRANSLATION_API
 ) as boolean;
 
 export default {
@@ -60,7 +60,7 @@ export default {
     process.env.AKISMET_ANTISPAM_API_KEY || (null as string | null),
   awsRegion: process.env.AWS_REGION as string,
   backfillCommentLangDetection: isTrue(
-    process.env.BACKFILL_COMMENT_LANG_DETECTION,
+    process.env.BACKFILL_COMMENT_LANG_DETECTION
   ) as boolean,
   cacheMathResults: isTrueOrBlank(process.env.CACHE_MATH_RESULTS) as boolean,
   databaseURL: process.env.DATABASE_URL as string,
@@ -78,7 +78,7 @@ export default {
   readOnlyDatabaseURL:
     process.env.READ_ONLY_DATABASE_URL || (process.env.DATABASE_URL as string),
   runPeriodicExportTests: isTrue(
-    process.env.RUN_PERIODIC_EXPORT_TESTS,
+    process.env.RUN_PERIODIC_EXPORT_TESTS
   ) as boolean,
   shouldUseTranslationAPI: setGoogleApplicationCredentials() as boolean,
   twitterConsumerKey:
@@ -119,7 +119,7 @@ function setGoogleApplicationCredentials(): boolean {
     // TODO: Consider deprecating GOOGLE_CREDS_STRINGIFIED in future.
     if (!googleCredentialsBase64 && !googleCredsStringified) {
       throw new Error(
-        "Missing Google credentials. Translation API will be disabled.",
+        "Missing Google credentials. Translation API will be disabled."
       );
     }
 

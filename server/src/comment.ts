@@ -145,7 +145,7 @@ function _getCommentsForModerationList(o: {
       return pg.queryP_metered_readOnly(
         "_getCommentsForModerationList",
         "select * from comments where comments.zid = ($1)" + modClause,
-        params,
+        params
       );
     }
 
@@ -154,7 +154,7 @@ function _getCommentsForModerationList(o: {
         "_getCommentsForModerationList",
         "select * from (select tid, vote, count(*) from votes_latest_unique where zid = ($1) group by tid, vote) as foo full outer join comments on foo.tid = comments.tid where comments.zid = ($1)" +
           modClause,
-        params,
+        params
       )
       .then((rows_) => {
         let rows = rows_ as Row[];
@@ -216,7 +216,7 @@ function _getCommentsList(o: {
         .from(
           SQL.sql_comments
             .join(SQL.sql_users)
-            .on(SQL.sql_comments.uid.equals(SQL.sql_users.uid)),
+            .on(SQL.sql_comments.uid.equals(SQL.sql_users.uid))
         )
         .where(SQL.sql_comments.zid.equals(o.zid));
       if (!_.isUndefined(o.pid)) {
@@ -237,8 +237,8 @@ function _getCommentsList(o: {
               .subQuery()
               .select(SQL.sql_votes_latest_unique.tid)
               .where(SQL.sql_votes_latest_unique.zid.equals(o.zid))
-              .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid)),
-          ),
+              .and(SQL.sql_votes_latest_unique.pid.equals(o.not_voted_by_pid))
+          )
         );
       } else if (!_.isUndefined(o.submitted_by_pid)) {
         q = q.and(SQL.sql_comments.pid.equals(o.submitted_by_pid));
@@ -274,7 +274,7 @@ function _getCommentsList(o: {
       }
 
       return (await pg.queryP(q.toString(), [])) as Row[];
-    })(),
+    })()
   );
 }
 
@@ -286,7 +286,7 @@ function getNumberOfCommentsRemaining(zid: any, pid: any) {
       "remaining as (select count(*) as remaining from c left join v on c.tid = v.tid where v.vote is null), " +
       "total as (select count(*) as total from c) " +
       "select cast(remaining.remaining as integer), cast(total.total as integer), cast(($2) as integer) as pid from remaining, total;",
-    [zid, pid],
+    [zid, pid]
   );
 }
 
@@ -299,7 +299,7 @@ function translateAndStoreComment(zid: any, tid: any, txt: any, lang: any) {
         pg
           .queryP(
             "insert into comment_translations (zid, tid, txt, lang, src) values ($1, $2, $3, $4, $5) returning *;",
-            [zid, tid, translation, lang, src],
+            [zid, tid, translation, lang, src]
           )
           //       Argument of type '(rows: Row[]) => Row' is not assignable to parameter of type '(value: unknown) => Row | PromiseLike<Row>'.
           // Types of parameters 'rows' and 'value' are incompatible.

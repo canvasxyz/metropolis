@@ -41,11 +41,10 @@ type FIPFrontmatterData = {
   created?: string;
 };
 
-type PullRequest =
-  Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
+type PullRequest = Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
 
 const DISCUSSION_REGEX = new RegExp(
-  `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/discussions/(\\d+)`,
+  `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/discussions/(\\d+)`
 );
 
 function execAsync(command: string, options: child_process.ExecOptions) {
@@ -145,7 +144,7 @@ async function getFipFromPR(
   repoDir: string,
   pull: PullRequest,
   existingFipFilenames: Set<string>,
-  mainBranchName: string,
+  mainBranchName: string
 ): Promise<FipFields> {
   const owner = pull.head.user?.login as string;
   const repo = pull.head.repo?.name as string;
@@ -155,7 +154,7 @@ async function getFipFromPR(
   // add remote
   await execAsync(
     `git remote add ${remote} https://github.com/${owner}/${repo}`,
-    { cwd: repoDir },
+    { cwd: repoDir }
   );
 
   // fetch the branches from the remote
@@ -167,15 +166,19 @@ async function getFipFromPR(
   });
 
   // get updated filenames against the mergebase, unless the FIP PR isn't against master
-  const { stdout: mergeBase } = await execAsync(
+  const {
+    stdout: mergeBase,
+  } = await execAsync(
     `git merge-base ${mainBranchName} ${remote}/${pull.head.ref}`,
-    { cwd: repoDir },
+    { cwd: repoDir }
   );
-  const { stdout: updatedFilenamesText } = await execAsync(
+  const {
+    stdout: updatedFilenamesText,
+  } = await execAsync(
     `git diff --name-status ${
       pull.base.ref === mainBranchName ? mergeBase : pull.base.ref
     }`,
-    { cwd: repoDir },
+    { cwd: repoDir }
   );
   const createdFilenames = updatedFilenamesText
     .trim()
@@ -186,7 +189,7 @@ async function getFipFromPR(
       (filename) =>
         filename.toLowerCase().startsWith("fip0001v2") ||
         filename.toLowerCase().startsWith("fips/") ||
-        filename.toLowerCase().startsWith("frcs/"),
+        filename.toLowerCase().startsWith("frcs/")
     );
 
   const updatedFilenames = updatedFilenamesText
@@ -198,12 +201,12 @@ async function getFipFromPR(
       (filename) =>
         filename.toLowerCase().startsWith("fip0001v2") ||
         filename.toLowerCase().startsWith("fips/") ||
-        filename.toLowerCase().startsWith("frcs/"),
+        filename.toLowerCase().startsWith("frcs/")
     );
 
   if (createdFilenames.length > 1) {
     console.error(
-      `[${pull.head?.label}] multiple FIP-XXXX.md files changed in PR #${pull.number}, using the last one`,
+      `[${pull.head?.label}] multiple FIP-XXXX.md files changed in PR #${pull.number}, using the last one`
     );
   }
 
@@ -213,7 +216,7 @@ async function getFipFromPR(
     // get the contents of the new FIP
     const content = await fsPromises.readFile(
       path.join(repoDir, filename),
-      "utf8",
+      "utf8"
     );
 
     // try to extract fip number
@@ -235,8 +238,9 @@ async function getFipFromPR(
 
     // try to extract fip number again
     if (!fipNumber || isNaN(fipNumber)) {
-      const frontmatterFipNumberMatch =
-        frontmatterData.fip?.match(/(fip-)?([0-9]*)/);
+      const frontmatterFipNumberMatch = frontmatterData.fip?.match(
+        /(fip-)?([0-9]*)/
+      );
       fipNumber = frontmatterFipNumberMatch
         ? parseInt(frontmatterFipNumberMatch[2], 10)
         : 0;
@@ -291,7 +295,7 @@ function getWelcomeMessage(serverNameWithProtocol: string, zinvite: string) {
 
 async function addDiscussionComment(
   message: string,
-  target: { repoOwner: string; repoName: string; discussionNumber: number },
+  target: { repoOwner: string; repoName: string; discussionNumber: number }
 ) {
   const graphqlWithAuth = await getGraphqlForInstallation();
 
@@ -307,7 +311,7 @@ async function addDiscussionComment(
           id
         }
       }
-    }`,
+    }`
   )) as any;
 
   await graphqlWithAuth(
@@ -315,7 +319,7 @@ async function addDiscussionComment(
       addDiscussionComment(input: {discussionId: "${discussionId}", body: "${message}"}) {
         clientMutationId
       }
-    }`,
+    }`
   );
 }
 
@@ -341,8 +345,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         repo: process.env.FIP_REPO_NAME,
         owner: process.env.FIP_REPO_OWNER,
         per_page: 100,
-        state: "all"
-      },
+        state: "all",
+      }
     );
 
     const workingDir = path.join(os.tmpdir(), uuidv4());
@@ -353,7 +357,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
 
     child_process.execSync(
       `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
-      { cwd: workingDir },
+      { cwd: workingDir }
     );
 
     const repoDir = path.join(workingDir, process.env.FIP_REPO_NAME);
@@ -365,7 +369,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         pulls.length
       } open FIPs in PRs: \n${pulls
         .map((pull: any) => "- " + pull.head?.label)
-        .join("\n")}`,
+        .join("\n")}`
     );
 
     let repoCollaboratorIds;
@@ -377,8 +381,8 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         DEFAULT_REPO_COLLABORATORS.map((user) =>
           fetch("https://api.github.com/users/${user}")
             .then((response) => response.json())
-            .then((json) => json.id),
-        ),
+            .then((json) => json.id)
+        )
       );
       repoCollaboratorIds = new Set(response);
     }
@@ -433,7 +437,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
       if (existingConversation) {
         if (!existingConversation.github_sync_enabled) {
           console.log(
-            `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`,
+            `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`
           );
           continue;
         }
@@ -441,7 +445,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         // update
         if (pull.state == "open") {
           console.log(
-            `[${pull.head?.label}] updating metadata for PR #${pull.number}`,
+            `[${pull.head?.label}] updating metadata for PR #${pull.number}`
           );
           // get fip
           let fipFields;
@@ -450,11 +454,11 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               repoDir,
               pull,
               existingFipFilenames,
-              mainBranchName,
+              mainBranchName
             );
           } catch (err) {
             console.log(
-              `[${pull.head?.label}] could not get fip for PR #${pull.number}`,
+              `[${pull.head?.label}] could not get fip for PR #${pull.number}`
             );
             continue;
           }
@@ -464,7 +468,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           fipsUpdated++;
         } else {
           console.log(
-            `[${pull.head?.label}] closing conversation with PR #${pull.number}`,
+            `[${pull.head?.label}] closing conversation with PR #${pull.number}`
           );
           // we don't care about getting the FIP since it's no longer being discussed
           // but we want to update the PR status to closed
@@ -474,7 +478,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         if (pull.state == "open") {
           // we only care about inserting conversations that are open
           console.log(
-            `[${pull.head?.label}] creating new polis conversation for PR #${pull.number}`,
+            `[${pull.head?.label}] creating new polis conversation for PR #${pull.number}`
           );
 
           // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
@@ -485,11 +489,11 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
               repoDir,
               pull,
               existingFipFilenames,
-              mainBranchName,
+              mainBranchName
             );
           } catch (err) {
             console.log(
-              `[${pull.head?.label}] skipping PR #${pull.number}: ${err}`,
+              `[${pull.head?.label}] skipping PR #${pull.number}: ${err}`
             );
             continue;
           }
@@ -502,7 +506,7 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
           const zinvite = await generateAndRegisterZinvite(zid, false);
 
           console.log(
-            `[${pull.head?.label}] created polis conversation for PR #${pull.number}`,
+            `[${pull.head?.label}] created polis conversation for PR #${pull.number}`
           );
 
           fipsCreated++;
