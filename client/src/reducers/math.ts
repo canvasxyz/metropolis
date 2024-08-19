@@ -9,7 +9,7 @@ const Math = (
     math_tick: -1,
     error: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_MATH:

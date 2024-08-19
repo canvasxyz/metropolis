@@ -1,25 +1,25 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"use strict";
+"use strict"
 
-import { parse } from "json2csv";
-import akismetLib from "akismet";
-import AWS from "aws-sdk";
-import badwords from "badwords/object";
-import async from "async";
-import bcrypt from "bcryptjs";
-import crypto from "crypto";
-import responseTime from "response-time";
-import request from "request-promise"; // includes Request, but adds promise methods
-import LruCache from "lru-cache";
-import timeout from "connect-timeout";
-import zlib from "zlib";
-import _ from "underscore";
-import pg from "pg";
+import { parse } from "json2csv"
+import akismetLib from "akismet"
+import AWS from "aws-sdk"
+import badwords from "badwords/object"
+import async from "async"
+import bcrypt from "bcryptjs"
+import crypto from "crypto"
+import responseTime from "response-time"
+import request from "request-promise" // includes Request, but adds promise methods
+import LruCache from "lru-cache"
+import timeout from "connect-timeout"
+import zlib from "zlib"
+import _ from "underscore"
+import pg from "pg"
 
-import { addInRamMetric, meteredPromise } from "./utils/metered";
-import { generateAndRegisterZinvite, createUser } from "./auth/create-user";
-import { generateToken, generateTokenP } from "./auth/password";
+import { addInRamMetric, meteredPromise } from "./utils/metered"
+import { generateAndRegisterZinvite, createUser } from "./auth/create-user"
+import { generateToken, generateTokenP } from "./auth/password"
 import {
   query,
   query_readOnly,
@@ -27,10 +27,10 @@ import {
   queryP_metered,
   queryP_readOnly,
   queryP_readOnly_wRetryIfEmpty,
-} from "./db/pg-query";
+} from "./db/pg-query"
 
-import Config from "./config";
-import fail from "./utils/fail";
+import Config from "./config"
+import fail from "./utils/fail"
 
 import {
   Body,
@@ -50,7 +50,7 @@ import {
   DemographicEntry,
   Demo,
   Vote,
-} from "./d";
+} from "./d"
 
 import {
   createDummyUser,
@@ -66,15 +66,15 @@ import {
   isAdministrator,
   isOwner,
   isOwnerOrParticipant,
-} from "./user";
+} from "./user"
 
-AWS.config.update({ region: Config.awsRegion });
-const devMode = Config.isDevMode;
+AWS.config.update({ region: Config.awsRegion })
+const devMode = Config.isDevMode
 
-const escapeLiteral = pg.Client.prototype.escapeLiteral;
+const escapeLiteral = pg.Client.prototype.escapeLiteral
 
 // TODO: Maybe able to remove
-import { generateHashedPassword } from "./auth/password";
+import { generateHashedPassword } from "./auth/password"
 import {
   COOKIES,
   COOKIES_TO_CLEAR,
@@ -84,15 +84,15 @@ import {
   addCookies,
   getPermanentCookieAndEnsureItIsSet,
   cookieDomain,
-} from "./utils/cookies";
-import { DEFAULTS } from "./utils/constants";
+} from "./utils/cookies"
+import { DEFAULTS } from "./utils/constants"
 import {
   getConversationInfo,
   getConversationInfoByConversationId,
   isXidWhitelisted,
   createXidRecordByZid,
   getZidFromConversationId,
-} from "./conversation";
+} from "./conversation"
 
 import {
   encrypt,
@@ -104,7 +104,7 @@ import {
   setupPwReset,
   getUidForPwResetToken,
   clearPwResetToken,
-} from "./session";
+} from "./session"
 
 import {
   getComments,
@@ -112,9 +112,9 @@ import {
   detectLanguage,
   translateAndStoreComment,
   getComment,
-} from "./comment";
+} from "./comment"
 
-import { polisTypes, hexToStr } from "./utils/common";
+import { polisTypes, hexToStr } from "./utils/common"
 
 import {
   sql_votes_latest_unique,
@@ -123,42 +123,42 @@ import {
   sql_participants_extended,
   sql_reports,
   sql_users,
-} from "./db/sqlUtils";
+} from "./db/sqlUtils"
 
-import logger from "./utils/logger";
+import logger from "./utils/logger"
 
-import { sendTextEmail } from "./email/senders";
-import { Request, Response } from "express";
-import { getConversationIdFetchZid } from "./utils/parameter";
-import { insertConversationPrAndFip } from "./handlers/queries";
+import { sendTextEmail } from "./email/senders"
+import { Request, Response } from "express"
+import { getConversationIdFetchZid } from "./utils/parameter"
+import { insertConversationPrAndFip } from "./handlers/queries"
 
-const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : [];
-const polisFromAddress = Config.polisFromAddress;
-const serverUrl = Config.getServerUrl(); // typically https://pol.is or http://localhost:8040
+const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : []
+const polisFromAddress = Config.polisFromAddress
+const serverUrl = Config.getServerUrl() // typically https://pol.is or http://localhost:8040
 
 let akismet = akismetLib.client({
   blog: serverUrl,
   apiKey: Config.akismetAntispamApiKey,
-});
+})
 
 akismet.verifyKey(function (err: any, verified: any) {
   if (verified) {
-    logger.debug("Akismet: API key successfully verified.");
+    logger.debug("Akismet: API key successfully verified.")
   } else {
-    logger.debug("Akismet: Unable to verify API key.");
+    logger.debug("Akismet: Unable to verify API key.")
   }
-});
+})
 // let SELF_HOSTNAME = Config.getServerHostname();
 
 function isSpam(o: {
-  comment_content: any;
-  comment_author: any;
-  permalink: string;
-  user_ip: any;
-  user_agent: any;
-  referrer: any;
+  comment_content: any
+  comment_author: any
+  permalink: string
+  user_ip: any
+  user_agent: any
+  referrer: any
 }) {
-  return new Promise((resolve) => resolve(false));
+  return new Promise((resolve) => resolve(false))
 
   // if (!Config.akismetAntispamApiKey) {
   //   return new Promise((resolve, reject) =>
@@ -182,33 +182,33 @@ function isSpam(o: {
 
 // basic defaultdict implementation
 function DD(this: any, f: () => { votes: number; comments: number }) {
-  this.m = {};
-  this.f = f;
+  this.m = {}
+  this.f = f
 }
 // basic defaultarray implementation
 function DA(this: any, f: any) {
-  this.m = [];
-  this.f = f;
+  this.m = []
+  this.f = f
 }
 DD.prototype.g = DA.prototype.g = function (k: string | number) {
   if (this.m.hasOwnProperty(k)) {
-    return this.m[k];
+    return this.m[k]
   }
-  let v = this.f(k);
-  this.m[k] = v;
-  return v;
-};
+  let v = this.f(k)
+  this.m[k] = v
+  return v
+}
 DD.prototype.s = DA.prototype.s = function (k: string | number, v: any) {
-  this.m[k] = v;
-};
+  this.m[k] = v
+}
 
-const domainOverride = Config.domainOverride;
+const domainOverride = Config.domainOverride
 
 function haltOnTimeout(req: { timedout: any }, res: any, next: () => void) {
   if (req.timedout) {
-    fail(res, 500, "polis_err_timeout_misc");
+    fail(res, 500, "polis_err_timeout_misc")
   } else {
-    next();
+    next()
   }
 }
 
@@ -218,7 +218,7 @@ function ifDefinedSet(
   dest: { [x: string]: any },
 ) {
   if (!_.isUndefined(source[name])) {
-    dest[name] = source[name];
+    dest[name] = source[name]
   }
 }
 
@@ -258,7 +258,7 @@ function getUidForApiKey(apikey: any) {
   return queryP_readOnly_wRetryIfEmpty(
     "select uid from apikeysndvweifu WHERE apikey = ($1);",
     [apikey],
-  );
+  )
 }
 // http://en.wikipedia.org/wiki/Basic_access_authentication#Client_side
 function doApiKeyBasicAuth(
@@ -274,8 +274,8 @@ function doApiKeyBasicAuth(
     parts = auth.split(/:/), // split on colon
     username = parts[0],
     // password = parts[1], // we don't use the password part (just use "apikey:")
-    apikey = username;
-  return doApiKeyAuth(assigner, apikey, isOptional, req, res, next);
+    apikey = username
+  return doApiKeyAuth(assigner, apikey, isOptional, req, res, next)
 }
 
 function doApiKeyAuth(
@@ -289,18 +289,18 @@ function doApiKeyAuth(
   getUidForApiKey(apikey)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        res.status(403);
-        next("polis_err_auth_no_such_api_token");
-        return;
+        res.status(403)
+        next("polis_err_auth_no_such_api_token")
+        return
       }
-      assigner(req, "uid", Number(rows[0].uid));
-      next();
+      assigner(req, "uid", Number(rows[0].uid))
+      next()
     })
     .catch(function (err: any) {
-      res.status(403);
-      logger.error("polis_err_auth_no_such_api_token2", err);
-      next("polis_err_auth_no_such_api_token2");
-    });
+      res.status(403)
+      logger.error("polis_err_auth_no_such_api_token2", err)
+      next("polis_err_auth_no_such_api_token2")
+    })
 }
 
 // function getXidRecordByXidConversationId(xid, conversation_id) {
@@ -327,20 +327,20 @@ function doXidApiKeyAuth(
   req: AuthRequest,
   res: { status: (arg0: number) => void },
   next: {
-    (err: any): void;
-    (err: any): void;
-    (arg0?: string | undefined): void;
+    (err: any): void
+    (err: any): void
+    (arg0?: string | undefined): void
   },
 ) {
   getUidForApiKey(apikey)
     .then(
       function (rows: string | any[]) {
         if (!rows || !rows.length) {
-          res.status(403);
-          next("polis_err_auth_no_such_api_token4");
-          return;
+          res.status(403)
+          next("polis_err_auth_no_such_api_token4")
+          return
         }
-        let uidForApiKey = Number(rows[0].uid);
+        let uidForApiKey = Number(rows[0].uid)
         return getXidRecordByXidOwnerId(
           xid,
           uidForApiKey,
@@ -352,32 +352,32 @@ function doXidApiKeyAuth(
         ).then((rows: string | any[] | null) => {
           if (!rows || !rows.length) {
             if (isOptional) {
-              return next();
+              return next()
             } else {
-              res.status(403);
-              next("polis_err_auth_no_such_xid_for_this_apikey_1");
-              return;
+              res.status(403)
+              next("polis_err_auth_no_such_xid_for_this_apikey_1")
+              return
             }
           }
-          let uidForCurrentUser = Number(rows[0].uid);
-          assigner(req, "uid", uidForCurrentUser);
-          assigner(req, "xid", xid);
-          assigner(req, "owner_uid", uidForApiKey);
-          assigner(req, "org_id", uidForApiKey);
-          next();
-        });
+          let uidForCurrentUser = Number(rows[0].uid)
+          assigner(req, "uid", uidForCurrentUser)
+          assigner(req, "xid", xid)
+          assigner(req, "owner_uid", uidForApiKey)
+          assigner(req, "org_id", uidForApiKey)
+          next()
+        })
       },
       function (err: any) {
-        res.status(403);
-        logger.error("polis_err_auth_no_such_api_token3", err);
-        next("polis_err_auth_no_such_api_token3");
+        res.status(403)
+        logger.error("polis_err_auth_no_such_api_token3", err)
+        next("polis_err_auth_no_such_api_token3")
       },
     )
     .catch(function (err: any) {
-      res.status(403);
-      logger.error("polis_err_auth_misc_23423", err);
-      next("polis_err_auth_misc_23423");
-    });
+      res.status(403)
+      logger.error("polis_err_auth_misc_23423", err)
+      next("polis_err_auth_misc_23423")
+    })
 }
 function doHeaderAuth(
   assigner: (arg0: any, arg1: string, arg2: number) => void,
@@ -386,42 +386,42 @@ function doHeaderAuth(
   res: { status: (arg0: number) => void },
   next: { (err: any): void; (arg0?: string | undefined): void },
 ) {
-  let token = "";
-  if (req && req.headers) token = req?.headers?.["x-polis"];
+  let token = ""
+  if (req && req.headers) token = req?.headers?.["x-polis"]
 
   //if (req.body.uid) { next(401); return; } // shouldn't be in the post - TODO - see if we can do the auth in parallel for non-destructive operations
   getUserInfoForSessionToken(token)
     .then((uid: any) => {
       if (req.body.uid && req.body.uid !== uid) {
-        res.status(401);
-        next("polis_err_auth_mismatch_uid");
+        res.status(401)
+        next("polis_err_auth_mismatch_uid")
       } else {
-        assigner(req, "uid", Number(uid));
-        next();
+        assigner(req, "uid", Number(uid))
+        next()
       }
     })
     .catch(() => {
-      res.status(403);
-      next("polis_err_auth_no_such_token");
-    });
+      res.status(403)
+      next("polis_err_auth_no_such_token")
+    })
 }
 
 // Property 'hashCode' does not exist on type 'String'.ts(2339)
 // @ts-ignore
 String.prototype.hashCode = function () {
-  let hash = 0;
-  let i;
-  let character;
+  let hash = 0
+  let i
+  let character
   if (this.length === 0) {
-    return hash;
+    return hash
   }
   for (i = 0; i < this.length; i++) {
-    character = this.charCodeAt(i);
-    hash = (hash << 5) - hash + character;
-    hash = hash & hash; // Convert to 32bit integer
+    character = this.charCodeAt(i)
+    hash = (hash << 5) - hash + character
+    hash = hash & hash // Convert to 32bit integer
   }
-  return hash;
-};
+  return hash
+}
 
 // // If there are any comments which have no votes by the owner, create a PASS vote by the owner.
 // query("select * from comments", [], function(err, comments) {
@@ -462,7 +462,7 @@ function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
     return queryP(
       "insert into permanentCookieZidJoins (cookie, zid) values ($1, $2);",
       [permanentCookieToken, zid],
-    );
+    )
   }
   return queryP(
     "select zid from permanentCookieZidJoins where cookie = ($1) and zid = ($2);",
@@ -472,40 +472,40 @@ function recordPermanentCookieZidJoin(permanentCookieToken: any, zid: any) {
       if (rows && rows.length) {
         // already there
       } else {
-        return doInsert();
+        return doInsert()
       }
     },
     function (err: any) {
-      logger.error("error in recordPermanentCookieZidJoin", err);
+      logger.error("error in recordPermanentCookieZidJoin", err)
       // hmm, weird, try inserting anyway
-      return doInsert();
+      return doInsert()
     },
-  );
+  )
 }
 
 if (Config.backfillCommentLangDetection) {
   queryP("select tid, txt, zid from comments where lang is null;", []).then(
     (comments: string | any[]) => {
-      let i = 0;
+      let i = 0
       function doNext() {
         if (i < comments.length) {
-          let c = comments[i];
-          i += 1;
+          let c = comments[i]
+          i += 1
           detectLanguage(c.txt).then((x: DetectLanguageResult[]) => {
-            const firstResult = x[0];
-            logger.debug("backfill " + firstResult.language + "\t\t" + c.txt);
+            const firstResult = x[0]
+            logger.debug("backfill " + firstResult.language + "\t\t" + c.txt)
             queryP(
               "update comments set lang = ($1), lang_confidence = ($2) where zid = ($3) and tid = ($4)",
               [firstResult.language, firstResult.confidence, c.zid, c.tid],
             ).then(() => {
-              doNext();
-            });
-          });
+              doNext()
+            })
+          })
         }
       }
-      doNext();
+      doNext()
     },
-  );
+  )
 }
 
 async function doVotesPost(
@@ -517,30 +517,30 @@ async function doVotesPost(
   weight?: number,
   high_priority?: boolean,
 ) {
-  let zid = conv?.zid;
-  weight = weight || 0;
-  let weight_x_32767 = Math.trunc(weight * 32767); // weight is stored as a SMALLINT, so convert from a [-1,1] float to [-32767,32767] int
+  let zid = conv?.zid
+  weight = weight || 0
+  let weight_x_32767 = Math.trunc(weight * 32767) // weight is stored as a SMALLINT, so convert from a [-1,1] float to [-32767,32767] int
 
   let queryS =
-    "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;";
-  let params = [pid, zid, tid, voteType, weight_x_32767, high_priority];
+    "INSERT INTO votes (pid, zid, tid, vote, weight_x_32767, high_priority, created) VALUES ($1, $2, $3, $4, $5, $6, default) RETURNING *;"
+  let params = [pid, zid, tid, voteType, weight_x_32767, high_priority]
 
-  let result: any[];
+  let result: any[]
   try {
-    result = await queryP(queryS, params);
+    result = await queryP(queryS, params)
   } catch (err) {
     if (err && isDuplicateKey(err as any)) {
-      throw new Error("polis_err_vote_duplicate");
+      throw new Error("polis_err_vote_duplicate")
     } else {
-      logger.error("polis_err_vote_other", err);
-      throw new Error("polis_err_vote_other");
+      logger.error("polis_err_vote_other", err)
+      throw new Error("polis_err_vote_other")
     }
   }
 
   return {
     conv: conv,
     vote: result[0],
-  };
+  }
 }
 
 function votesPost(
@@ -555,16 +555,16 @@ function votesPost(
   return queryP_readOnly("select * from conversations where zid = ($1);", [zid])
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        throw "polis_err_unknown_conversation";
+        throw "polis_err_unknown_conversation"
       }
-      let conv = rows[0];
+      let conv = rows[0]
       if (!conv.is_active) {
-        throw "polis_err_conversation_is_closed";
+        throw "polis_err_conversation_is_closed"
       }
       if (conv.auth_needed_to_vote) {
         return isOwner(zid, uid).then((is_mod: any) => {
           if (is_mod) {
-            return conv;
+            return conv
           }
           return Promise.all([
             queryP("select * from xids where owner = ($1) and uid = ($2);", [
@@ -572,26 +572,26 @@ function votesPost(
               uid,
             ]),
           ]).then((xids) => {
-            const hasXid = xids.length > 0;
+            const hasXid = xids.length > 0
             if (hasXid) {
-              return conv;
+              return conv
             } else {
-              throw "polis_err_post_votes_social_needed";
+              throw "polis_err_post_votes_social_needed"
             }
-          });
-        });
+          })
+        })
       }
-      return conv;
+      return conv
     })
     .then(function (conv: any) {
-      return doVotesPost(uid, pid, conv, tid, voteType, weight, high_priority);
-    });
+      return doVotesPost(uid, pid, conv, tid, voteType, weight, high_priority)
+    })
 }
 function getVotesForSingleParticipant(p: { pid: any }) {
   if (_.isUndefined(p.pid)) {
-    return Promise.resolve([]);
+    return Promise.resolve([])
   }
-  return votesGet(p);
+  return votesGet(p)
 }
 
 function votesGet(p: { zid?: any; pid?: any; tid?: any }): Promise<any[]> {
@@ -600,33 +600,33 @@ function votesGet(p: { zid?: any; pid?: any; tid?: any }): Promise<any[]> {
     new Promise((resolve, reject) => {
       let q = sql_votes_latest_unique
         .select(sql_votes_latest_unique.star())
-        .where(sql_votes_latest_unique.zid.equals(p.zid));
+        .where(sql_votes_latest_unique.zid.equals(p.zid))
 
       if (!_.isUndefined(p.pid)) {
-        q = q.where(sql_votes_latest_unique.pid.equals(p.pid));
+        q = q.where(sql_votes_latest_unique.pid.equals(p.pid))
       }
       if (!_.isUndefined(p.tid)) {
-        q = q.where(sql_votes_latest_unique.tid.equals(p.tid));
+        q = q.where(sql_votes_latest_unique.tid.equals(p.tid))
       }
       query_readOnly(q.toString(), function (err: any, results: { rows: any }) {
         if (err) {
-          reject(err);
+          reject(err)
         } else {
-          resolve(results.rows);
+          resolve(results.rows)
         }
-      });
+      })
     }),
-  );
+  )
 } // End votesGet
 
 function writeDefaultHead(
   req: any,
   res: {
     set: (arg0: {
-      "Content-Type": string;
-      "Cache-Control": string;
-      Connection: string;
-    }) => void;
+      "Content-Type": string
+      "Cache-Control": string
+      Connection: string
+    }) => void
   },
   next: () => void,
 ) {
@@ -636,31 +636,31 @@ function writeDefaultHead(
     Connection: "keep-alive",
     //    'Access-Control-Allow-Origin': '*',
     //    'Access-Control-Allow-Credentials': 'true'
-  });
-  next();
+  })
+  next()
 }
 
 function redirectIfNotHttps(req: Request, res: Response, next: () => any) {
-  let exempt = devMode;
+  let exempt = devMode
 
   // IE is picky, so use HTTP.
   // TODO figure out IE situation, (proxy static files in worst-case)
   // exempt = exempt || /MSIE/.test(req?.headers?.['user-agent']); // TODO test IE11
 
   if (exempt) {
-    return next();
+    return next()
   }
 
-  const isHttps = req?.headers?.["x-forwarded-proto"] === "https";
+  const isHttps = req?.headers?.["x-forwarded-proto"] === "https"
 
   if (!isHttps) {
     // assuming we're running on Heroku, where we're behind a proxy.
     res.writeHead(302, {
       Location: "https://" + req?.headers?.host + req.url,
-    });
-    return res.end();
+    })
+    return res.end()
   }
-  return next();
+  return next()
 }
 
 function doXidConversationIdAuth(
@@ -685,47 +685,47 @@ function doXidConversationIdAuth(
       ).then((rows: string | any[] | null) => {
         if (!rows || !rows.length) {
           if (isOptional) {
-            return onDone();
+            return onDone()
           } else {
-            res.status(403);
-            onDone("polis_err_auth_no_such_xid_for_this_apikey_11");
-            return;
+            res.status(403)
+            onDone("polis_err_auth_no_such_xid_for_this_apikey_11")
+            return
           }
         }
-        let uidForCurrentUser = Number(rows[0].uid);
-        assigner(req, "uid", uidForCurrentUser);
-        onDone();
-      });
+        let uidForCurrentUser = Number(rows[0].uid)
+        assigner(req, "uid", uidForCurrentUser)
+        onDone()
+      })
     })
     .catch((err: any) => {
-      logger.error("doXidConversationIdAuth error", err);
-      onDone(err);
-    });
+      logger.error("doXidConversationIdAuth error", err)
+      onDone(err)
+    })
 }
 function _auth(assigner: any, isOptional: boolean) {
   function getKey(
     req: {
-      body: Body;
-      headers?: Headers;
-      query?: Query;
+      body: Body
+      headers?: Headers
+      query?: Query
     },
     key: string,
   ) {
-    return req.body[key] || req?.headers?.[key] || req?.query?.[key];
+    return req.body[key] || req?.headers?.[key] || req?.query?.[key]
   }
 
   function doAuth(
     req: {
-      cookies: { [x: string]: any };
-      headers?: { [x: string]: any; authorization: any };
-      p: { uid?: any };
-      body: Body;
+      cookies: { [x: string]: any }
+      headers?: { [x: string]: any; authorization: any }
+      p: { uid?: any }
+      body: Body
     },
     res: { status: (arg0: number) => void },
   ) {
     //var token = req.body.token;
-    let token = req.cookies[COOKIES.TOKEN];
-    let xPolisToken = req?.headers?.["x-polis"];
+    let token = req.cookies[COOKIES.TOKEN]
+    let xPolisToken = req?.headers?.["x-polis"]
 
     return new Promise(function (
       resolve: (arg0: any) => void,
@@ -733,16 +733,16 @@ function _auth(assigner: any, isOptional: boolean) {
     ) {
       function onDone(err?: string) {
         if (err) {
-          reject(err);
+          reject(err)
         }
         if ((!req.p || !req.p.uid) && !isOptional) {
-          reject("polis_err_mandatory_auth_unsuccessful");
+          reject("polis_err_mandatory_auth_unsuccessful")
         }
-        resolve(req.p && req.p.uid);
+        resolve(req.p && req.p.uid)
       }
       if (xPolisToken) {
-        logger.info("authtype: doHeaderAuth");
-        doHeaderAuth(assigner, isOptional, req, res, onDone);
+        logger.info("authtype: doHeaderAuth")
+        doHeaderAuth(assigner, isOptional, req, res, onDone)
       } else if (getKey(req, "polisApiKey") && getKey(req, "ownerXid")) {
         doXidApiKeyAuth(
           assigner,
@@ -752,7 +752,7 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
       } else if (getKey(req, "polisApiKey") && getKey(req, "xid")) {
         doXidApiKeyAuth(
           assigner,
@@ -762,7 +762,7 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
         // } else if (req?.headers?.["x-sandstorm-app-polis-apikey"] && req?.headers?.["x-sandstorm-app-polis-xid"] && req?.headers?.["x-sandstorm-app-polis-owner-xid"]) {
         //   doXidApiKeyAuth(
         //     assigner,
@@ -779,7 +779,7 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
       } else if (req?.headers?.["x-sandstorm-app-polis-apikey"]) {
         doApiKeyAuth(
           assigner,
@@ -788,7 +788,7 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
       } else if (req.body["polisApiKey"]) {
         doApiKeyAuth(
           assigner,
@@ -797,9 +797,9 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
       } else if (token) {
-        doCookieAuth(assigner, isOptional, req, res, onDone);
+        doCookieAuth(assigner, isOptional, req, res, onDone)
       } else if (req?.headers?.authorization) {
         doApiKeyBasicAuth(
           assigner,
@@ -808,49 +808,49 @@ function _auth(assigner: any, isOptional: boolean) {
           req,
           res,
           onDone,
-        );
+        )
       } else if (req.body.agid) {
         // Auto Gen user  ID
         createDummyUser()
           .then(
             function (uid?: any) {
-              let shouldAddCookies = _.isUndefined(req.body.xid);
+              let shouldAddCookies = _.isUndefined(req.body.xid)
               if (!shouldAddCookies) {
-                req.p = req.p || {};
-                req.p.uid = uid;
-                return onDone();
+                req.p = req.p || {}
+                req.p.uid = uid
+                return onDone()
               }
               return startSessionAndAddCookies(req, res, uid).then(
                 function () {
-                  req.p = req.p || {};
-                  req.p.uid = uid;
-                  onDone();
+                  req.p = req.p || {}
+                  req.p.uid = uid
+                  onDone()
                 },
                 function (err: any) {
-                  res.status(500);
-                  logger.error("polis_err_auth_token_error_2343", err);
-                  onDone("polis_err_auth_token_error_2343");
+                  res.status(500)
+                  logger.error("polis_err_auth_token_error_2343", err)
+                  onDone("polis_err_auth_token_error_2343")
                 },
-              );
+              )
             },
             function (err: any) {
-              res.status(500);
-              logger.error("polis_err_auth_token_error_1241", err);
-              onDone("polis_err_auth_token_error_1241");
+              res.status(500)
+              logger.error("polis_err_auth_token_error_1241", err)
+              onDone("polis_err_auth_token_error_1241")
             },
           )
           .catch(function (err: any) {
-            res.status(500);
-            logger.error("polis_err_auth_token_error_5345", err);
-            onDone("polis_err_auth_token_error_5345");
-          });
+            res.status(500)
+            logger.error("polis_err_auth_token_error_5345", err)
+            onDone("polis_err_auth_token_error_5345")
+          })
       } else if (isOptional) {
-        onDone(); // didn't create user
+        onDone() // didn't create user
       } else {
-        res.status(401);
-        onDone("polis_err_auth_token_not_supplied");
+        res.status(401)
+        onDone("polis_err_auth_token_not_supplied")
       }
-    });
+    })
   }
   return function (
     req: any,
@@ -859,14 +859,14 @@ function _auth(assigner: any, isOptional: boolean) {
   ) {
     doAuth(req, res)
       .then(() => {
-        return next();
+        return next()
       })
       .catch((err: any) => {
-        res.status(500);
-        logger.error("polis_err_auth_error_432", err);
-        next(err || "polis_err_auth_error_432");
-      });
-  };
+        res.status(500)
+        logger.error("polis_err_auth_error_432", err)
+        next(err || "polis_err_auth_error_432")
+      })
+  }
 
   //   let xid = req.body.xid;
   //   let hasXid = !_.isUndefined(xid);
@@ -909,16 +909,16 @@ function _auth(assigner: any, isOptional: boolean) {
 }
 // input token from body or query, and populate req.body.u with userid.
 function authOptional(assigner: any) {
-  return _auth(assigner, true);
+  return _auth(assigner, true)
 }
 
 function auth(assigner: any) {
-  return _auth(assigner, false);
+  return _auth(assigner, false)
 }
 
 function enableAgid(req: { body: Body }, res: any, next: () => void) {
-  req.body.agid = 1;
-  next();
+  req.body.agid = 1
+  next()
 }
 /*
 function meter(name) {
@@ -954,7 +954,7 @@ function meter(name) {
 let whitelistedCrossDomainRoutes = [
   /^\/api\/v[0-9]+\/launchPrep/,
   /^\/api\/v[0-9]+\/setFirstCookie/,
-];
+]
 
 let whitelistedDomains = [
   Config.getServerHostname(),
@@ -967,22 +967,22 @@ let whitelistedDomains = [
   "facebook.com",
   "api.twitter.com",
   "", // for API
-];
+]
 
 function hasWhitelistMatches(host: string) {
-  let hostWithoutProtocol = host;
+  let hostWithoutProtocol = host
   if (host.startsWith("http://")) {
-    hostWithoutProtocol = host.slice(7);
+    hostWithoutProtocol = host.slice(7)
   } else if (host.startsWith("https://")) {
-    hostWithoutProtocol = host.slice(8);
+    hostWithoutProtocol = host.slice(8)
   }
 
   for (let i = 0; i < whitelistedDomains.length; i++) {
-    let w = whitelistedDomains[i];
+    let w = whitelistedDomains[i]
     if (hostWithoutProtocol.endsWith(w || "")) {
       // ok, the ending matches, now we need to make sure it's the same, or a subdomain.
       if (hostWithoutProtocol === w) {
-        return true;
+        return true
       }
       if (
         hostWithoutProtocol[
@@ -990,73 +990,73 @@ function hasWhitelistMatches(host: string) {
         ] === "."
       ) {
         // separated by a dot, so it's a subdomain.
-        return true;
+        return true
       }
     }
   }
-  return false;
+  return false
 }
 function addCorsHeader(
   req: {
-    protocol: string;
-    get: (arg0: string) => any;
-    path: any;
-    headers: Headers;
+    protocol: string
+    get: (arg0: string) => any
+    path: any
+    headers: Headers
   },
   res: { header: (arg0: string, arg1: string | boolean) => void },
   next: (arg0?: string) => any,
 ) {
-  let host = "";
+  let host = ""
   if (domainOverride) {
-    host = req.protocol + "://" + domainOverride;
+    host = req.protocol + "://" + domainOverride
   } else {
     // TODO does it make sense for this middleware to look
     // at origin || referer? is Origin for CORS preflight?
     // or for everything?
     // Origin was missing from FF, so added Referer.
-    host = req.get("Origin") || req.get("Referer") || "";
+    host = req.get("Origin") || req.get("Referer") || ""
   }
 
   // Somehow the fragment identifier is being sent by IE10????
   // Remove unexpected fragment identifier
-  host = host.replace(/#.*$/, "");
+  host = host.replace(/#.*$/, "")
 
   // Remove characters starting with the first slash following the double slash at the beginning.
-  let result = /^[^/]*\/\/[^/]*/.exec(host);
+  let result = /^[^/]*\/\/[^/]*/.exec(host)
   if (result && result[0]) {
-    host = result[0];
+    host = result[0]
   }
   // check if the route is on a special list that allows it to be called cross domain (by polisHost.js for example)
   let routeIsWhitelistedForAnyDomain = _.some(
     whitelistedCrossDomainRoutes,
     function (regex: { test: (arg0: any) => any }) {
-      return regex.test(req.path);
+      return regex.test(req.path)
     },
-  );
+  )
 
   if (
     !domainOverride &&
     !hasWhitelistMatches(host) &&
     !routeIsWhitelistedForAnyDomain
   ) {
-    logger.info("not whitelisted", { headers: req.headers, path: req.path });
-    return next("unauthorized domain: " + host);
+    logger.info("not whitelisted", { headers: req.headers, path: req.path })
+    return next("unauthorized domain: " + host)
   }
   if (host === "") {
     // API
   } else {
-    res.header("Access-Control-Allow-Origin", host);
+    res.header("Access-Control-Allow-Origin", host)
     res.header(
       "Access-Control-Allow-Headers",
       "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With",
-    );
+    )
     res.header(
       "Access-Control-Allow-Methods",
       "GET, PUT, POST, DELETE, OPTIONS",
-    );
-    res.header("Access-Control-Allow-Credentials", true);
+    )
+    res.header("Access-Control-Allow-Credentials", true)
   }
-  return next();
+  return next()
 }
 
 ////////////////////////////////////////////
@@ -1077,37 +1077,39 @@ function addCorsHeader(
 
 function handle_GET_launchPrep(
   req: {
-    headers?: { origin: string };
-    cookies: { [x: string]: any };
-    p: { dest: any };
+    headers?: { origin: string }
+    cookies: { [x: string]: any }
+    p: { dest: any }
   },
   res: { redirect: (arg0: any) => void },
 ) {
   if (!req.cookies[COOKIES.PERMANENT_COOKIE]) {
-    setPermanentCookie(req, res, makeSessionToken());
+    setPermanentCookie(req, res, makeSessionToken())
   }
-  setCookieTestCookie(req, res);
+  setCookieTestCookie(req, res)
 
   // Argument of type '{ redirect: (arg0: any) => void; }' is not assignable to parameter of type '{ cookie: (arg0: any, arg1: any, arg2: any) => void; }'.
   // Property 'cookie' is missing in type '{ redirect: (arg0: any) => void; }' but required in type '{ cookie: (arg0: any, arg1: any, arg2: any) => void; }'.ts(2345)
   // @ts-ignore
   setCookie(req, res, "top", "ok", {
     httpOnly: false, // not httpOnly - needed by JS
-  });
+  })
 
   // using hex since it doesn't require escaping like base64.
-  let dest = hexToStr(req.p.dest);
-  res.redirect(dest);
+  let dest = hexToStr(req.p.dest)
+  res.redirect(dest)
 }
 
 function handle_GET_tryCookie(
   req: { headers?: { origin: string }; cookies: { [x: string]: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   if (!req.cookies[COOKIES.TRY_COOKIE]) {
@@ -1120,34 +1122,34 @@ function handle_GET_tryCookie(
     // @ts-ignore
     setCookie(req, res, COOKIES.TRY_COOKIE, "ok", {
       httpOnly: false, // not httpOnly - needed by JS
-    });
+    })
   }
-  res.status(200).json({});
+  res.status(200).json({})
 }
 type PcaCacheValue = {
   asPOJO: {
-    zid: any;
-    math_tick?: number;
-  };
-  asJSON: string;
-  asBufferOfGzippedJson: any;
-  expiration: number;
-};
+    zid: any
+    math_tick?: number
+  }
+  asJSON: string
+  asBufferOfGzippedJson: any
+  expiration: number
+}
 
-let pcaCacheSize = Config.cacheMathResults ? 300 : 1;
+let pcaCacheSize = Config.cacheMathResults ? 300 : 1
 let pcaCache = new LruCache<string, PcaCacheValue>({
   max: pcaCacheSize,
-});
+})
 
-let lastPrefetchedMathTick = -1;
+let lastPrefetchedMathTick = -1
 
 // this scheme might not last forever. For now, there are only a couple of MB worth of conversation pca data.
 function fetchAndCacheLatestPcaData() {
-  let lastPrefetchPollStartTime = Date.now();
+  let lastPrefetchPollStartTime = Date.now()
 
   function waitTime() {
-    let timePassed = Date.now() - lastPrefetchPollStartTime;
-    return Math.max(0, 2500 - timePassed);
+    let timePassed = Date.now() - lastPrefetchPollStartTime
+    return Math.max(0, 2500 - timePassed)
   }
   // cursor.sort([["math_tick", "asc"]]);
   queryP_readOnly(
@@ -1157,50 +1159,50 @@ function fetchAndCacheLatestPcaData() {
     .then((rows: any[]) => {
       if (!rows || !rows.length) {
         // call again
-        logger.info("mathpoll done");
-        setTimeout(fetchAndCacheLatestPcaData, waitTime());
-        return;
+        logger.info("mathpoll done")
+        setTimeout(fetchAndCacheLatestPcaData, waitTime())
+        return
       }
 
       let results = rows.map(
         (row: { data: any; math_tick: any; caching_tick: any }) => {
-          let item = row.data;
+          let item = row.data
 
           if (row.math_tick) {
-            item.math_tick = Number(row.math_tick);
+            item.math_tick = Number(row.math_tick)
           }
           if (row.caching_tick) {
-            item.caching_tick = Number(row.caching_tick);
+            item.caching_tick = Number(row.caching_tick)
           }
 
           logger.info("mathpoll updating", {
             caching_tick: item.caching_tick,
             zid: item.zid,
-          });
+          })
 
           // let prev = pcaCache.get(item.zid);
           if (item.caching_tick > lastPrefetchedMathTick) {
-            lastPrefetchedMathTick = item.caching_tick;
+            lastPrefetchedMathTick = item.caching_tick
           }
 
-          processMathObject(item);
+          processMathObject(item)
 
-          return updatePcaCache(item.zid, item);
+          return updatePcaCache(item.zid, item)
         },
-      );
+      )
       Promise.all(results).then(() => {
-        setTimeout(fetchAndCacheLatestPcaData, waitTime());
-      });
+        setTimeout(fetchAndCacheLatestPcaData, waitTime())
+      })
     })
     .catch((err: any) => {
-      logger.error("mathpoll error", err);
-      setTimeout(fetchAndCacheLatestPcaData, waitTime());
-    });
+      logger.error("mathpoll error", err)
+      setTimeout(fetchAndCacheLatestPcaData, waitTime())
+    })
 }
 
 // don't start immediately, let other things load first.
 // setTimeout(fetchAndCacheLatestPcaData, 5000);
-fetchAndCacheLatestPcaData; // TODO_DELETE
+fetchAndCacheLatestPcaData // TODO_DELETE
 
 /*
 function splitTopLevelGroup(o, gid) {
@@ -1274,8 +1276,8 @@ function processMathObject(o: { [x: string]: any }) {
   function remapSubgroupStuff(g: { val: any[] }) {
     if (_.isArray(g.val)) {
       g.val = g.val.map((x: { id: number }) => {
-        return { id: Number(x.id), val: x };
-      });
+        return { id: Number(x.id), val: x }
+      })
     } else {
       // Argument of type '(id: number) => { id: number; val: any; }'
       // is not assignable to parameter of type '(value: string, index: number, array: string[]) => { id: number; val: any; }'.
@@ -1283,10 +1285,10 @@ function processMathObject(o: { [x: string]: any }) {
       //         Type 'string' is not assignable to type 'number'.ts(2345)
       // @ts-ignore
       g.val = _.keys(g.val).map((id: number) => {
-        return { id: Number(id), val: g.val[id] };
-      });
+        return { id: Number(id), val: g.val[id] }
+      })
     }
-    return g;
+    return g
   }
 
   // Normalize so everything is arrays of objects (group-clusters is already in this format, but needs to have the val: subobject style too).
@@ -1294,43 +1296,43 @@ function processMathObject(o: { [x: string]: any }) {
   if (_.isArray(o["group-clusters"])) {
     // NOTE this is different since group-clusters is already an array.
     o["group-clusters"] = o["group-clusters"].map((g: { id: any }) => {
-      return { id: Number(g.id), val: g };
-    });
+      return { id: Number(g.id), val: g }
+    })
   }
 
   if (!_.isArray(o["repness"])) {
     o["repness"] = _.keys(o["repness"]).map((gid: string | number) => {
-      return { id: Number(gid), val: o["repness"][gid] };
-    });
+      return { id: Number(gid), val: o["repness"][gid] }
+    })
   }
   if (!_.isArray(o["group-votes"])) {
     o["group-votes"] = _.keys(o["group-votes"]).map((gid: string | number) => {
-      return { id: Number(gid), val: o["group-votes"][gid] };
-    });
+      return { id: Number(gid), val: o["group-votes"][gid] }
+    })
   }
   if (!_.isArray(o["subgroup-repness"])) {
     o["subgroup-repness"] = _.keys(o["subgroup-repness"]).map(
       (gid: string | number) => {
-        return { id: Number(gid), val: o["subgroup-repness"][gid] };
+        return { id: Number(gid), val: o["subgroup-repness"][gid] }
       },
-    );
-    o["subgroup-repness"].map(remapSubgroupStuff);
+    )
+    o["subgroup-repness"].map(remapSubgroupStuff)
   }
   if (!_.isArray(o["subgroup-votes"])) {
     o["subgroup-votes"] = _.keys(o["subgroup-votes"]).map(
       (gid: string | number) => {
-        return { id: Number(gid), val: o["subgroup-votes"][gid] };
+        return { id: Number(gid), val: o["subgroup-votes"][gid] }
       },
-    );
-    o["subgroup-votes"].map(remapSubgroupStuff);
+    )
+    o["subgroup-votes"].map(remapSubgroupStuff)
   }
   if (!_.isArray(o["subgroup-clusters"])) {
     o["subgroup-clusters"] = _.keys(o["subgroup-clusters"]).map(
       (gid: string | number) => {
-        return { id: Number(gid), val: o["subgroup-clusters"][gid] };
+        return { id: Number(gid), val: o["subgroup-clusters"][gid] }
       },
-    );
-    o["subgroup-clusters"].map(remapSubgroupStuff);
+    )
+    o["subgroup-clusters"].map(remapSubgroupStuff)
   }
 
   // Edge case where there are two groups and one is huge, split the large group.
@@ -1354,85 +1356,85 @@ function processMathObject(o: { [x: string]: any }) {
   // Un-normalize to maintain API consistency.
   // This could removed in a future API version.
   function toObj(a: string | any[]) {
-    let obj = {};
+    let obj = {}
     if (!a) {
-      return obj;
+      return obj
     }
     for (let i = 0; i < a.length; i++) {
       // Element implicitly has an 'any' type
       // because expression of type 'any' can't be used to index type '{ } '.ts(7053)
       // @ts-ignore
-      obj[a[i].id] = a[i].val;
+      obj[a[i].id] = a[i].val
       // Element implicitly has an 'any' type
       // because expression of type 'any' can't be used to index type '{ } '.ts(7053)
       // @ts-ignore
-      obj[a[i].id].id = a[i].id;
+      obj[a[i].id].id = a[i].id
     }
-    return obj;
+    return obj
   }
   function toArray(a: any[]) {
     if (!a) {
-      return [];
+      return []
     }
     return a.map((g: { id: any; val: any }) => {
-      let id = g.id;
-      g = g.val;
-      g.id = id;
-      return g;
-    });
+      let id = g.id
+      g = g.val
+      g.id = id
+      return g
+    })
   }
-  o["repness"] = toObj(o["repness"]);
-  o["group-votes"] = toObj(o["group-votes"]);
-  o["group-clusters"] = toArray(o["group-clusters"]);
+  o["repness"] = toObj(o["repness"])
+  o["group-votes"] = toObj(o["group-votes"])
+  o["group-clusters"] = toArray(o["group-clusters"])
 
-  delete o["subgroup-repness"];
-  delete o["subgroup-votes"];
-  delete o["subgroup-clusters"];
-  return o;
+  delete o["subgroup-repness"]
+  delete o["subgroup-votes"]
+  delete o["subgroup-clusters"]
+  return o
 }
 
 function getPca(
   zid?: any,
   math_tick?: number,
 ): Promise<PcaCacheValue | undefined> {
-  let cached = pcaCache.get(zid);
+  let cached = pcaCache.get(zid)
   // Object is of type 'unknown'.ts(2571)
   // @ts-ignore
   if (cached && cached.expiration < Date.now()) {
-    cached = undefined;
+    cached = undefined
   }
   // Object is of type 'unknown'.ts(2571)
   // @ts-ignore
-  let cachedPOJO = cached && cached.asPOJO;
+  let cachedPOJO = cached && cached.asPOJO
   if (cachedPOJO) {
     if (cachedPOJO.math_tick && cachedPOJO.math_tick <= (math_tick || 0)) {
       logger.info("math was cached but not new", {
         zid,
         cached_math_tick: cachedPOJO.math_tick,
         query_math_tick: math_tick,
-      });
-      return Promise.resolve(undefined);
+      })
+      return Promise.resolve(undefined)
     } else {
-      logger.info("math from cache", { zid, math_tick });
-      return Promise.resolve(cached);
+      logger.info("math from cache", { zid, math_tick })
+      return Promise.resolve(cached)
     }
   }
 
-  logger.info("mathpoll cache miss", { zid, math_tick });
+  logger.info("mathpoll cache miss", { zid, math_tick })
 
   // NOTE: not caching results from this query for now, think about this later.
   // not caching these means that conversations without new votes might not be cached. (closed conversations may be slower to load)
   // It's probably not difficult to cache, but keeping things simple for now, and only caching things that come down with the poll.
 
-  let queryStart = Date.now();
+  let queryStart = Date.now()
 
   return queryP_readOnly(
     "select * from math_main where zid = ($1) and math_env = ($2);",
     [zid, Config.mathEnv],
   ).then((rows: string | any[]) => {
-    let queryEnd = Date.now();
-    let queryDuration = queryEnd - queryStart;
-    addInRamMetric("pcaGetQuery", queryDuration);
+    let queryEnd = Date.now()
+    let queryDuration = queryEnd - queryStart
+    addInRamMetric("pcaGetQuery", queryDuration)
 
     if (!rows || !rows.length) {
       logger.info(
@@ -1442,56 +1444,56 @@ function getPca(
           math_tick,
           math_env: Config.mathEnv,
         },
-      );
-      return null;
+      )
+      return null
     }
-    let item = rows[0].data;
+    let item = rows[0].data
 
     if (rows[0].math_tick) {
-      item.math_tick = Number(rows[0].math_tick);
+      item.math_tick = Number(rows[0].math_tick)
     }
 
     if (item.math_tick <= (math_tick || 0)) {
       logger.info("after cache miss, unable to find newer item", {
         zid,
         math_tick,
-      });
-      return null;
+      })
+      return null
     }
     logger.info("after cache miss, found item, adding to cache", {
       zid,
       math_tick,
-    });
+    })
 
-    processMathObject(item);
+    processMathObject(item)
 
     return updatePcaCache(zid, item).then(
       function (o: any) {
-        return o;
+        return o
       },
       function (err: any) {
-        return err;
+        return err
       },
-    );
-  });
+    )
+  })
 }
 
 function updatePcaCache(zid: any, item: { zid: any }) {
   return new Promise(function (
     resolve: (arg0: {
-      asPOJO: any;
-      asJSON: string;
-      asBufferOfGzippedJson: any;
-      expiration: number;
+      asPOJO: any
+      asJSON: string
+      asBufferOfGzippedJson: any
+      expiration: number
     }) => void,
     reject: (arg0: any) => any,
   ) {
-    delete item.zid; // don't leak zid
-    let asJSON = JSON.stringify(item);
-    let buf = Buffer.from(asJSON, "utf-8");
+    delete item.zid // don't leak zid
+    let asJSON = JSON.stringify(item)
+    let buf = Buffer.from(asJSON, "utf-8")
     zlib.gzip(buf, function (err: any, jsondGzipdPcaBuffer: any) {
       if (err) {
-        return reject(err);
+        return reject(err)
       }
 
       let o = {
@@ -1499,74 +1501,76 @@ function updatePcaCache(zid: any, item: { zid: any }) {
         asJSON: asJSON,
         asBufferOfGzippedJson: jsondGzipdPcaBuffer,
         expiration: Date.now() + 3000,
-      };
+      }
       // save in LRU cache, but don't update the lastPrefetchedMathTick
-      pcaCache.set(zid, o);
-      resolve(o);
-    });
-  });
+      pcaCache.set(zid, o)
+      resolve(o)
+    })
+  })
 }
 function redirectIfHasZidButNoConversationId(
   req: { body: { zid: any; conversation_id: any }; headers?: any },
   res: {
-    writeHead: (arg0: number, arg1: { Location: string }) => void;
-    end: () => any;
+    writeHead: (arg0: number, arg1: { Location: string }) => void
+    end: () => any
   },
   next: () => any,
 ) {
   if (req.body.zid && !req.body.conversation_id) {
-    logger.info("redirecting old zid user to about page");
+    logger.info("redirecting old zid user to about page")
 
-    const path = "/about";
-    const protocol = req.headers["x-forwarded-proto"] || "http";
+    const path = "/about"
+    const protocol = req.headers["x-forwarded-proto"] || "http"
 
     res.writeHead(302, {
       Location: protocol + "://" + req?.headers?.host + path,
-    });
-    return res.end();
+    })
+    return res.end()
   }
-  return next();
+  return next()
 }
 
 function handle_GET_math_pca(req: Request, res: Response) {
   // migrated off this path, old clients were causing timeout issues by polling repeatedly without waiting for a result for a previous poll.
-  res.status(304).end();
+  res.status(304).end()
 }
 
 // Cache the knowledge of whether there are any pca results for a given zid.
 // Needed to determine whether to return a 404 or a 304.
 // zid -> boolean
-let pcaResultsExistForZid = {};
+let pcaResultsExistForZid = {}
 function handle_GET_math_pca2(
   req: { p: { zid: any; math_tick: any; ifNoneMatch: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      end: { (): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      end: { (): void; new (): any }
+    }
     set: (arg0: {
-      "Content-Type": string;
-      "Content-Encoding": string;
-      Etag: string;
-    }) => void;
-    send: (arg0: any) => void;
+      "Content-Type": string
+      "Content-Encoding": string
+      Etag: string
+    }) => void
+    send: (arg0: any) => void
   },
 ) {
-  let zid = req.p.zid;
-  let math_tick = req.p.math_tick;
+  let zid = req.p.zid
+  let math_tick = req.p.math_tick
 
-  let ifNoneMatch = req.p.ifNoneMatch;
+  let ifNoneMatch = req.p.ifNoneMatch
   if (ifNoneMatch) {
     if (!_.isUndefined(math_tick)) {
       return fail(
         res,
         400,
         "Expected either math_tick param or If-Not-Match header, but not both.",
-      );
+      )
     }
     if (ifNoneMatch.includes("*")) {
-      math_tick = 0;
+      math_tick = 0
     } else {
       let entries = ifNoneMatch.split(/ *, */).map((x: string) => {
         return Number(
@@ -1574,24 +1578,24 @@ function handle_GET_math_pca2(
             .replace(/^[wW]\//, "")
             .replace(/^"/, "")
             .replace(/"$/, ""),
-        );
-      });
-      math_tick = _.min(entries); // supporting multiple values for the ifNoneMatch header doesn't really make sense, so I've arbitrarily chosen _.min to decide on one.
+        )
+      })
+      math_tick = _.min(entries) // supporting multiple values for the ifNoneMatch header doesn't really make sense, so I've arbitrarily chosen _.min to decide on one.
     }
   } else if (_.isUndefined(math_tick)) {
-    math_tick = -1;
+    math_tick = -1
   }
   function finishWith304or404() {
     // Element implicitly has an 'any' type
     // because expression of type 'any' can't be used to index type '{ } '.ts(7053)
     // @ts-ignore
     if (pcaResultsExistForZid[zid]) {
-      res.status(304).end();
+      res.status(304).end()
     } else {
       // Technically, this should probably be a 404, but
       // the red errors make it hard to see other errors
       // in Chrome Developer Tools.
-      res.status(304).end();
+      res.status(304).end()
       // res.status(404).end();
     }
   }
@@ -1606,8 +1610,8 @@ function handle_GET_math_pca2(
           "Content-Type": "application/json",
           "Content-Encoding": "gzip",
           Etag: '"' + data.asPOJO.math_tick + '"',
-        });
-        res.send(data.asBufferOfGzippedJson);
+        })
+        res.send(data.asBufferOfGzippedJson)
       } else {
         // check whether we should return a 304 or a 404
         // Element implicitly has an 'any' type
@@ -1617,53 +1621,55 @@ function handle_GET_math_pca2(
           // This server doesn't know yet if there are any PCA results in the DB
           // So try querying from -1
           return getPca(zid, -1).then(function (data: any) {
-            let exists = !!data;
+            let exists = !!data
             // Element implicitly has an 'any' type
             // because expression of type 'any' can't be used to index type '{ } '.ts(7053)
             // @ts-ignore
-            pcaResultsExistForZid[zid] = exists;
-            finishWith304or404();
-          });
+            pcaResultsExistForZid[zid] = exists
+            finishWith304or404()
+          })
         } else {
-          finishWith304or404();
+          finishWith304or404()
         }
       }
     })
     .catch(function (err: any) {
-      fail(res, 500, err);
-    });
+      fail(res, 500, err)
+    })
 }
 
 function getZidForRid(rid: any) {
   return queryP("select zid from reports where rid = ($1);", [rid]).then(
     (row: string | any[]) => {
       if (!row || !row.length) {
-        return null;
+        return null
       }
-      return row[0].zid;
+      return row[0].zid
     },
-  );
+  )
 }
 
 function handle_GET_math_correlationMatrix(
   req: { p: { rid: any; math_tick: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { status: string }): void; new (): any };
-    };
-    json: (arg0: any) => void;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { status: string }): void; new (): any }
+    }
+    json: (arg0: any) => void
   },
 ) {
-  let rid = req.p.rid;
-  let math_env = Config.mathEnv;
-  let math_tick = req.p.math_tick;
+  let rid = req.p.rid
+  let math_env = Config.mathEnv
+  let math_tick = req.p.math_tick
 
   function finishAsPending() {
     res.status(202).json({
       status: "pending",
-    });
+    })
   }
 
   function hasCommentSelections() {
@@ -1671,8 +1677,8 @@ function handle_GET_math_correlationMatrix(
       "select * from report_comment_selections where rid = ($1) and selection = 1;",
       [rid],
     ).then((rows: string | any[]) => {
-      return rows.length > 0;
-    });
+      return rows.length > 0
+    })
   }
 
   let requestExistsPromise = queryP(
@@ -1682,20 +1688,20 @@ function handle_GET_math_correlationMatrix(
       "and (task_data->>'math_tick')::int >= ($3) " +
       "and finished_time is NULL;",
     [rid, math_env, math_tick],
-  );
+  )
 
   let resultExistsPromise = queryP(
     "select * from math_report_correlationmatrix where rid = ($1) and math_env = ($2) and math_tick >= ($3);",
     [rid, math_env, math_tick],
-  );
+  )
 
   Promise.all([resultExistsPromise, getZidForRid(rid)])
     .then((a: any[]) => {
-      let rows = a[0];
-      let zid = a[1];
+      let rows = a[0]
+      let zid = a[1]
       if (!rows || !rows.length) {
         return requestExistsPromise.then((requests_rows: string | any[]) => {
-          const shouldAddTask = !requests_rows || !requests_rows.length;
+          const shouldAddTask = !requests_rows || !requests_rows.length
           // const shouldAddTask = true;
 
           if (shouldAddTask) {
@@ -1703,7 +1709,7 @@ function handle_GET_math_correlationMatrix(
               if (!hasSelections) {
                 return res.status(202).json({
                   status: "polis_report_needs_comment_selection",
-                });
+                })
               }
               return queryP(
                 "insert into worker_tasks (task_type, task_data, task_bucket, math_env) values ('generate_report_data', $1, $2, $3);",
@@ -1716,17 +1722,17 @@ function handle_GET_math_correlationMatrix(
                   rid,
                   math_env,
                 ],
-              ).then(finishAsPending);
-            });
+              ).then(finishAsPending)
+            })
           }
-          finishAsPending();
-        });
+          finishAsPending()
+        })
       }
-      res.json(rows[0].data);
+      res.json(rows[0].data)
     })
     .catch((err: any) => {
-      return fail(res, 500, "polis_err_GET_math_correlationMatrix", err);
-    });
+      return fail(res, 500, "polis_err_GET_math_correlationMatrix", err)
+    })
 }
 
 function doAddDataExportTask(
@@ -1749,43 +1755,40 @@ function doAddDataExportTask(
       },
       task_bucket, // TODO hash the params to get a consistent number?
     ],
-  );
+  )
 }
 if (Config.runPeriodicExportTests && !devMode && Config.mathEnv === "preprod") {
   let runExportTest = () => {
-    let math_env = "prod";
-    let email = Config.adminEmailDataExportTest;
-    let zid = 12480;
-    let atDate = Date.now();
-    let format = "csv";
-    let task_bucket = Math.abs((Math.random() * 999999999999) >> 0);
+    let math_env = "prod"
+    let email = Config.adminEmailDataExportTest
+    let zid = 12480
+    let atDate = Date.now()
+    let format = "csv"
+    let task_bucket = Math.abs((Math.random() * 999999999999) >> 0)
     doAddDataExportTask(math_env, email, zid, atDate, format, task_bucket).then(
       () => {
-        setTimeout(
-          () => {
-            queryP(
-              "select * from worker_tasks where task_type = 'generate_export_data' and task_bucket = ($1);",
-              [task_bucket],
-            ).then((rows: string | any[]) => {
-              let ok = rows && rows.length;
-              let newOk;
-              if (ok) {
-                newOk = rows[0].finished_time > 0;
-              }
-              if (ok && newOk) {
-                logger.info("runExportTest success");
-              } else {
-                logger.error("runExportTest failed");
-                emailBadProblemTime("Math export didn't finish.");
-              }
-            });
-          },
-          10 * 60 * 1000,
-        ); // wait 10 minutes before verifying
+        setTimeout(() => {
+          queryP(
+            "select * from worker_tasks where task_type = 'generate_export_data' and task_bucket = ($1);",
+            [task_bucket],
+          ).then((rows: string | any[]) => {
+            let ok = rows && rows.length
+            let newOk
+            if (ok) {
+              newOk = rows[0].finished_time > 0
+            }
+            if (ok && newOk) {
+              logger.info("runExportTest success")
+            } else {
+              logger.error("runExportTest failed")
+              emailBadProblemTime("Math export didn't finish.")
+            }
+          })
+        }, 10 * 60 * 1000) // wait 10 minutes before verifying
       },
-    );
-  };
-  setInterval(runExportTest, 6 * 60 * 60 * 1000); // every 6 hours
+    )
+  }
+  setInterval(runExportTest, 6 * 60 * 60 * 1000) // every 6 hours
 }
 function handle_GET_dataExport(
   req: { params: { export?: string; format?: string }; p: { zid: any } },
@@ -1794,24 +1797,24 @@ function handle_GET_dataExport(
   // standard data export handler
   const dataExportHandler = (err: any, result: { rows: any }) => {
     if (err) {
-      return fail(res, 500, "polis_err_data_export123");
+      return fail(res, 500, "polis_err_data_export123")
     }
 
     if (result.rows.length === 0) {
-      return fail(res, 404, "No data");
+      return fail(res, 404, "No data")
     }
 
     if (req.params.export?.endsWith("csv")) {
-      const csv = parse(result.rows);
-      res.header("Content-Type", "text/csv");
-      res.attachment(req.params.export);
-      res.send(csv);
+      const csv = parse(result.rows)
+      res.header("Content-Type", "text/csv")
+      res.attachment(req.params.export)
+      res.send(csv)
     } else {
       res.status(200).json({
         data: result.rows,
-      });
+      })
     }
-  };
+  }
 
   // participants-votes.csv
   if (
@@ -1833,7 +1836,7 @@ function handle_GET_dataExport(
       order by participants.pid`,
       [req.p.zid],
       dataExportHandler,
-    );
+    )
   }
 
   // comments.csv
@@ -1856,7 +1859,7 @@ function handle_GET_dataExport(
         where comments.zid = ($1)`,
       [req.p.zid],
       dataExportHandler,
-    );
+    )
   }
 
   // votes.csv
@@ -1866,55 +1869,57 @@ function handle_GET_dataExport(
       from votes where zid = ($1)`,
       [req.p.zid],
       dataExportHandler,
-    );
+    )
   }
 
-  res.writeHead(404);
+  res.writeHead(404)
   res.json({
     status: 404,
-  });
-  return;
+  })
+  return
 }
 function getBidIndexToPidMapping(zid: number, math_tick: number) {
-  math_tick = math_tick || -1;
+  math_tick = math_tick || -1
   return queryP_readOnly(
     "select * from math_bidtopid where zid = ($1) and math_env = ($2);",
     [zid, Config.mathEnv],
   ).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
       // Could actually be a 404, would require more work to determine that.
-      return new Error("polis_err_get_pca_results_missing");
+      return new Error("polis_err_get_pca_results_missing")
     } else if (rows[0].data.math_tick <= math_tick) {
-      return new Error("polis_err_get_pca_results_not_new");
+      return new Error("polis_err_get_pca_results_not_new")
     } else {
-      return rows[0].data;
+      return rows[0].data
     }
-  });
+  })
 }
 function handle_GET_bidToPid(
   req: { p: { zid: any; math_tick: any } },
   res: {
-    json: (arg0: { bidToPid: any }) => void;
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      end: { (): void; new (): any };
-    };
+    json: (arg0: { bidToPid: any }) => void
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      end: { (): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let math_tick = req.p.math_tick;
+  let zid = req.p.zid
+  let math_tick = req.p.math_tick
   getBidIndexToPidMapping(zid, math_tick).then(
     function (doc: { bidToPid: any }) {
-      let b2p = doc.bidToPid;
+      let b2p = doc.bidToPid
       res.json({
         bidToPid: b2p,
-      });
+      })
     },
     function () {
-      res.status(304).end();
+      res.status(304).end()
     },
-  );
+  )
 }
 
 function getXids(zid: any) {
@@ -1931,68 +1936,72 @@ function getXids(zid: any) {
         [zid],
         function (err: any, result: { rows: any }) {
           if (err) {
-            reject("polis_err_fetching_xids");
-            return;
+            reject("polis_err_fetching_xids")
+            return
           }
-          resolve(result.rows);
+          resolve(result.rows)
         },
-      );
+      )
     }),
-  );
+  )
 }
 function handle_GET_xids(
   req: { p: { uid?: any; zid: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
+  let uid = req.p.uid
+  let zid = req.p.zid
 
   isOwner(zid, uid).then(
     function (owner: any) {
       if (owner) {
         getXids(zid).then(
           function (xids: any) {
-            res.status(200).json(xids);
+            res.status(200).json(xids)
           },
           function (err: any) {
-            fail(res, 500, "polis_err_get_xids", err);
+            fail(res, 500, "polis_err_get_xids", err)
           },
-        );
+        )
       } else {
-        fail(res, 403, "polis_err_get_xids_not_authorized");
+        fail(res, 403, "polis_err_get_xids_not_authorized")
       }
     },
     function (err: any) {
-      fail(res, 500, "polis_err_get_xids", err);
+      fail(res, 500, "polis_err_get_xids", err)
     },
-  );
+  )
 }
 function handle_POST_xidWhitelist(
   req: { p: { xid_whitelist: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  const xid_whitelist = req.p.xid_whitelist;
-  const len = xid_whitelist.length;
-  const owner = req.p.uid;
-  const entries = [];
+  const xid_whitelist = req.p.xid_whitelist
+  const len = xid_whitelist.length
+  const owner = req.p.uid
+  const entries = []
   try {
     for (let i = 0; i < len; i++) {
-      entries.push("(" + escapeLiteral(xid_whitelist[i]) + "," + owner + ")");
+      entries.push("(" + escapeLiteral(xid_whitelist[i]) + "," + owner + ")")
     }
   } catch (err) {
-    return fail(res, 400, "polis_err_bad_xid", err);
+    return fail(res, 400, "polis_err_bad_xid", err)
   }
 
   queryP(
@@ -2002,93 +2011,97 @@ function handle_POST_xidWhitelist(
     [],
   )
     .then(() => {
-      res.status(200).json({});
+      res.status(200).json({})
     })
     .catch((err: any) => {
-      return fail(res, 500, "polis_err_POST_xidWhitelist", err);
-    });
+      return fail(res, 500, "polis_err_POST_xidWhitelist", err)
+    })
 }
 
 function handle_GET_bid(
   req: { p: { uid?: any; zid: any; math_tick: any } },
   res: {
-    json: (arg0: { bid: any }) => void;
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      end: { (): void; new (): any };
-    };
+    json: (arg0: { bid: any }) => void
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      end: { (): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-  let math_tick = req.p.math_tick;
+  let uid = req.p.uid
+  let zid = req.p.zid
+  let math_tick = req.p.math_tick
 
-  let dataPromise = getBidIndexToPidMapping(zid, math_tick);
-  let pidPromise = getPidPromise(zid, uid);
-  let mathResultsPromise = getPca(zid, math_tick);
+  let dataPromise = getBidIndexToPidMapping(zid, math_tick)
+  let pidPromise = getPidPromise(zid, uid)
+  let mathResultsPromise = getPca(zid, math_tick)
 
   Promise.all([dataPromise, pidPromise, mathResultsPromise])
     .then(
       function (items: { asPOJO: any }[]) {
         // Property 'bidToPid' does not exist on type '{ asPOJO: any; }'.ts(2339)
         // @ts-ignore
-        let b2p = items[0].bidToPid || []; // not sure yet if "|| []" is right here.
-        let pid = items[1];
-        let mathResults = items[2].asPOJO;
-        if ((pid as unknown as number) < 0) {
+        let b2p = items[0].bidToPid || [] // not sure yet if "|| []" is right here.
+        let pid = items[1]
+        let mathResults = items[2].asPOJO
+        if (((pid as unknown) as number) < 0) {
           // NOTE: this API should not be called in /demo mode
-          fail(res, 500, "polis_err_get_bid_bad_pid");
-          return;
+          fail(res, 500, "polis_err_get_bid_bad_pid")
+          return
         }
 
-        let indexToBid = mathResults["base-clusters"].id;
+        let indexToBid = mathResults["base-clusters"].id
 
-        let yourBidi = -1;
+        let yourBidi = -1
         for (let bidi = 0; bidi < b2p.length; bidi++) {
-          let pids = b2p[bidi];
+          let pids = b2p[bidi]
           if (pids.indexOf(pid) !== -1) {
-            yourBidi = bidi;
-            break;
+            yourBidi = bidi
+            break
           }
         }
 
-        let yourBid = indexToBid[yourBidi];
+        let yourBid = indexToBid[yourBidi]
 
         if (yourBidi >= 0 && _.isUndefined(yourBid)) {
-          logger.error("polis_err_math_index_mapping_mismatch", { pid, b2p });
-          yourBid = -1;
+          logger.error("polis_err_math_index_mapping_mismatch", { pid, b2p })
+          yourBid = -1
         }
 
         res.json({
           bid: yourBid, // The user's current bid
-        });
+        })
       },
       function () {
-        res.status(304).end();
+        res.status(304).end()
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_bid_misc", err);
-    });
+      fail(res, 500, "polis_err_get_bid_misc", err)
+    })
 }
 
 function handle_POST_auth_password(
   req: { p: { pwresettoken: any; newPassword: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: string): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: string): void; new (): any }
+    }
   },
 ) {
-  let pwresettoken = req.p.pwresettoken;
-  let newPassword = req.p.newPassword;
+  let pwresettoken = req.p.pwresettoken
+  let newPassword = req.p.newPassword
 
   getUidForPwResetToken(pwresettoken)
     .then((userParams: { uid: any }) => {
-      let uid = Number(userParams.uid);
+      let uid = Number(userParams.uid)
       generateHashedPassword(
         newPassword,
         function (err: any, hashedPassword: any) {
@@ -2099,19 +2112,19 @@ function handle_POST_auth_password(
             [uid, hashedPassword],
           ).then(
             () => {
-              res.status(200).json("Password reset successful.");
+              res.status(200).json("Password reset successful.")
               clearPwResetToken(pwresettoken, function (err: any) {
                 if (err) {
-                  logger.error("polis_err_auth_pwresettoken_clear_fail", err);
+                  logger.error("polis_err_auth_pwresettoken_clear_fail", err)
                 }
-              });
+              })
             },
             (err: any) => {
-              fail(res, 500, "Couldn't reset password.", err);
+              fail(res, 500, "Couldn't reset password.", err)
             },
-          );
+          )
         },
-      );
+      )
     })
     .catch((err) => {
       fail(
@@ -2119,52 +2132,54 @@ function handle_POST_auth_password(
         500,
         "Password Reset failed. Couldn't find matching pwresettoken.",
         err,
-      );
-    });
+      )
+    })
 }
 
-const getServerNameWithProtocol = Config.getServerNameWithProtocol;
+const getServerNameWithProtocol = Config.getServerNameWithProtocol
 
 async function handle_POST_auth_pwresettoken(
   req: { p: { email: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: string): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: string): void; new (): any }
+    }
   },
 ) {
-  let email = req.p.email;
+  let email = req.p.email
 
-  let server = getServerNameWithProtocol(req);
+  let server = getServerNameWithProtocol(req)
 
   // let's clear the cookies here, in case something is borked.
-  clearCookies(req, res);
+  clearCookies(req, res)
 
   function finish() {
-    res.status(200).json("Password reset email sent, please check your email.");
+    res.status(200).json("Password reset email sent, please check your email.")
   }
 
-  let uid;
+  let uid
   try {
-    uid = await getUidByEmail(email);
+    uid = await getUidByEmail(email)
   } catch (err) {
-    sendPasswordResetEmailFailure(email, server);
-    finish();
-    return;
+    sendPasswordResetEmailFailure(email, server)
+    finish()
+    return
   }
 
-  const pwresettoken = await setupPwReset(uid);
+  const pwresettoken = await setupPwReset(uid)
   try {
     // TODO: make this async
-    await sendPasswordResetEmail(uid, pwresettoken, server);
+    await sendPasswordResetEmail(uid, pwresettoken, server)
   } catch (err) {
-    fail(res, 500, "Error: Couldn't send password reset email.", err);
-    return;
+    fail(res, 500, "Error: Couldn't send password reset email.", err)
+    return
   }
 
-  finish();
+  finish()
 }
 
 function sendPasswordResetEmailFailure(email: any, server: any) {
@@ -2174,35 +2189,35 @@ You may have used another email address to create your account.
 
 If you need to create a new account, you can do that here ${server}/
 
-Feel free to reply to this email if you need help.`;
+Feel free to reply to this email if you need help.`
 
-  return sendTextEmail(polisFromAddress, email, "Password Reset Failed", body);
+  return sendTextEmail(polisFromAddress, email, "Password Reset Failed", body)
 }
 
 function getUidByEmail(email: string) {
-  email = email.toLowerCase();
+  email = email.toLowerCase()
   return queryP_readOnly("SELECT uid FROM users where LOWER(email) = ($1);", [
     email,
   ]).then(function (rows: string | any[]) {
     if (!rows || !rows.length) {
-      throw new Error("polis_err_no_user_matching_email");
+      throw new Error("polis_err_no_user_matching_email")
     }
-    return rows[0].uid;
-  });
+    return rows[0].uid
+  })
 }
 
 function clearCookie(
   req: { [key: string]: any; headers?: { origin: string } },
   res: {
-    [key: string]: any;
-    clearCookie?: (arg0: any, arg1: { path: string; domain?: string }) => void;
+    [key: string]: any
+    clearCookie?: (arg0: any, arg1: { path: string; domain?: string }) => void
   },
   cookieName: any,
 ) {
   res?.clearCookie?.(cookieName, {
     path: "/",
     domain: cookieDomain(req),
-  });
+  })
 }
 
 function clearCookies(
@@ -2211,14 +2226,14 @@ function clearCookies(
     clearCookie?: (
       arg0: string,
       arg1: { path: string; domain?: string },
-    ) => void;
-    status?: (arg0: number) => void;
-    _headers?: { [x: string]: any };
-    redirect?: (arg0: string) => void;
-    set?: (arg0: { "Content-Type": string }) => void;
+    ) => void
+    status?: (arg0: number) => void
+    _headers?: { [x: string]: any }
+    redirect?: (arg0: string) => void
+    set?: (arg0: { "Content-Type": string }) => void
   },
 ) {
-  let cookieName;
+  let cookieName
   for (cookieName in req.cookies) {
     // Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ e: boolean; token2: boolean; uid2: boolean; uc: boolean; plan: boolean; referrer: boolean; parent_url: boolean; }'.
     // No index signature with a parameter of type 'string' was found on type '{ e: boolean; token2: boolean; uid2: boolean; uc: boolean; plan: boolean; referrer: boolean; parent_url: boolean; }'.ts(7053)
@@ -2227,13 +2242,13 @@ function clearCookies(
       res?.clearCookie?.(cookieName, {
         path: "/",
         domain: cookieDomain(req),
-      });
+      })
     }
   }
   logger.info(
     "after clear res set-cookie: " +
       JSON.stringify(res?._headers?.["set-cookie"]),
-  );
+  )
 }
 function doCookieAuth(
   assigner: (arg0: any, arg1: string, arg2: number) => void,
@@ -2242,130 +2257,134 @@ function doCookieAuth(
   res: { status: (arg0: number) => void },
   next: { (err: any): void; (arg0?: string): void },
 ) {
-  let token = req.cookies[COOKIES.TOKEN];
+  let token = req.cookies[COOKIES.TOKEN]
 
   //if (req.body.uid) { next(401); return; } // shouldn't be in the post - TODO - see if we can do the auth in parallel for non-destructive operations
   getUserInfoForSessionToken(token)
     .then((uid) => {
       if (req.body.uid && req.body.uid !== uid) {
-        res.status(401);
-        next("polis_err_auth_mismatch_uid");
-        return;
+        res.status(401)
+        next("polis_err_auth_mismatch_uid")
+        return
       }
-      assigner(req, "uid", Number(uid));
-      next();
+      assigner(req, "uid", Number(uid))
+      next()
     })
     .catch(() => {
-      clearCookies(req, res); // TODO_MULTI_DATACENTER_CONSIDERATION
+      clearCookies(req, res) // TODO_MULTI_DATACENTER_CONSIDERATION
       if (isOptional) {
-        next();
+        next()
       } else {
-        res.status(403);
-        next("polis_err_auth_no_such_token");
+        res.status(403)
+        next("polis_err_auth_no_such_token")
       }
-      return;
-    });
+      return
+    })
 }
 async function handle_POST_auth_deregister(
   req: { p: { showPage?: any }; cookies: { [x: string]: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      end: { (): void; new (): any };
-      send: { (arg0: string): void; new (): any };
-    };
-    set: (arg0: { "Content-Type": string }) => void;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      end: { (): void; new (): any }
+      send: { (arg0: string): void; new (): any }
+    }
+    set: (arg0: { "Content-Type": string }) => void
   },
 ) {
-  req.p = req.p || {};
-  let token = req.cookies[COOKIES.TOKEN];
+  req.p = req.p || {}
+  let token = req.cookies[COOKIES.TOKEN]
 
   // clear cookies regardless of auth status
-  clearCookies(req, res);
+  clearCookies(req, res)
 
   function finish() {
     if (!req.p.showPage) {
-      res.status(200).end();
+      res.status(200).end()
     }
   }
   if (!token) {
     // nothing to do
-    return finish();
+    return finish()
   }
 
   try {
-    await endSession(token);
-    finish();
+    await endSession(token)
+    finish()
   } catch (err) {
-    fail(res, 500, "couldn't end session", err);
-    return;
+    fail(res, 500, "couldn't end session", err)
+    return
   }
 }
 
 function hashStringToInt32(s: string) {
-  let h = 1;
+  let h = 1
   if (typeof s !== "string" || !s.length) {
-    return 99;
+    return 99
   }
   for (let i = 0; i < s.length; i++) {
-    h = h * s.charCodeAt(i) * 31;
+    h = h * s.charCodeAt(i) * 31
   }
   if (h < 0) {
-    h = -h;
+    h = -h
   }
   // fit in 32 bit signed
   while (h > 2147483648) {
-    h = h / 2;
+    h = h / 2
   }
-  return h;
+  return h
 }
 
 function handle_POST_metrics(
   req: {
-    cookies: { [x: string]: any };
+    cookies: { [x: string]: any }
     p: {
-      uid: null;
-      durs: any[];
-      clientTimestamp: any;
-      times: any[];
-      types: any[];
-    };
+      uid: null
+      durs: any[]
+      clientTimestamp: any
+      times: any[]
+      types: any[]
+    }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): any; new (): any };
-    };
-    json: (arg0: any) => void;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): any; new (): any }
+    }
+    json: (arg0: any) => void
   },
 ) {
-  const enabled = false;
+  const enabled = false
   if (!enabled) {
-    return res.status(200).json({});
+    return res.status(200).json({})
   }
 
-  const pc = req.cookies[COOKIES.PERMANENT_COOKIE];
-  const hashedPc = hashStringToInt32(pc);
+  const pc = req.cookies[COOKIES.PERMANENT_COOKIE]
+  const hashedPc = hashStringToInt32(pc)
 
-  const uid = req.p.uid || null;
+  const uid = req.p.uid || null
   const durs = req.p.durs.map(function (dur: number | null) {
     if (dur === -1) {
-      dur = null;
+      dur = null
     }
-    return dur;
-  });
-  const clientTimestamp = req.p.clientTimestamp;
+    return dur
+  })
+  const clientTimestamp = req.p.clientTimestamp
   const ages = req.p.times.map(function (t: number) {
-    return clientTimestamp - t;
-  });
-  const now = Date.now();
+    return clientTimestamp - t
+  })
+  const now = Date.now()
   const timesInTermsOfServerTime = ages.map(function (a: number) {
-    return now - a;
-  });
-  const len = timesInTermsOfServerTime.length;
-  const entries = [];
+    return now - a
+  })
+  const len = timesInTermsOfServerTime.length
+  const entries = []
   for (let i = 0; i < len; i++) {
     entries.push(
       "(" +
@@ -2377,7 +2396,7 @@ function handle_POST_metrics(
           timesInTermsOfServerTime[i],
         ].join(",") +
         ")",
-    );
+    )
   }
 
   queryP(
@@ -2387,23 +2406,25 @@ function handle_POST_metrics(
     [],
   )
     .then(function () {
-      res.json({});
+      res.json({})
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_metrics_post", err);
-    });
+      fail(res, 500, "polis_err_metrics_post", err)
+    })
 }
 
 function handle_GET_zinvites(
   req: { p: { zid: any; uid?: any } },
   res: {
-    writeHead: (arg0: number) => void;
-    json: (arg0: { status: number }) => void;
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { codes: any }): void; new (): any };
-    };
+    writeHead: (arg0: number) => void
+    json: (arg0: { status: number }) => void
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { codes: any }): void; new (): any }
+    }
   },
 ) {
   // if uid is not conversation owner, fail
@@ -2417,15 +2438,15 @@ function handle_GET_zinvites(
           500,
           "polis_err_fetching_zinvite_invalid_conversation_or_owner",
           err,
-        );
-        return;
+        )
+        return
       }
       if (!results || !results.rows) {
-        res.writeHead(404);
+        res.writeHead(404)
         res.json({
           status: 404,
-        });
-        return;
+        })
+        return
       }
       query_readOnly(
         "SELECT * FROM zinvites WHERE zid = ($1);",
@@ -2437,28 +2458,28 @@ function handle_GET_zinvites(
               500,
               "polis_err_fetching_zinvite_invalid_conversation_or_owner_or_something",
               err,
-            );
-            return;
+            )
+            return
           }
           if (!results || !results.rows) {
-            res.writeHead(404);
+            res.writeHead(404)
             res.json({
               status: 404,
-            });
-            return;
+            })
+            return
           }
           res.status(200).json({
             codes: results.rows, // _.pluck(results.rows[0],"code");
-          });
+          })
         },
-      );
+      )
     },
-  );
+  )
 }
 
 function generateConversationURLPrefix() {
   // not 1 or 0 since they look like "l" and "O"
-  return "" + _.random(2, 9);
+  return "" + _.random(2, 9)
 }
 
 function generateSUZinvites(numTokens: number) {
@@ -2471,68 +2492,70 @@ function generateSUZinvites(numTokens: number) {
       true, // For now, pseodorandom bytes are probably ok. Anticipating API call will generate lots of these at once, possibly draining the entropy pool. Revisit this if the otzinvites really need to be unguessable.
       function (err: any, longStringOfTokens?: string) {
         if (err) {
-          reject(new Error("polis_err_creating_otzinvite"));
-          return;
+          reject(new Error("polis_err_creating_otzinvite"))
+          return
         }
-        let otzinviteArrayRegexMatch = longStringOfTokens?.match(/.{1,31}/g);
-        let otzinviteArray = otzinviteArrayRegexMatch?.slice(0, numTokens); // Base64 encoding expands to extra characters, so trim to the number of tokens we want.
+        let otzinviteArrayRegexMatch = longStringOfTokens?.match(/.{1,31}/g)
+        let otzinviteArray = otzinviteArrayRegexMatch?.slice(0, numTokens) // Base64 encoding expands to extra characters, so trim to the number of tokens we want.
         otzinviteArray = otzinviteArray?.map(function (suzinvite: string) {
-          return generateConversationURLPrefix() + suzinvite;
-        });
-        resolve(otzinviteArray);
+          return generateConversationURLPrefix() + suzinvite
+        })
+        resolve(otzinviteArray)
       },
-    );
-  });
+    )
+  })
 }
 
 async function handle_POST_zinvites(
   req: { p: { short_url: any; zid: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { zinvite: any }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { zinvite: any }): void; new (): any }
+    }
   },
 ) {
-  let generateShortUrl = req.p.short_url;
+  let generateShortUrl = req.p.short_url
 
   try {
     await queryP(
       "SELECT * FROM conversations WHERE zid = ($1) AND owner = ($2);",
       [req.p.zid, req.p.uid],
-    );
+    )
   } catch (err) {
     fail(
       res,
       500,
       "polis_err_creating_zinvite_invalid_conversation_or_owner",
       err,
-    );
-    return;
+    )
+    return
   }
 
-  let zinvite;
+  let zinvite
   try {
-    zinvite = await generateAndRegisterZinvite(req.p.zid, generateShortUrl);
+    zinvite = await generateAndRegisterZinvite(req.p.zid, generateShortUrl)
   } catch (err) {
-    fail(res, 500, "polis_err_creating_zinvite", err);
-    return;
+    fail(res, 500, "polis_err_creating_zinvite", err)
+    return
   }
 
   res.status(200).json({
     zinvite: zinvite,
-  });
+  })
 }
 
 function checkZinviteCodeValidity(
   zid: any,
   zinvite: any,
   callback: {
-    (err: any, foo: any): void;
-    (err: any, foo: any): void;
-    (err: any): void;
-    (arg0: number | null): void;
+    (err: any, foo: any): void
+    (err: any, foo: any): void
+    (err: any): void
+    (arg0: number | null): void
   },
 ) {
   query_readOnly(
@@ -2540,71 +2563,71 @@ function checkZinviteCodeValidity(
     [zid, zinvite],
     function (err: any, results: { rows: string | any[] }) {
       if (err || !results || !results.rows || !results.rows.length) {
-        callback(1);
+        callback(1)
       } else {
-        callback(null); // ok
+        callback(null) // ok
       }
     },
-  );
+  )
 }
 
 let zidToConversationIdCache = new LruCache({
   max: 1000,
-});
+})
 
 function getZinvite(zid: any, dontUseCache?: boolean) {
-  let cachedConversationId = zidToConversationIdCache.get(zid);
+  let cachedConversationId = zidToConversationIdCache.get(zid)
   if (!dontUseCache && cachedConversationId) {
-    return Promise.resolve(cachedConversationId);
+    return Promise.resolve(cachedConversationId)
   }
   return queryP_metered(
     "getZinvite",
     "select * from zinvites where zid = ($1);",
     [zid],
   ).then(function (rows: any) {
-    let conversation_id = (rows && rows[0] && rows[0].zinvite) || void 0;
+    let conversation_id = (rows && rows[0] && rows[0].zinvite) || void 0
     if (conversation_id) {
-      zidToConversationIdCache.set(zid, conversation_id);
+      zidToConversationIdCache.set(zid, conversation_id)
     }
-    return conversation_id;
-  });
+    return conversation_id
+  })
 }
 
 function getZinvites(zids: any[]) {
   if (!zids.length) {
-    return Promise.resolve(zids);
+    return Promise.resolve(zids)
   }
   zids = _.map(zids, function (zid: any) {
-    return Number(zid); // just in case
-  });
-  zids = _.uniq(zids);
+    return Number(zid) // just in case
+  })
+  zids = _.uniq(zids)
 
   let uncachedZids = zids.filter(function (zid: any) {
-    return !zidToConversationIdCache.get(zid);
-  });
+    return !zidToConversationIdCache.get(zid)
+  })
   let zidsWithCachedConversationIds = zids
     .filter(function (zid: any) {
-      return !!zidToConversationIdCache.get(zid);
+      return !!zidToConversationIdCache.get(zid)
     })
     .map(function (zid: any) {
       return {
         zid: zid,
         zinvite: zidToConversationIdCache.get(zid),
-      };
-    });
+      }
+    })
 
   function makeZidToConversationIdMap(arrays: any[]) {
-    let zid2conversation_id = {};
+    let zid2conversation_id = {}
     arrays.forEach(function (a: any[]) {
       a.forEach(function (o: { zid: string | number; zinvite: any }) {
         // (property) zid: string | number
         // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
         //           No index signature with a parameter of type 'string' was found onpe '{}'.ts(7053)
         // @ts-ignore
-        zid2conversation_id[o.zid] = o.zinvite;
-      });
-    });
-    return zid2conversation_id;
+        zid2conversation_id[o.zid] = o.zinvite
+      })
+    })
+    return zid2conversation_id
   }
 
   return meteredPromise(
@@ -2614,27 +2637,27 @@ function getZinvites(zids: any[]) {
       reject: (arg0: any) => void,
     ) {
       if (uncachedZids.length === 0) {
-        resolve(makeZidToConversationIdMap([zidsWithCachedConversationIds]));
-        return;
+        resolve(makeZidToConversationIdMap([zidsWithCachedConversationIds]))
+        return
       }
       query_readOnly(
         "select * from zinvites where zid in (" + uncachedZids.join(",") + ");",
         [],
         function (err: any, result: { rows: any }) {
           if (err) {
-            reject(err);
+            reject(err)
           } else {
             resolve(
               makeZidToConversationIdMap([
                 result.rows,
                 zidsWithCachedConversationIds,
               ]),
-            );
+            )
           }
         },
-      );
+      )
     }),
-  );
+  )
 }
 
 function addConversationId(
@@ -2643,32 +2666,32 @@ function addConversationId(
 ) {
   if (!o.zid) {
     // if no zid, resolve without fetching zinvite.
-    return Promise.resolve(o);
+    return Promise.resolve(o)
   }
   return getZinvite(o.zid, dontUseCache).then(function (conversation_id: any) {
-    o.conversation_id = conversation_id;
-    return o;
-  });
+    o.conversation_id = conversation_id
+    return o
+  })
 }
 
 function addConversationIds(a: any[]) {
-  let zids = [];
+  let zids = []
   for (let i = 0; i < a.length; i++) {
     if (a[i].zid) {
-      zids.push(a[i].zid);
+      zids.push(a[i].zid)
     }
   }
   if (!zids.length) {
-    return Promise.resolve(a);
+    return Promise.resolve(a)
   }
   return getZinvites(zids).then(function (zid2conversation_id: {
-    [x: string]: any;
+    [x: string]: any
   }) {
     return a.map(function (o: { conversation_id: any; zid: string | number }) {
-      o.conversation_id = zid2conversation_id[o.zid];
-      return o;
-    });
-  });
+      o.conversation_id = zid2conversation_id[o.zid]
+      return o
+    })
+  })
 }
 
 function finishOne(
@@ -2682,27 +2705,29 @@ function finishOne(
       function (item: any) {
         // ensure we don't expose zid
         if (item.zid) {
-          delete item.zid;
+          delete item.zid
         }
-        let statusCode = altStatusCode || 200;
-        res.status(statusCode).json(item);
+        let statusCode = altStatusCode || 200
+        res.status(statusCode).json(item)
       },
       function (err: any) {
-        fail(res, 500, "polis_err_finishing_responseA", err);
+        fail(res, 500, "polis_err_finishing_responseA", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_finishing_response", err);
-    });
+      fail(res, 500, "polis_err_finishing_response", err)
+    })
 }
 
 function finishArray(
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
   a: any,
 ) {
@@ -2713,46 +2738,46 @@ function finishArray(
         if (items) {
           for (let i = 0; i < items.length; i++) {
             if (items[i].zid) {
-              delete items[i].zid;
+              delete items[i].zid
             }
           }
         }
-        res.status(200).json(items);
+        res.status(200).json(items)
       },
       function (err: any) {
-        fail(res, 500, "polis_err_finishing_response2A", err);
+        fail(res, 500, "polis_err_finishing_response2A", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_finishing_response2", err);
-    });
+      fail(res, 500, "polis_err_finishing_response2", err)
+    })
 }
 
 async function checkSuzinviteCodeValidity(zid: any, suzinvite: any) {
   return await queryP(
     "SELECT * FROM suzinvites WHERE zid = ($1) AND suzinvite = ($2);",
     [zid, suzinvite],
-  );
+  )
 }
 
 async function getSUZinviteInfo(suzinvite: any) {
   const results = await queryP(
     "SELECT * FROM suzinvites WHERE suzinvite = ($1);",
     [suzinvite],
-  );
+  )
 
   if (!results || !results.length) {
-    throw new Error("polis_err_no_matching_suzinvite");
+    throw new Error("polis_err_no_matching_suzinvite")
   }
 
-  return results[0];
+  return results[0]
 }
 
 async function deleteSuzinvite(suzinvite: any) {
   try {
-    await queryP("DELETE FROM suzinvites WHERE suzinvite = ($1);", [suzinvite]);
+    await queryP("DELETE FROM suzinvites WHERE suzinvite = ($1);", [suzinvite])
   } catch (err) {
-    logger.error("polis_err_removing_suzinvite", err);
+    logger.error("polis_err_removing_suzinvite", err)
   }
 }
 
@@ -2761,8 +2786,8 @@ function xidExists(xid: any, owner: any, uid?: any) {
     "select * from xids where xid = ($1) and owner = ($2) and uid = ($3);",
     [xid, owner, uid],
   ).then(function (rows: string | any[]) {
-    return rows && rows.length;
-  });
+    return rows && rows.length
+  })
 }
 
 async function createXidEntry(xid: any, owner: any, uid?: any) {
@@ -2771,10 +2796,10 @@ async function createXidEntry(xid: any, owner: any, uid?: any) {
       uid,
       owner,
       xid,
-    ]);
+    ])
   } catch (err) {
-    logger.error("polis_err_adding_xid_entry", err);
-    throw new Error("polis_err_adding_xid_entry");
+    logger.error("polis_err_adding_xid_entry", err)
+    throw new Error("polis_err_adding_xid_entry")
   }
 }
 
@@ -2786,38 +2811,38 @@ async function saveParticipantMetadataChoices(
   // answers is a list of pmaid
   if (!answers || !answers.length) {
     // nothing to save
-    return 0;
+    return 0
   }
 
   let q =
     "select * from participant_metadata_answers where zid = ($1) and pmaid in (" +
     answers.join(",") +
-    ");";
+    ");"
 
-  let qa_results;
+  let qa_results
   try {
-    qa_results = await queryP(q, [zid]);
+    qa_results = await queryP(q, [zid])
   } catch (err) {
-    logger.error("polis_err_getting_participant_metadata_answers", err);
-    return;
+    logger.error("polis_err_getting_participant_metadata_answers", err)
+    return
   }
 
-  const qa_resultsIndexed = _.indexBy(qa_results, "pmaid");
+  const qa_resultsIndexed = _.indexBy(qa_results, "pmaid")
   // construct an array of params arrays
   answers = answers.map(function (pmaid: string | number) {
-    let pmqid = qa_resultsIndexed[pmaid].pmqid;
-    return [zid, pid, pmaid, pmqid];
-  });
+    let pmqid = qa_resultsIndexed[pmaid].pmqid
+    return [zid, pid, pmaid, pmqid]
+  })
 
   for (const answer of answers) {
     try {
       await queryP(
         "INSERT INTO participant_metadata_choices (zid, pid, pmaid, pmqid) VALUES ($1,$2,$3,$4);",
         answer,
-      );
+      )
     } catch (err) {
-      logger.error("polis_err_saving_participant_metadata_choices", err);
-      throw err;
+      logger.error("polis_err_saving_participant_metadata_choices", err)
+      throw err
     }
   }
 }
@@ -2826,24 +2851,24 @@ function updateLastInteractionTimeForConversation(zid: any, uid?: any) {
   return queryP(
     "update participants set last_interaction = now_as_millis(), nsli = 0 where zid = ($1) and uid = ($2);",
     [zid, uid],
-  );
+  )
 }
 function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
-  const userId = Config.maxmindUserID;
-  const licenseKey = Config.maxmindLicenseKey;
+  const userId = Config.maxmindUserID
+  const licenseKey = Config.maxmindLicenseKey
 
-  let url = "https://geoip.maxmind.com/geoip/v2.1/city/";
+  let url = "https://geoip.maxmind.com/geoip/v2.1/city/"
   let contentType =
-    "application/vnd.maxmind.com-city+json; charset=UTF-8; version=2.1";
+    "application/vnd.maxmind.com-city+json; charset=UTF-8; version=2.1"
 
   // "city" is     $0.0004 per query
   // "insights" is $0.002  per query
-  const insights = false;
+  const insights = false
 
   if (insights) {
-    url = "https://geoip.maxmind.com/geoip/v2.1/insights/";
+    url = "https://geoip.maxmind.com/geoip/v2.1/insights/"
     contentType =
-      "application/vnd.maxmind.com-insights+json; charset=UTF-8; version=2.1";
+      "application/vnd.maxmind.com-insights+json; charset=UTF-8; version=2.1"
   }
   //   No overload matches this call.
   // Overload 1 of 3, '(uri: string, options?: RequestPromiseOptions | undefined, callback?: RequestCallback | undefined): RequestPromise<any>', gave the following error.
@@ -2866,8 +2891,8 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
       },
     })
     .then(function (response: string) {
-      const parsedResponse = JSON.parse(response);
-      logger.debug("maxmind response", parsedResponse);
+      const parsedResponse = JSON.parse(response)
+      logger.debug("maxmind response", parsedResponse)
 
       return queryP(
         "update participants_extended set modified=now_as_millis(), country_iso_code=($4), encrypted_maxmind_response_city=($3), " +
@@ -2884,27 +2909,27 @@ function populateGeoIpInfo(zid: any, uid?: any, ipAddress?: string | null) {
           parsedResponse.location.latitude,
           parsedResponse.location.longitude,
         ],
-      );
-    });
+      )
+    })
 }
 
 function addExtendedParticipantInfo(zid: any, uid?: any, data?: any) {
   if (!data || !_.keys(data).length) {
-    return Promise.resolve();
+    return Promise.resolve()
   }
 
   let params = Object.assign({}, data, {
     zid: zid,
     uid: uid,
     modified: 9876543212345, // hacky string, will be replaced with the word "default".
-  });
+  })
   let qUpdate = sql_participants_extended
     .update(params)
     .where(sql_participants_extended.zid.equals(zid))
-    .and(sql_participants_extended.uid.equals(uid));
-  let qString = qUpdate.toString();
-  qString = qString.replace("9876543212345", "now_as_millis()");
-  return queryP(qString, []);
+    .and(sql_participants_extended.uid.equals(uid))
+  let qString = qUpdate.toString()
+  qString = qString.replace("9876543212345", "now_as_millis()")
+  return queryP(qString, [])
 }
 
 function tryToJoinConversation(
@@ -2915,72 +2940,72 @@ function tryToJoinConversation(
 ) {
   function doAddExtendedParticipantInfo() {
     if (info && _.keys(info).length > 0) {
-      addExtendedParticipantInfo(zid, uid, info);
+      addExtendedParticipantInfo(zid, uid, info)
     }
   }
 
   function saveMetadataChoices(pid?: number) {
     if (pmaid_answers && pmaid_answers.length) {
-      saveParticipantMetadataChoices(zid, pid, pmaid_answers);
+      saveParticipantMetadataChoices(zid, pid, pmaid_answers)
     }
   }
 
   return addParticipant(zid, uid).then(function (rows: any[]) {
-    let ptpt = rows[0];
+    let ptpt = rows[0]
 
-    doAddExtendedParticipantInfo();
+    doAddExtendedParticipantInfo()
 
     if (pmaid_answers && pmaid_answers.length) {
-      saveMetadataChoices();
+      saveMetadataChoices()
     }
-    return ptpt;
-  });
+    return ptpt
+  })
 }
 
 function addParticipantAndMetadata(
   zid: any,
   uid?: any,
   req?: {
-    cookies: { [x: string]: any };
-    p: { parent_url: any };
-    headers?: { [x: string]: any };
+    cookies: { [x: string]: any }
+    p: { parent_url: any }
+    headers?: { [x: string]: any }
   },
   permanent_cookie?: any,
 ) {
-  let info: { [key: string]: string } = {};
-  let parent_url = req?.cookies?.[COOKIES.PARENT_URL] || req?.p?.parent_url;
+  let info: { [key: string]: string } = {}
+  let parent_url = req?.cookies?.[COOKIES.PARENT_URL] || req?.p?.parent_url
   let referer =
     req?.cookies[COOKIES.PARENT_REFERRER] ||
     req?.headers?.["referer"] ||
-    req?.headers?.["referrer"];
+    req?.headers?.["referrer"]
   if (parent_url) {
-    info.parent_url = parent_url;
+    info.parent_url = parent_url
   }
   if (referer) {
-    info.referrer = referer;
+    info.referrer = referer
   }
-  let x_forwarded_for = req?.headers?.["x-forwarded-for"];
-  let ip: string | null = null;
+  let x_forwarded_for = req?.headers?.["x-forwarded-for"]
+  let ip: string | null = null
   if (x_forwarded_for) {
-    let ips = x_forwarded_for;
-    ips = ips && ips.split(", ");
-    ip = ips.length && ips[0];
-    info.encrypted_ip_address = encrypt(ip);
-    info.encrypted_x_forwarded_for = encrypt(x_forwarded_for);
+    let ips = x_forwarded_for
+    ips = ips && ips.split(", ")
+    ip = ips.length && ips[0]
+    info.encrypted_ip_address = encrypt(ip)
+    info.encrypted_x_forwarded_for = encrypt(x_forwarded_for)
   }
   if (permanent_cookie) {
-    info.permanent_cookie = permanent_cookie;
+    info.permanent_cookie = permanent_cookie
   }
   if (req?.headers?.["origin"]) {
-    info.origin = req?.headers?.["origin"];
+    info.origin = req?.headers?.["origin"]
   }
   return addParticipant(zid, uid).then((rows: any[]) => {
-    addExtendedParticipantInfo(zid, uid, info);
+    addExtendedParticipantInfo(zid, uid, info)
     if (ip) {
-      populateGeoIpInfo(zid, uid, ip);
+      populateGeoIpInfo(zid, uid, ip)
     }
-    return rows;
-  });
+    return rows
+  })
 }
 
 function joinConversation(
@@ -2990,7 +3015,7 @@ function joinConversation(
   pmaid_answers?: any,
 ) {
   function tryJoin() {
-    return tryToJoinConversation(zid, uid, info, pmaid_answers);
+    return tryToJoinConversation(zid, uid, info, pmaid_answers)
   }
 
   function doJoin() {
@@ -3008,18 +3033,18 @@ function joinConversation(
       .catch(tryJoin)
       .catch(tryJoin)
       .catch(tryJoin)
-      .catch(tryJoin);
-    return promise;
+      .catch(tryJoin)
+    return promise
   }
 
   return getPidPromise(zid, uid).then(function (pid: number) {
     if (pid >= 0) {
       // already a ptpt, so don't create another
-      return;
+      return
     } else {
-      return doJoin();
+      return doJoin()
     }
-  }, doJoin);
+  }, doJoin)
 }
 
 // returns null if it's missing
@@ -3035,22 +3060,22 @@ function getParticipant(zid: any, uid?: any) {
         [zid, uid],
         function (err: any, results: { rows: any[] }) {
           if (err) {
-            return reject(err);
+            return reject(err)
           }
           if (!results || !results.rows) {
-            return reject(new Error("polis_err_getParticipant_failed"));
+            return reject(new Error("polis_err_getParticipant_failed"))
           }
-          resolve(results.rows[0]);
+          resolve(results.rows[0])
         },
-      );
+      )
     }),
-  );
+  )
 }
 function getAnswersForConversation(
   zid: any,
   callback: {
-    (err: any, available_answers: any): any;
-    (arg0: number, arg1?: undefined): void;
+    (err: any, available_answers: any): any
+    (arg0: number, arg1?: undefined): void
   },
 ) {
   query_readOnly(
@@ -3058,12 +3083,12 @@ function getAnswersForConversation(
     [zid],
     function (err: any, x: { rows: any }) {
       if (err) {
-        callback(err);
-        return;
+        callback(err)
+        return
       }
-      callback(0, x.rows);
+      callback(0, x.rows)
     },
-  );
+  )
 }
 
 function getChoicesForConversation(zid: any) {
@@ -3076,17 +3101,17 @@ function getChoicesForConversation(zid: any) {
       [zid],
       function (err: any, x: { rows: any }) {
         if (err) {
-          reject(err);
-          return;
+          reject(err)
+          return
         }
         if (!x || !x.rows) {
-          resolve([]);
-          return;
+          resolve([])
+          return
         }
-        resolve(x.rows);
+        resolve(x.rows)
       },
-    );
-  });
+    )
+  })
 }
 
 function emailTeam(subject: string, body: string) {
@@ -3096,25 +3121,25 @@ function emailTeam(subject: string, body: string) {
     subject,
     body,
   ).catch(function (err: any) {
-    logger.error("polis_err_failed_to_email_team", err);
-  });
+    logger.error("polis_err_failed_to_email_team", err)
+  })
 }
 
 function emailBadProblemTime(message: string) {
   const body = `Yo, there was a serious problem. Here's the message:
 
-${message}`;
+${message}`
 
-  return emailTeam("Polis Bad Problems!!!", body);
+  return emailTeam("Polis Bad Problems!!!", body)
 }
 async function sendPasswordResetEmail(
   uid?: any,
   pwresettoken?: any,
   serverName?: any,
 ) {
-  const userInfo = (await getUserInfoForUid(uid)) as { hname: any; email: any };
+  const userInfo = (await getUserInfoForUid(uid)) as { hname: any; email: any }
   if (!userInfo) {
-    throw new Error("missing user info");
+    throw new Error("missing user info")
   }
 
   let body = `Hi ${userInfo.hname},
@@ -3124,7 +3149,7 @@ We have just received a password reset request for ${userInfo.email}
 To reset your password, visit this page:
 ${serverName}/pwreset/${pwresettoken}
 
-"Thank you for using Metropolis!`;
+"Thank you for using Metropolis!`
 
   try {
     await sendTextEmail(
@@ -3132,10 +3157,10 @@ ${serverName}/pwreset/${pwresettoken}
       userInfo.email,
       "Polis Password Reset",
       body,
-    );
+    )
   } catch (err) {
-    logger.error("polis_err_failed_to_email_password_reset_code", err);
-    throw err;
+    logger.error("polis_err_failed_to_email_password_reset_code", err)
+    throw err
   }
 }
 
@@ -3162,88 +3187,88 @@ function sendMultipleTextEmails(
   subject: string,
   text: string,
 ) {
-  recipientArray = recipientArray || [];
+  recipientArray = recipientArray || []
   return Promise.all(
     recipientArray.map(function (email: string) {
-      let promise = sendTextEmail(sender, email, subject, text);
+      let promise = sendTextEmail(sender, email, subject, text)
       promise.catch(function (err: any) {
-        logger.error("polis_err_failed_to_email_for_user", { email, err });
-      });
-      return promise;
+        logger.error("polis_err_failed_to_email_for_user", { email, err })
+      })
+      return promise
     }),
-  );
+  )
 }
 
 function sendEinviteEmail(req: any, email: any, einvite: any) {
-  let serverName = getServerNameWithProtocol(req);
+  let serverName = getServerNameWithProtocol(req)
   const body = `Welcome to Metropolis!
 
 Click this link to open your account:
 
-${serverName}/welcome/${einvite}`;
+${serverName}/welcome/${einvite}`
 
-  return sendTextEmail(polisFromAddress, email, "Get Started with Polis", body);
+  return sendTextEmail(polisFromAddress, email, "Get Started with Polis", body)
 }
 
 async function handle_GET_verification(
   req: { p: { e: any } },
   res: {
-    set: (arg0: string, arg1: string) => void;
-    send: (arg0: string) => void;
+    set: (arg0: string, arg1: string) => void
+    send: (arg0: string) => void
   },
 ) {
-  let einvite = req.p.e;
+  let einvite = req.p.e
 
-  let emailRows;
+  let emailRows
   try {
     emailRows = await queryP("select * from einvites where einvite = ($1);", [
       einvite,
-    ]);
+    ])
   } catch (err) {
-    fail(res, 500, "polis_err_verification", err);
-    return;
+    fail(res, 500, "polis_err_verification", err)
+    return
   }
 
   if (!emailRows.length) {
-    fail(res, 500, "polis_err_verification_missing");
-    return;
+    fail(res, 500, "polis_err_verification_missing")
+    return
   }
 
-  let email = emailRows[0].email;
+  let email = emailRows[0].email
 
   const emailValidations = await queryP(
     "select email from email_validations where email = ($1);",
     [email],
-  );
+  )
 
   if (emailValidations.length == 0) {
-    await queryP("insert into email_validations (email) values ($1);", [email]);
+    await queryP("insert into email_validations (email) values ($1);", [email])
   }
 
-  res.set("Content-Type", "text/html");
+  res.set("Content-Type", "text/html")
   res.send(
     `<html><body>
 <div style='font-family: Futura, Helvetica, sans-serif;'>
 Email verified! You can close this tab or hit the back button.
 </div>
 </body></html>`,
-  );
+  )
 }
 
 function paramsToStringSortedByName(params: {
-  conversation_id?: any;
-  email?: any;
+  conversation_id?: any
+  email?: any
 }) {
   // Argument of type '(a: number[], b: number[]) => boolean' is not assignable to parameter of type '(a: ["email" | "conversation_id", any], b: ["email" | "conversation_id", any]) => number'.
   //   Type 'boolean' is not assignable to type 'number'.ts(2345)
   // @ts-ignore
   let pairs = _.pairs(params).sort(function (a: number[], b: number[]) {
-    return a[0] > b[0];
-  });
+    return a[0] > b[0]
+  })
   const pairsList = pairs.map(function (pair: any[]) {
-    return pair.join("=");
-  });
-  return pairsList.join("&");
+    return pair.join("=")
+  })
+  return pairsList.join("&")
 }
 
 // // units are seconds
@@ -3251,23 +3276,23 @@ function paramsToStringSortedByName(params: {
 //     pwreset_created : 60 * 60 * 2,
 // };
 
-let HMAC_SIGNATURE_PARAM_NAME = "signature";
+let HMAC_SIGNATURE_PARAM_NAME = "signature"
 
 function createHmacForQueryParams(
   path: string,
   params: { conversation_id?: any; email?: any },
 ) {
-  path = path.replace(/\/$/, ""); // trim trailing "/"
-  let s = path + "?" + paramsToStringSortedByName(params);
+  path = path.replace(/\/$/, "") // trim trailing "/"
+  let s = path + "?" + paramsToStringSortedByName(params)
   let hmac = crypto.createHmac(
     "sha1",
     "G7f387ylIll8yuskuf2373rNBmcxqWYFfHhdsd78f3uekfs77EOLR8wofw",
-  );
-  hmac.setEncoding("hex");
-  hmac.write(s);
-  hmac.end();
-  let hash = hmac.read();
-  return hash;
+  )
+  hmac.setEncoding("hex")
+  hmac.write(s)
+  hmac.end()
+  let hash = hmac.read()
+  return hash
 }
 
 function verifyHmacForQueryParams(
@@ -3275,20 +3300,20 @@ function verifyHmacForQueryParams(
   params: { [x: string]: any; conversation_id?: any; email?: any },
 ) {
   return new Promise(function (resolve, reject) {
-    params = _.clone(params);
-    let hash = params[HMAC_SIGNATURE_PARAM_NAME];
-    delete params[HMAC_SIGNATURE_PARAM_NAME];
-    let correctHash = createHmacForQueryParams(path, params);
+    params = _.clone(params)
+    let hash = params[HMAC_SIGNATURE_PARAM_NAME]
+    delete params[HMAC_SIGNATURE_PARAM_NAME]
+    let correctHash = createHmacForQueryParams(path, params)
     // To thwart timing attacks, add some randomness to the response time with setTimeout.
     setTimeout(function () {
-      logger.debug("comparing", { correctHash, hash });
+      logger.debug("comparing", { correctHash, hash })
       if (correctHash === hash) {
-        resolve(undefined);
+        resolve(undefined)
       } else {
-        reject();
+        reject()
       }
-    });
-  });
+    })
+  })
 }
 
 function sendEmailByUid(uid?: any, subject?: string, body?: string | number) {
@@ -3298,32 +3323,34 @@ function sendEmailByUid(uid?: any, subject?: string, body?: string | number) {
       userInfo.hname ? `${userInfo.hname} <${userInfo.email}>` : userInfo.email,
       subject,
       body,
-    );
-  });
+    )
+  })
 }
 
 function handle_GET_participants(
   req: { p: { zid: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
+  let zid = req.p.zid
 
   queryP_readOnly(
     "SELECT users.hname, participants.pid, participants.vote_count, participants.last_interaction, participants.created FROM users INNER JOIN participants ON users.uid = participants.uid WHERE zid = ($1) ORDER BY participants.pid;",
     [zid],
   )
     .then(function (rows: string | any[]) {
-      res.status(200).json(rows);
+      res.status(200).json(rows)
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_participant", err);
-    });
+      fail(res, 500, "polis_err_get_participant", err)
+    })
 }
 
 function doGetConversationsRecent(
@@ -3332,33 +3359,33 @@ function doGetConversationsRecent(
   field: string,
 ) {
   if (!isAdministrator(req.p.uid)) {
-    fail(res, 403, "polis_err_no_access_for_this_user");
-    return;
+    fail(res, 403, "polis_err_no_access_for_this_user")
+    return
   }
-  let time = req.p.sinceUnixTimestamp;
+  let time = req.p.sinceUnixTimestamp
   if (_.isUndefined(time)) {
-    time = Date.now() - 1000 * 60 * 60 * 24 * 7;
+    time = Date.now() - 1000 * 60 * 60 * 24 * 7
   } else {
-    time *= 1000;
+    time *= 1000
   }
-  time = parseInt(time);
+  time = parseInt(time)
   queryP_readOnly("select * from conversations where " + field + " >= ($1);", [
     time,
   ])
     .then((rows: any) => {
-      res.json(rows);
+      res.json(rows)
     })
     .catch((err: any) => {
-      fail(res, 403, "polis_err_conversationsRecent", err);
-    });
+      fail(res, 403, "polis_err_conversationsRecent", err)
+    })
 }
 
 function handle_GET_conversationsRecentlyStarted(req: any, res: any) {
-  doGetConversationsRecent(req, res, "created");
+  doGetConversationsRecent(req, res, "created")
 }
 
 function handle_GET_conversationsRecentActivity(req: any, res: any) {
-  doGetConversationsRecent(req, res, "modified");
+  doGetConversationsRecent(req, res, "modified")
 }
 
 function userHasAnsweredZeQuestions(zid: any, answers: string | any[]) {
@@ -3369,58 +3396,60 @@ function userHasAnsweredZeQuestions(zid: any, answers: string | any[]) {
         zid,
         function (err: any, available_answers: any) {
           if (err) {
-            reject(err);
-            return;
+            reject(err)
+            return
           }
 
-          let q2a = _.indexBy(available_answers, "pmqid");
-          let a2q = _.indexBy(available_answers, "pmaid");
+          let q2a = _.indexBy(available_answers, "pmqid")
+          let a2q = _.indexBy(available_answers, "pmaid")
           for (let i = 0; i < answers.length; i++) {
-            let pmqid = a2q[answers[i]].pmqid;
-            delete q2a[pmqid];
+            let pmqid = a2q[answers[i]].pmqid
+            delete q2a[pmqid]
           }
-          let remainingKeys = _.keys(q2a);
-          let missing = remainingKeys && remainingKeys.length > 0;
+          let remainingKeys = _.keys(q2a)
+          let missing = remainingKeys && remainingKeys.length > 0
           if (missing) {
             return reject(
               new Error(
                 "polis_err_metadata_not_chosen_pmqid_" + remainingKeys[0],
               ),
-            );
+            )
           } else {
-            return resolve(undefined);
+            return resolve(undefined)
           }
         },
-      );
+      )
     }),
-  );
+  )
 }
 function handle_POST_participants(
   req: {
-    p: { zid: any; uid?: any; answers: any; parent_url: any; referrer: any };
-    cookies: { [x: string]: any };
+    p: { zid: any; uid?: any; answers: any; parent_url: any; referrer: any }
+    cookies: { [x: string]: any }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let answers = req.p.answers;
-  let info: ParticipantInfo = {};
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let answers = req.p.answers
+  let info: ParticipantInfo = {}
 
-  let parent_url = req.cookies[COOKIES.PARENT_URL] || req.p.parent_url;
-  let referrer = req.cookies[COOKIES.PARENT_REFERRER] || req.p.referrer;
+  let parent_url = req.cookies[COOKIES.PARENT_URL] || req.p.parent_url
+  let referrer = req.cookies[COOKIES.PARENT_REFERRER] || req.p.referrer
 
   if (parent_url) {
-    info.parent_url = parent_url;
+    info.parent_url = parent_url
   }
   if (referrer) {
-    info.referrer = referrer;
+    info.referrer = referrer
   }
 
   function finish(ptpt: any) {
@@ -3430,13 +3459,13 @@ function handle_POST_participants(
     // }
     // addCookie(res, getZidToPidCookieKey(zid), pid);
 
-    clearCookie(req, res, COOKIES.PARENT_URL);
-    clearCookie(req, res, COOKIES.PARENT_REFERRER);
+    clearCookie(req, res, COOKIES.PARENT_URL)
+    clearCookie(req, res, COOKIES.PARENT_REFERRER)
 
     setTimeout(function () {
-      updateLastInteractionTimeForConversation(zid, uid);
-    }, 0);
-    res.status(200).json(ptpt);
+      updateLastInteractionTimeForConversation(zid, uid)
+    }, 0)
+    res.status(200).json(ptpt)
   }
 
   function doJoin() {
@@ -3444,17 +3473,17 @@ function handle_POST_participants(
       function () {
         joinConversation(zid, uid, info, answers).then(
           function (ptpt: any) {
-            finish(ptpt);
+            finish(ptpt)
           },
           function (err: any) {
-            fail(res, 500, "polis_err_add_participant", err);
+            fail(res, 500, "polis_err_add_participant", err)
           },
-        );
+        )
       },
       function (err: { message: any }) {
-        fail(res, 400, err.message, err);
+        fail(res, 400, err.message, err)
       },
-    );
+    )
   }
 
   // Check if already in the conversation
@@ -3462,15 +3491,15 @@ function handle_POST_participants(
     .then(
       function (ptpt: { pid: any }) {
         if (ptpt) {
-          finish(ptpt);
+          finish(ptpt)
 
-          addExtendedParticipantInfo(zid, req.p.uid, info);
-          return;
+          addExtendedParticipantInfo(zid, req.p.uid, info)
+          return
         }
 
         getConversationInfo(zid)
           .then(function () {
-            doJoin();
+            doJoin()
           })
           .catch(function (err: any) {
             fail(
@@ -3478,55 +3507,55 @@ function handle_POST_participants(
               500,
               "polis_err_post_participants_need_uid_to_check_lti_users_4",
               err,
-            );
-          });
+            )
+          })
       },
       function (err: any) {
-        fail(res, 500, "polis_err_post_participants_db_err", err);
+        fail(res, 500, "polis_err_post_participants_db_err", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_post_participants_misc", err);
-    });
+      fail(res, 500, "polis_err_post_participants_misc", err)
+    })
 }
 
 async function subscribeToNotifications(zid: any, uid?: any, email?: any) {
-  let type = 1; // 1 for email
-  logger.info("subscribeToNotifications", { zid, uid });
+  let type = 1 // 1 for email
+  logger.info("subscribeToNotifications", { zid, uid })
   await queryP(
     "update participants_extended set subscribe_email = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, email],
-  );
+  )
 
   await queryP(
     "update participants set subscribed = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, type],
-  );
+  )
 
-  return type;
+  return type
 }
 
 async function unsubscribeFromNotifications(zid: any, uid?: any) {
-  let type = 0; // 1 for nothing
+  let type = 0 // 1 for nothing
   await queryP(
     "update participants set subscribed = ($3) where zid = ($1) and uid = ($2);",
     [zid, uid, type],
-  );
-  return type;
+  )
+  return type
 }
 
 function addNotificationTask(zid: any) {
   return queryP(
     "insert into notification_tasks (zid) values ($1) on conflict (zid) do update set modified = now_as_millis();",
     [zid],
-  );
+  )
 }
 
 function maybeAddNotificationTask(zid: any, timeInMillis: any) {
   return queryP(
     "insert into notification_tasks (zid, modified) values ($1, $2) on conflict (zid) do nothing;",
     [zid, timeInMillis],
-  );
+  )
 }
 
 function claimNextNotificationTask() {
@@ -3534,22 +3563,22 @@ function claimNextNotificationTask() {
     "delete from notification_tasks where zid = (select zid from notification_tasks order by random() for update skip locked limit 1) returning *;",
   ).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
-      return null;
+      return null
     }
-    return rows[0];
-  });
+    return rows[0]
+  })
 }
 
 function getDbTime() {
   return queryP("select now_as_millis();", []).then(
     (rows: { now_as_millis: any }[]) => {
-      return rows[0].now_as_millis;
+      return rows[0].now_as_millis
     },
-  );
+  )
 }
 
 function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
-  let shouldTryAgain = false;
+  let shouldTryAgain = false
 
   return queryP(
     "select * from participants where zid = ($1) and last_notified < ($2) and subscribed > 0;",
@@ -3557,38 +3586,38 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
   )
     .then((candidates: any[]) => {
       if (!candidates || !candidates.length) {
-        return null;
+        return null
       }
       candidates = candidates.map(
         (ptpt: { last_notified: number; last_interaction: number }) => {
-          ptpt.last_notified = Number(ptpt.last_notified);
-          ptpt.last_interaction = Number(ptpt.last_interaction);
-          return ptpt;
+          ptpt.last_notified = Number(ptpt.last_notified)
+          ptpt.last_interaction = Number(ptpt.last_interaction)
+          return ptpt
         },
-      );
+      )
       return Promise.all([
         getDbTime(),
         getConversationInfo(zid),
         getZinvite(zid),
       ]).then((a: any[]) => {
-        let dbTimeMillis = a[0];
-        let conv = a[1];
-        let conversation_id = a[2];
+        let dbTimeMillis = a[0]
+        let conv = a[1]
+        let conversation_id = a[2]
 
-        let url = conv.parent_url || "https://pol.is/" + conversation_id;
+        let url = conv.parent_url || "https://pol.is/" + conversation_id
 
-        let pid_to_ptpt = {};
+        let pid_to_ptpt = {}
         candidates.forEach((c: { pid: string | number }) => {
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          pid_to_ptpt[c.pid] = c;
-        });
+          pid_to_ptpt[c.pid] = c
+        })
         return Promise.all(
           candidates.map((item: { zid: any; pid: any }) =>
             getNumberOfCommentsRemaining(item.zid, item.pid).then(
               (rows: any[]) => {
-                return rows[0];
+                return rows[0]
               },
             ),
           ),
@@ -3598,61 +3627,61 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
               // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
               // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
               // @ts-ignore
-              let ptpt = pid_to_ptpt[result.pid];
-              let needs = true;
+              let ptpt = pid_to_ptpt[result.pid]
+              let needs = true
 
-              needs = needs && result.remaining > 0;
+              needs = needs && result.remaining > 0
 
               // if (needs && result.remaining < 5) {
               //   // no need to try again for this user since new comments will create new tasks
               //   needs = false;
               // }
 
-              let waitTime = 60 * 60 * 1000;
+              let waitTime = 60 * 60 * 1000
 
               // notifications since last interation
               if (ptpt.nsli === 0) {
                 // first notification since last interaction
-                waitTime = 60 * 60 * 1000; // 1 hour
+                waitTime = 60 * 60 * 1000 // 1 hour
               } else if (ptpt.nsli === 1) {
                 // second notification since last interaction
-                waitTime = 2 * 60 * 60 * 1000; // 4 hours
+                waitTime = 2 * 60 * 60 * 1000 // 4 hours
               } else if (ptpt.nsli === 2) {
                 // third notification since last interaction
-                waitTime = 24 * 60 * 60 * 1000; // 24 hours
+                waitTime = 24 * 60 * 60 * 1000 // 24 hours
               } else if (ptpt.nsli === 3) {
                 // third notification since last interaction
-                waitTime = 48 * 60 * 60 * 1000; // 48 hours
+                waitTime = 48 * 60 * 60 * 1000 // 48 hours
               } else {
                 // give up, if they vote again nsli will be set to zero again.
-                needs = false;
+                needs = false
               }
 
               if (needs && dbTimeMillis < ptpt.last_notified + waitTime) {
                 // Limit to one per hour.
-                shouldTryAgain = true;
-                needs = false;
+                shouldTryAgain = true
+                needs = false
               }
               if (
                 needs &&
                 dbTimeMillis < ptpt.last_interaction + 5 * 60 * 1000
               ) {
                 // Wait until 5 minutes after their last interaction.
-                shouldTryAgain = true;
-                needs = false;
+                shouldTryAgain = true
+                needs = false
               }
 
               if (devMode) {
-                needs = needs && isAdministrator(ptpt.uid);
+                needs = needs && isAdministrator(ptpt.uid)
               }
-              return needs;
+              return needs
             },
-          );
+          )
 
           if (needNotification.length === 0) {
-            return null;
+            return null
           }
-          const pids = _.pluck(needNotification, "pid");
+          const pids = _.pluck(needNotification, "pid")
 
           // return queryP("select p.uid, p.pid, u.email from participants as p left join users as u on p.uid = u.uid where p.pid in (" + pids.join(",") + ")", []).then((rows) => {
 
@@ -3663,15 +3692,15 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
               "));",
             [],
           ).then((rows: any[]) => {
-            let uidToEmail = {};
+            let uidToEmail = {}
             rows.forEach(
               (row: { uid: string | number; subscribe_email: any }) => {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                 // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                 // @ts-ignore
-                uidToEmail[row.uid] = row.subscribe_email;
+                uidToEmail[row.uid] = row.subscribe_email
               },
-            );
+            )
 
             return Promise.all(
               needNotification.map(
@@ -3679,7 +3708,7 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
                   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                   // @ts-ignore
-                  const uid = pid_to_ptpt[item.pid].uid;
+                  const uid = pid_to_ptpt[item.pid].uid
                   return sendNotificationEmail(
                     uid,
                     url,
@@ -3692,24 +3721,24 @@ function doNotificationsForZid(zid: any, timeOfLastEvent: any) {
                     return queryP(
                       "update participants set last_notified = now_as_millis(), nsli = nsli + 1 where uid = ($1) and zid = ($2);",
                       [uid, zid],
-                    );
-                  });
+                    )
+                  })
                 },
               ),
-            );
-          });
-        });
-      });
+            )
+          })
+        })
+      })
     })
     .then(() => {
-      return shouldTryAgain;
-    });
+      return shouldTryAgain
+    })
 }
 function doNotificationBatch() {
   return claimNextNotificationTask().then(
     (task: { zid: any; modified: any }) => {
       if (!task) {
-        return Promise.resolve();
+        return Promise.resolve()
       }
       return doNotificationsForZid(task.zid, task.modified).then(
         (shouldTryAgain: any) => {
@@ -3717,19 +3746,19 @@ function doNotificationBatch() {
             // Since we claimed the task above, there will be no record, so we need to
             // put it back to trigger a retry - unless there's a new one there, in which case we should
             // leave the new one.
-            maybeAddNotificationTask(task.zid, task.modified);
+            maybeAddNotificationTask(task.zid, task.modified)
           }
         },
-      );
+      )
     },
-  );
+  )
 }
 
 function doNotificationLoop() {
-  logger.debug("doNotificationLoop");
+  logger.debug("doNotificationLoop")
   doNotificationBatch().then(() => {
-    setTimeout(doNotificationLoop, 10000);
-  });
+    setTimeout(doNotificationLoop, 10000)
+  })
 }
 
 function sendNotificationEmail(
@@ -3739,77 +3768,77 @@ function sendNotificationEmail(
   email?: any,
 ) {
   let subject =
-    "New statements to vote on (conversation " + conversation_id + ")"; // Not sure if putting the conversation_id is ideal, but we need some way to ensure that the notifications for each conversation appear in separte threads.
-  let body = "There are new statements available for you to vote on here:\n";
-  body += "\n";
-  body += url + "\n";
-  body += "\n";
+    "New statements to vote on (conversation " + conversation_id + ")" // Not sure if putting the conversation_id is ideal, but we need some way to ensure that the notifications for each conversation appear in separte threads.
+  let body = "There are new statements available for you to vote on here:\n"
+  body += "\n"
+  body += url + "\n"
+  body += "\n"
   body +=
-    "You're receiving this message because you're signed up to receive Polis notifications for this conversation. You can unsubscribe from these emails by clicking this link:\n";
-  body += createNotificationsUnsubscribeUrl(conversation_id, email) + "\n";
-  body += "\n";
+    "You're receiving this message because you're signed up to receive Polis notifications for this conversation. You can unsubscribe from these emails by clicking this link:\n"
+  body += createNotificationsUnsubscribeUrl(conversation_id, email) + "\n"
+  body += "\n"
   body +=
-    "If for some reason the above link does not work, please reply directly to this email with the message 'Unsubscribe' and we will remove you within 24 hours.";
-  body += "\n";
-  body += "Thanks for your participation";
-  return sendEmailByUid(uid, subject, body);
+    "If for some reason the above link does not work, please reply directly to this email with the message 'Unsubscribe' and we will remove you within 24 hours."
+  body += "\n"
+  body += "Thanks for your participation"
+  return sendEmailByUid(uid, subject, body)
 }
 
-let shouldSendNotifications = !devMode;
+let shouldSendNotifications = !devMode
 // let shouldSendNotifications = true;
 // let shouldSendNotifications = false;
 if (shouldSendNotifications) {
-  doNotificationLoop();
+  doNotificationLoop()
 }
 function createNotificationsUnsubscribeUrl(conversation_id: any, email: any) {
   let params = {
     conversation_id: conversation_id,
     email: email,
-  };
-  let path = "api/v3/notifications/unsubscribe";
+  }
+  let path = "api/v3/notifications/unsubscribe"
   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
   // @ts-ignore
-  params[HMAC_SIGNATURE_PARAM_NAME] = createHmacForQueryParams(path, params);
+  params[HMAC_SIGNATURE_PARAM_NAME] = createHmacForQueryParams(path, params)
 
-  let server = Config.getServerUrl();
-  return server + "/" + path + "?" + paramsToStringSortedByName(params);
+  let server = Config.getServerUrl()
+  return server + "/" + path + "?" + paramsToStringSortedByName(params)
 }
 
 function createNotificationsSubscribeUrl(conversation_id: any, email: any) {
   let params = {
     conversation_id: conversation_id,
     email: email,
-  };
-  let path = "api/v3/notifications/subscribe";
+  }
+  let path = "api/v3/notifications/subscribe"
   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
   // @ts-ignore
-  params[HMAC_SIGNATURE_PARAM_NAME] = createHmacForQueryParams(path, params);
+  params[HMAC_SIGNATURE_PARAM_NAME] = createHmacForQueryParams(path, params)
 
-  let server = Config.getServerUrl();
-  return server + "/" + path + "?" + paramsToStringSortedByName(params);
+  let server = Config.getServerUrl()
+  return server + "/" + path + "?" + paramsToStringSortedByName(params)
 }
 
 function handle_GET_notifications_subscribe(
   req: {
-    p: { [x: string]: any; zid: any; email: any; conversation_id: any };
+    p: { [x: string]: any; zid: any; email: any; conversation_id: any }
   },
   res: {
-    set: (arg0: string, arg1: string) => void;
-    send: (arg0: string) => void;
+    set: (arg0: string, arg1: string) => void
+    send: (arg0: string) => void
   },
 ) {
-  let zid = req.p.zid;
-  let email = req.p.email;
+  let zid = req.p.zid
+  let email = req.p.email
   let params = {
     conversation_id: req.p.conversation_id,
     email: req.p.email,
-  };
+  }
   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
   // @ts-ignore
-  params[HMAC_SIGNATURE_PARAM_NAME] = req.p[HMAC_SIGNATURE_PARAM_NAME];
+  params[HMAC_SIGNATURE_PARAM_NAME] = req.p[HMAC_SIGNATURE_PARAM_NAME]
   verifyHmacForQueryParams("api/v3/notifications/subscribe", params)
     .then(
       function () {
@@ -3817,7 +3846,7 @@ function handle_GET_notifications_subscribe(
           "update participants set subscribed = 1 where uid = (select uid from users where email = ($2)) and zid = ($1);",
           [zid, email],
         ).then(function () {
-          res.set("Content-Type", "text/html");
+          res.set("Content-Type", "text/html")
           res.send(
             `<h1>Subscribed!</h1>
 <p>
@@ -3826,36 +3855,36 @@ function handle_GET_notifications_subscribe(
               req.p.email,
             )}">oops, unsubscribe me.</a>
 </p>`,
-          );
-        });
+          )
+        })
       },
       function () {
-        fail(res, 403, "polis_err_subscribe_signature_mismatch");
+        fail(res, 403, "polis_err_subscribe_signature_mismatch")
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_subscribe_misc", err);
-    });
+      fail(res, 500, "polis_err_subscribe_misc", err)
+    })
 }
 function handle_GET_notifications_unsubscribe(
   req: {
-    p: { [x: string]: any; zid: any; email: any; conversation_id: any };
+    p: { [x: string]: any; zid: any; email: any; conversation_id: any }
   },
   res: {
-    set: (arg0: string, arg1: string) => void;
-    send: (arg0: string) => void;
+    set: (arg0: string, arg1: string) => void
+    send: (arg0: string) => void
   },
 ) {
-  let zid = req.p.zid;
-  let email = req.p.email;
+  let zid = req.p.zid
+  let email = req.p.email
   let params = {
     conversation_id: req.p.conversation_id,
     email: email,
-  };
+  }
   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
   // @ts-ignore
-  params[HMAC_SIGNATURE_PARAM_NAME] = req.p[HMAC_SIGNATURE_PARAM_NAME];
+  params[HMAC_SIGNATURE_PARAM_NAME] = req.p[HMAC_SIGNATURE_PARAM_NAME]
   verifyHmacForQueryParams("api/v3/notifications/unsubscribe", params)
     .then(
       function () {
@@ -3863,7 +3892,7 @@ function handle_GET_notifications_unsubscribe(
           "update participants set subscribed = 0 where uid = (select uid from users where email = ($2)) and zid = ($1);",
           [zid, email],
         ).then(function () {
-          res.set("Content-Type", "text/html");
+          res.set("Content-Type", "text/html")
           res.send(
             `<h1>Unsubscribed.</h1>
 <p>
@@ -3872,152 +3901,156 @@ function handle_GET_notifications_unsubscribe(
               req.p.email,
             )}">oops, subscribe me again.</a>
 </p>`,
-          );
-        });
+          )
+        })
       },
       function () {
-        fail(res, 403, "polis_err_unsubscribe_signature_mismatch");
+        fail(res, 403, "polis_err_unsubscribe_signature_mismatch")
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_unsubscribe_misc", err);
-    });
+      fail(res, 500, "polis_err_unsubscribe_misc", err)
+    })
 }
 function handle_POST_convSubscriptions(
   req: { p: { zid: any; uid?: any; type: any; email: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { subscribed: any }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { subscribed: any }): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let type = req.p.type;
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let type = req.p.type
 
-  let email = req.p.email;
+  let email = req.p.email
 
   function finish(type: any) {
     res.status(200).json({
       subscribed: type,
-    });
+    })
   }
 
   if (type === 1) {
     subscribeToNotifications(zid, uid, email)
       .then(finish)
       .catch(function (err: any) {
-        fail(res, 500, "polis_err_sub_conv " + zid + " " + uid, err);
-      });
+        fail(res, 500, "polis_err_sub_conv " + zid + " " + uid, err)
+      })
   } else if (type === 0) {
     unsubscribeFromNotifications(zid, uid)
       .then(finish)
       .catch(function (err: any) {
-        fail(res, 500, "polis_err_unsub_conv " + zid + " " + uid, err);
-      });
+        fail(res, 500, "polis_err_unsub_conv " + zid + " " + uid, err)
+      })
   } else {
     fail(
       res,
       400,
       "polis_err_bad_subscription_type",
       new Error("polis_err_bad_subscription_type"),
-    );
+    )
   }
 }
 
 async function handle_POST_auth_login(
   req: {
     p: {
-      password: any;
-      email: string;
-    };
+      password: any
+      email: string
+    }
   },
   res: {
-    redirect: (arg0: any) => void;
-    json: (arg0: { uid?: any; email: any; token: any }) => void;
+    redirect: (arg0: any) => void
+    json: (arg0: { uid?: any; email: any; token: any }) => void
   },
 ) {
-  let password = req.p.password;
-  let email = req.p.email || "";
+  let password = req.p.password
+  let email = req.p.email || ""
 
-  email = email.toLowerCase();
+  email = email.toLowerCase()
   if (!_.isString(password) || !password.length) {
-    fail(res, 403, "polis_err_login_need_password");
-    return;
+    fail(res, 403, "polis_err_login_need_password")
+    return
   }
 
-  let docs;
+  let docs
   try {
     docs = await queryP("SELECT * FROM users WHERE LOWER(email) = ($1);", [
       email,
-    ]);
+    ])
   } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err);
-    return;
+    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
+    return
   }
 
-  const uid = docs[0].uid;
+  const uid = docs[0].uid
 
-  let results;
+  let results
   try {
     results = await queryP("select pwhash from jianiuevyew where uid = ($1);", [
       uid,
-    ]);
+    ])
   } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err);
-    return;
+    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
+    return
   }
 
   if (!results || results.length === 0) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password");
-    return;
+    fail(res, 403, "polis_err_login_unknown_user_or_password")
+    return
   }
 
-  let hashedPassword = results[0].pwhash;
+  let hashedPassword = results[0].pwhash
   try {
-    await bcrypt.compare(password, hashedPassword);
+    await bcrypt.compare(password, hashedPassword)
   } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password");
-    return;
+    fail(res, 403, "polis_err_login_unknown_user_or_password")
+    return
   }
 
-  const token = await startSession(uid);
+  const token = await startSession(uid)
   const response_data = {
     uid: uid,
     email: email,
     token: token,
-  };
+  }
 
   try {
     // @ts-ignore
-    await addCookies(req, res, token, uid);
+    await addCookies(req, res, token, uid)
   } catch (err) {
-    fail(res, 500, "polis_err_adding_cookies", err);
-    return;
+    fail(res, 500, "polis_err_adding_cookies", err)
+    return
   }
-  res.json(response_data);
+  res.json(response_data)
 } // /api/v3/auth/login
 
 function handle_POST_joinWithInvite(
   req: {
     p: {
-      answers: any;
-      uid?: any;
-      suzinvite: any;
-      permanentCookieToken: any;
-      zid: any;
-      referrer: any;
-      parent_url: any;
-    };
+      answers: any
+      uid?: any
+      suzinvite: any
+      permanentCookieToken: any
+      zid: any
+      referrer: any
+      parent_url: any
+    }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { pid: any; uid?: any }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { pid: any; uid?: any }): void; new (): any }
+    }
   },
 ) {
   // if they're already in the conv
@@ -4046,17 +4079,17 @@ function handle_POST_joinWithInvite(
     })
       // @ts-ignore
       .then(function (o: { uid?: any; existingAuth: string }) {
-        let uid = o.uid;
+        let uid = o.uid
         logger.info(
           "startSessionAndAddCookies " + uid + " existing " + o.existingAuth,
-        );
+        )
         // TODO check for possible security implications
         if (!o.existingAuth) {
           return startSessionAndAddCookies(req, res, uid).then(function () {
-            return o;
-          });
+            return o
+          })
         }
-        return Promise.resolve(o);
+        return Promise.resolve(o)
       })
       //       No overload matches this call.
       // Overload 1 of 2, '(onFulfill?: ((value: unknown) => Resolvable<{ permanentCookieToken: any; zid: any; }>) | undefined,
@@ -4073,21 +4106,21 @@ function handle_POST_joinWithInvite(
       //     Type 'unknown' is not assignable to type '{ permanentCookieToken: any; zid: any; }'.ts(2769)
       // @ts-ignore
       .then(function (o: { permanentCookieToken: any; zid: any }) {
-        logger.info("permanentCookieToken", o.permanentCookieToken);
+        logger.info("permanentCookieToken", o.permanentCookieToken)
         if (o.permanentCookieToken) {
           return recordPermanentCookieZidJoin(
             o.permanentCookieToken,
             o.zid,
           ).then(
             function () {
-              return o;
+              return o
             },
             function () {
-              return o;
+              return o
             },
-          );
+          )
         } else {
-          return o;
+          return o
         }
       })
       //       No overload matches this call.
@@ -4101,11 +4134,11 @@ function handle_POST_joinWithInvite(
       //     Type 'unknown' is not assignable to type '{ pid: any; }'.ts(2769)
       // @ts-ignore
       .then(function (o: { pid: any }) {
-        let pid = o.pid;
+        let pid = o.pid
         res.status(200).json({
           pid: pid,
           uid: req.p.uid,
-        });
+        })
       })
       .catch(function (err: { message: string }) {
         if (
@@ -4113,16 +4146,16 @@ function handle_POST_joinWithInvite(
           err.message &&
           err.message.match(/polis_err_need_full_user/)
         ) {
-          fail(res, 403, err.message, err);
+          fail(res, 403, err.message, err)
         } else if (err && err.message) {
-          fail(res, 500, err.message, err);
+          fail(res, 500, err.message, err)
         } else if (err) {
-          fail(res, 500, "polis_err_joinWithZidOrSuzinvite", err);
+          fail(res, 500, "polis_err_joinWithZidOrSuzinvite", err)
         } else {
-          fail(res, 500, "polis_err_joinWithZidOrSuzinvite");
+          fail(res, 500, "polis_err_joinWithZidOrSuzinvite")
         }
       })
-  );
+  )
 }
 // Test for deadlock condition
 // _.times(2, function() {
@@ -4139,14 +4172,14 @@ function handle_POST_joinWithInvite(
 // }, 10);
 // });
 function joinWithZidOrSuzinvite(o: {
-  answers: any;
-  existingAuth: boolean;
-  suzinvite: any;
-  permanentCookieToken: any;
-  uid?: any;
-  zid: any; // since the zid is looked up using the conversation_id, it's safe to use zid as an invite token. TODO huh?
-  referrer: any;
-  parent_url: any;
+  answers: any
+  existingAuth: boolean
+  suzinvite: any
+  permanentCookieToken: any
+  uid?: any
+  zid: any // since the zid is looked up using the conversation_id, it's safe to use zid as an invite token. TODO huh?
+  referrer: any
+  parent_url: any
 }) {
   return (
     Promise.resolve(o)
@@ -4155,24 +4188,24 @@ function joinWithZidOrSuzinvite(o: {
           return getSUZinviteInfo(o.suzinvite).then(function (
             suzinviteInfo: any,
           ) {
-            return Object.assign(o, suzinviteInfo);
-          });
+            return Object.assign(o, suzinviteInfo)
+          })
         } else if (o.zid) {
-          return o;
+          return o
         } else {
-          throw new Error("polis_err_missing_invite");
+          throw new Error("polis_err_missing_invite")
         }
       })
       .then(function (o: { zid: any; conv: any }) {
-        logger.info("joinWithZidOrSuzinvite convinfo begin");
+        logger.info("joinWithZidOrSuzinvite convinfo begin")
         return getConversationInfo(o.zid).then(function (conv: any) {
-          logger.info("joinWithZidOrSuzinvite convinfo done");
-          o.conv = conv;
-          return o;
-        });
+          logger.info("joinWithZidOrSuzinvite convinfo done")
+          o.conv = conv
+          return o
+        })
       })
       .then(function (o: any) {
-        return o;
+        return o
       })
       //       No overload matches this call.
       // Overload 1 of 2, '(onFulfill?: ((value: unknown) => any) | undefined, onReject?: ((error: any) => any) | undefined): Bluebird<any>', gave the following error.
@@ -4185,27 +4218,27 @@ function joinWithZidOrSuzinvite(o: {
       //     Type 'unknown' is not assignable to type '{ uid?: any; user: any; }'.ts(2769)
       // @ts-ignore
       .then(function (o: { uid?: any; user: any }) {
-        logger.info("joinWithZidOrSuzinvite userinfo begin");
+        logger.info("joinWithZidOrSuzinvite userinfo begin")
         if (!o.uid) {
-          logger.info("joinWithZidOrSuzinvite userinfo no uid");
-          return o;
+          logger.info("joinWithZidOrSuzinvite userinfo no uid")
+          return o
         }
         return getUserInfoForUid2(o.uid).then(function (user: any) {
-          logger.info("joinWithZidOrSuzinvite userinfo done");
-          o.user = user;
-          return o;
-        });
+          logger.info("joinWithZidOrSuzinvite userinfo done")
+          o.user = user
+          return o
+        })
       })
       // @ts-ignore
       .then(function (o: { uid?: any }) {
         if (o.uid) {
-          return o;
+          return o
         } else {
           return createDummyUser().then(function (uid?: any) {
             return Object.assign(o, {
               uid: uid,
-            });
-          });
+            })
+          })
         }
       })
       // No overload matches this call.
@@ -4221,8 +4254,8 @@ function joinWithZidOrSuzinvite(o: {
       .then(function (o: { zid: any; answers: any }) {
         return userHasAnsweredZeQuestions(o.zid, o.answers).then(function () {
           // looks good, pass through
-          return o;
-        });
+          return o
+        })
       })
       //       No overload matches this call.
       // Overload 1 of 2, '(onFulfill?: ((value: unknown) => any) | undefined, onReject?: ((error: any) => any) | undefined): Bluebird<any>', gave the following error.
@@ -4235,25 +4268,25 @@ function joinWithZidOrSuzinvite(o: {
       //     Type 'unknown' is not assignable to type '{ referrer: any; parent_url: any; zid: any; uid?: any; answers: any; }'.ts(2769)
       // @ts-ignore
       .then(function (o: {
-        referrer: any;
-        parent_url: any;
-        zid: any;
-        uid?: any;
-        answers: any;
+        referrer: any
+        parent_url: any
+        zid: any
+        uid?: any
+        answers: any
       }) {
-        let info: ParticipantInfo = {};
+        let info: ParticipantInfo = {}
         if (o.referrer) {
-          info.referrer = o.referrer;
+          info.referrer = o.referrer
         }
         if (o.parent_url) {
-          info.parent_url = o.parent_url;
+          info.parent_url = o.parent_url
         }
         // TODO_REFERRER add info as third arg
         return joinConversation(o.zid, o.uid, info, o.answers).then(function (
           ptpt: any,
         ) {
-          return Object.assign(o, ptpt);
-        });
+          return Object.assign(o, ptpt)
+        })
       })
       //       No overload matches this call.
       // Overload 1 of 2, '(onFulfill?: ((value: unknown) => Resolvable<{ xid: any; conv: { org_id: any; use_xid_whitelist: any; owner: any; };
@@ -4272,9 +4305,9 @@ function joinWithZidOrSuzinvite(o: {
       //       Type 'unknown' is not assignable to type '{ xid: any; conv: { org_id: any; use_xid_whitelist: any; owner: any; }; uid?: any; }'.ts(2769)
       // @ts-ignore
       .then(function (o: {
-        xid: any;
-        conv: { org_id: any; use_xid_whitelist: any; owner: any };
-        uid?: any;
+        xid: any
+        conv: { org_id: any; use_xid_whitelist: any; owner: any }
+        uid?: any
       }) {
         if (o.xid) {
           // used for suzinvite case
@@ -4284,25 +4317,25 @@ function joinWithZidOrSuzinvite(o: {
           ) {
             if (exists) {
               // skip creating the entry (workaround for posgres's lack of upsert)
-              return o;
+              return o
             }
             const shouldCreateXidEntryPromise = o.conv.use_xid_whitelist
               ? isXidWhitelisted(o.conv.owner, o.xid)
-              : Promise.resolve(true);
+              : Promise.resolve(true)
             shouldCreateXidEntryPromise.then((should: any) => {
               if (should) {
                 return createXidEntry(o.xid, o.conv.org_id, o.uid).then(
                   function () {
-                    return o;
+                    return o
                   },
-                );
+                )
               } else {
-                throw new Error("polis_err_xid_not_whitelisted");
+                throw new Error("polis_err_xid_not_whitelisted")
               }
-            });
-          });
+            })
+          })
         } else {
-          return o;
+          return o
         }
       })
       //       No overload matches this call.
@@ -4318,43 +4351,43 @@ function joinWithZidOrSuzinvite(o: {
       .then(function (o: { suzinvite: any }) {
         if (o.suzinvite) {
           return deleteSuzinvite(o.suzinvite).then(function () {
-            return o;
-          });
+            return o
+          })
         } else {
-          return o;
+          return o
         }
       })
-  );
+  )
 }
 async function startSessionAndAddCookies(req: any, res: any, uid?: any) {
-  let token;
+  let token
   try {
-    token = await startSession(uid);
+    token = await startSession(uid)
   } catch (err) {
-    throw new Error("polis_err_reg_failed_to_start_session");
+    throw new Error("polis_err_reg_failed_to_start_session")
   }
 
-  await addCookies(req, res, token, uid);
+  await addCookies(req, res, token, uid)
 }
 
 function getFirstForPid(votes: string | any[]) {
-  let seen = {};
-  let len = votes.length;
-  let firstVotes = [];
+  let seen = {}
+  let len = votes.length
+  let firstVotes = []
   for (let i = 0; i < len; i++) {
-    let vote = votes[i];
+    let vote = votes[i]
     // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
     // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
     // @ts-ignore
     if (!seen[vote.pid]) {
-      firstVotes.push(vote);
+      firstVotes.push(vote)
       // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
       // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
       // @ts-ignore
-      seen[vote.pid] = true;
+      seen[vote.pid] = true
     }
   }
-  return firstVotes;
+  return firstVotes
 }
 function isParentDomainWhitelisted(
   domain: string,
@@ -4372,75 +4405,75 @@ function isParentDomainWhitelisted(
       domain,
       zid,
       isWithinIframe,
-    });
+    })
     if (!rows || !rows.length || !rows[0].domain_whitelist.length) {
       // there is no whitelist, so any domain is ok.
-      logger.debug("isParentDomainWhitelisted : no whitelist");
-      return true;
+      logger.debug("isParentDomainWhitelisted : no whitelist")
+      return true
     }
-    let whitelist = rows[0].domain_whitelist;
-    let wdomains = whitelist.split(",");
+    let whitelist = rows[0].domain_whitelist
+    let wdomains = whitelist.split(",")
     if (!isWithinIframe && wdomains.indexOf("*.pol.is") >= 0) {
       // if pol.is is in the whitelist, then it's ok to show the conversation outside of an iframe.
-      logger.debug("isParentDomainWhitelisted : *.pol.is");
-      return true;
+      logger.debug("isParentDomainWhitelisted : *.pol.is")
+      return true
     }
     if (
       domain_whitelist_override_key &&
       rows[0].domain_whitelist_override_key === domain_whitelist_override_key
     ) {
-      return true;
+      return true
     }
-    let ok = false;
+    let ok = false
     for (let i = 0; i < wdomains.length; i++) {
-      let w = wdomains[i];
-      let wParts = w.split(".");
+      let w = wdomains[i]
+      let wParts = w.split(".")
 
       // example: domain might be blogs.nytimes.com, and whitelist entry might be *.nytimes.com, and that should be a match
-      let parts = domain.split(".");
+      let parts = domain.split(".")
 
       if (wParts.length && wParts[0] === "*") {
         // wild card case
         // check for a match on each part following the '*'
-        let bad = false;
+        let bad = false
 
-        wParts = wParts.reverse();
-        parts = parts.reverse();
+        wParts = wParts.reverse()
+        parts = parts.reverse()
         for (let p = 0; p < wParts.length - 1; p++) {
           if (wParts[p] !== parts[p]) {
-            bad = true;
-            break;
+            bad = true
+            break
           }
         }
-        ok = !bad;
+        ok = !bad
       } else {
         // no wild card
-        let bad2 = false;
+        let bad2 = false
         if (wParts.length !== parts.length) {
-          bad2 = true;
+          bad2 = true
         }
         // check for a match on each part
         for (let p2 = 0; p2 < wParts.length; p2++) {
           if (wParts[p2] !== parts[p2]) {
-            bad2 = true;
-            break;
+            bad2 = true
+            break
           }
         }
-        ok = !bad2;
+        ok = !bad2
       }
 
       if (ok) {
-        break;
+        break
       }
     }
-    logger.debug("isParentDomainWhitelisted : " + ok);
-    return ok;
-  });
+    logger.debug("isParentDomainWhitelisted : " + ok)
+    return ok
+  })
 }
 function denyIfNotFromWhitelistedDomain(
   req: {
-    headers?: { referrer: string };
-    p: { zid: any; domain_whitelist_override_key: any };
+    headers?: { referrer: string }
+    p: { zid: any; domain_whitelist_override_key: any }
   },
   res: any,
   next: (arg0?: string) => void,
@@ -4448,31 +4481,31 @@ function denyIfNotFromWhitelistedDomain(
   let isWithinIframe =
     req.headers &&
     req.headers.referrer &&
-    req.headers.referrer.includes("parent_url");
+    req.headers.referrer.includes("parent_url")
   // res.status(403);
   // next("polis_err_domain");
   // return;
 
-  let ref = req?.headers?.referrer;
-  let refParts: string[] = [];
-  let resultRef = "";
+  let ref = req?.headers?.referrer
+  let refParts: string[] = []
+  let resultRef = ""
   if (isWithinIframe) {
     if (ref) {
       const decodedRefString = decodeURIComponent(
         ref.replace(/.*parent_url=/, "").replace(/&.*/, ""),
-      );
+      )
       if (decodedRefString && decodedRefString.length)
-        refParts = decodedRefString.split("/");
-      resultRef = (refParts && refParts.length >= 3 && refParts[2]) || "";
+        refParts = decodedRefString.split("/")
+      resultRef = (refParts && refParts.length >= 3 && refParts[2]) || ""
     }
   } else {
-    if (ref && ref.length) refParts = ref.split("/");
-    if (refParts && refParts.length >= 3) resultRef = refParts[2] || "";
+    if (ref && ref.length) refParts = ref.split("/")
+    if (refParts && refParts.length >= 3) resultRef = refParts[2] || ""
   }
   // let path = req.path;
   // path = path && path.split('/');
   // let conversation_id = path && path.length >= 2 && path[1];
-  let zid = req.p.zid;
+  let zid = req.p.zid
 
   isParentDomainWhitelisted(
     resultRef,
@@ -4482,17 +4515,17 @@ function denyIfNotFromWhitelistedDomain(
   )
     .then(function (isOk: any) {
       if (isOk) {
-        next();
+        next()
       } else {
-        res.status(403).send("polis_err_domain");
-        next("polis_err_domain");
+        res.status(403).send("polis_err_domain")
+        next("polis_err_domain")
       }
     })
     .catch(function (err: any) {
-      logger.error("error in isParentDomainWhitelisted", err);
-      res.status(403).send("polis_err_domain");
-      next("polis_err_domain_misc");
-    });
+      logger.error("error in isParentDomainWhitelisted", err)
+      res.status(403).send("polis_err_domain")
+      next("polis_err_domain_misc")
+    })
 }
 
 function setDomainWhitelist(uid?: any, newWhitelist?: any) {
@@ -4505,14 +4538,14 @@ function setDomainWhitelist(uid?: any, newWhitelist?: any) {
       return queryP(
         "insert into site_domain_whitelist (site_id, domain_whitelist) values ((select site_id from users where uid = ($1)), $2);",
         [uid, newWhitelist],
-      );
+      )
     } else {
       return queryP(
         "update site_domain_whitelist set domain_whitelist = ($2) where site_id = (select site_id from users where uid = ($1));",
         [uid, newWhitelist],
-      );
+      )
     }
-  });
+  })
 }
 
 function getDomainWhitelist(uid?: any) {
@@ -4521,10 +4554,10 @@ function getDomainWhitelist(uid?: any) {
     [uid],
   ).then(function (rows: string | any[]) {
     if (!rows || !rows.length) {
-      return "";
+      return ""
     }
-    return rows[0].domain_whitelist;
-  });
+    return rows[0].domain_whitelist
+  })
 }
 function handle_GET_domainWhitelist(
   req: { p: { uid?: any } },
@@ -4534,11 +4567,11 @@ function handle_GET_domainWhitelist(
     .then(function (whitelist: any) {
       res.json({
         domain_whitelist: whitelist,
-      });
+      })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_domainWhitelist_misc", err);
-    });
+      fail(res, 500, "polis_err_get_domainWhitelist_misc", err)
+    })
 }
 function handle_POST_domainWhitelist(
   req: { p: { uid?: any; domain_whitelist: any } },
@@ -4548,40 +4581,42 @@ function handle_POST_domainWhitelist(
     .then(function () {
       res.json({
         domain_whitelist: req.p.domain_whitelist,
-      });
+      })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_post_domainWhitelist_misc", err);
-    });
+      fail(res, 500, "polis_err_post_domainWhitelist_misc", err)
+    })
 }
 function handle_GET_conversationStats(
   req: { p: { zid: any; uid?: any; until: any; rid: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
       json: {
         (arg0: {
-          voteTimes: any;
-          firstVoteTimes: any[];
-          commentTimes: any;
-          firstCommentTimes: any[];
+          voteTimes: any
+          firstVoteTimes: any[]
+          commentTimes: any
+          firstCommentTimes: any[]
           // viewTimes: viewTimes,
-          votesHistogram: any;
-          burstHistogram: any[];
-        }): void;
-        new (): any;
-      };
-    };
+          votesHistogram: any
+          burstHistogram: any[]
+        }): void
+        new (): any
+      }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let until = req.p.until;
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let until = req.p.until
 
   let hasPermission = req.p.rid
     ? Promise.resolve(!!req.p.rid)
-    : isOwner(zid, uid);
+    : isOwner(zid, uid)
 
   hasPermission
     .then(function (ok: any) {
@@ -4590,22 +4625,22 @@ function handle_GET_conversationStats(
           res,
           403,
           "polis_err_conversationStats_need_report_id_or_moderation_permission",
-        );
-        return;
+        )
+        return
       }
 
-      let args = [zid];
+      let args = [zid]
 
       let q0 = until
         ? "select created, pid, mod from comments where zid = ($1) and created < ($2) order by created;"
-        : "select created, pid, mod from comments where zid = ($1) order by created;";
+        : "select created, pid, mod from comments where zid = ($1) order by created;"
 
       let q1 = until
         ? "select created, pid from votes where zid = ($1) and created < ($2) order by created;"
-        : "select created, pid from votes where zid = ($1) order by created;";
+        : "select created, pid from votes where zid = ($1) order by created;"
 
       if (until) {
-        args.push(until);
+        args.push(until)
       }
 
       return Promise.all([
@@ -4614,17 +4649,17 @@ function handle_GET_conversationStats(
         // queryP_readOnly("select created from participants where zid = ($1) order by created;", [zid]),
       ]).then(function (a: any[]) {
         function castTimestamp(o: { created: number }) {
-          o.created = Number(o.created);
-          return o;
+          o.created = Number(o.created)
+          return o
         }
-        let comments = _.map(a[0], castTimestamp);
-        let votes = _.map(a[1], castTimestamp);
+        let comments = _.map(a[0], castTimestamp)
+        let votes = _.map(a[1], castTimestamp)
         // let uniqueHits = _.map(a[2], castTimestamp); // participants table
         // let votesHistogram = a[2];
         // let socialUsers = _.map(a[4], castTimestamp);
 
-        let votesGroupedByPid = _.groupBy(votes, "pid");
-        let votesHistogramObj = {};
+        let votesGroupedByPid = _.groupBy(votes, "pid")
+        let votesHistogramObj = {}
         _.each(
           votesGroupedByPid,
           function (votesByParticipant: string | any[]) {
@@ -4635,45 +4670,45 @@ function handle_GET_conversationStats(
               // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
               // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
               // @ts-ignore
-              votesHistogramObj[votesByParticipant.length] + 1 || 1;
+              votesHistogramObj[votesByParticipant.length] + 1 || 1
           },
-        );
-        let votesHistogram: { n_votes: any; n_ptpts: any }[] = [];
+        )
+        let votesHistogram: { n_votes: any; n_ptpts: any }[] = []
         _.each(votesHistogramObj, function (ptptCount: any, voteCount: any) {
           votesHistogram.push({
             n_votes: voteCount,
             n_ptpts: ptptCount,
-          });
-        });
+          })
+        })
         votesHistogram.sort(function (a, b) {
-          return a.n_ptpts - b.n_ptpts;
-        });
+          return a.n_ptpts - b.n_ptpts
+        })
 
-        let burstsForPid = {};
-        let interBurstGap = 10 * 60 * 1000; // a 10 minute gap between votes counts as a gap between bursts
+        let burstsForPid = {}
+        let interBurstGap = 10 * 60 * 1000 // a 10 minute gap between votes counts as a gap between bursts
         _.each(
           votesGroupedByPid,
           function (votesByParticipant: string | any[], pid: string | number) {
             // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
             // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
             // @ts-ignore
-            burstsForPid[pid] = 1;
+            burstsForPid[pid] = 1
             let prevCreated = votesByParticipant.length
               ? votesByParticipant[0]
-              : 0;
+              : 0
             for (let v = 1; v < votesByParticipant.length; v++) {
-              let vote = votesByParticipant[v];
+              let vote = votesByParticipant[v]
               if (interBurstGap + prevCreated < vote.created) {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                 // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                 // @ts-ignore
-                burstsForPid[pid] += 1;
+                burstsForPid[pid] += 1
               }
-              prevCreated = vote.created;
+              prevCreated = vote.created
             }
           },
-        );
-        let burstHistogramObj = {};
+        )
+        let burstHistogramObj = {}
         //         Argument of type '(bursts: string | number, pid: any) => void' is not assignable to parameter of type 'CollectionIterator<unknown, void, {}>'.
         // Types of parameters 'bursts' and 'element' are incompatible.
         //   Type 'unknown' is not assignable to type 'string | number'.
@@ -4683,26 +4718,26 @@ function handle_GET_conversationStats(
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          burstHistogramObj[bursts] = burstHistogramObj[bursts] + 1 || 1;
-        });
-        let burstHistogram: { n_ptpts: any; n_bursts: number }[] = [];
+          burstHistogramObj[bursts] = burstHistogramObj[bursts] + 1 || 1
+        })
+        let burstHistogram: { n_ptpts: any; n_bursts: number }[] = []
         _.each(burstHistogramObj, function (ptptCount: any, burstCount: any) {
           burstHistogram.push({
             n_ptpts: ptptCount,
             n_bursts: Number(burstCount),
-          });
-        });
+          })
+        })
         burstHistogram.sort(function (a, b) {
-          return a.n_bursts - b.n_bursts;
-        });
+          return a.n_bursts - b.n_bursts
+        })
 
-        let actualParticipants = getFirstForPid(votes); // since an agree vote is submitted for each comment's author, this includes people who only wrote a comment, but didn't explicitly vote.
-        actualParticipants = _.pluck(actualParticipants, "created");
-        let commenters = getFirstForPid(comments);
-        commenters = _.pluck(commenters, "created");
+        let actualParticipants = getFirstForPid(votes) // since an agree vote is submitted for each comment's author, this includes people who only wrote a comment, but didn't explicitly vote.
+        actualParticipants = _.pluck(actualParticipants, "created")
+        let commenters = getFirstForPid(comments)
+        commenters = _.pluck(commenters, "created")
 
-        let totalComments = _.pluck(comments, "created");
-        let totalVotes = _.pluck(votes, "created");
+        let totalComments = _.pluck(comments, "created")
+        let totalVotes = _.pluck(votes, "created")
         // let viewTimes = _.pluck(uniqueHits, "created");
         // let totalSocialUsers = _.pluck(socialUsers, "created");
 
@@ -4712,9 +4747,9 @@ function handle_GET_conversationStats(
             return {
               n_votes: Number(x.n_votes),
               n_ptpts: Number(x.n_ptpts),
-            };
+            }
           },
-        );
+        )
 
         res.status(200).json({
           voteTimes: totalVotes,
@@ -4725,88 +4760,94 @@ function handle_GET_conversationStats(
           votesHistogram: votesHistogram,
           burstHistogram: burstHistogram,
           // socialUsers: totalSocialUsers,
-        });
-      });
+        })
+      })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_conversationStats_misc", err);
-    });
+      fail(res, 500, "polis_err_conversationStats_misc", err)
+    })
 }
 
 function handle_POST_auth_new(req: any, res: any) {
-  createUser(req, res);
+  createUser(req, res)
 } // end /api/v3/auth/new
 
 function handle_POST_tutorial(
   req: { p: { uid?: any; step: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let step = req.p.step;
+  let uid = req.p.uid
+  let step = req.p.step
   queryP("update users set tut = ($1) where uid = ($2);", [step, uid])
     .then(function () {
-      res.status(200).json({});
+      res.status(200).json({})
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_saving_tutorial_state", err);
-    });
+      fail(res, 500, "polis_err_saving_tutorial_state", err)
+    })
 }
 
 function handle_GET_users(
   req: { p: { uid?: any; errIfNoAuth: any; xid: any; owner_uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
+  let uid = req.p.uid
 
   if (req.p.errIfNoAuth && !uid) {
-    fail(res, 500, "polis_err_getting_user_info", new Error());
-    return;
+    fail(res, 500, "polis_err_getting_user_info", new Error())
+    return
   }
 
   getUser(uid, null, req.p.xid, req.p.owner_uid)
     .then(
       function (user: any) {
-        res.status(200).json(user);
+        res.status(200).json(user)
       },
       function (err: any) {
-        fail(res, 500, "polis_err_getting_user_info2", err);
+        fail(res, 500, "polis_err_getting_user_info2", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_getting_user_info", err);
-    });
+      fail(res, 500, "polis_err_getting_user_info", err)
+    })
 }
 
 function handle_GET_participation(
   req: { p: { zid: any; uid?: any; strict: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let strict = req.p.strict;
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let strict = req.p.strict
   isOwner(zid, uid)
     .then(function (ok: any) {
       if (!ok) {
-        fail(res, 403, "polis_err_get_participation_auth");
-        return;
+        fail(res, 403, "polis_err_get_participation_auth")
+        return
       }
 
       return Promise.all([
@@ -4820,18 +4861,18 @@ function handle_GET_participation(
         ),
         getXids(zid), //queryP_readOnly("select pid, xid from xids inner join (select * from participants where zid = ($1)) as p on xids.uid = p.uid;", [zid]),
       ]).then(function (o: any[]) {
-        let voteCountRows = o[0];
-        let commentCountRows = o[1];
-        let pidXidRows = o[2];
-        let i, r;
+        let voteCountRows = o[0]
+        let commentCountRows = o[1]
+        let pidXidRows = o[2]
+        let i, r
 
         if (strict && !pidXidRows.length) {
           fail(
             res,
             409,
             "polis_err_get_participation_missing_xids This conversation has no xids for its participants.",
-          );
-          return;
+          )
+          return
         }
 
         // @ts-ignore
@@ -4839,41 +4880,41 @@ function handle_GET_participation(
           return {
             votes: 0,
             comments: 0,
-          };
-        });
+          }
+        })
 
         // Count votes
         for (i = 0; i < voteCountRows.length; i++) {
-          r = voteCountRows[i];
-          result.g(r.pid).votes = Number(r.count);
+          r = voteCountRows[i]
+          result.g(r.pid).votes = Number(r.count)
         }
         // Count comments
         for (i = 0; i < commentCountRows.length; i++) {
-          r = commentCountRows[i];
-          result.g(r.pid).comments = Number(r.count);
+          r = commentCountRows[i]
+          result.g(r.pid).comments = Number(r.count)
         }
 
         // convert from DD to POJO
-        result = result.m;
+        result = result.m
 
         if (pidXidRows && pidXidRows.length) {
           // Convert from {pid -> foo} to {xid -> foo}
-          let pidToXid = {};
+          let pidToXid = {}
           for (i = 0; i < pidXidRows.length; i++) {
             // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
             // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
             // @ts-ignore
-            pidToXid[pidXidRows[i].pid] = pidXidRows[i].xid;
+            pidToXid[pidXidRows[i].pid] = pidXidRows[i].xid
           }
-          let xidBasedResult: Record<string, any> = {};
-          let size = 0;
+          let xidBasedResult: Record<string, any> = {}
+          let size = 0
           _.each(result, function (val: any, key: string | number) {
             // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
             // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
             // @ts-ignore
-            xidBasedResult[pidToXid[key]] = val;
-            size += 1;
-          });
+            xidBasedResult[pidToXid[key]] = val
+            size += 1
+          })
 
           if (
             strict &&
@@ -4884,65 +4925,65 @@ function handle_GET_participation(
               res,
               409,
               "polis_err_get_participation_missing_xids This conversation is missing xids for some of its participants.",
-            );
-            return;
+            )
+            return
           }
-          res.status(200).json(xidBasedResult);
+          res.status(200).json(xidBasedResult)
         } else {
-          res.status(200).json(result);
+          res.status(200).json(result)
         }
-      });
+      })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_participation_misc", err);
-    });
+      fail(res, 500, "polis_err_get_participation_misc", err)
+    })
 }
 function getAgeRange(demo: Demo) {
-  const currentYear = new Date().getUTCFullYear();
-  const birthYear = demo.ms_birth_year_estimate_fb;
+  const currentYear = new Date().getUTCFullYear()
+  const birthYear = demo.ms_birth_year_estimate_fb
   if (_.isNull(birthYear) || _.isUndefined(birthYear) || _.isNaN(birthYear)) {
-    return "?";
+    return "?"
   }
-  const age = currentYear - birthYear;
+  const age = currentYear - birthYear
   if (age < 12) {
-    return "0-11";
+    return "0-11"
   } else if (age < 18) {
-    return "12-17";
+    return "12-17"
   } else if (age < 25) {
-    return "18-24";
+    return "18-24"
   } else if (age < 35) {
-    return "25-34";
+    return "25-34"
   } else if (age < 45) {
-    return "35-44";
+    return "35-44"
   } else if (age < 55) {
-    return "45-54";
+    return "45-54"
   } else if (age < 65) {
-    return "55-64";
+    return "55-64"
   } else {
-    return "65+";
+    return "65+"
   }
 }
 
 function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
   function isAgree(v: { vote: any }) {
-    return v.vote === polisTypes.reactions.pull;
+    return v.vote === polisTypes.reactions.pull
   }
   function isDisgree(v: { vote: any }) {
-    return v.vote === polisTypes.reactions.push;
+    return v.vote === polisTypes.reactions.push
   }
   function isPass(v: { vote: any }) {
-    return v.vote === polisTypes.reactions.pass;
+    return v.vote === polisTypes.reactions.pass
   }
 
   function isGenderMale(demo: { gender: number }) {
-    return demo.gender === 0;
+    return demo.gender === 0
   }
   function isGenderFemale(demo: { gender: number }) {
-    return demo.gender === 1;
+    return demo.gender === 1
   }
   function isGenderUnknown(demo: { gender: any }) {
-    const gender = demo.gender;
-    return gender !== 0 && gender !== 1;
+    const gender = demo.gender
+    return gender !== 0 && gender !== 1
   }
 
   return Promise.all([
@@ -4954,23 +4995,23 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
       [zid],
     ),
   ]).then((a: any[]) => {
-    let votes = a[0];
-    let demo = a[1];
+    let votes = a[0]
+    let demo = a[1]
     demo = demo.map((d: Demo) => {
       return {
         pid: d.pid,
         // TODO: should we get rid of this?
         gender: 2,
         ageRange: getAgeRange(d),
-      };
-    });
-    const demoByPid = _.indexBy(demo, "pid");
+      }
+    })
+    const demoByPid = _.indexBy(demo, "pid")
 
     votes = votes.map((v: { pid: string | number }) => {
-      return _.extend(v, demoByPid[v.pid]);
-    });
+      return _.extend(v, demoByPid[v.pid])
+    })
 
-    const votesByTid = _.groupBy(votes, "tid");
+    const votesByTid = _.groupBy(votes, "tid")
 
     // TODO maybe we should actually look at gender, then a/d/p %
     // TODO maybe we should actually look at each age range, then a/d/p %
@@ -4978,28 +5019,28 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
 
     return comments.map(
       (c: {
-        tid: string | number;
+        tid: string | number
         demographics: {
           gender: {
-            m: { agree: any; disagree: any; pass: any };
-            f: { agree: any; disagree: any; pass: any };
-            "?": { agree: any; disagree: any; pass: any };
-          };
+            m: { agree: any; disagree: any; pass: any }
+            f: { agree: any; disagree: any; pass: any }
+            "?": { agree: any; disagree: any; pass: any }
+          }
           // TODO return all age ranges even if zero.
-          age: any;
-        };
+          age: any
+        }
       }) => {
-        const votesForThisComment = votesByTid[c.tid];
+        const votesForThisComment = votesByTid[c.tid]
 
         if (!votesForThisComment || !votesForThisComment.length) {
-          return c;
+          return c
         }
 
-        const agrees = votesForThisComment.filter(isAgree);
-        const disagrees = votesForThisComment.filter(isDisgree);
-        const passes = votesForThisComment.filter(isPass);
+        const agrees = votesForThisComment.filter(isAgree)
+        const disagrees = votesForThisComment.filter(isDisgree)
+        const passes = votesForThisComment.filter(isPass)
 
-        const votesByAgeRange = _.groupBy(votesForThisComment, "ageRange");
+        const votesByAgeRange = _.groupBy(votesForThisComment, "ageRange")
 
         c.demographics = {
           gender: {
@@ -5021,33 +5062,35 @@ function getDemographicsForVotersOnComments(zid: any, comments: any[]) {
           },
           // TODO return all age ranges even if zero.
           age: _.mapObject(votesByAgeRange, (votes: any) => {
-            const o = _.countBy(votes, "vote");
+            const o = _.countBy(votes, "vote")
             return {
               agree: o[polisTypes.reactions.pull],
               disagree: o[polisTypes.reactions.push],
               pass: o[polisTypes.reactions.pass],
-            };
+            }
           }),
-        };
-        return c;
+        }
+        return c
       },
-    );
-  });
+    )
+  })
 }
 
 function handle_GET_comments_translations(
   req: { p: { zid: any; tid: any; lang: string } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  const zid = req.p.zid;
-  const tid = req.p.tid;
-  const firstTwoCharsOfLang = req.p.lang.substr(0, 2);
+  const zid = req.p.zid
+  const tid = req.p.tid
+  const firstTwoCharsOfLang = req.p.lang.substr(0, 2)
 
   getComment(zid, tid)
     //   Argument of type '(comment: {    txt: any;}) => globalThis.Promise<void>' is not assignable to parameter of type '(value: Row) => void | PromiseLike<void>'.
@@ -5061,31 +5104,31 @@ function handle_GET_comments_translations(
       )
         .then((existingTranslations: any) => {
           if (existingTranslations) {
-            return existingTranslations;
+            return existingTranslations
           }
-          return translateAndStoreComment(zid, tid, comment.txt, req.p.lang);
+          return translateAndStoreComment(zid, tid, comment.txt, req.p.lang)
         })
         .then((rows: any) => {
-          res.status(200).json(rows || []);
-        });
+          res.status(200).json(rows || [])
+        })
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_get_comments_translations", err);
-    });
+      fail(res, 500, "polis_err_get_comments_translations", err)
+    })
 }
 
 function handle_GET_comments(
   req: {
-    headers?: Headers;
-    p: { rid: any; include_demographics: any; zid: any; uid?: any };
+    headers?: Headers
+    p: { rid: any; include_demographics: any; zid: any; uid?: any }
   },
   res: any,
 ) {
   const rid =
-    req?.headers?.["x-request-id"] + " " + req?.headers?.["user-agent"];
-  logger.debug("getComments begin", { rid });
+    req?.headers?.["x-request-id"] + " " + req?.headers?.["user-agent"]
+  logger.debug("getComments begin", { rid })
 
-  const isReportQuery = !_.isUndefined(req.p.rid);
+  const isReportQuery = !_.isUndefined(req.p.rid)
 
   // Argument of type '{ rid: any; include_demographics: any; zid: any; uid?: any; }' is not assignable to parameter of type 'O'.
   //   Type '{ rid: any; include_demographics: any; zid: any; uid?: any; }' is missing the following properties from type 'O': include_voting_patterns, modIn, pid, tids, and 9 more.ts(2345)
@@ -5097,18 +5140,18 @@ function handle_GET_comments(
           "select tid, selection from report_comment_selections where rid = ($1);",
           [req.p.rid],
         ).then((selections: any) => {
-          let tidToSelection = _.indexBy(selections, "tid");
+          let tidToSelection = _.indexBy(selections, "tid")
           comments = comments.map(
             (c: { includeInReport: any; tid: string | number }) => {
               c.includeInReport =
-                tidToSelection[c.tid] && tidToSelection[c.tid].selection > 0;
-              return c;
+                tidToSelection[c.tid] && tidToSelection[c.tid].selection > 0
+              return c
             },
-          );
-          return comments;
-        });
+          )
+          return comments
+        })
       } else {
-        return comments;
+        return comments
       }
     })
     .then(function (comments: any[]) {
@@ -5118,51 +5161,53 @@ function handle_GET_comments(
             if (owner || isReportQuery) {
               return getDemographicsForVotersOnComments(req.p.zid, comments)
                 .then((commentsWithDemographics: any) => {
-                  finishArray(res, commentsWithDemographics);
+                  finishArray(res, commentsWithDemographics)
                 })
                 .catch((err: any) => {
-                  fail(res, 500, "polis_err_get_comments3", err);
-                });
+                  fail(res, 500, "polis_err_get_comments3", err)
+                })
             } else {
-              fail(res, 500, "polis_err_get_comments_permissions");
+              fail(res, 500, "polis_err_get_comments_permissions")
             }
           })
           .catch((err: any) => {
-            fail(res, 500, "polis_err_get_comments2", err);
-          });
+            fail(res, 500, "polis_err_get_comments2", err)
+          })
       } else {
-        finishArray(res, comments);
+        finishArray(res, comments)
       }
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_comments", err);
-    });
+      fail(res, 500, "polis_err_get_comments", err)
+    })
 } // end GET /api/v3/comments
 function isDuplicateKey(err: {
-  code: string | number;
-  sqlState: string | number;
-  messagePrimary: string | string[];
+  code: string | number
+  sqlState: string | number
+  messagePrimary: string | string[]
 }) {
   let isdup =
     err.code === 23505 ||
     err.code === "23505" ||
     err.sqlState === 23505 ||
     err.sqlState === "23505" ||
-    (err.messagePrimary && err.messagePrimary.includes("duplicate key value"));
-  return isdup;
+    (err.messagePrimary && err.messagePrimary.includes("duplicate key value"))
+  return isdup
 }
 
 function failWithRetryRequest(res: {
-  setHeader: (arg0: string, arg1: number) => void;
-  writeHead: (arg0: number) => {
-    (): any;
-    new (): any;
-    send: { (arg0: number): void; new (): any };
-  };
+  setHeader: (arg0: string, arg1: number) => void
+  writeHead: (
+    arg0: number,
+  ) => {
+    (): any
+    new (): any
+    send: { (arg0: number): void; new (): any }
+  }
 }) {
-  res.setHeader("Retry-After", 0);
-  logger.warn("failWithRetryRequest");
-  res.writeHead(500).send(57493875);
+  res.setHeader("Retry-After", 0)
+  logger.warn("failWithRetryRequest")
+  res.writeHead(500).send(57493875)
 }
 
 function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
@@ -5174,20 +5219,20 @@ function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
         [zid, mod],
         function (err: any, result: { rows: { count: any }[] }) {
           if (err) {
-            reject(err);
+            reject(err)
           } else {
             let count =
-              result && result.rows && result.rows[0] && result.rows[0].count;
-            count = Number(count);
+              result && result.rows && result.rows[0] && result.rows[0].count
+            count = Number(count)
             if (isNaN(count)) {
-              count = void 0;
+              count = void 0
             }
-            resolve(count);
+            resolve(count)
           }
         },
-      );
+      )
     }),
-  );
+  )
 }
 
 function sendCommentModerationEmail(
@@ -5197,26 +5242,26 @@ function sendCommentModerationEmail(
   unmoderatedCommentCount: string | number,
 ) {
   if (_.isUndefined(unmoderatedCommentCount)) {
-    unmoderatedCommentCount = "";
+    unmoderatedCommentCount = ""
   }
-  let body = unmoderatedCommentCount;
+  let body = unmoderatedCommentCount
   if (unmoderatedCommentCount === 1) {
-    body += " Statement is waiting for your review here: ";
+    body += " Statement is waiting for your review here: "
   } else {
-    body += " Statements are waiting for your review here: ";
+    body += " Statements are waiting for your review here: "
   }
 
   getZinvite(zid)
     .catch(function (err: any) {
-      logger.error("polis_err_getting_zinvite", err);
-      return void 0;
+      logger.error("polis_err_getting_zinvite", err)
+      return void 0
     })
     .then(function (zinvite: any) {
       // NOTE: the counter goes in the email body so it doesn't create a new email thread (in Gmail, etc)
 
-      body += createProdModerationUrl(zinvite);
+      body += createProdModerationUrl(zinvite)
 
-      body += "\n\nThank you for using Metropolis.";
+      body += "\n\nThank you for using Metropolis."
 
       // NOTE: adding a changing element (date) at the end to prevent gmail from thinking the URL is a signature, and hiding it. (since the URL doesn't change between emails, Gmail tries to be smart, and hides it)
       // "Sent: " + Date.now() + "\n";
@@ -5226,28 +5271,28 @@ function sendCommentModerationEmail(
         uid,
         `Waiting for review (conversation ${zinvite})`,
         body,
-      );
+      )
     })
     .catch(function (err: any) {
-      logger.error("polis_err_sending_email", err);
-    });
+      logger.error("polis_err_sending_email", err)
+    })
 }
 
 function createProdModerationUrl(zinvite: string) {
-  return "https://metropolis.vote/m/" + zinvite;
+  return "https://metropolis.vote/m/" + zinvite
 }
 
 function createModerationUrl(
   req: { p?: ConversationType; protocol?: string; headers?: Headers },
   zinvite: string,
 ) {
-  let server = Config.getServerUrl();
+  let server = Config.getServerUrl()
   if (domainOverride) {
-    server = req?.protocol + "://" + domainOverride;
+    server = req?.protocol + "://" + domainOverride
   }
 
-  let url = server + "/m/" + zinvite;
-  return url;
+  let url = server + "/m/" + zinvite
+  return url
 }
 
 // function createMuteUrl(zid, tid) {
@@ -5285,16 +5330,16 @@ function moderateComment(
       [zid, tid, active, mod, is_meta],
       function (err: any) {
         if (err) {
-          reject(err);
+          reject(err)
         } else {
           // TODO an optimization would be to only add the task when the comment becomes visible after the mod.
-          addNotificationTask(zid);
+          addNotificationTask(zid)
 
-          resolve(undefined);
+          resolve(undefined)
         }
       },
-    );
-  });
+    )
+  })
 }
 
 // function muteComment(zid, tid) {
@@ -5357,14 +5402,14 @@ function moderateComment(
 //     });
 // }
 function hasBadWords(txt: string) {
-  txt = txt.toLowerCase();
-  let tokens = txt.split(" ");
+  txt = txt.toLowerCase()
+  let tokens = txt.split(" ")
   for (let i = 0; i < tokens.length; i++) {
     if (badwords[tokens[i]]) {
-      return true;
+      return true
     }
   }
-  return false;
+  return false
 }
 
 function commentExists(zid: any, txt: any) {
@@ -5372,52 +5417,52 @@ function commentExists(zid: any, txt: any) {
     zid,
     txt,
   ]).then(function (rows: string | any[]) {
-    return rows && rows.length;
-  });
+    return rows && rows.length
+  })
 }
 
 function handle_POST_comments(
   req: {
     p: {
-      zid?: any;
-      uid?: any;
-      txt?: any;
-      pid?: any;
-      quote_txt?: any;
-      quote_src_url?: any;
-      anon?: any;
-      is_seed?: any;
-    };
-    headers?: Headers;
-    connection?: { remoteAddress: any; socket: { remoteAddress: any } };
-    socket?: { remoteAddress: any };
+      zid?: any
+      uid?: any
+      txt?: any
+      pid?: any
+      quote_txt?: any
+      quote_src_url?: any
+      anon?: any
+      is_seed?: any
+    }
+    headers?: Headers
+    connection?: { remoteAddress: any; socket: { remoteAddress: any } }
+    socket?: { remoteAddress: any }
   },
   res: { json: (arg0: { tid: any; currentPid: any }) => void },
 ) {
-  let zid = req.p.zid;
-  let xid = void 0; //req.p.xid;
-  let uid = req.p.uid;
-  let txt = req.p.txt;
-  let pid = req.p.pid; // PID_FLOW may be undefined
-  let currentPid = pid;
-  let quote_txt = req.p.quote_txt;
-  let quote_src_url = req.p.quote_src_url;
-  let anon = req.p.anon;
-  let is_seed = req.p.is_seed;
-  let mustBeModerator = !!quote_txt || anon;
+  let zid = req.p.zid
+  let xid = void 0 //req.p.xid;
+  let uid = req.p.uid
+  let txt = req.p.txt
+  let pid = req.p.pid // PID_FLOW may be undefined
+  let currentPid = pid
+  let quote_txt = req.p.quote_txt
+  let quote_src_url = req.p.quote_src_url
+  let anon = req.p.anon
+  let is_seed = req.p.is_seed
+  let mustBeModerator = !!quote_txt || anon
 
   // either include txt, or a tweet id
   if (
     (_.isUndefined(txt) || txt === "") &&
     (_.isUndefined(quote_txt) || quote_txt === "")
   ) {
-    fail(res, 400, "polis_err_param_missing_txt");
-    return;
+    fail(res, 400, "polis_err_param_missing_txt")
+    return
   }
 
   if (quote_txt && _.isUndefined(quote_src_url)) {
-    fail(res, 400, "polis_err_param_missing_quote_src_url");
-    return;
+    fail(res, 400, "polis_err_param_missing_quote_src_url")
+    return
   }
 
   // get participant id
@@ -5432,24 +5477,24 @@ function handle_POST_comments(
           return addParticipant(req.p.zid, req.p.uid).then(function (
             rows: any[],
           ) {
-            let ptpt = rows[0];
-            pid = ptpt.pid;
-            currentPid = pid;
-            return pid;
-          });
+            let ptpt = rows[0]
+            pid = ptpt.pid
+            currentPid = pid
+            return pid
+          })
         } else {
-          return pid;
+          return pid
         }
-      });
+      })
     }
-    return Promise.resolve(pid);
+    return Promise.resolve(pid)
   }
 
   let ip =
     req?.headers?.["x-forwarded-for"] || // TODO This header may contain multiple IP addresses. Which should we report?
     req?.connection?.remoteAddress ||
     req?.socket?.remoteAddress ||
-    req?.connection?.socket.remoteAddress;
+    req?.connection?.socket.remoteAddress
 
   let isSpamPromise = isSpam({
     comment_content: txt,
@@ -5458,30 +5503,30 @@ function handle_POST_comments(
     user_ip: ip,
     user_agent: req?.headers?.["user-agent"],
     referrer: req?.headers?.referer,
-  });
+  })
   isSpamPromise.catch(function (err: any) {
-    logger.error("isSpam failed", err);
-  });
-  let isOwnerPromise = isOwner(zid, uid);
+    logger.error("isSpam failed", err)
+  })
+  let isOwnerPromise = isOwner(zid, uid)
 
-  let conversationInfoPromise = getConversationInfo(zid);
+  let conversationInfoPromise = getConversationInfo(zid)
 
-  let shouldCreateXidRecord = false;
+  let shouldCreateXidRecord = false
 
   // get external user id
   let xidUserPromise =
     !_.isUndefined(xid) && !_.isNull(xid)
       ? getXidStuff(xid, zid)
-      : Promise.resolve();
+      : Promise.resolve()
 
   // get participant id based on external id
   const pidPromise = xidUserPromise.then(
     (xidUser: UserType | "noXidRecord") => {
-      shouldCreateXidRecord = xidUser === "noXidRecord";
+      shouldCreateXidRecord = xidUser === "noXidRecord"
       if (typeof xidUser === "object") {
-        uid = xidUser.uid;
-        pid = xidUser.pid;
-        return pid;
+        uid = xidUser.uid
+        pid = xidUser.pid
+        return pid
       } else {
         return doGetPid().then((pid: any) => {
           if (shouldCreateXidRecord) {
@@ -5489,16 +5534,16 @@ function handle_POST_comments(
             // conversation.ts(34, 3): An argument for 'x_profile_image_url' was not provided.
             // @ts-ignore
             return createXidRecordByZid(zid, uid, xid).then(() => {
-              return pid;
-            });
+              return pid
+            })
           }
-          return pid;
-        });
+          return pid
+        })
       }
     },
-  );
+  )
 
-  let commentExistsPromise = commentExists(zid, txt);
+  let commentExistsPromise = commentExists(zid, txt)
 
   // main logic
   return Promise.all([
@@ -5508,83 +5553,83 @@ function handle_POST_comments(
     commentExistsPromise,
   ]).then(
     function (results: any[]) {
-      let pid = results[0];
-      let conv = results[1];
-      let is_moderator = results[2];
-      let commentExists = results[3];
+      let pid = results[0]
+      let conv = results[1]
+      let is_moderator = results[2]
+      let commentExists = results[3]
 
       if (!is_moderator && mustBeModerator) {
-        fail(res, 403, "polis_err_post_comment_auth");
-        return;
+        fail(res, 403, "polis_err_post_comment_auth")
+        return
       }
 
       if (pid < 0) {
         // NOTE: this API should not be called in /demo mode
-        fail(res, 500, "polis_err_post_comment_bad_pid");
-        return;
+        fail(res, 500, "polis_err_post_comment_bad_pid")
+        return
       }
 
       if (commentExists) {
-        fail(res, 409, "polis_err_post_comment_duplicate");
-        return;
+        fail(res, 409, "polis_err_post_comment_duplicate")
+        return
       }
 
       if (!conv.is_active) {
-        fail(res, 403, "polis_err_conversation_is_closed");
-        return;
+        fail(res, 403, "polis_err_conversation_is_closed")
+        return
       }
 
       if (_.isUndefined(txt)) {
-        logger.error("polis_err_post_comments_missing_txt");
-        throw "polis_err_post_comments_missing_txt";
+        logger.error("polis_err_post_comments_missing_txt")
+        throw "polis_err_post_comments_missing_txt"
       }
-      let bad = hasBadWords(txt);
+      let bad = hasBadWords(txt)
 
       return isSpamPromise
         .then(
           function (spammy: any) {
-            return spammy;
+            return spammy
           },
           function (err: any) {
-            logger.error("spam check failed", err);
-            return false; // spam check failed, continue assuming "not spammy".
+            logger.error("spam check failed", err)
+            return false // spam check failed, continue assuming "not spammy".
           },
         )
         .then(function (spammy: any) {
-          let velocity = 1;
-          let active = true;
-          let classifications = [];
+          let velocity = 1
+          let active = true
+          let classifications = []
           if (bad && conv.profanity_filter) {
-            active = false;
-            classifications.push("bad");
-            logger.info("active=false because (bad && conv.profanity_filter)");
+            active = false
+            classifications.push("bad")
+            logger.info("active=false because (bad && conv.profanity_filter)")
           }
           if (spammy && conv.spam_filter) {
-            active = false;
-            classifications.push("spammy");
-            logger.info("active=false because (spammy && conv.spam_filter)");
+            active = false
+            classifications.push("spammy")
+            logger.info("active=false because (spammy && conv.spam_filter)")
           }
           if (conv.strict_moderation) {
-            active = false;
-            logger.info("active=false because (conv.strict_moderation)");
+            active = false
+            logger.info("active=false because (conv.strict_moderation)")
           }
 
-          let mod = 0; // hasn't yet been moderated.
+          let mod = 0 // hasn't yet been moderated.
 
           // moderators' comments are automatically in (when prepopulating).
           if (is_moderator && is_seed) {
-            mod = polisTypes.mod.ok;
-            active = true;
+            mod = polisTypes.mod.ok
+            active = true
           }
-          let authorUid = uid;
+          let authorUid = uid
 
           Promise.all([detectLanguage(txt)]).then((a: any[]) => {
-            let detections = a[0];
+            let detections = a[0]
             let detection = Array.isArray(detections)
               ? detections[0]
-              : detections;
-            let lang = detection.language;
-            let lang_confidence = detection.confidence;
+              : detections
+            let lang = detection.language
+            let lang_confidence = detection.confidence
 
             // actually create comment
             return queryP(
@@ -5612,8 +5657,8 @@ function handle_POST_comments(
               //                     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
               // @ts-ignore
               function (docs: any[]) {
-                let comment = docs && docs[0];
-                let tid = comment && comment.tid;
+                let comment = docs && docs[0]
+                let tid = comment && comment.tid
                 // let createdTime = comment && comment.created;
 
                 if (bad || spammy || conv.strict_moderation) {
@@ -5625,108 +5670,108 @@ function handle_POST_comments(
                       logger.error(
                         "polis_err_getting_modstatus_comment_count",
                         err,
-                      );
-                      return void 0;
+                      )
+                      return void 0
                     })
                     .then(function (n: any) {
                       if (n === 0) {
-                        return;
+                        return
                       }
                       queryP_readOnly(
                         "select * from users where site_id = (select site_id from page_ids where zid = ($1)) UNION select * from users where uid = ($2);",
                         [zid, conv.owner],
                       ).then(function (users: any) {
-                        let uids = _.pluck(users, "uid");
+                        let uids = _.pluck(users, "uid")
                         // also notify polis team for moderation
                         uids.forEach(function (uid?: any) {
-                          sendCommentModerationEmail(req, uid, zid, n);
-                        });
-                      });
-                    });
+                          sendCommentModerationEmail(req, uid, zid, n)
+                        })
+                      })
+                    })
                 } else {
-                  addNotificationTask(zid);
+                  addNotificationTask(zid)
                 }
 
-                let createdTime = comment.created;
+                let createdTime = comment.created
 
                 setTimeout(function () {
-                  updateConversationModifiedTime(zid, createdTime);
-                  updateLastInteractionTimeForConversation(zid, uid);
-                }, 100);
+                  updateConversationModifiedTime(zid, createdTime)
+                  updateLastInteractionTimeForConversation(zid, uid)
+                }, 100)
 
                 res.json({
                   tid: tid,
                   currentPid: currentPid,
-                });
+                })
               },
               function (err: { code: string | number }) {
                 if (err.code === "23505" || err.code === 23505) {
                   // duplicate comment
-                  fail(res, 409, "polis_err_post_comment_duplicate", err);
+                  fail(res, 409, "polis_err_post_comment_duplicate", err)
                 } else {
-                  fail(res, 500, "polis_err_post_comment", err);
+                  fail(res, 500, "polis_err_post_comment", err)
                 }
               },
-            ); // insert
-          }); // lang
-        });
+            ) // insert
+          }) // lang
+        })
     },
     function (errors: any[]) {
       if (errors[0]) {
-        fail(res, 500, "polis_err_getting_pid", errors[0]);
-        return;
+        fail(res, 500, "polis_err_getting_pid", errors[0])
+        return
       }
       if (errors[1]) {
-        fail(res, 500, "polis_err_getting_conv_info", errors[1]);
-        return;
+        fail(res, 500, "polis_err_getting_conv_info", errors[1])
+        return
       }
     },
-  );
+  )
 } // end POST /api/v3/comments
 
 async function handle_GET_votes_me(
   req: { p: { zid: any; uid?: any; pid: any } },
   res: any,
 ) {
-  let pid;
+  let pid
 
   try {
-    pid = await getPidPromise(req.p.zid, req.p.uid);
+    pid = await getPidPromise(req.p.zid, req.p.uid)
   } catch (err) {
-    fail(res, 500, "polis_err_getting_pid", err);
-    return;
+    fail(res, 500, "polis_err_getting_pid", err)
+    return
   }
 
   if (pid < 0) {
-    fail(res, 500, "polis_err_getting_pid");
-    return;
+    fail(res, 500, "polis_err_getting_pid")
+    return
   }
 
-  let rows;
+  let rows
   try {
     rows = await queryP_readOnly(
       "SELECT * FROM votes WHERE zid = ($1) AND pid = ($2);",
       [req.p.zid, req.p.pid],
-    );
+    )
   } catch (err) {
-    fail(res, 500, "polis_err_get_votes_by_me", err);
-    return;
+    fail(res, 500, "polis_err_get_votes_by_me", err)
+    return
   }
   for (let i = 0; i < rows.length; i++) {
-    rows[i].weight = rows[i].weight / 32767;
+    rows[i].weight = rows[i].weight / 32767
   }
-  finishArray(res, rows);
+  finishArray(res, rows)
 }
 
 function handle_GET_votes(req: { p: any }, res: any) {
   getVotesForSingleParticipant(req.p).then(
     function (votes: any) {
-      finishArray(res, votes);
+      finishArray(res, votes)
     },
     function (err: any) {
-      fail(res, 500, "polis_err_votes_get", err);
+      fail(res, 500, "polis_err_votes_get", err)
     },
-  );
+  )
 }
 
 function selectProbabilistically(
@@ -5743,22 +5788,22 @@ function selectProbabilistically(
       // If we like, we can use nTotal and nRemaining here to figure out how much we should emphasize the
       // priority, potentially. Maybe we end up with different classes of priorities lists for this purpose?
       // scaling this value in some way may also be helpful.
-      let lookup_val = o.lastCount + (priorities[comment.tid] || 1);
-      o.lookup.push([lookup_val, comment]);
-      o.lastCount = lookup_val;
-      return o;
+      let lookup_val = o.lastCount + (priorities[comment.tid] || 1)
+      o.lookup.push([lookup_val, comment])
+      o.lastCount = lookup_val
+      return o
     },
     { lastCount: 0, lookup: [] },
-  );
+  )
   // We arrange a random number that should fall somewhere in the range of the lookup_vals
-  let randomN = Math.random() * lookup.lastCount;
+  let randomN = Math.random() * lookup.lastCount
   // Return the first one that has a greater lookup; could eventually replace this with something smarter
   // that does a bisectional lookup if performance becomes an issue. But I want to keep the implementation
   // simple to reason about all other things being equal.
-  let result = _.find(lookup.lookup, (x: number[]) => x[0] > randomN);
-  let c = result?.[1];
-  c.randomN = randomN;
-  return c;
+  let result = _.find(lookup.lookup, (x: number[]) => x[0] > randomN)
+  let c = result?.[1]
+  c.randomN = randomN
+  return c
 }
 
 // This very much follows the outline of the random selection above, but factors out the probabilistic logic
@@ -5775,9 +5820,9 @@ function getNextPrioritizedComment(
     zid: zid,
     not_voted_by_pid: pid,
     include_social: include_social,
-  };
+  }
   if (!_.isUndefined(withoutTids) && withoutTids.length) {
-    params.withoutTids = withoutTids;
+    params.withoutTids = withoutTids
   }
   // What should we set timestamp to below in getPca? Is 0 ok? What triggers updates?
   return Promise.all([
@@ -5785,39 +5830,39 @@ function getNextPrioritizedComment(
     getPca(zid, 0),
     getNumberOfCommentsRemaining(zid, pid),
   ]).then((results: any[]) => {
-    let comments = results[0];
-    let math = results[1];
-    let numberOfCommentsRemainingRows = results[2];
+    let comments = results[0]
+    let math = results[1]
+    let numberOfCommentsRemainingRows = results[2]
     logger.debug("getNextPrioritizedComment intermediate results:", {
       zid,
       pid,
       numberOfCommentsRemainingRows,
-    });
+    })
     if (!comments || !comments.length) {
-      return null;
+      return null
     } else if (
       !numberOfCommentsRemainingRows ||
       !numberOfCommentsRemainingRows.length
     ) {
       throw new Error(
         "polis_err_getNumberOfCommentsRemaining_" + zid + "_" + pid,
-      );
+      )
     }
-    let commentPriorities = math ? math.asPOJO["comment-priorities"] || {} : {};
-    let nTotal = Number(numberOfCommentsRemainingRows[0].total);
-    let nRemaining = Number(numberOfCommentsRemainingRows[0].remaining);
-    let c = selectProbabilistically(comments, commentPriorities);
-    c.remaining = nRemaining;
-    c.total = nTotal;
-    return c;
-  });
+    let commentPriorities = math ? math.asPOJO["comment-priorities"] || {} : {}
+    let nTotal = Number(numberOfCommentsRemainingRows[0].total)
+    let nRemaining = Number(numberOfCommentsRemainingRows[0].remaining)
+    let c = selectProbabilistically(comments, commentPriorities)
+    c.remaining = nRemaining
+    c.total = nTotal
+    return c
+  })
 }
 
 function getCommentTranslations(zid: any, tid: any) {
   return queryP(
     "select * from comment_translations where zid = ($1) and tid = ($2);",
     [zid, tid],
-  );
+  )
 }
 
 function getNextComment(
@@ -5830,30 +5875,30 @@ function getNextComment(
   return getNextPrioritizedComment(zid, pid, withoutTids, include_social).then(
     (c: CommentType) => {
       if (lang && c) {
-        const firstTwoCharsOfLang = lang.substr(0, 2);
+        const firstTwoCharsOfLang = lang.substr(0, 2)
         return getCommentTranslations(zid, c.tid).then((translations: any) => {
-          c.translations = translations;
+          c.translations = translations
           let hasMatch = _.some(translations, (t: { lang: string }) => {
-            return t.lang.startsWith(firstTwoCharsOfLang);
-          });
+            return t.lang.startsWith(firstTwoCharsOfLang)
+          })
           if (!hasMatch) {
             return translateAndStoreComment(zid, c.tid, c.txt, lang).then(
               (translation: any) => {
                 if (translation) {
-                  c.translations.push(translation);
+                  c.translations.push(translation)
                 }
-                return c;
+                return c
               },
-            );
+            )
           }
-          return c;
-        });
+          return c
+        })
       } else if (c) {
-        c.translations = [];
+        c.translations = []
       }
-      return c;
+      return c
     },
-  );
+  )
 }
 
 // NOTE: only call this in response to a vote. Don't call this from a poll, like /api/v3/nextComment
@@ -5862,30 +5907,32 @@ function addNoMoreCommentsRecord(zid: any, pid: any) {
     "insert into event_ptpt_no_more_comments (zid, pid, votes_placed) values ($1, $2, " +
       "(select count(*) from votes where zid = ($1) and pid = ($2)))",
     [zid, pid],
-  );
+  )
 }
 
 function handle_GET_nextComment(
   req: {
-    timedout: any;
+    timedout: any
     p: {
-      zid: any;
-      not_voted_by_pid: any;
-      without: any;
-      include_social: any;
-      lang: any;
-    };
+      zid: any
+      not_voted_by_pid: any
+      without: any
+      include_social: any
+      lang: any
+    }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   if (req.timedout) {
-    return;
+    return
   }
   // NOTE: I tried to speed up this query by adding db indexes, and by removing queries like getConversationInfo and finishOne.
   //          They didn't help much, at least under current load, which is negligible. pg:diagnose isn't complaining about indexes.
@@ -5904,71 +5951,73 @@ function handle_GET_nextComment(
     .then(
       function (c: { currentPid: any }) {
         if (req.timedout) {
-          return;
+          return
         }
         if (c) {
           if (!_.isUndefined(req.p.not_voted_by_pid)) {
-            c.currentPid = req.p.not_voted_by_pid;
+            c.currentPid = req.p.not_voted_by_pid
           }
-          finishOne(res, c);
+          finishOne(res, c)
         } else {
-          let o: CommentOptions = {};
+          let o: CommentOptions = {}
           if (!_.isUndefined(req.p.not_voted_by_pid)) {
-            o.currentPid = req.p.not_voted_by_pid;
+            o.currentPid = req.p.not_voted_by_pid
           }
-          res.status(200).json(o);
+          res.status(200).json(o)
         }
       },
       function (err: any) {
         if (req.timedout) {
-          return;
+          return
         }
-        fail(res, 500, "polis_err_get_next_comment2", err);
+        fail(res, 500, "polis_err_get_next_comment2", err)
       },
     )
     .catch(function (err: any) {
       if (req.timedout) {
-        return;
+        return
       }
-      fail(res, 500, "polis_err_get_next_comment", err);
-    });
+      fail(res, 500, "polis_err_get_next_comment", err)
+    })
 }
 function handle_GET_participationInit(
   req: {
     p: {
-      conversation_id: any;
-      uid?: any;
-      lang: string;
-      zid: any;
-      xid: any;
-      owner_uid?: any;
-      pid: any;
-    };
-    headers?: Headers;
-    cookies: { [x: string]: any };
+      conversation_id: any
+      uid?: any
+      lang: string
+      zid: any
+      xid: any
+      owner_uid?: any
+      pid: any
+    }
+    headers?: Headers
+    cookies: { [x: string]: any }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
       json: {
         (arg0: {
-          user: any;
-          ptpt: any;
-          nextComment: any;
-          conversation: any;
-          votes: any;
-          pca: any;
-          famous: any;
+          user: any
+          ptpt: any
+          nextComment: any
+          conversation: any
+          votes: any
+          pca: any
+          famous: any
           // famous: JSON.parse(arr[6]),
-          acceptLanguage: any;
-        }): void;
-        new (): any;
-      };
-    };
+          acceptLanguage: any
+        }): void
+        new (): any
+      }
+    }
   },
 ) {
-  logger.info("handle_GET_participationInit");
+  logger.info("handle_GET_participationInit")
   // let qs = {
   //   conversation_id: req.p.conversation_id,
   // };
@@ -6021,43 +6070,43 @@ function handle_GET_participationInit(
         withoutTids: any,
         include_social: any,
         lang?: any,
-      ): CommentType;
-      (zid: any, uid?: any, lang?: any): any;
-      (p: any): any;
-      (zid: any, math_tick: any): any;
-      (o: any, req: any): any;
-      apply?: any;
+      ): CommentType
+      (zid: any, uid?: any, lang?: any): any
+      (p: any): any
+      (zid: any, math_tick: any): any
+      (o: any, req: any): any
+      apply?: any
     },
     args: any[],
   ) {
     if (req.p.conversation_id) {
       // eslint-disable-next-line prefer-spread
-      return f.apply(null, args);
+      return f.apply(null, args)
     } else {
-      return Promise.resolve(null);
+      return Promise.resolve(null)
     }
   }
 
   function ifConvAndAuth(f: (zid: any, uid?: any) => any, args: any[]) {
     if (req.p.uid) {
-      return ifConv(f, args);
+      return ifConv(f, args)
     } else {
-      return Promise.resolve(null);
+      return Promise.resolve(null)
     }
   }
 
   let acceptLanguage =
     req?.headers?.["accept-language"] ||
     req?.headers?.["Accept-Language"] ||
-    "en-US";
+    "en-US"
 
   if (req.p.lang === "acceptLang") {
     // "en-US,en;q=0.8,da;q=0.6,it;q=0.4,es;q=0.2,pt-BR;q=0.2,pt;q=0.2" --> "en-US"
     // req.p.lang = acceptLanguage.match("^[^,;]*")[0];
-    req.p.lang = acceptLanguage.substr(0, 2);
+    req.p.lang = acceptLanguage.substr(0, 2)
   }
 
-  getPermanentCookieAndEnsureItIsSet(req, res);
+  getPermanentCookieAndEnsureItIsSet(req, res)
 
   Promise.all([
     // request.get({uri: "http://" + SELF_HOSTNAME + "/api/v3/users", qs: qs, headers: req.headers, gzip: true}),
@@ -6094,7 +6143,7 @@ function handle_GET_participationInit(
   ])
     .then(
       function (arr: any[]) {
-        let conv = arr[3];
+        let conv = arr[3]
         let o = {
           user: arr[0],
           ptpt: arr[1],
@@ -6105,98 +6154,98 @@ function handle_GET_participationInit(
           famous: arr[6],
           // famous: JSON.parse(arr[6]),
           acceptLanguage: acceptLanguage,
-        };
+        }
         if (o.conversation) {
-          delete o.conversation.zid;
-          o.conversation.conversation_id = req.p.conversation_id;
+          delete o.conversation.zid
+          o.conversation.conversation_id = req.p.conversation_id
         }
         if (o.ptpt) {
-          delete o.ptpt.zid;
+          delete o.ptpt.zid
         }
         for (let i = 0; i < o.votes.length; i++) {
-          delete o.votes[i].zid; // strip zid for security
+          delete o.votes[i].zid // strip zid for security
           // delete o.votes[i].pid; // because it's extra crap. Feel free to delete this line if you need pid.
         }
         if (!o.nextComment) {
-          o.nextComment = {};
+          o.nextComment = {}
         }
         if (!_.isUndefined(req.p.pid)) {
-          o.nextComment.currentPid = req.p.pid;
+          o.nextComment.currentPid = req.p.pid
         }
 
-        res.status(200).json(o);
+        res.status(200).json(o)
       },
       function (err: any) {
-        fail(res, 500, "polis_err_get_participationInit2", err);
+        fail(res, 500, "polis_err_get_participationInit2", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_participationInit", err);
-    });
+      fail(res, 500, "polis_err_get_participationInit", err)
+    })
 }
 
 function updateConversationModifiedTime(zid: any, t?: undefined) {
-  let modified = _.isUndefined(t) ? Date.now() : Number(t);
+  let modified = _.isUndefined(t) ? Date.now() : Number(t)
   let query =
-    "update conversations set modified = ($2) where zid = ($1) and modified < ($2);";
-  let params = [zid, modified];
+    "update conversations set modified = ($2) where zid = ($1) and modified < ($2);"
+  let params = [zid, modified]
   if (_.isUndefined(t)) {
     query =
-      "update conversations set modified = now_as_millis() where zid = ($1);";
-    params = [zid];
+      "update conversations set modified = now_as_millis() where zid = ($1);"
+    params = [zid]
   }
-  return queryP(query, params);
+  return queryP(query, params)
 }
 
 function handle_PUT_participants_extended(
   req: { p: { zid: any; uid?: any; show_translation_activated: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
+  let zid = req.p.zid
+  let uid = req.p.uid
 
-  let fields: ParticipantFields = {};
+  let fields: ParticipantFields = {}
   if (!_.isUndefined(req.p.show_translation_activated)) {
-    fields.show_translation_activated = req.p.show_translation_activated;
+    fields.show_translation_activated = req.p.show_translation_activated
   }
 
   let q = sql_participants_extended
     .update(fields)
     .where(sql_participants_extended.zid.equals(zid))
-    .and(sql_participants_extended.uid.equals(uid));
+    .and(sql_participants_extended.uid.equals(uid))
 
   queryP(q.toString(), [])
     .then((result: any) => {
-      res.json(result);
+      res.json(result)
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_put_participants_extended", err);
-    });
+      fail(res, 500, "polis_err_put_participants_extended", err)
+    })
 }
 
 function handle_POST_votes(
   req: {
-    p: Vote;
-    cookies: { [x: string]: any };
-    headers?: Headers;
+    p: Vote
+    cookies: { [x: string]: any }
+    headers?: Headers
   },
   res: any,
 ) {
-  let uid = req.p.uid; // PID_FLOW uid may be undefined here.
-  let zid = req.p.zid;
-  let pid = req.p.pid; // PID_FLOW pid may be undefined here.
-  let lang = req.p.lang;
+  let uid = req.p.uid // PID_FLOW uid may be undefined here.
+  let zid = req.p.zid
+  let pid = req.p.pid // PID_FLOW pid may be undefined here.
+  let lang = req.p.lang
 
   // We allow viewing (and possibly writing) without cookies enabled, but voting requires cookies (except the auto-vote on your own comment, which seems ok)
-  let token = req.cookies[COOKIES.TOKEN];
-  let apiToken = req?.headers?.authorization || "";
-  let xPolisHeaderToken = req?.headers?.["x-polis"];
+  let token = req.cookies[COOKIES.TOKEN]
+  let apiToken = req?.headers?.authorization || ""
+  let xPolisHeaderToken = req?.headers?.["x-polis"]
   if (!uid && !token && !apiToken && !xPolisHeaderToken) {
-    fail(res, 403, "polis_err_vote_noauth");
-    return;
+    fail(res, 403, "polis_err_vote_noauth")
+    return
   }
 
-  let permanent_cookie = getPermanentCookieAndEnsureItIsSet(req, res);
+  let permanent_cookie = getPermanentCookieAndEnsureItIsSet(req, res)
 
   // PID_FLOW WIP for now assume we have a uid, but need a participant record.
   let pidReadyPromise = _.isUndefined(req.p.pid)
@@ -6206,14 +6255,14 @@ function handle_POST_votes(
         req,
         permanent_cookie,
       ).then(function (rows: any[]) {
-        let ptpt = rows[0];
-        pid = ptpt.pid;
+        let ptpt = rows[0]
+        pid = ptpt.pid
       })
-    : Promise.resolve();
+    : Promise.resolve()
   pidReadyPromise
     .then(function () {
       // let conv;
-      let vote;
+      let vote
 
       // PID_FLOW WIP for now assume we have a uid, but need a participant record.
       let pidReadyPromise = _.isUndefined(pid)
@@ -6222,10 +6271,10 @@ function handle_POST_votes(
           //         Type 'unknown' is not assignable to type 'any[]'.ts(2345)
           // @ts-ignore
           addParticipant(zid, uid).then(function (rows: any[]) {
-            let ptpt = rows[0];
-            pid = ptpt.pid;
+            let ptpt = rows[0]
+            pid = ptpt.pid
           })
-        : Promise.resolve();
+        : Promise.resolve()
 
       return pidReadyPromise
         .then(function () {
@@ -6237,104 +6286,104 @@ function handle_POST_votes(
             req.p.vote,
             req.p.weight,
             req.p.high_priority,
-          );
+          )
         })
         .then(function (o: { vote: any }) {
           // conv = o.conv;
-          vote = o.vote;
-          let createdTime = vote.created;
+          vote = o.vote
+          let createdTime = vote.created
           setTimeout(function () {
-            updateConversationModifiedTime(zid, createdTime);
-            updateLastInteractionTimeForConversation(zid, uid);
+            updateConversationModifiedTime(zid, createdTime)
+            updateLastInteractionTimeForConversation(zid, uid)
 
             // NOTE: may be greater than number of comments, if they change votes
-            updateVoteCount(zid, pid);
-          }, 100);
+            updateVoteCount(zid, pid)
+          }, 100)
           if (_.isUndefined(req.p.starred)) {
-            return;
+            return
           } else {
-            return addStar(zid, req.p.tid, pid, req.p.starred, createdTime);
+            return addStar(zid, req.p.tid, pid, req.p.starred, createdTime)
           }
         })
         .then(function () {
-          return getNextComment(zid, pid, [], true, lang);
+          return getNextComment(zid, pid, [], true, lang)
         })
         .then(function (nextComment: any) {
           logger.debug("handle_POST_votes nextComment:", {
             zid,
             pid,
             nextComment,
-          });
-          let result: PidReadyResult = {};
+          })
+          let result: PidReadyResult = {}
           if (nextComment) {
-            result.nextComment = nextComment;
+            result.nextComment = nextComment
           } else {
             // no need to wait for this to finish
-            addNoMoreCommentsRecord(zid, pid);
+            addNoMoreCommentsRecord(zid, pid)
           }
           // PID_FLOW This may be the first time the client gets the pid.
-          result.currentPid = pid;
+          result.currentPid = pid
           // result.shouldMod = true; // TODO
           if (result.shouldMod) {
-            result.modOptions = {};
+            result.modOptions = {}
             if (req.p.vote === polisTypes.reactions.pull) {
-              result.modOptions.as_important = true;
-              result.modOptions.as_factual = true;
-              result.modOptions.as_feeling = true;
+              result.modOptions.as_important = true
+              result.modOptions.as_factual = true
+              result.modOptions.as_feeling = true
             } else if (req.p.vote === polisTypes.reactions.push) {
-              result.modOptions.as_notmyfeeling = true;
-              result.modOptions.as_notgoodidea = true;
-              result.modOptions.as_notfact = true;
-              result.modOptions.as_abusive = true;
+              result.modOptions.as_notmyfeeling = true
+              result.modOptions.as_notgoodidea = true
+              result.modOptions.as_notfact = true
+              result.modOptions.as_abusive = true
             } else if (req.p.vote === polisTypes.reactions.pass) {
-              result.modOptions.as_unsure = true;
-              result.modOptions.as_spam = true;
-              result.modOptions.as_abusive = true;
+              result.modOptions.as_unsure = true
+              result.modOptions.as_spam = true
+              result.modOptions.as_abusive = true
             }
           }
 
-          finishOne(res, result);
-        });
+          finishOne(res, result)
+        })
     })
     .catch(function (err: string) {
       if (err === "polis_err_vote_duplicate") {
-        fail(res, 406, "polis_err_vote_duplicate", err); // TODO allow for changing votes?
+        fail(res, 406, "polis_err_vote_duplicate", err) // TODO allow for changing votes?
       } else if (err === "polis_err_conversation_is_closed") {
-        fail(res, 403, "polis_err_conversation_is_closed", err);
+        fail(res, 403, "polis_err_conversation_is_closed", err)
       } else if (err === "polis_err_post_votes_social_needed") {
-        fail(res, 403, "polis_err_post_votes_social_needed", err);
+        fail(res, 403, "polis_err_post_votes_social_needed", err)
       } else {
-        fail(res, 500, "polis_err_vote", err);
+        fail(res, 500, "polis_err_vote", err)
       }
-    });
+    })
 }
 
 function handle_POST_ptptCommentMod(
   req: {
     p: {
-      zid: any;
-      pid: any;
-      uid?: any;
-      tid: any;
-      as_abusive: any;
-      as_factual: any;
-      as_feeling: any;
-      as_important: any;
-      as_notfact: any;
-      as_notgoodidea: any;
-      as_notmyfeeling: any;
-      as_offtopic: any;
-      as_spam: any;
-      unsure: any;
-      lang: any;
-    };
+      zid: any
+      pid: any
+      uid?: any
+      tid: any
+      as_abusive: any
+      as_factual: any
+      as_feeling: any
+      as_important: any
+      as_notfact: any
+      as_notgoodidea: any
+      as_notmyfeeling: any
+      as_offtopic: any
+      as_spam: any
+      unsure: any
+      lang: any
+    }
   },
   res: any,
 ) {
-  let zid = req.p.zid;
-  let pid = req.p.pid;
+  let zid = req.p.zid
+  let pid = req.p.pid
 
-  let uid = req.p.uid;
+  let uid = req.p.uid
 
   // need('as_important', getBool, assignToP, false),
   // need('as_spam', getBool, assignToP, false),
@@ -6386,48 +6435,50 @@ function handle_POST_ptptCommentMod(
   )
     .then((createdTime: any) => {
       setTimeout(function () {
-        updateConversationModifiedTime(req.p.zid, createdTime);
-        updateLastInteractionTimeForConversation(zid, uid);
-      }, 100);
+        updateConversationModifiedTime(req.p.zid, createdTime)
+        updateLastInteractionTimeForConversation(zid, uid)
+      }, 100)
     })
     .then(function () {
-      return getNextComment(req.p.zid, pid, [], true, req.p.lang); // TODO req.p.lang is probably not defined
+      return getNextComment(req.p.zid, pid, [], true, req.p.lang) // TODO req.p.lang is probably not defined
     })
     .then(function (nextComment: any) {
-      let result: ParticipantCommentModerationResult = {};
+      let result: ParticipantCommentModerationResult = {}
       if (nextComment) {
-        result.nextComment = nextComment;
+        result.nextComment = nextComment
       } else {
         // no need to wait for this to finish
-        addNoMoreCommentsRecord(req.p.zid, pid);
+        addNoMoreCommentsRecord(req.p.zid, pid)
       }
       // PID_FLOW This may be the first time the client gets the pid.
-      result.currentPid = req.p.pid;
-      finishOne(res, result);
+      result.currentPid = req.p.pid
+      finishOne(res, result)
     })
     .catch(function (err: string) {
       if (err === "polis_err_ptptCommentMod_duplicate") {
-        fail(res, 406, "polis_err_ptptCommentMod_duplicate", err); // TODO allow for changing votes?
+        fail(res, 406, "polis_err_ptptCommentMod_duplicate", err) // TODO allow for changing votes?
       } else if (err === "polis_err_conversation_is_closed") {
-        fail(res, 403, "polis_err_conversation_is_closed", err);
+        fail(res, 403, "polis_err_conversation_is_closed", err)
       } else {
-        fail(res, 500, "polis_err_ptptCommentMod", err);
+        fail(res, 500, "polis_err_ptptCommentMod", err)
       }
-    });
+    })
 }
 
 function handle_POST_upvotes(
   req: { p: { uid?: any; zid: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
+  let uid = req.p.uid
+  let zid = req.p.zid
 
   queryP("select * from upvotes where uid = ($1) and zid = ($2);", [
     uid,
@@ -6435,7 +6486,7 @@ function handle_POST_upvotes(
   ]).then(
     function (rows: string | any[]) {
       if (rows && rows.length) {
-        fail(res, 403, "polis_err_upvote_already_upvoted");
+        fail(res, 403, "polis_err_upvote_already_upvoted")
       } else {
         queryP("insert into upvotes (uid, zid) VALUES ($1, $2);", [
           uid,
@@ -6447,23 +6498,23 @@ function handle_POST_upvotes(
               [zid],
             ).then(
               function () {
-                res.status(200).json({});
+                res.status(200).json({})
               },
               function (err: any) {
-                fail(res, 500, "polis_err_upvote_update", err);
+                fail(res, 500, "polis_err_upvote_update", err)
               },
-            );
+            )
           },
           function (err: any) {
-            fail(res, 500, "polis_err_upvote_insert", err);
+            fail(res, 500, "polis_err_upvote_insert", err)
           },
-        );
+        )
       }
     },
     function (err: any) {
-      fail(res, 500, "polis_err_upvote_check", err);
+      fail(res, 500, "polis_err_upvote_check", err)
     },
-  );
+  )
 }
 function addStar(
   zid: any,
@@ -6472,25 +6523,27 @@ function addStar(
   starred: number,
   created?: undefined,
 ) {
-  starred = starred ? 1 : 0;
+  starred = starred ? 1 : 0
   let query =
-    "INSERT INTO stars (pid, zid, tid, starred, created) VALUES ($1, $2, $3, $4, default) RETURNING created;";
-  let params = [pid, zid, tid, starred];
+    "INSERT INTO stars (pid, zid, tid, starred, created) VALUES ($1, $2, $3, $4, default) RETURNING created;"
+  let params = [pid, zid, tid, starred]
   if (!_.isUndefined(created)) {
     query =
-      "INSERT INTO stars (pid, zid, tid, starred, created) VALUES ($1, $2, $3, $4, $5) RETURNING created;";
-    params.push(created);
+      "INSERT INTO stars (pid, zid, tid, starred, created) VALUES ($1, $2, $3, $4, $5) RETURNING created;"
+    params.push(created)
   }
-  return queryP(query, params);
+  return queryP(query, params)
 }
 function handle_POST_stars(
   req: { p: { zid: any; tid: any; pid: any; starred: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   addStar(req.p.zid, req.p.tid, req.p.pid, req.p.starred)
@@ -6499,76 +6552,78 @@ function handle_POST_stars(
     //     Type 'unknown' is not assignable to type '{ rows: { created: any; }[]; }'.ts(2345)
     // @ts-ignore
     .then(function (result: { rows: { created: any }[] }) {
-      let createdTime = result.rows[0].created;
+      let createdTime = result.rows[0].created
       setTimeout(function () {
-        updateConversationModifiedTime(req.p.zid, createdTime);
-      }, 100);
-      res.status(200).json({}); // TODO don't stop after the first one, map the inserts to deferreds.
+        updateConversationModifiedTime(req.p.zid, createdTime)
+      }, 100)
+      res.status(200).json({}) // TODO don't stop after the first one, map the inserts to deferreds.
     })
     .catch(function (err: any) {
       if (err) {
         if (isDuplicateKey(err)) {
-          fail(res, 406, "polis_err_vote_duplicate", err); // TODO allow for changing votes?
+          fail(res, 406, "polis_err_vote_duplicate", err) // TODO allow for changing votes?
         } else {
-          fail(res, 500, "polis_err_vote", err);
+          fail(res, 500, "polis_err_vote", err)
         }
       }
-    });
+    })
 }
 
 function handle_POST_trashes(
   req: { p: { pid: any; zid: any; tid: any; trashed: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   let queryS =
-    "INSERT INTO trashes (pid, zid, tid, trashed, created) VALUES ($1, $2, $3, $4, default);";
-  let params = [req.p.pid, req.p.zid, req.p.tid, req.p.trashed];
+    "INSERT INTO trashes (pid, zid, tid, trashed, created) VALUES ($1, $2, $3, $4, default);"
+  let params = [req.p.pid, req.p.zid, req.p.tid, req.p.trashed]
   query(
     queryS,
     params,
     function (err: any, result: { rows: { created: any }[] }) {
       if (err) {
         if (isDuplicateKey(err)) {
-          fail(res, 406, "polis_err_vote_duplicate", err); // TODO allow for changing votes?
+          fail(res, 406, "polis_err_vote_duplicate", err) // TODO allow for changing votes?
         } else {
-          fail(res, 500, "polis_err_vote", err);
+          fail(res, 500, "polis_err_vote", err)
         }
-        return;
+        return
       }
 
-      let createdTime = result.rows[0].created;
+      let createdTime = result.rows[0].created
       setTimeout(function () {
-        updateConversationModifiedTime(req.p.zid, createdTime);
-      }, 100);
+        updateConversationModifiedTime(req.p.zid, createdTime)
+      }, 100)
 
-      res.status(200).json({}); // TODO don't stop after the first one, map the inserts to deferreds.
+      res.status(200).json({}) // TODO don't stop after the first one, map the inserts to deferreds.
     },
-  );
+  )
 }
 function verifyMetadataAnswersExistForEachQuestion(zid: any) {
-  let errorcode = "polis_err_missing_metadata_answers";
+  let errorcode = "polis_err_missing_metadata_answers"
   return new Promise(function (resolve, reject) {
     query_readOnly(
       "select pmqid from participant_metadata_questions where zid = ($1);",
       [zid],
       function (err: any, results: { rows: any[] }) {
         if (err) {
-          reject(err);
-          return;
+          reject(err)
+          return
         }
         if (!results.rows || !results.rows.length) {
-          resolve(undefined);
-          return;
+          resolve(undefined)
+          return
         }
         let pmqids = results.rows.map(function (row: { pmqid: any }) {
-          return Number(row.pmqid);
-        });
+          return Number(row.pmqid)
+        })
         query_readOnly(
           "select pmaid, pmqid from participant_metadata_answers where pmqid in (" +
             pmqids.join(",") +
@@ -6576,88 +6631,90 @@ function verifyMetadataAnswersExistForEachQuestion(zid: any) {
           [zid],
           function (err: any, results: { rows: any[] }) {
             if (err) {
-              reject(err);
-              return;
+              reject(err)
+              return
             }
             if (!results.rows || !results.rows.length) {
-              reject(new Error(errorcode));
-              return;
+              reject(new Error(errorcode))
+              return
             }
             let questions = _.reduce(
               pmqids,
               function (o: { [x: string]: number }, pmqid: string | number) {
-                o[pmqid] = 1;
-                return o;
+                o[pmqid] = 1
+                return o
               },
               {},
-            );
+            )
             results.rows.forEach(function (row: { pmqid: string | number }) {
-              delete questions[row.pmqid];
-            });
+              delete questions[row.pmqid]
+            })
             if (Object.keys(questions).length) {
-              reject(new Error(errorcode));
+              reject(new Error(errorcode))
             } else {
-              resolve(undefined);
+              resolve(undefined)
             }
           },
-        );
+        )
       },
-    );
-  });
+    )
+  })
 }
 
 function handle_PUT_comments(
   req: {
-    p: { uid?: any; zid: any; tid: any; active: any; mod: any; is_meta: any };
+    p: { uid?: any; zid: any; tid: any; active: any; mod: any; is_meta: any }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-  let tid = req.p.tid;
-  let active = req.p.active;
-  let mod = req.p.mod;
-  let is_meta = req.p.is_meta;
+  let uid = req.p.uid
+  let zid = req.p.zid
+  let tid = req.p.tid
+  let active = req.p.active
+  let mod = req.p.mod
+  let is_meta = req.p.is_meta
 
   isOwner(zid, uid)
     .then(function (isOwner: any) {
       if (isOwner) {
         moderateComment(zid, tid, active, mod, is_meta).then(
           function () {
-            res.status(200).json({});
+            res.status(200).json({})
           },
           function (err: any) {
-            fail(res, 500, "polis_err_update_comment", err);
+            fail(res, 500, "polis_err_update_comment", err)
           },
-        );
+        )
       } else {
-        fail(res, 403, "polis_err_update_comment_auth");
+        fail(res, 403, "polis_err_update_comment_auth")
       }
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_update_comment", err);
-    });
+      fail(res, 500, "polis_err_update_comment", err)
+    })
 }
 
 function handle_POST_reportCommentSelections(
   req: { p: { uid?: any; zid: any; rid: any; tid: any; include: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-  let rid = req.p.rid;
-  let tid = req.p.tid;
-  let selection = req.p.include ? 1 : -1;
+  let uid = req.p.uid
+  let zid = req.p.zid
+  let rid = req.p.rid
+  let tid = req.p.tid
+  let selection = req.p.include ? 1 : -1
   isOwner(zid, uid)
     .then((isMod: any) => {
       if (!isMod) {
-        return fail(res, 403, "polis_err_POST_reportCommentSelections_auth");
+        return fail(res, 403, "polis_err_POST_reportCommentSelections_auth")
       }
       return queryP(
         "insert into report_comment_selections (rid, tid, selection, zid, modified) values ($1, $2, $3, $4, now_as_millis()) " +
@@ -6669,23 +6726,23 @@ function handle_POST_reportCommentSelections(
           return queryP(
             "delete from math_report_correlationmatrix where rid = ($1);",
             [rid],
-          );
+          )
         })
         .then(() => {
-          res.json({});
-        });
+          res.json({})
+        })
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_POST_reportCommentSelections_misc", err);
-    });
+      fail(res, 500, "polis_err_POST_reportCommentSelections_misc", err)
+    })
 }
 // kind of crappy that we're replacing the zinvite.
 // This is needed because we initially create a conversation with the POST, then actually set the properties with the subsequent PUT.
 // if we stop doing that, we can remove this function.
 function generateAndReplaceZinvite(zid: any, generateShortZinvite: any) {
-  let len = 12;
+  let len = 12
   if (generateShortZinvite) {
-    len = 6;
+    len = 6
   }
   return new Promise(function (
     resolve: (arg0: any) => void,
@@ -6693,156 +6750,160 @@ function generateAndReplaceZinvite(zid: any, generateShortZinvite: any) {
   ) {
     generateToken(len, false, function (err: any, zinvite: any) {
       if (err) {
-        return reject("polis_err_creating_zinvite");
+        return reject("polis_err_creating_zinvite")
       }
       query(
         "update zinvites set zinvite = ($1) where zid = ($2);",
         [zinvite, zid],
         function (err: any) {
           if (err) {
-            reject(err);
+            reject(err)
           } else {
-            resolve(zinvite);
+            resolve(zinvite)
           }
         },
-      );
-    });
-  });
+      )
+    })
+  })
 }
 
 async function handle_POST_conversation_close(
   req: { p: { zid: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let q = "select * from conversations where zid = ($1)";
-  let params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)"
+  let params = [req.p.zid]
   if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
-    q = q + " and owner = ($2)";
-    params.push(req.p.uid);
+    q = q + " and owner = ($2)"
+    params.push(req.p.uid)
   }
   queryP(q, params)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        fail(res, 500, "polis_err_closing_conversation_no_such_conversation");
-        return;
+        fail(res, 500, "polis_err_closing_conversation_no_such_conversation")
+        return
       }
-      let conv = rows[0];
+      let conv = rows[0]
       queryP("update conversations set is_archived = true where zid = ($1);", [
         conv.zid,
       ])
         .then(function () {
-          res.status(200).json({});
+          res.status(200).json({})
         })
         .catch(function (err: any) {
-          fail(res, 500, "polis_err_closing_conversation2", err);
-        });
+          fail(res, 500, "polis_err_closing_conversation2", err)
+        })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_closing_conversation", err);
-    });
+      fail(res, 500, "polis_err_closing_conversation", err)
+    })
 }
 
 async function handle_POST_conversation_reopen(
   req: { p: { zid: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let q = "select * from conversations where zid = ($1)";
-  let params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)"
+  let params = [req.p.zid]
   if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
-    q = q + " and owner = ($2)";
-    params.push(req.p.uid);
+    q = q + " and owner = ($2)"
+    params.push(req.p.uid)
   }
   queryP(q, params)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        fail(res, 500, "polis_err_closing_conversation_no_such_conversation");
-        return;
+        fail(res, 500, "polis_err_closing_conversation_no_such_conversation")
+        return
       }
-      let conv = rows[0];
+      let conv = rows[0]
       queryP("update conversations set is_archived = false where zid = ($1);", [
         conv.zid,
       ])
         .then(function () {
-          res.status(200).json({});
+          res.status(200).json({})
         })
         .catch(function (err: any) {
-          fail(res, 500, "polis_err_reopening_conversation2", err);
-        });
+          fail(res, 500, "polis_err_reopening_conversation2", err)
+        })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_reopening_conversation", err);
-    });
+      fail(res, 500, "polis_err_reopening_conversation", err)
+    })
 }
 
 async function handle_POST_conversation_moderate(
   req: { p: { zid: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let q = "select * from conversations where zid = ($1)";
-  let params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)"
+  let params = [req.p.zid]
   if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
-    fail(res, 500, "polis_err_moderating_conversation_disallowed");
-    return;
+    fail(res, 500, "polis_err_moderating_conversation_disallowed")
+    return
   }
   queryP(q, params)
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        fail(
-          res,
-          500,
-          "polis_err_moderating_conversation_no_such_conversation",
-        );
-        return;
+        fail(res, 500, "polis_err_moderating_conversation_no_such_conversation")
+        return
       }
-      let conv = rows[0];
+      let conv = rows[0]
       queryP("update conversations set is_hidden = true where zid = ($1);", [
         conv.zid,
       ])
         .then(function () {
-          res.status(200).json({});
+          res.status(200).json({})
         })
         .catch(function (err: any) {
-          fail(res, 500, "polis_err_moderating_conversation2", err);
-        });
+          fail(res, 500, "polis_err_moderating_conversation2", err)
+        })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_moderating_conversation", err);
-    });
+      fail(res, 500, "polis_err_moderating_conversation", err)
+    })
 }
 
 async function handle_POST_conversation_unmoderate(
   req: { p: { zid: any; uid?: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let q = "select * from conversations where zid = ($1)";
-  let params = [req.p.zid];
+  let q = "select * from conversations where zid = ($1)"
+  let params = [req.p.zid]
   if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
-    fail(res, 500, "polis_err_unmoderating_conversation_disallowed");
-    return;
+    fail(res, 500, "polis_err_unmoderating_conversation_disallowed")
+    return
   }
   queryP(q, params)
     .then(function (rows: string | any[]) {
@@ -6851,42 +6912,44 @@ async function handle_POST_conversation_unmoderate(
           res,
           500,
           "polis_err_unmoderating_conversation_no_such_conversation",
-        );
-        return;
+        )
+        return
       }
-      let conv = rows[0];
+      let conv = rows[0]
       queryP("update conversations set is_hidden = false where zid = ($1);", [
         conv.zid,
       ])
         .then(function () {
-          res.status(200).json({});
+          res.status(200).json({})
         })
         .catch(function (err: any) {
-          fail(res, 500, "polis_err_unmoderating_conversation2", err);
-        });
+          fail(res, 500, "polis_err_unmoderating_conversation2", err)
+        })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_unmoderating_conversation", err);
-    });
+      fail(res, 500, "polis_err_unmoderating_conversation", err)
+    })
 }
 
 async function handle_POST_conversation_sentiment(
   req: { p: { zid: any; uid: any; vote: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   const results = await queryP_readOnly(
     "SELECT github_username from users where uid = $1",
     [req.p.uid],
-  );
+  )
   if (results.length === 0 || !results[0].github_username) {
-    fail(res, 500, "polis_err_conversation_sentiment_missing_github");
-    return;
+    fail(res, 500, "polis_err_conversation_sentiment_missing_github")
+    return
   }
 
   queryP(
@@ -6895,116 +6958,114 @@ async function handle_POST_conversation_sentiment(
     [req.p.zid, req.p.uid, req.p.vote],
   )
     .then(function () {
-      res.status(200).json({ vote: req.p.vote });
+      res.status(200).json({ vote: req.p.vote })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_conversation_sentiment", err);
-    });
+      fail(res, 500, "polis_err_conversation_sentiment", err)
+    })
 }
 
 function handle_PUT_users(
   req: { p: { uid?: any; uid_of_user: any; email: any; hname: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let uid = req.p.uid;
+  let uid = req.p.uid
   if (isAdministrator(uid) && req.p.uid_of_user) {
-    uid = req.p.uid_of_user;
+    uid = req.p.uid_of_user
   }
 
-  let fields: UserType = {};
+  let fields: UserType = {}
   if (!_.isUndefined(req.p.email)) {
-    fields.email = req.p.email;
+    fields.email = req.p.email
   }
   if (!_.isUndefined(req.p.hname)) {
-    fields.hname = req.p.hname;
+    fields.hname = req.p.hname
   }
 
-  let q = sql_users.update(fields).where(sql_users.uid.equals(uid));
+  let q = sql_users.update(fields).where(sql_users.uid.equals(uid))
 
   queryP(q.toString(), [])
     .then((result: any) => {
-      res.json(result);
+      res.json(result)
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_put_user", err);
-    });
+      fail(res, 500, "polis_err_put_user", err)
+    })
 }
 
 function handle_PUT_conversations(
   req: {
     p: {
-      short_url: any;
-      zid: any;
-      uid?: any;
-      verifyMeta: any;
-      is_active: any;
-      is_anon: any;
-      is_data_open: any;
-      github_sync_enabled: any;
-      fip_number: any;
-      fip_author: any;
-      fip_discussions_to: any;
-      fip_status: any;
-      fip_type: any;
-      fip_category: any;
-      fip_created: any;
-      fip_title: any;
-      profanity_filter: any;
-      spam_filter: any;
-      strict_moderation: any;
-      topic: string;
-      description: string;
-      survey_caption: string;
-      postsurvey: string;
-      postsurvey_limit: number;
-      postsurvey_submissions: number;
-      postsurvey_redirect: number;
-      vis_type: any;
-      help_type: any;
-      socialbtn_type: any;
-      bgcolor: string;
-      help_color: string;
-      help_bgcolor: string;
-      style_btn: any;
-      write_type: any;
-      launch_presentation_return_url_hex: any;
-      link_url: any;
-      send_created_email: any;
-      conversation_id: string;
-      context: any;
-    };
+      short_url: any
+      zid: any
+      uid?: any
+      verifyMeta: any
+      is_active: any
+      is_anon: any
+      is_data_open: any
+      github_sync_enabled: any
+      fip_number: any
+      fip_author: any
+      fip_discussions_to: any
+      fip_status: any
+      fip_type: any
+      fip_category: any
+      fip_created: any
+      fip_title: any
+      profanity_filter: any
+      spam_filter: any
+      strict_moderation: any
+      topic: string
+      description: string
+      survey_caption: string
+      postsurvey: string
+      postsurvey_limit: number
+      postsurvey_submissions: number
+      postsurvey_redirect: number
+      vis_type: any
+      help_type: any
+      socialbtn_type: any
+      bgcolor: string
+      help_color: string
+      help_bgcolor: string
+      style_btn: any
+      write_type: any
+      launch_presentation_return_url_hex: any
+      link_url: any
+      send_created_email: any
+      conversation_id: string
+      context: any
+    }
   },
   res: any,
 ) {
-  let generateShortUrl = req.p.short_url;
+  let generateShortUrl = req.p.short_url
   isOwner(req.p.zid, req.p.uid)
     .then(function (ok: any) {
       if (!ok) {
-        fail(res, 403, "polis_err_update_conversation_permission");
-        return;
+        fail(res, 403, "polis_err_update_conversation_permission")
+        return
       }
 
-      let verifyMetaPromise;
+      let verifyMetaPromise
       if (req.p.verifyMeta) {
-        verifyMetaPromise = verifyMetadataAnswersExistForEachQuestion(
-          req.p.zid,
-        );
+        verifyMetaPromise = verifyMetadataAnswersExistForEachQuestion(req.p.zid)
       } else {
-        verifyMetaPromise = Promise.resolve();
+        verifyMetaPromise = Promise.resolve()
       }
 
-      let fields: ConversationType = {};
+      let fields: ConversationType = {}
       if (!_.isUndefined(req.p.is_active)) {
-        fields.is_active = req.p.is_active;
+        fields.is_active = req.p.is_active
       }
       if (!_.isUndefined(req.p.is_anon)) {
-        fields.is_anon = req.p.is_anon;
+        fields.is_anon = req.p.is_anon
       }
       if (!_.isUndefined(req.p.is_data_open)) {
-        fields.is_data_open = req.p.is_data_open;
+        fields.is_data_open = req.p.is_data_open
       }
       if (!_.isUndefined(req.p.github_sync_enabled)) {
-        fields.github_sync_enabled = req.p.github_sync_enabled;
+        fields.github_sync_enabled = req.p.github_sync_enabled
       }
 
       // FIP fields
@@ -7012,127 +7073,127 @@ function handle_PUT_conversations(
       // this is because if github sync was to be enabled, then the FIP fields would be overwritten
       if (req.p.github_sync_enabled == false) {
         if (!_.isUndefined(req.p.fip_title)) {
-          fields.fip_title = req.p.fip_title;
+          fields.fip_title = req.p.fip_title
         }
         if (!_.isUndefined(req.p.fip_author)) {
-          fields.fip_author = req.p.fip_author;
+          fields.fip_author = req.p.fip_author
         }
         if (!_.isUndefined(req.p.fip_discussions_to)) {
-          fields.fip_discussions_to = req.p.fip_discussions_to;
+          fields.fip_discussions_to = req.p.fip_discussions_to
         }
         if (!_.isUndefined(req.p.fip_status)) {
-          fields.fip_status = req.p.fip_status;
+          fields.fip_status = req.p.fip_status
         }
         if (!_.isUndefined(req.p.fip_type)) {
-          fields.fip_type = req.p.fip_type;
+          fields.fip_type = req.p.fip_type
         }
         if (!_.isUndefined(req.p.fip_category)) {
-          fields.fip_category = req.p.fip_category;
+          fields.fip_category = req.p.fip_category
         }
         if (!_.isUndefined(req.p.fip_created)) {
-          fields.fip_created = req.p.fip_created;
+          fields.fip_created = req.p.fip_created
         }
       }
 
       if (!_.isUndefined(req.p.profanity_filter)) {
-        fields.profanity_filter = req.p.profanity_filter;
+        fields.profanity_filter = req.p.profanity_filter
       }
       if (!_.isUndefined(req.p.spam_filter)) {
-        fields.spam_filter = req.p.spam_filter;
+        fields.spam_filter = req.p.spam_filter
       }
       if (!_.isUndefined(req.p.strict_moderation)) {
-        fields.strict_moderation = req.p.strict_moderation;
+        fields.strict_moderation = req.p.strict_moderation
       }
       if (!_.isUndefined(req.p.topic)) {
-        fields.topic = req.p.topic;
+        fields.topic = req.p.topic
       }
       if (!_.isUndefined(req.p.description)) {
-        fields.description = req.p.description;
+        fields.description = req.p.description
       }
       if (!_.isUndefined(req.p.survey_caption)) {
-        fields.survey_caption = req.p.survey_caption;
+        fields.survey_caption = req.p.survey_caption
       }
       if (!_.isUndefined(req.p.postsurvey)) {
-        fields.postsurvey = req.p.postsurvey;
+        fields.postsurvey = req.p.postsurvey
       }
       if (!_.isUndefined(req.p.postsurvey_limit)) {
-        fields.postsurvey_limit = req.p.postsurvey_limit;
+        fields.postsurvey_limit = req.p.postsurvey_limit
       }
       if (!_.isUndefined(req.p.postsurvey_submissions)) {
-        fields.postsurvey_submissions = req.p.postsurvey_submissions;
+        fields.postsurvey_submissions = req.p.postsurvey_submissions
       }
       if (!_.isUndefined(req.p.postsurvey_redirect)) {
-        fields.postsurvey_redirect = req.p.postsurvey_redirect;
+        fields.postsurvey_redirect = req.p.postsurvey_redirect
       }
       if (!_.isUndefined(req.p.vis_type)) {
-        fields.vis_type = req.p.vis_type;
+        fields.vis_type = req.p.vis_type
       }
       if (!_.isUndefined(req.p.help_type)) {
-        fields.help_type = req.p.help_type;
+        fields.help_type = req.p.help_type
       }
       if (!_.isUndefined(req.p.socialbtn_type)) {
-        fields.socialbtn_type = req.p.socialbtn_type;
+        fields.socialbtn_type = req.p.socialbtn_type
       }
       if (!_.isUndefined(req.p.bgcolor)) {
         if (req.p.bgcolor === "default") {
-          fields.bgcolor = null;
+          fields.bgcolor = null
         } else {
-          fields.bgcolor = req.p.bgcolor;
+          fields.bgcolor = req.p.bgcolor
         }
       }
       if (!_.isUndefined(req.p.help_color)) {
         if (req.p.help_color === "default") {
-          fields.help_color = null;
+          fields.help_color = null
         } else {
-          fields.help_color = req.p.help_color;
+          fields.help_color = req.p.help_color
         }
       }
       if (!_.isUndefined(req.p.help_bgcolor)) {
         if (req.p.help_bgcolor === "default") {
-          fields.help_bgcolor = null;
+          fields.help_bgcolor = null
         } else {
-          fields.help_bgcolor = req.p.help_bgcolor;
+          fields.help_bgcolor = req.p.help_bgcolor
         }
       }
       if (!_.isUndefined(req.p.style_btn)) {
-        fields.style_btn = req.p.style_btn;
+        fields.style_btn = req.p.style_btn
       }
       if (!_.isUndefined(req.p.write_type)) {
-        fields.write_type = req.p.write_type;
+        fields.write_type = req.p.write_type
       }
-      ifDefinedSet("auth_needed_to_vote", req.p, fields);
-      ifDefinedSet("auth_needed_to_write", req.p, fields);
-      ifDefinedSet("auth_opt_fb", req.p, fields);
-      ifDefinedSet("auth_opt_tw", req.p, fields);
-      ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields);
+      ifDefinedSet("auth_needed_to_vote", req.p, fields)
+      ifDefinedSet("auth_needed_to_write", req.p, fields)
+      ifDefinedSet("auth_opt_fb", req.p, fields)
+      ifDefinedSet("auth_opt_tw", req.p, fields)
+      ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields)
 
       if (!_.isUndefined(req.p.link_url)) {
-        fields.link_url = req.p.link_url;
+        fields.link_url = req.p.link_url
       }
 
-      ifDefinedSet("subscribe_type", req.p, fields);
+      ifDefinedSet("subscribe_type", req.p, fields)
 
       let q = sql_conversations
         .update(fields)
         .where(sql_conversations.zid.equals(req.p.zid))
         // .and( sql_conversations.owner.equals(req.p.uid) )
-        .returning("*");
+        .returning("*")
       verifyMetaPromise.then(
         function () {
           query(q.toString(), function (err: any, result: { rows: any[] }) {
             if (err) {
-              fail(res, 500, "polis_err_update_conversation", err);
-              return;
+              fail(res, 500, "polis_err_update_conversation", err)
+              return
             }
-            let conv = result && result.rows && result.rows[0];
+            let conv = result && result.rows && result.rows[0]
             // The first check with isOwner implictly tells us this can be returned in HTTP response.
-            conv.is_mod = true;
-            conv.is_owner = true;
+            conv.is_mod = true
+            conv.is_owner = true
 
             let promise = generateShortUrl
               ? generateAndReplaceZinvite(req.p.zid, generateShortUrl)
-              : Promise.resolve();
-            let successCode = generateShortUrl ? 201 : 200;
+              : Promise.resolve()
+            let successCode = generateShortUrl ? 201 : 200
 
             promise
               .then(function () {
@@ -7143,8 +7204,8 @@ function handle_PUT_conversations(
                     getConversationUrl(req, req.p.zid, true),
                   ])
                     .then(function (results: any[]) {
-                      let hname = results[0].hname;
-                      let url = results[1];
+                      let hname = results[0].hname
+                      let url = results[1]
                       sendEmailByUid(
                         req.p.uid,
                         "Conversation created",
@@ -7164,65 +7225,65 @@ function handle_PUT_conversations(
                         logger.error(
                           "polis_err_sending_conversation_created_email",
                           err,
-                        );
-                      });
+                        )
+                      })
                     })
                     .catch(function (err: any) {
                       logger.error(
                         "polis_err_sending_conversation_created_email",
                         err,
-                      );
-                    });
+                      )
+                    })
                 }
 
-                finishOne(res, conv, true, successCode);
+                finishOne(res, conv, true, successCode)
 
-                updateConversationModifiedTime(req.p.zid);
+                updateConversationModifiedTime(req.p.zid)
               })
               .catch(function (err: any) {
-                fail(res, 500, "polis_err_update_conversation", err);
-              });
-          });
+                fail(res, 500, "polis_err_update_conversation", err)
+              })
+          })
         },
         function (err: { message: any }) {
-          fail(res, 500, err.message, err);
+          fail(res, 500, err.message, err)
         },
-      );
+      )
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_update_conversation", err);
-    });
+      fail(res, 500, "polis_err_update_conversation", err)
+    })
 }
 
 async function handle_DELETE_metadata_questions(
   req: { p: { uid?: any; pmqid: any } },
   res: { sendStatus: (arg0: number) => void },
 ) {
-  let uid = req.p.uid;
-  let pmqid = req.p.pmqid;
+  let uid = req.p.uid
+  let pmqid = req.p.pmqid
 
-  let zid;
+  let zid
   try {
-    zid = await getZidForQuestion(pmqid);
+    zid = await getZidForQuestion(pmqid)
   } catch (err) {
     return fail(
       res,
       500,
       "polis_err_delete_participant_metadata_questions_zid",
       err,
-    );
+    )
   }
 
-  let canDelete;
+  let canDelete
   try {
-    canDelete = await isOwner(zid, uid);
+    canDelete = await isOwner(zid, uid)
   } catch (err) {
     return fail(
       res,
       403,
       "polis_err_delete_participant_metadata_questions_auth",
       err,
-    );
+    )
   }
 
   if (!canDelete) {
@@ -7231,122 +7292,122 @@ async function handle_DELETE_metadata_questions(
       403,
       "polis_err_delete_participant_metadata_questions_auth",
       undefined,
-    );
+    )
   }
 
   try {
-    await deleteMetadataQuestionAndAnswers(pmqid);
+    await deleteMetadataQuestionAndAnswers(pmqid)
   } catch (err) {
-    fail(res, 500, "polis_err_delete_participant_metadata_question", err);
+    fail(res, 500, "polis_err_delete_participant_metadata_question", err)
   }
 
-  res.sendStatus(200);
+  res.sendStatus(200)
 }
 
 async function handle_DELETE_metadata_answers(
   req: { p: { uid?: any; pmaid: any } },
   res: { sendStatus: (arg0: number) => void },
 ) {
-  let uid = req.p.uid;
-  let pmaid = req.p.pmaid;
+  let uid = req.p.uid
+  let pmaid = req.p.pmaid
 
-  let zid;
+  let zid
   try {
-    zid = await getZidForAnswer(pmaid);
+    zid = await getZidForAnswer(pmaid)
   } catch (err) {
     return fail(
       res,
       500,
       "polis_err_delete_participant_metadata_answers_zid",
       err,
-    );
+    )
   }
 
-  let canDelete;
+  let canDelete
   try {
-    canDelete = await isOwner(zid, uid);
+    canDelete = await isOwner(zid, uid)
   } catch (err) {
     return fail(
       res,
       403,
       "polis_err_delete_participant_metadata_answers_auth",
       err,
-    );
+    )
   }
 
   if (!canDelete) {
-    return fail(res, 403, "polis_err_delete_participant_metadata_answers_auth");
+    return fail(res, 403, "polis_err_delete_participant_metadata_answers_auth")
   }
 
   try {
-    await deleteMetadataAnswer(pmaid);
+    await deleteMetadataAnswer(pmaid)
   } catch (err) {
-    return fail(res, 500, "polis_err_delete_participant_metadata_answers", err);
+    return fail(res, 500, "polis_err_delete_participant_metadata_answers", err)
   }
-  res.sendStatus(200);
+  res.sendStatus(200)
 }
 
 async function getZidForAnswer(pmaid: any) {
   const rows = await queryP(
     "SELECT zid FROM participant_metadata_answers WHERE pmaid = ($1);",
     [pmaid],
-  );
+  )
 
   if (!rows || !rows.length) {
-    throw new Error("polis_err_zid_missing_for_answer");
+    throw new Error("polis_err_zid_missing_for_answer")
   }
 
-  return rows[0].zid;
+  return rows[0].zid
 }
 
 async function getZidForQuestion(pmqid: any) {
-  let rows;
+  let rows
   try {
     rows = await queryP(
       "SELECT zid FROM participant_metadata_questions WHERE pmqid = ($1);",
       [pmqid],
-    );
+    )
   } catch (err) {
-    throw new Error("polis_err_zid_missing_for_question");
+    throw new Error("polis_err_zid_missing_for_question")
   }
 
   if (!rows || !rows.length) {
-    throw new Error("polis_err_zid_missing_for_question");
+    throw new Error("polis_err_zid_missing_for_question")
   }
 
-  return rows[0].zid;
+  return rows[0].zid
 }
 
 async function deleteMetadataAnswer(pmaid: any) {
   await queryP(
     "update participant_metadata_answers set alive = FALSE where pmaid = ($1);",
     [pmaid],
-  );
+  )
 }
 
 async function deleteMetadataQuestionAndAnswers(pmqid: any) {
   await queryP(
     "update participant_metadata_answers set alive = FALSE where pmqid = ($1);",
     [pmqid],
-  );
+  )
   await queryP(
     "update participant_metadata_questions set alive = FALSE where pmqid = ($1);",
     [pmqid],
-  );
+  )
 }
 
 function handle_GET_metadata_questions(
   req: { p: { zid: any; zinvite: any; suzinvite: any } },
   res: any,
 ) {
-  let zid = req.p.zid;
-  let zinvite = req.p.zinvite;
-  let suzinvite = req.p.suzinvite;
+  let zid = req.p.zid
+  let zinvite = req.p.zinvite
+  let suzinvite = req.p.suzinvite
 
   function doneChecking(err: boolean) {
     if (err) {
-      fail(res, 403, "polis_err_get_participant_metadata_auth", err);
-      return;
+      fail(res, 403, "polis_err_get_participant_metadata_auth", err)
+      return
     }
 
     //     No overload matches this call.
@@ -7366,24 +7427,24 @@ function handle_GET_metadata_questions(
             "SELECT * FROM participant_metadata_questions WHERE alive = true AND zid = ($1);",
             [zid],
             callback,
-          );
+          )
         },
         //function(callback) { query_readOnly("SELECT * FROM participant_metadata_answers WHERE alive = true AND zid = ($1);", [zid], callback); },
         //function(callback) { query_readOnly("SELECT * FROM participant_metadata_choices WHERE alive = true AND zid = ($1);", [zid], callback); },
       ],
       function (err: any, result: { rows: any }[]) {
         if (err) {
-          fail(res, 500, "polis_err_get_participant_metadata_questions", err);
-          return;
+          fail(res, 500, "polis_err_get_participant_metadata_questions", err)
+          return
         }
-        let rows = result[0] && result[0].rows;
+        let rows = result[0] && result[0].rows
         rows = rows.map(function (r: { required: boolean }) {
-          r.required = true;
-          return r;
-        });
-        finishArray(res, rows);
+          r.required = true
+          return r
+        })
+        finishArray(res, rows)
       },
-    );
+    )
   }
 
   if (zinvite) {
@@ -7393,7 +7454,7 @@ function handle_GET_metadata_questions(
     //     Type 'number | null' is not assignable to type 'boolean'.
     //         Type 'null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkZinviteCodeValidity(zid, zinvite, doneChecking);
+    checkZinviteCodeValidity(zid, zinvite, doneChecking)
   } else if (suzinvite) {
     //       (local function) checkSuzinviteCodeValidity(zid: any, suzinvite: any, callback: {
     //     (err: any, foo: any): void;
@@ -7405,9 +7466,9 @@ function handle_GET_metadata_questions(
     //   Types of parameters 'err' and 'arg0' are incompatible.
     //       Type 'number | null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking);
+    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking)
   } else {
-    doneChecking(false);
+    doneChecking(false)
   }
 }
 
@@ -7415,126 +7476,126 @@ async function handle_POST_metadata_questions(
   req: { p: { zid: any; key: any; uid?: any } },
   res: any,
 ) {
-  let zid = req.p.zid;
-  let key = req.p.key;
-  let uid = req.p.uid;
+  let zid = req.p.zid
+  let key = req.p.key
+  let uid = req.p.uid
 
-  let canPost;
+  let canPost
   try {
-    canPost = await isOwner(zid, uid);
+    canPost = await isOwner(zid, uid)
   } catch (err) {
-    return fail(res, 403, "polis_err_post_participant_metadata_auth", err);
+    return fail(res, 403, "polis_err_post_participant_metadata_auth", err)
   }
   if (!canPost)
-    return fail(res, 403, "polis_err_post_participant_metadata_auth");
+    return fail(res, 403, "polis_err_post_participant_metadata_auth")
 
-  let rows;
+  let rows
   try {
     rows = await await queryP(
       "INSERT INTO participant_metadata_questions (pmqid, zid, key) VALUES (default, $1, $2) RETURNING *;",
       [zid, key],
-    );
+    )
   } catch (err) {
-    return fail(res, 500, "polis_err_post_participant_metadata_key", err);
+    return fail(res, 500, "polis_err_post_participant_metadata_key", err)
   }
 
-  finishOne(res, rows[0]);
+  finishOne(res, rows[0])
 }
 
 async function handle_POST_metadata_answers(
   req: { p: { zid: any; uid?: any; pmqid: any; value: any } },
   res: any,
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let pmqid = req.p.pmqid;
-  let value = req.p.value;
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let pmqid = req.p.pmqid
+  let value = req.p.value
 
-  let canPost;
+  let canPost
   try {
-    canPost = await isOwnerOrParticipant(zid, uid);
+    canPost = await isOwnerOrParticipant(zid, uid)
   } catch (err) {
-    return fail(res, 403, "polis_err_permissions");
+    return fail(res, 403, "polis_err_permissions")
   }
   if (!canPost) {
-    return fail(res, 403, "polis_err_permissions");
+    return fail(res, 403, "polis_err_permissions")
   }
 
   // try to do an insert
-  let insertRows;
+  let insertRows
   try {
     insertRows = await queryP(
       "INSERT INTO participant_metadata_answers (pmqid, zid, value, pmaid) VALUES ($1, $2, $3, default) RETURNING *;",
       [pmqid, zid, value],
-    );
+    )
   } catch (err) {
     // if the insert fails, just try to update the existing row
   }
 
   if (!insertRows || !insertRows.length) {
-    let updateRows;
+    let updateRows
     try {
       updateRows = await queryP(
         "UPDATE participant_metadata_answers set alive = TRUE where pmqid = ($1) AND zid = ($2) AND value = ($3) RETURNING *;",
         [pmqid, zid, value],
-      );
+      )
     } catch (err) {
-      return fail(res, 500, "polis_err_post_participant_metadata_value", err);
+      return fail(res, 500, "polis_err_post_participant_metadata_value", err)
     }
-    finishOne(res, updateRows[0]);
+    finishOne(res, updateRows[0])
   } else {
-    finishOne(res, insertRows[0]);
+    finishOne(res, insertRows[0])
   }
 }
 
 function handle_GET_metadata_choices(req: { p: { zid: any } }, res: any) {
-  let zid = req.p.zid;
+  let zid = req.p.zid
 
   getChoicesForConversation(zid).then(
     function (choices: any) {
-      finishArray(res, choices);
+      finishArray(res, choices)
     },
     function (err: any) {
-      fail(res, 500, "polis_err_get_participant_metadata_choices", err);
+      fail(res, 500, "polis_err_get_participant_metadata_choices", err)
     },
-  );
+  )
 }
 function handle_GET_metadata_answers(
   req: { p: { zid: any; zinvite: any; suzinvite: any; pmqid: any } },
   res: any,
 ) {
-  let zid = req.p.zid;
-  let zinvite = req.p.zinvite;
-  let suzinvite = req.p.suzinvite;
-  let pmqid = req.p.pmqid;
+  let zid = req.p.zid
+  let zinvite = req.p.zinvite
+  let suzinvite = req.p.suzinvite
+  let pmqid = req.p.pmqid
 
   function doneChecking(err: boolean) {
     if (err) {
-      fail(res, 403, "polis_err_get_participant_metadata_auth", err);
-      return;
+      fail(res, 403, "polis_err_get_participant_metadata_auth", err)
+      return
     }
     let query = sql_participant_metadata_answers
       .select(sql_participant_metadata_answers.star())
       .where(sql_participant_metadata_answers.zid.equals(zid))
-      .and(sql_participant_metadata_answers.alive.equals(true));
+      .and(sql_participant_metadata_answers.alive.equals(true))
 
     if (pmqid) {
-      query = query.where(sql_participant_metadata_answers.pmqid.equals(pmqid));
+      query = query.where(sql_participant_metadata_answers.pmqid.equals(pmqid))
     }
     query_readOnly(
       query.toString(),
       function (err: any, result: { rows: any[] }) {
         if (err) {
-          fail(res, 500, "polis_err_get_participant_metadata_answers", err);
-          return;
+          fail(res, 500, "polis_err_get_participant_metadata_answers", err)
+          return
         }
         let rows = result.rows.map(function (r: { is_exclusive: boolean }) {
-          r.is_exclusive = true; // TODO fetch this info from the queston itself
-          return r;
-        });
-        finishArray(res, rows);
+          r.is_exclusive = true // TODO fetch this info from the queston itself
+          return r
+        })
+        finishArray(res, rows)
       },
-    );
+    )
   }
 
   if (zinvite) {
@@ -7543,39 +7604,41 @@ function handle_GET_metadata_answers(
     //   Types of parameters 'err' and 'arg0' are incompatible.
     //         Type 'number | null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkZinviteCodeValidity(zid, zinvite, doneChecking);
+    checkZinviteCodeValidity(zid, zinvite, doneChecking)
   } else if (suzinvite) {
     //       (local function) doneChecking(err: boolean, foo?: undefined): void
     // Argument of type '(err: boolean, foo?: undefined) => void' is not assignable to parameter of type '{ (err: any, foo: any): void; (err: any, foo: any): void; (err: any): void; (arg0: number | null): void; }'.
     //   Types of parameters 'err' and 'arg0' are incompatible.
     //     Type 'number | null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking);
+    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking)
   } else {
-    doneChecking(false);
+    doneChecking(false)
   }
 }
 function handle_GET_metadata(
   req: { p: { zid: any; zinvite: any; suzinvite: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
       json: {
-        (arg0: { kvp?: any; keys?: any; values?: any }): void;
-        new (): any;
-      };
-    };
+        (arg0: { kvp?: any; keys?: any; values?: any }): void
+        new (): any
+      }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let zinvite = req.p.zinvite;
-  let suzinvite = req.p.suzinvite;
+  let zid = req.p.zid
+  let zinvite = req.p.zinvite
+  let suzinvite = req.p.suzinvite
 
   function doneChecking(err: boolean) {
     if (err) {
-      fail(res, 403, "polis_err_get_participant_metadata_auth", err);
-      return;
+      fail(res, 403, "polis_err_get_participant_metadata_auth", err)
+      return
     }
 
     //     No overload matches this call.
@@ -7595,83 +7658,83 @@ function handle_GET_metadata(
             "SELECT * FROM participant_metadata_questions WHERE zid = ($1);",
             [zid],
             callback,
-          );
+          )
         },
         function (callback: any) {
           query_readOnly(
             "SELECT * FROM participant_metadata_answers WHERE zid = ($1);",
             [zid],
             callback,
-          );
+          )
         },
         function (callback: any) {
           query_readOnly(
             "SELECT * FROM participant_metadata_choices WHERE zid = ($1);",
             [zid],
             callback,
-          );
+          )
         },
       ],
       function (err: any, result: { rows: any }[]) {
         if (err) {
-          fail(res, 500, "polis_err_get_participant_metadata", err);
-          return;
+          fail(res, 500, "polis_err_get_participant_metadata", err)
+          return
         }
-        let keys = result[0] && result[0].rows;
-        let vals = result[1] && result[1].rows;
-        let choices = result[2] && result[2].rows;
-        let o = {};
-        let keyNames = {};
-        let valueNames = {};
-        let i;
-        let k;
-        let v;
+        let keys = result[0] && result[0].rows
+        let vals = result[1] && result[1].rows
+        let choices = result[2] && result[2].rows
+        let o = {}
+        let keyNames = {}
+        let valueNames = {}
+        let i
+        let k
+        let v
         if (!keys || !keys.length) {
-          res.status(200).json({});
-          return;
+          res.status(200).json({})
+          return
         }
         for (i = 0; i < keys.length; i++) {
           // Add a map for each keyId
-          k = keys[i];
+          k = keys[i]
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          o[k.pmqid] = {};
+          o[k.pmqid] = {}
           // keep the user-facing key name
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          keyNames[k.pmqid] = k.key;
+          keyNames[k.pmqid] = k.key
         }
         for (i = 0; i < vals.length; i++) {
           // Add an array for each possible valueId
-          k = vals[i];
-          v = vals[i];
+          k = vals[i]
+          v = vals[i]
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          o[k.pmqid][v.pmaid] = [];
+          o[k.pmqid][v.pmaid] = []
           // keep the user-facing value string
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          valueNames[v.pmaid] = v.value;
+          valueNames[v.pmaid] = v.value
         }
         for (i = 0; i < choices.length; i++) {
           // Append a pid for each person who has seleted that value for that key.
           // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
           // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
           // @ts-ignore
-          o[choices[i].pmqid][choices[i].pmaid] = choices[i].pid;
+          o[choices[i].pmqid][choices[i].pmaid] = choices[i].pid
         }
         // TODO cache
         res.status(200).json({
           kvp: o, // key_id => value_id => [pid]
           keys: keyNames,
           values: valueNames,
-        });
+        })
       },
-    );
+    )
   }
 
   if (zinvite) {
@@ -7680,16 +7743,16 @@ function handle_GET_metadata(
     //   Types of parameters 'err' and 'arg0' are incompatible.
     //         Type 'number | null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkZinviteCodeValidity(zid, zinvite, doneChecking);
+    checkZinviteCodeValidity(zid, zinvite, doneChecking)
   } else if (suzinvite) {
     //       (local function) doneChecking(err: boolean): void
     // Argument of type '(err: boolean) => void' is not assignable to parameter of type '{ (err: any, foo: any): void; (err: any, foo: any): void; (err: any): void; (arg0: number | null): void; }'.
     //   Types of parameters 'err' and 'arg0' are incompatible.
     //         Type 'number | null' is not assignable to type 'boolean'.ts(2345)
     // @ts-ignore
-    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking);
+    checkSuzinviteCodeValidity(zid, suzinvite, doneChecking)
   } else {
-    doneChecking(false);
+    doneChecking(false)
   }
 }
 function getConversationHasMetadata(zid: any) {
@@ -7702,41 +7765,41 @@ function getConversationHasMetadata(zid: any) {
       [zid],
       function (err: any, metadataResults: { rows: string | any[] }) {
         if (err) {
-          return reject("polis_err_get_conversation_metadata_by_zid");
+          return reject("polis_err_get_conversation_metadata_by_zid")
         }
         let hasNoMetadata =
           !metadataResults ||
           !metadataResults.rows ||
-          !metadataResults.rows.length;
-        resolve(!hasNoMetadata);
+          !metadataResults.rows.length
+        resolve(!hasNoMetadata)
       },
-    );
-  });
+    )
+  })
 }
 
 function getConversationTranslations(zid: any, lang: string) {
-  const firstTwoCharsOfLang = lang.substr(0, 2);
+  const firstTwoCharsOfLang = lang.substr(0, 2)
   return queryP(
     "select * from conversation_translations where zid = ($1) and lang = ($2);",
     [zid, firstTwoCharsOfLang],
-  );
+  )
 }
 
 function getConversationTranslationsMinimal(zid: any, lang: any) {
   if (!lang) {
-    return Promise.resolve([]);
+    return Promise.resolve([])
   }
   return getConversationTranslations(zid, lang).then(function (
     rows: string | any[],
   ) {
     for (let i = 0; i < rows.length; i++) {
-      delete rows[i].zid;
-      delete rows[i].created;
-      delete rows[i].modified;
-      delete rows[i].src;
+      delete rows[i].zid
+      delete rows[i].created
+      delete rows[i].modified
+      delete rows[i].src
     }
-    return rows;
-  });
+    return rows
+  })
 }
 
 async function getOneConversation(zid: any, uid?: number, lang?: null) {
@@ -7745,103 +7808,103 @@ async function getOneConversation(zid: any, uid?: number, lang?: null) {
 left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
 where conversations.zid = ($1);`,
     [zid],
-  );
-  const conv = conversationRows[0];
+  )
+  const conv = conversationRows[0]
 
   const sentimentVoterRows = await queryP_readOnly(
     `select users.github_username, conversation_sentiment_votes.vote from conversation_sentiment_votes
 left join users on conversation_sentiment_votes.uid = users.uid
 where conversation_sentiment_votes.zid = ($1);`,
     [zid],
-  );
-  conv.sentiment = sentimentVoterRows;
+  )
+  conv.sentiment = sentimentVoterRows
 
   if (conv.github_pr_id !== null) {
-    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
   } else {
-    conv.github_pr_url = null;
+    conv.github_pr_url = null
   }
 
-  const convHasMetadata = await getConversationHasMetadata(zid);
-  const translations = await getConversationTranslationsMinimal(zid, lang);
+  const convHasMetadata = await getConversationHasMetadata(zid)
+  const translations = await getConversationTranslationsMinimal(zid, lang)
 
   conv.auth_opt_allow_3rdparty = ifDefinedFirstElseSecond(
     conv.auth_opt_allow_3rdparty,
     true,
-  );
+  )
   conv.auth_opt_fb_computed =
     conv.auth_opt_allow_3rdparty &&
-    ifDefinedFirstElseSecond(conv.auth_opt_fb, true);
+    ifDefinedFirstElseSecond(conv.auth_opt_fb, true)
   conv.auth_opt_tw_computed =
     conv.auth_opt_allow_3rdparty &&
-    ifDefinedFirstElseSecond(conv.auth_opt_tw, true);
+    ifDefinedFirstElseSecond(conv.auth_opt_tw, true)
 
-  conv.translations = translations;
-  const ownerInfo = await getUserInfoForUid2(conv.owner);
+  conv.translations = translations
+  const ownerInfo = await getUserInfoForUid2(conv.owner)
 
-  let ownername = ownerInfo.hname;
+  let ownername = ownerInfo.hname
   if (convHasMetadata) {
-    conv.hasMetadata = true;
+    conv.hasMetadata = true
   }
-  conv.is_mod = uid && isAdministrator(uid);
-  conv.is_owner = uid && (await isOwner(zid, uid));
-  delete conv.uid; // conv.owner is what you want, uid shouldn't be returned.
-  return conv;
+  conv.is_mod = uid && isAdministrator(uid)
+  conv.is_owner = uid && (await isOwner(zid, uid))
+  delete conv.uid // conv.owner is what you want, uid shouldn't be returned.
+  return conv
 }
 
 async function handle_GET_conversations(
   req: {
     p: {
-      uid: number;
-      limit?: number;
-    };
+      uid: number
+      limit?: number
+    }
   },
   res: any,
 ) {
-  const uid = req.p.uid;
+  const uid = req.p.uid
 
   const query =
-    "SELECT conversations.*, users.hname, users.github_username, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;";
+    "SELECT conversations.*, users.hname, users.github_username, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;"
   // TODO paginate
-  const limit = req.p.limit || 999;
+  const limit = req.p.limit || 999
 
-  let conversationsResult;
+  let conversationsResult
   try {
-    conversationsResult = await queryP_readOnly(query.toString(), [limit]);
+    conversationsResult = await queryP_readOnly(query.toString(), [limit])
   } catch (err) {
-    fail(res, 500, "polis_err_get_conversations", err);
-    return;
+    fail(res, 500, "polis_err_get_conversations", err)
+    return
   }
 
   conversationsResult.forEach(function (conv) {
-    conv.created = Number(conv.created);
-    conv.modified = Number(conv.modified);
+    conv.created = Number(conv.created)
+    conv.modified = Number(conv.modified)
 
     // if there is no topic, provide a UTC timstamp instead
     if (_.isUndefined(conv.topic) || conv.topic === "") {
-      conv.topic = new Date(conv.created).toUTCString();
+      conv.topic = new Date(conv.created).toUTCString()
     }
 
-    conv.is_mod = uid && isAdministrator(uid);
+    conv.is_mod = uid && isAdministrator(uid)
 
     if (conv.github_pr_id !== null) {
-      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
     } else {
-      conv.github_pr_url = null;
+      conv.github_pr_url = null
     }
 
     // Make sure zid is not exposed
-    delete conv.zid;
+    delete conv.zid
 
-    delete conv.is_anon;
-    delete conv.is_public;
+    delete conv.is_anon
+    delete conv.is_public
     if (conv.context === "") {
-      delete conv.context;
+      delete conv.context
     }
-    return conv;
-  });
+    return conv
+  })
 
-  res.status(200).json(conversationsResult);
+  res.status(200).json(conversationsResult)
 }
 
 async function handle_GET_conversations_summary(req: Request, res: Response) {
@@ -7881,29 +7944,29 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
   JOIN users ON conversations.owner = users.uid
   JOIN zinvites ON conversations.zid = zinvites.zid;
-  `;
+  `
 
-  const rows = await queryP_readOnly(query, []);
+  const rows = await queryP_readOnly(query, [])
 
   rows.forEach(function (conv) {
-    conv.created = Number(conv.created);
-    conv.modified = Number(conv.modified);
+    conv.created = Number(conv.created)
+    conv.modified = Number(conv.modified)
 
     // if there is no topic, provide a UTC timstamp instead
     if (_.isUndefined(conv.topic) || conv.topic === "") {
-      conv.topic = new Date(conv.created).toUTCString();
+      conv.topic = new Date(conv.created).toUTCString()
     }
 
     if (conv.github_pr_id !== null) {
-      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`;
+      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
     } else {
-      conv.github_pr_url = null;
+      conv.github_pr_url = null
     }
 
-    return conv;
-  });
+    return conv
+  })
 
-  return res.json(rows);
+  return res.json(rows)
 }
 
 function createReport(zid: any) {
@@ -7912,19 +7975,19 @@ function createReport(zid: any) {
   //     Type 'unknown' is not assignable to type 'string'.ts(2345)
   // @ts-ignore
   return generateTokenP(20, false).then(function (report_id: string) {
-    report_id = "r" + report_id;
+    report_id = "r" + report_id
     return queryP("insert into reports (zid, report_id) values ($1, $2);", [
       zid,
       report_id,
-    ]);
-  });
+    ])
+  })
 }
 
 async function handle_POST_increment_conversation_view_count(
   req: { p: { zid: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let zid = req.p.zid;
+  let zid = req.p.zid
   const result = await queryP(
     `
     INSERT INTO conversation_view_counts (zid, view_count)
@@ -7934,15 +7997,15 @@ async function handle_POST_increment_conversation_view_count(
     RETURNING view_count;
     `,
     [zid],
-  );
-  res.json(result[0].view_count);
+  )
+  res.json(result[0].view_count)
 }
 
 function handle_POST_reports(
   req: { p: { zid: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let zid = req.p.zid;
+  let zid = req.p.zid
 
   queryP("select * from reports where zid = ($1);", [zid])
     .then((reports: any[]) => {
@@ -7950,25 +8013,25 @@ function handle_POST_reports(
         return createReport(zid)
           .then(() => res.json({}))
           .catch((err: any) => {
-            fail(res, 500, "polis_err_post_reports_misc", err);
-          });
+            fail(res, 500, "polis_err_post_reports_misc", err)
+          })
       }
 
-      fail(res, 500, "polis_err_post_reports_already_exists");
+      fail(res, 500, "polis_err_post_reports_already_exists")
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_post_reports_misc", err);
-    });
+      fail(res, 500, "polis_err_post_reports_misc", err)
+    })
 }
 function handle_PUT_reports(
   req: {
-    p: { [x: string]: any; rid: any; uid?: any; zid: any; report_name: any };
+    p: { [x: string]: any; rid: any; uid?: any; zid: any; report_name: any }
   },
   res: { json: (arg0: any) => void },
 ) {
-  let rid = req.p.rid;
-  let uid = req.p.uid;
-  let zid = req.p.zid;
+  let rid = req.p.rid
+  let uid = req.p.uid
+  let zid = req.p.zid
 
   return (
     isOwner(zid, uid)
@@ -7976,65 +8039,65 @@ function handle_PUT_reports(
       // @ts-ignore
       .then((isMod: any, err: string) => {
         if (!isMod) {
-          return fail(res, 403, "polis_err_put_reports_permissions", err);
+          return fail(res, 403, "polis_err_put_reports_permissions", err)
         }
 
         let fields: { [key: string]: string } = {
           modified: "now_as_millis()",
-        };
+        }
 
         sql_reports.columns
           .map((c: { name: any }) => {
-            return c.name;
+            return c.name
           })
           .filter((name: string) => {
             // only allow changing label fields, (label_x_neg, etc) not zid, etc.
-            return name.startsWith("label_");
+            return name.startsWith("label_")
           })
           .forEach((name: string | number) => {
             if (!_.isUndefined(req.p[name])) {
-              fields[name] = req.p[name];
+              fields[name] = req.p[name]
             }
-          });
+          })
 
         if (!_.isUndefined(req.p.report_name)) {
-          fields.report_name = req.p.report_name;
+          fields.report_name = req.p.report_name
         }
 
-        let q = sql_reports.update(fields).where(sql_reports.rid.equals(rid));
+        let q = sql_reports.update(fields).where(sql_reports.rid.equals(rid))
 
-        let query = q.toString();
-        query = query.replace("'now_as_millis()'", "now_as_millis()"); // remove quotes added by sql lib
+        let query = q.toString()
+        query = query.replace("'now_as_millis()'", "now_as_millis()") // remove quotes added by sql lib
 
         return queryP(query, []).then(() => {
-          res.json({});
-        });
+          res.json({})
+        })
       })
       .catch((err: any) => {
-        fail(res, 500, "polis_err_post_reports_misc", err);
+        fail(res, 500, "polis_err_post_reports_misc", err)
       })
-  );
+  )
 }
 function handle_GET_reports(
   req: { p: { zid: any; rid: any; uid?: any } },
   res: { json: (arg0: any) => void },
 ) {
-  let zid = req.p.zid;
-  let rid = req.p.rid;
-  let uid = req.p.uid;
+  let zid = req.p.zid
+  let rid = req.p.rid
+  let uid = req.p.uid
 
-  let reportsPromise = null;
+  let reportsPromise = null
 
   if (rid) {
     if (zid) {
       reportsPromise = Promise.reject(
         "polis_err_get_reports_should_not_specify_both_report_id_and_conversation_id",
-      );
+      )
     } else {
-      reportsPromise = queryP("select * from reports where rid = ($1);", [rid]);
+      reportsPromise = queryP("select * from reports where rid = ($1);", [rid])
     }
   } else if (zid) {
-    reportsPromise = queryP("select * from reports where zid = ($1);", [zid]);
+    reportsPromise = queryP("select * from reports where zid = ($1);", [zid])
     // reportsPromise = isOwner(zid, uid).then((doesOwnConversation: any) => {
     //   if (!doesOwnConversation) {
     //     throw "polis_err_permissions";
@@ -8045,7 +8108,7 @@ function handle_GET_reports(
     reportsPromise = queryP(
       "select * from reports where zid in (select zid from conversations where owner = ($1));",
       [uid],
-    );
+    )
   }
 
   reportsPromise
@@ -8054,34 +8117,34 @@ function handle_GET_reports(
     //     Type 'unknown' is not assignable to type 'any[]'.ts(2345)
     // @ts-ignore
     .then((reports: any[]) => {
-      let zids: any[] = [];
+      let zids: any[] = []
       reports = reports.map((report: { zid: any; rid: any }) => {
-        zids.push(report.zid);
-        delete report.rid;
-        return report;
-      });
+        zids.push(report.zid)
+        delete report.rid
+        return report
+      })
 
       if (zids.length === 0) {
-        return res.json(reports);
+        return res.json(reports)
       }
       return queryP(
         "select * from zinvites where zid in (" + zids.join(",") + ");",
         [],
       ).then((zinvite_entries: any) => {
-        let zidToZinvite = _.indexBy(zinvite_entries, "zid");
+        let zidToZinvite = _.indexBy(zinvite_entries, "zid")
         reports = reports.map(
           (report: { conversation_id: any; zid?: string | number }) => {
-            report.conversation_id = zidToZinvite[report.zid || ""]?.zinvite;
-            delete report.zid;
-            return report;
+            report.conversation_id = zidToZinvite[report.zid || ""]?.zinvite
+            delete report.zid
+            return report
           },
-        );
-        res.json(reports);
-      });
+        )
+        res.json(reports)
+      })
     })
     .catch((err: string) => {
       if (err === "polis_err_permissions") {
-        fail(res, 403, "polis_err_permissions");
+        fail(res, 403, "polis_err_permissions")
       } else if (
         err ===
         "polis_err_get_reports_should_not_specify_both_report_id_and_conversation_id"
@@ -8090,11 +8153,11 @@ function handle_GET_reports(
           res,
           404,
           "polis_err_get_reports_should_not_specify_both_report_id_and_conversation_id",
-        );
+        )
       } else {
-        fail(res, 500, "polis_err_get_reports_misc", err);
+        fail(res, 500, "polis_err_get_reports_misc", err)
       }
-    });
+    })
 }
 
 async function handle_GET_conversation(
@@ -8102,22 +8165,24 @@ async function handle_GET_conversation(
   res: Response,
 ) {
   if (!req.body.conversation_id) {
-    fail(res, 400, "polis_err_get_conversation_no_conversation_id");
+    fail(res, 400, "polis_err_get_conversation_no_conversation_id")
   }
-  const zid = await getConversationIdFetchZid(req.body.conversation_id);
-  const lang = null; // for now just return the default
-  const data = await getOneConversation(zid, req.p.uid, lang);
-  finishOne(res, data);
+  const zid = await getConversationIdFetchZid(req.body.conversation_id)
+  const lang = null // for now just return the default
+  const data = await getOneConversation(zid, req.p.uid, lang)
+  finishOne(res, data)
 }
 
 function handle_GET_contexts(
   req: any,
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   queryP_readOnly(
@@ -8126,29 +8191,31 @@ function handle_GET_contexts(
   )
     .then(
       function (contexts: any) {
-        res.status(200).json(contexts);
+        res.status(200).json(contexts)
       },
       function (err: any) {
-        fail(res, 500, "polis_err_get_contexts_query", err);
+        fail(res, 500, "polis_err_get_contexts_query", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_get_contexts_misc", err);
-    });
+      fail(res, 500, "polis_err_get_contexts_misc", err)
+    })
 }
 
 function handle_POST_contexts(
   req: { p: { uid?: any; name: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let name = req.p.name;
+  let uid = req.p.uid
+  let name = req.p.name
 
   function createContext() {
     return queryP(
@@ -8157,61 +8224,61 @@ function handle_POST_contexts(
     )
       .then(
         function () {
-          res.status(200).json({});
+          res.status(200).json({})
         },
         function (err: any) {
-          fail(res, 500, "polis_err_post_contexts_query", err);
+          fail(res, 500, "polis_err_post_contexts_query", err)
         },
       )
       .catch(function (err: any) {
-        fail(res, 500, "polis_err_post_contexts_misc", err);
-      });
+        fail(res, 500, "polis_err_post_contexts_misc", err)
+      })
   }
   queryP("select name from contexts where name = ($1);", [name])
     .then(
       function (rows: string | any[]) {
-        let exists = rows && rows.length;
+        let exists = rows && rows.length
         if (exists) {
-          fail(res, 422, "polis_err_post_context_exists");
-          return;
+          fail(res, 422, "polis_err_post_context_exists")
+          return
         }
-        return createContext();
+        return createContext()
       },
       function (err: any) {
-        fail(res, 500, "polis_err_post_contexts_check_query", err);
+        fail(res, 500, "polis_err_post_contexts_check_query", err)
       },
     )
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_post_contexts_check_misc", err);
-    });
+      fail(res, 500, "polis_err_post_contexts_check_misc", err)
+    })
 }
 
 function handle_POST_reserve_conversation_id(
   req: any,
   res: { json: (arg0: { conversation_id: any }) => void },
 ) {
-  const zid = 0;
-  const shortUrl = false;
+  const zid = 0
+  const shortUrl = false
   // TODO check auth - maybe bot has key
   generateAndRegisterZinvite(zid, shortUrl)
     .then(function (conversation_id: any) {
       res.json({
         conversation_id: conversation_id,
-      });
+      })
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_reserve_conversation_id", err);
-    });
+      fail(res, 500, "polis_err_reserve_conversation_id", err)
+    })
 }
 async function handle_POST_conversations(
   req: {
     p: {
-      uid: number;
-      topic: string;
-      description: string;
-      auth_needed_to_vote: boolean;
-      auth_needed_to_write: boolean;
-    };
+      uid: number
+      topic: string
+      description: string
+      auth_needed_to_vote: boolean
+      auth_needed_to_write: boolean
+    }
   },
   res: any,
 ) {
@@ -8224,27 +8291,27 @@ async function handle_POST_conversations(
       is_active: true,
       auth_needed_to_vote: req.p.auth_needed_to_vote,
       auth_needed_to_write: req.p.auth_needed_to_write,
-    };
-    const insertData = Object.entries(insertObject);
-    const fields = insertData.map(([field, _]) => field);
-    const values = insertData.map(([_, value]) => value);
+    }
+    const insertData = Object.entries(insertObject)
+    const fields = insertData.map(([field, _]) => field)
+    const values = insertData.map(([_, value]) => value)
 
-    const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+    const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ")
     const query = `INSERT INTO conversations (${fields.join(
       ", ",
-    )}) VALUES (${fieldPlaceholders}) RETURNING zid;`;
-    const insertResult = await queryP(query, values);
+    )}) VALUES (${fieldPlaceholders}) RETURNING zid;`
+    const insertResult = await queryP(query, values)
 
     // @ts-ignore
-    const zid = insertResult[0].zid as number;
+    const zid = insertResult[0].zid as number
 
-    const zinvite = await generateAndRegisterZinvite(zid, undefined);
+    const zinvite = await generateAndRegisterZinvite(zid, undefined)
     finishOne(res, {
       url: buildConversationUrl(req, zinvite),
       zid: zid,
-    });
+    })
   } catch (err) {
-    fail(res, 500, "polis_err_post_conversations", err);
+    fail(res, 500, "polis_err_post_conversations", err)
   }
 }
 
@@ -8252,22 +8319,22 @@ async function handle_POST_query_participants_by_metadata(
   req: { p: { uid?: any; zid: any; pmaids: any } },
   res: Response,
 ) {
-  let uid = req.p.uid;
-  let zid = req.p.zid;
-  let pmaids = req.p.pmaids;
+  let uid = req.p.uid
+  let zid = req.p.zid
+  let pmaids = req.p.pmaids
 
   if (!pmaids.length) {
     // empty selection
-    return res.status(200).json([]);
+    return res.status(200).json([])
   }
 
-  const canPost = await isOwnerOrParticipant(zid, uid);
+  const canPost = await isOwnerOrParticipant(zid, uid)
   if (!canPost) {
-    return fail(res, 403, "polis_err_permissions");
+    return fail(res, 403, "polis_err_permissions")
   }
 
   // find list of participants who are not eliminated by the list of excluded choices.
-  let rows;
+  let rows
   try {
     rows = await queryP_readOnly(
       // 3. invert the selection of participants, so we get those who passed the filter.
@@ -8281,22 +8348,24 @@ async function handle_POST_query_participants_by_metadata(
         ")" +
         ";",
       [zid, zid],
-    );
+    )
   } catch (err) {
-    fail(res, 500, "polis_err_metadata_query", err);
-    return;
+    fail(res, 500, "polis_err_metadata_query", err)
+    return
   }
-  res.status(200);
-  res.json(rows.map((row) => row.pid));
+  res.status(200)
+  res.json(rows.map((row) => row.pid))
 }
 function handle_POST_sendCreatedLinkToEmail(
   req: { p: { uid?: any; zid: string } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   query_readOnly(
@@ -8304,18 +8373,18 @@ function handle_POST_sendCreatedLinkToEmail(
     [req.p.uid],
     function (err: any, results: { rows: UserType[] }) {
       if (err) {
-        fail(res, 500, "polis_err_get_email_db", err);
-        return;
+        fail(res, 500, "polis_err_get_email_db", err)
+        return
       }
-      let email = results.rows[0].email;
-      let fullname = results.rows[0].hname;
+      let email = results.rows[0].email
+      let fullname = results.rows[0].hname
       query_readOnly(
         "select * from zinvites where zid = $1",
         [req.p.zid],
         function (err: any, results: { rows: { zinvite: any }[] }) {
-          let zinvite = results.rows[0].zinvite;
-          let server = getServerNameWithProtocol(req);
-          let createdLink = server + "/#" + req.p.zid + "/" + zinvite;
+          let zinvite = results.rows[0].zinvite
+          let server = getServerNameWithProtocol(req)
+          let createdLink = server + "/#" + req.p.zid + "/" + zinvite
           let body =
             "" +
             "Hi " +
@@ -8329,7 +8398,7 @@ function handle_POST_sendCreatedLinkToEmail(
             "\n" +
             "With gratitude,\n" +
             "\n" +
-            "The team";
+            "The team"
 
           return sendTextEmail(
             polisFromAddress,
@@ -8338,81 +8407,85 @@ function handle_POST_sendCreatedLinkToEmail(
             body,
           )
             .then(function () {
-              res.status(200).json({});
+              res.status(200).json({})
             })
             .catch(function (err: any) {
-              fail(res, 500, "polis_err_sending_created_link_to_email", err);
-            });
+              fail(res, 500, "polis_err_sending_created_link_to_email", err)
+            })
         },
-      );
+      )
     },
-  );
+  )
 }
 
 function handle_POST_notifyTeam(
   req: {
     p: {
-      webserver_pass: string | undefined;
-      webserver_username: string | undefined;
-      subject: any;
-      body: any;
-    };
+      webserver_pass: string | undefined
+      webserver_username: string | undefined
+      subject: any
+      body: any
+    }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   if (
     req.p.webserver_pass !== Config.webserverPass ||
     req.p.webserver_username !== Config.webserverUsername
   ) {
-    return fail(res, 403, "polis_err_notifyTeam_auth");
+    return fail(res, 403, "polis_err_notifyTeam_auth")
   }
-  let subject = req.p.subject;
-  let body = req.p.body;
+  let subject = req.p.subject
+  let body = req.p.body
   emailTeam(subject, body)
     .then(() => {
-      res.status(200).json({});
+      res.status(200).json({})
     })
     .catch((err: any) => {
-      return fail(res, 500, "polis_err_notifyTeam", err);
-    });
+      return fail(res, 500, "polis_err_notifyTeam", err)
+    })
 }
 
 function handle_POST_sendEmailExportReady(
   req: {
     p: {
-      webserver_pass: string | undefined;
-      webserver_username: string | undefined;
-      email: any;
-      conversation_id: string;
-      filename: any;
-    };
+      webserver_pass: string | undefined
+      webserver_username: string | undefined
+      email: any
+      conversation_id: string
+      filename: any
+    }
   },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   if (
     req.p.webserver_pass !== Config.webserverPass ||
     req.p.webserver_username !== Config.webserverUsername
   ) {
-    return fail(res, 403, "polis_err_sending_export_link_to_email_auth");
+    return fail(res, 403, "polis_err_sending_export_link_to_email_auth")
   }
 
-  const serverUrl = Config.getServerUrl();
-  const email = req.p.email;
+  const serverUrl = Config.getServerUrl()
+  const email = req.p.email
   const subject =
-    "Data export for conversation metropolis.vote/c/" + req.p.conversation_id;
-  const fromAddress = `Polis Team <${Config.adminEmailDataExport}>`;
+    "Data export for conversation metropolis.vote/c/" + req.p.conversation_id
+  const fromAddress = `Polis Team <${Config.adminEmailDataExport}>`
   const body = `Greetings
 
 You created a data export for conversation ${serverUrl}/${req.p.conversation_id} that has just completed. You can download the results for this conversation at the following url:
@@ -8422,15 +8495,15 @@ ${serverUrl}/api/v3/dataExport/results?filename=${req.p.filename}&conversation_i
 Please let us know if you have any questions about the data.
 
 Thanks for using Metropolis!
-`;
+`
 
   sendTextEmail(fromAddress, email, subject, body)
     .then(function () {
-      res.status(200).json({});
+      res.status(200).json({})
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_sending_export_link_to_email", err);
-    });
+      fail(res, 500, "polis_err_sending_export_link_to_email", err)
+    })
 }
 
 function addParticipant(zid: any, uid?: any) {
@@ -8441,8 +8514,8 @@ function addParticipant(zid: any, uid?: any) {
     return queryP(
       "INSERT INTO participants (pid, zid, uid, created) VALUES (NULL, $1, $2, default) RETURNING *;",
       [zid, uid],
-    );
-  });
+    )
+  })
 }
 
 function getSocialParticipantsForMod_timed(
@@ -8454,8 +8527,8 @@ function getSocialParticipantsForMod_timed(
   return getSocialParticipantsForMod
     .apply(null, [zid, limit, mod, convOwner])
     .then(function (results: any) {
-      return results;
-    });
+      return results
+    })
 }
 
 function getSocialParticipantsForMod(
@@ -8464,11 +8537,11 @@ function getSocialParticipantsForMod(
   mod: any,
   owner: any,
 ) {
-  let modClause = "";
-  let params = [zid, limit, owner];
+  let modClause = ""
+  let params = [zid, limit, owner]
   if (!_.isUndefined(mod)) {
-    modClause = " and mod = ($4)";
-    params.push(mod);
+    modClause = " and mod = ($4)"
+    params.push(mod)
   }
 
   let q =
@@ -8494,8 +8567,8 @@ function getSocialParticipantsForMod(
     ") " +
     "select * from all_rows where (xid is not null) " +
     // "select * from all_rows " +
-    ";";
-  return queryP(q, params);
+    ";"
+  return queryP(q, params)
 }
 
 function updateVoteCount(zid: any, pid: any) {
@@ -8503,14 +8576,14 @@ function updateVoteCount(zid: any, pid: any) {
   return queryP(
     "update participants set vote_count = (select count(*) from votes where zid = ($1) and pid = ($2)) where zid = ($1) and pid = ($2)",
     [zid, pid],
-  );
+  )
 }
 
 function getLocationsForParticipants(zid: any) {
   return queryP_readOnly(
     "select * from participant_locations where zid = ($1);",
     [zid],
-  );
+  )
 }
 
 function getPidsForGid(zid: any, gid: number, math_tick: number) {
@@ -8519,58 +8592,58 @@ function getPidsForGid(zid: any, gid: number, math_tick: number) {
     getBidIndexToPidMapping(zid, math_tick),
   ]).then(function (o: ParticipantOption[]) {
     if (!o[0] || !o[0].asPOJO) {
-      return [];
+      return []
     }
-    o[0] = o[0].asPOJO;
-    let clusters = o[0]["group-clusters"];
-    let indexToBid = o[0]["base-clusters"].id; // index to bid
-    let bidToIndex = [];
+    o[0] = o[0].asPOJO
+    let clusters = o[0]["group-clusters"]
+    let indexToBid = o[0]["base-clusters"].id // index to bid
+    let bidToIndex = []
     for (let i = 0; i < indexToBid.length; i++) {
-      bidToIndex[indexToBid[i]] = i;
+      bidToIndex[indexToBid[i]] = i
     }
-    let indexToPids = o[1].bidToPid; // actually index to [pid]
-    let cluster = clusters[gid];
+    let indexToPids = o[1].bidToPid // actually index to [pid]
+    let cluster = clusters[gid]
     if (!cluster) {
-      return [];
+      return []
     }
-    let members = cluster.members; // bids
-    let pids: any[] = [];
+    let members = cluster.members // bids
+    let pids: any[] = []
     for (let i = 0; i < members.length; i++) {
-      let bid = members[i];
-      let index = bidToIndex[bid];
-      let morePids = indexToPids[index];
-      Array.prototype.push.apply(pids, morePids);
+      let bid = members[i]
+      let index = bidToIndex[bid]
+      let morePids = indexToPids[index]
+      Array.prototype.push.apply(pids, morePids)
     }
     pids = pids.map(function (x) {
-      return parseInt(x);
-    });
+      return parseInt(x)
+    })
     pids.sort(function (a, b) {
-      return a - b;
-    });
-    return pids;
-  });
+      return a - b
+    })
+    return pids
+  })
 }
 
 function getParticipantDemographicsForConversation(zid: any) {
   return queryP(
     "select * from demographic_data left join participants on participants.uid = demographic_data.uid where zid = ($1);",
     [zid],
-  );
+  )
 }
 
 function getParticipantVotesForCommentsFlaggedWith_is_meta(zid: any) {
   return queryP(
     "select tid, pid, vote from votes_latest_unique where zid = ($1) and tid in (select tid from comments where zid = ($1) and is_meta = true)",
     [zid],
-  );
+  )
 }
 function handle_GET_groupDemographics(
   req: { p: { zid: any; uid?: any; rid: any } },
   res: {
     json: (
       arg0: {
-        gid: number;
-        count: number;
+        gid: number
+        count: number
         // fb_gender_male: 0,
         // fb_gender_female: 0,
         // fb_gender_null: 0,
@@ -8585,19 +8658,19 @@ function handle_GET_groupDemographics(
         // birth_year_guess: 0,
         // birth_year_guess_count: 0,
         // convenient counts
-        gender_male: number;
-        gender_female: number;
-        gender_null: number;
-        birth_year: number;
-        birth_year_count: number;
-        meta_comment_agrees: any;
-        meta_comment_disagrees: any;
-        meta_comment_passes: any;
+        gender_male: number
+        gender_female: number
+        gender_null: number
+        birth_year: number
+        birth_year_count: number
+        meta_comment_agrees: any
+        meta_comment_disagrees: any
+        meta_comment_passes: any
       }[],
-    ) => void;
+    ) => void
   },
 ) {
-  let zid = req.p.zid;
+  let zid = req.p.zid
   Promise.all([
     getPidsForGid(zid, 0, -1),
     getPidsForGid(zid, 1, -1),
@@ -8609,22 +8682,22 @@ function handle_GET_groupDemographics(
     isOwner(req.p.zid, req.p.uid),
   ])
     .then((o: any[]) => {
-      let groupPids = [];
-      let groupStats = [];
+      let groupPids = []
+      let groupStats = []
 
-      let meta = o[5];
-      let metaVotes = o[6];
-      let isMod = o[7];
+      let meta = o[5]
+      let metaVotes = o[6]
+      let isMod = o[7]
 
-      const isReportQuery = !_.isUndefined(req.p.rid);
+      const isReportQuery = !_.isUndefined(req.p.rid)
 
       if (!isMod && !isReportQuery) {
-        throw "polis_err_groupDemographics_auth";
+        throw "polis_err_groupDemographics_auth"
       }
 
       for (let i = 0; i < 5; i++) {
         if (o[i] && o[i].length) {
-          groupPids.push(o[i]);
+          groupPids.push(o[i])
 
           groupStats.push({
             gid: i,
@@ -8653,13 +8726,13 @@ function handle_GET_groupDemographics(
             meta_comment_agrees: {},
             meta_comment_disagrees: {},
             meta_comment_passes: {},
-          });
+          })
         } else {
-          break;
+          break
         }
       }
-      meta = _.indexBy(meta, "pid");
-      let pidToMetaVotes = _.groupBy(metaVotes, "pid");
+      meta = _.indexBy(meta, "pid")
+      let pidToMetaVotes = _.groupBy(metaVotes, "pid")
 
       for (let i = 0; i < groupStats.length; i++) {
         // Type '{ gid: number; count: number; gender_male: number; gender_female: number;
@@ -8670,13 +8743,13 @@ function handle_GET_groupDemographics(
         // birth_year_guess_countts(2739)
         //
         // @ts-ignore
-        let s: DemographicEntry = groupStats[i];
-        let pids = groupPids[i];
+        let s: DemographicEntry = groupStats[i]
+        let pids = groupPids[i]
         for (let p = 0; p < pids.length; p++) {
-          let pid = pids[p];
-          let ptptMeta = meta[pid];
+          let pid = pids[p]
+          let ptptMeta = meta[pid]
           if (ptptMeta) {
-            s.count += 1;
+            s.count += 1
             // if (ptptMeta.fb_gender === 0) {
             //   s.fb_gender_male += 1;
             // } else if (ptptMeta.fb_gender === 1) {
@@ -8709,36 +8782,36 @@ function handle_GET_groupDemographics(
             // }
 
             // compute convenient counts
-            let gender = null;
+            let gender = null
             if (_.isNumber(ptptMeta.fb_gender)) {
-              gender = ptptMeta.fb_gender;
+              gender = ptptMeta.fb_gender
             } else if (_.isNumber(ptptMeta.gender_guess)) {
-              gender = ptptMeta.gender_guess;
+              gender = ptptMeta.gender_guess
             } else if (_.isNumber(ptptMeta.ms_gender_estimate_fb)) {
-              gender = ptptMeta.ms_gender_estimate_fb;
+              gender = ptptMeta.ms_gender_estimate_fb
             }
             if (gender === 0) {
-              s.gender_male += 1;
+              s.gender_male += 1
             } else if (gender === 1) {
-              s.gender_female += 1;
+              s.gender_female += 1
             } else {
-              s.gender_null += 1;
+              s.gender_null += 1
             }
-            let birthYear = null;
+            let birthYear = null
             if (ptptMeta.ms_birth_year_estimate_fb > 1900) {
-              birthYear = ptptMeta.ms_birth_year_estimate_fb;
+              birthYear = ptptMeta.ms_birth_year_estimate_fb
             } else if (ptptMeta.birth_year_guess > 1900) {
-              birthYear = ptptMeta.birth_year_guess;
+              birthYear = ptptMeta.birth_year_guess
             }
             if (birthYear > 1900) {
-              s.birth_year += birthYear;
-              s.birth_year_count += 1;
+              s.birth_year += birthYear
+              s.birth_year_count += 1
             }
           }
-          let ptptMetaVotes = pidToMetaVotes[pid];
+          let ptptMetaVotes = pidToMetaVotes[pid]
           if (ptptMetaVotes) {
             for (let v = 0; v < ptptMetaVotes.length; v++) {
-              let vote = ptptMetaVotes[v];
+              let vote = ptptMetaVotes[v]
               if (vote.vote === polisTypes.reactions.pass) {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                 // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
@@ -8747,7 +8820,7 @@ function handle_GET_groupDemographics(
                   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                   // @ts-ignore
-                  1 + (s.meta_comment_passes[vote.tid] || 0);
+                  1 + (s.meta_comment_passes[vote.tid] || 0)
               } else if (vote.vote === polisTypes.reactions.pull) {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                 // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
@@ -8756,7 +8829,7 @@ function handle_GET_groupDemographics(
                   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                   // @ts-ignore
-                  1 + (s.meta_comment_agrees[vote.tid] || 0);
+                  1 + (s.meta_comment_agrees[vote.tid] || 0)
               } else if (vote.vote === polisTypes.reactions.push) {
                 // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                 // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
@@ -8765,22 +8838,22 @@ function handle_GET_groupDemographics(
                   // Element implicitly has an 'any' type because expression of type 'string | number' can't be used to index type '{}'.
                   // No index signature with a parameter of type 'string' was found on type '{}'.ts(7053)
                   // @ts-ignore
-                  1 + (s.meta_comment_disagrees[vote.tid] || 0);
+                  1 + (s.meta_comment_disagrees[vote.tid] || 0)
               }
             }
           }
         }
         s.ms_birth_year_estimate_fb =
-          s.ms_birth_year_estimate_fb / s.ms_birth_year_count;
-        s.birth_year_guess = s.birth_year_guess / s.birth_year_guess_count;
-        s.birth_year = s.birth_year / s.birth_year_count;
+          s.ms_birth_year_estimate_fb / s.ms_birth_year_count
+        s.birth_year_guess = s.birth_year_guess / s.birth_year_guess_count
+        s.birth_year = s.birth_year / s.birth_year_count
       }
 
-      res.json(groupStats);
+      res.json(groupStats)
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_groupDemographics", err);
-    });
+      fail(res, 500, "polis_err_groupDemographics", err)
+    })
 }
 
 // this is for testing the encryption
@@ -8792,7 +8865,7 @@ function handle_GET_logMaxmindResponse(
     // TODO fix this by piping the error from the usage of this in ./app
     // Cannot find name 'err'.ts(2304)
     // @ts-ignore
-    return fail(res, 403, "polis_err_permissions", err);
+    return fail(res, 403, "polis_err_permissions", err)
   }
   queryP(
     "select * from participants_extended where zid = ($1) and uid = ($2);",
@@ -8805,184 +8878,191 @@ function handle_GET_logMaxmindResponse(
     // @ts-ignore
     .then((results: string | any[]) => {
       if (!results || !results.length) {
-        res.json({});
-        return;
+        res.json({})
+        return
       }
-      const o = results[0];
+      const o = results[0]
       _.each(o, (val: any, key: string) => {
         if (key.startsWith("encrypted_")) {
-          o[key] = decrypt(val);
+          o[key] = decrypt(val)
         }
-      });
-      res.json({});
+      })
+      res.json({})
     })
     .catch((err: any) => {
-      fail(res, 500, "polis_err_get_participantsExtended", err);
-    });
+      fail(res, 500, "polis_err_get_participantsExtended", err)
+    })
 }
 
 function handle_GET_locations(
   req: { p: { zid: any; gid: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let gid = req.p.gid;
+  let zid = req.p.zid
+  let gid = req.p.gid
 
   Promise.all([getPidsForGid(zid, gid, -1), getLocationsForParticipants(zid)])
     .then(function (o: any[]) {
-      let pids = o[0];
-      let locations = o[1];
+      let pids = o[0]
+      let locations = o[1]
       locations = locations.filter(function (locData: { pid: any }) {
-        let pidIsInGroup = _.indexOf(pids, locData.pid, true) >= 0; // uses binary search
-        return pidIsInGroup;
-      });
+        let pidIsInGroup = _.indexOf(pids, locData.pid, true) >= 0 // uses binary search
+        return pidIsInGroup
+      })
       locations = locations.map(function (locData: { lat: any; lng: any }) {
         return {
           lat: locData.lat,
           lng: locData.lng,
           n: 1,
-        };
-      });
-      res.status(200).json(locations);
+        }
+      })
+      res.status(200).json(locations)
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_locations_01", err);
-    });
+      fail(res, 500, "polis_err_locations_01", err)
+    })
 }
 function removeNullOrUndefinedProperties(o: { [x: string]: any }) {
   for (const k in o) {
-    let v = o[k];
+    let v = o[k]
     if (v === null || v === undefined) {
-      delete o[k];
+      delete o[k]
     }
   }
-  return o;
+  return o
 }
 
 function pullXInfoIntoSubObjects(ptptoiRecord: any) {
-  let p = ptptoiRecord;
+  let p = ptptoiRecord
   if (p.x_profile_image_url || p.xid || p.x_email) {
-    p.xInfo = {};
-    p.xInfo.x_profile_image_url = p.x_profile_image_url;
-    p.xInfo.xid = p.xid;
-    p.xInfo.x_name = p.x_name;
+    p.xInfo = {}
+    p.xInfo.x_profile_image_url = p.x_profile_image_url
+    p.xInfo.xid = p.xid
+    p.xInfo.x_name = p.x_name
     // p.xInfo.x_email = p.x_email;
-    delete p.x_profile_image_url;
-    delete p.xid;
-    delete p.x_name;
-    delete p.x_email;
+    delete p.x_profile_image_url
+    delete p.xid
+    delete p.x_name
+    delete p.x_email
   }
-  return p;
+  return p
 }
 
 function handle_PUT_ptptois(
   req: { p: { zid: any; uid?: any; pid: any; mod: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let uid = req.p.uid;
-  let pid = req.p.pid;
-  let mod = req.p.mod;
+  let zid = req.p.zid
+  let uid = req.p.uid
+  let pid = req.p.pid
+  let mod = req.p.mod
   isOwner(zid, uid)
     .then(function (isMod: any) {
       if (!isMod) {
-        fail(res, 403, "polis_err_ptptoi_permissions_123");
-        return;
+        fail(res, 403, "polis_err_ptptoi_permissions_123")
+        return
       }
       return queryP(
         "update participants set mod = ($3) where zid = ($1) and pid = ($2);",
         [zid, pid, mod],
       ).then(function () {
-        res.status(200).json({});
-      });
+        res.status(200).json({})
+      })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_ptptoi_misc_234", err);
-    });
+      fail(res, 500, "polis_err_ptptoi_misc_234", err)
+    })
 }
 function handle_GET_ptptois(
   req: { p: { zid: any; mod: any; uid?: any; conversation_id: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let zid = req.p.zid;
-  let mod = req.p.mod;
-  let uid = req.p.uid;
-  let limit = 99999;
+  let zid = req.p.zid
+  let mod = req.p.mod
+  let uid = req.p.uid
+  let limit = 99999
 
-  let convPromise = getConversationInfo(req.p.zid);
+  let convPromise = getConversationInfo(req.p.zid)
   let socialPtptsPromise = convPromise.then((conv: { owner: any }) => {
-    return getSocialParticipantsForMod_timed(zid, limit, mod, conv.owner);
-  });
+    return getSocialParticipantsForMod_timed(zid, limit, mod, conv.owner)
+  })
 
   Promise.all([socialPtptsPromise, getConversationInfo(zid)])
     .then(function (a: any[]) {
-      let ptptois = a[0];
-      let conv = a[1];
-      let isOwner = uid === conv.owner;
-      let isAllowed =
-        isOwner || isAdministrator(req.p.uid) || conv.is_data_open;
+      let ptptois = a[0]
+      let conv = a[1]
+      let isOwner = uid === conv.owner
+      let isAllowed = isOwner || isAdministrator(req.p.uid) || conv.is_data_open
       if (isAllowed) {
-        ptptois = ptptois.map(pullXInfoIntoSubObjects);
-        ptptois = ptptois.map(removeNullOrUndefinedProperties);
+        ptptois = ptptois.map(pullXInfoIntoSubObjects)
+        ptptois = ptptois.map(removeNullOrUndefinedProperties)
         ptptois = ptptois.map(function (p: { conversation_id: any }) {
-          p.conversation_id = req.p.conversation_id;
-          return p;
-        });
+          p.conversation_id = req.p.conversation_id
+          return p
+        })
       } else {
-        ptptois = [];
+        ptptois = []
       }
-      res.status(200).json(ptptois);
+      res.status(200).json(ptptois)
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_ptptoi_misc", err);
-    });
+      fail(res, 500, "polis_err_ptptoi_misc", err)
+    })
 }
 
 async function doSendEinvite(req: any, email: any) {
-  const einvite = await generateTokenP(30, false);
+  const einvite = await generateTokenP(30, false)
   await queryP("insert into einvites (email, einvite) values ($1, $2);", [
     email,
     einvite,
-  ]);
-  await sendEinviteEmail(req, email, einvite);
+  ])
+  await sendEinviteEmail(req, email, einvite)
 }
 
 function handle_POST_einvites(
   req: { p: { email: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let email = req.p.email;
+  let email = req.p.email
   doSendEinvite(req, email)
     .then(function () {
-      res.status(200).json({});
+      res.status(200).json({})
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_sending_einvite", err);
-    });
+      fail(res, 500, "polis_err_sending_einvite", err)
+    })
 }
 
 // function handle_GET_cache_purge(req, res) {
@@ -9003,25 +9083,27 @@ function handle_POST_einvites(
 function handle_GET_einvites(
   req: { p: { einvite: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
-  let einvite = req.p.einvite;
+  let einvite = req.p.einvite
 
   queryP("select * from einvites where einvite = ($1);", [einvite])
     .then(function (rows: string | any[]) {
       if (!rows.length) {
-        throw new Error("polis_err_missing_einvite");
+        throw new Error("polis_err_missing_einvite")
       }
-      res.status(200).json(rows[0]);
+      res.status(200).json(rows[0])
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_fetching_einvite", err);
-    });
+      fail(res, 500, "polis_err_fetching_einvite", err)
+    })
 }
 
 function generateSingleUseUrl(
@@ -9031,16 +9113,16 @@ function generateSingleUseUrl(
 ) {
   return (
     getServerNameWithProtocol(req) + "/ot/" + conversation_id + "/" + suzinvite
-  );
+  )
 }
 function buildConversationUrl(req: any, zinvite: string | null) {
-  return getServerNameWithProtocol(req) + "/" + zinvite;
+  return getServerNameWithProtocol(req) + "/" + zinvite
 }
 
 function getConversationUrl(req: any, zid: any, dontUseCache: boolean) {
   return getZinvite(zid, dontUseCache).then(function (zinvite: any) {
-    return buildConversationUrl(req, zinvite);
-  });
+    return buildConversationUrl(req, zinvite)
+  })
 }
 function createOneSuzinvite(
   xid: any,
@@ -9049,28 +9131,28 @@ function createOneSuzinvite(
   generateSingleUseUrl: (arg0: any, arg1: any) => any,
 ) {
   return generateSUZinvites(1).then(function (suzinviteArray: any[]) {
-    let suzinvite = suzinviteArray[0];
+    let suzinvite = suzinviteArray[0]
     return queryP(
       "INSERT INTO suzinvites (suzinvite, xid, zid, owner) VALUES ($1, $2, $3, $4);",
       [suzinvite, xid, zid, owner],
     )
       .then(function () {
-        return getZinvite(zid);
+        return getZinvite(zid)
       })
       .then(function (conversation_id: any) {
         return {
           zid: zid,
           conversation_id: conversation_id,
-        };
+        }
       })
       .then(function (o: { zid: any; conversation_id: any }) {
         return {
           zid: o.zid,
           conversation_id: o.conversation_id,
           suurl: generateSingleUseUrl(o.conversation_id, suzinvite),
-        };
-      });
-  });
+        }
+      })
+  })
 }
 
 // function handle_POST_users_invite(req, res) {
@@ -9113,38 +9195,42 @@ function createOneSuzinvite(
 function handle_GET_testConnection(
   req: any,
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { status: string }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { status: string }): void; new (): any }
+    }
   },
 ) {
   res.status(200).json({
     status: "ok",
-  });
+  })
 }
 
 function handle_GET_testDatabase(
   req: any,
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { status: string }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { status: string }): void; new (): any }
+    }
   },
 ) {
   queryP("select uid from users limit 1", []).then(
     () => {
       res.status(200).json({
         status: "ok",
-      });
+      })
     },
     (err: any) => {
-      fail(res, 500, "polis_err_testDatabase", err);
+      fail(res, 500, "polis_err_testDatabase", err)
     },
-  );
+  )
 }
 
 function sendSuzinviteEmail(
@@ -9153,7 +9239,7 @@ function sendSuzinviteEmail(
   conversation_id: string,
   suzinvite: string,
 ) {
-  let serverName = getServerNameWithProtocol(req);
+  let serverName = getServerNameWithProtocol(req)
   let body =
     "" +
     "Welcome to Metropolis!\n" +
@@ -9165,70 +9251,72 @@ function sendSuzinviteEmail(
     conversation_id +
     "/" +
     suzinvite +
-    "\n";
+    "\n"
 
   return sendTextEmail(
     polisFromAddress,
     email,
     "Metropolis: Join the conversation!",
     body,
-  );
+  )
 }
 
 function addInviter(inviter_uid?: any, invited_email?: any) {
   return queryP(
     "insert into inviters (inviter_uid, invited_email) VALUES ($1, $2);",
     [inviter_uid, invited_email],
-  );
+  )
 }
 
 function handle_POST_users_invite(
   req: { p: { uid?: any; emails: any; zid: any; conversation_id: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: { status: string }): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: { status: string }): void; new (): any }
+    }
   },
 ) {
-  let uid = req.p.uid;
-  let emails = req.p.emails;
-  let zid = req.p.zid;
-  let conversation_id = req.p.conversation_id;
+  let uid = req.p.uid
+  let emails = req.p.emails
+  let zid = req.p.zid
+  let conversation_id = req.p.conversation_id
 
   getConversationInfo(zid)
     .then(function (conv: { owner: any }) {
-      let owner = conv.owner;
+      let owner = conv.owner
 
       // generate some tokens
       // add them to a table paired with user_ids
       // return URLs with those.
       generateSUZinvites(emails.length)
         .then(function (suzinviteArray: any) {
-          let pairs = _.zip(emails, suzinviteArray);
+          let pairs = _.zip(emails, suzinviteArray)
 
           let valuesStatements = pairs.map(function (pair: any[]) {
-            let xid = escapeLiteral(pair[0]);
-            let suzinvite = escapeLiteral(pair[1]);
+            let xid = escapeLiteral(pair[0])
+            let suzinvite = escapeLiteral(pair[1])
             let statement =
-              "(" + suzinvite + ", " + xid + "," + zid + "," + owner + ")";
-            return statement;
-          });
+              "(" + suzinvite + ", " + xid + "," + zid + "," + owner + ")"
+            return statement
+          })
           let queryS =
             "INSERT INTO suzinvites (suzinvite, xid, zid, owner) VALUES " +
             valuesStatements.join(",") +
-            ";";
+            ";"
           query(queryS, [], function (err: any) {
             if (err) {
-              fail(res, 500, "polis_err_saving_invites", err);
-              return;
+              fail(res, 500, "polis_err_saving_invites", err)
+              return
             }
 
             Promise.all(
               pairs.map(function (pair: any[]) {
-                let email = pair[0];
-                let suzinvite = pair[1];
+                let email = pair[0]
+                let suzinvite = pair[1]
                 return sendSuzinviteEmail(
                   req,
                   email,
@@ -9236,49 +9324,49 @@ function handle_POST_users_invite(
                   suzinvite,
                 ).then(
                   function () {
-                    return addInviter(uid, email);
+                    return addInviter(uid, email)
                   },
                   function (err: any) {
-                    fail(res, 500, "polis_err_sending_invite", err);
+                    fail(res, 500, "polis_err_sending_invite", err)
                   },
-                );
+                )
               }),
             )
               .then(function () {
                 res.status(200).json({
                   status: ":-)",
-                });
+                })
               })
               .catch(function (err: any) {
-                fail(res, 500, "polis_err_sending_invite", err);
-              });
-          });
+                fail(res, 500, "polis_err_sending_invite", err)
+              })
+          })
         })
         .catch(function (err: any) {
-          fail(res, 500, "polis_err_generating_invites", err);
-        });
+          fail(res, 500, "polis_err_generating_invites", err)
+        })
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_getting_conversation_info", err);
-    });
+      fail(res, 500, "polis_err_getting_conversation_info", err)
+    })
 }
 
 function doGetConversationPreloadInfo(conversation_id: any) {
   // return Promise.resolve({});
   return getZidFromConversationId(conversation_id)
     .then(function (zid: any) {
-      return Promise.all([getConversationInfo(zid)]);
+      return Promise.all([getConversationInfo(zid)])
     })
     .then(function (a: any[]) {
-      let conv = a[0];
+      let conv = a[0]
 
       let auth_opt_allow_3rdparty = ifDefinedFirstElseSecond(
         conv.auth_opt_allow_3rdparty,
         DEFAULTS.auth_opt_allow_3rdparty,
-      );
+      )
       let auth_opt_tw_computed =
         auth_opt_allow_3rdparty &&
-        ifDefinedFirstElseSecond(conv.auth_opt_tw, DEFAULTS.auth_opt_tw);
+        ifDefinedFirstElseSecond(conv.auth_opt_tw, DEFAULTS.auth_opt_tw)
 
       conv = {
         topic: conv.topic,
@@ -9309,48 +9397,50 @@ function doGetConversationPreloadInfo(conversation_id: any) {
         ),
         auth_opt_allow_3rdparty: auth_opt_allow_3rdparty,
         auth_opt_tw_computed: auth_opt_tw_computed,
-      };
-      conv.conversation_id = conversation_id;
+      }
+      conv.conversation_id = conversation_id
       // conv = Object.assign({}, optionalResults, conv);
-      return conv;
-    });
+      return conv
+    })
 }
 
 function handle_GET_conversationPreloadInfo(
   req: { p: { conversation_id: any } },
   res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: { (arg0: any): void; new (): any };
-    };
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
   },
 ) {
   return doGetConversationPreloadInfo(req.p.conversation_id).then(
     (conv: any) => {
-      res.status(200).json(conv);
+      res.status(200).json(conv)
     },
     (err: any) => {
-      fail(res, 500, "polis_err_get_conversation_preload_info", err);
+      fail(res, 500, "polis_err_get_conversation_preload_info", err)
     },
-  );
+  )
 }
 
 function makeRedirectorTo(path: string) {
   return function (
     req: { headers?: { host: string } },
     res: {
-      writeHead: (arg0: number, arg1: { Location: string }) => void;
-      end: () => void;
+      writeHead: (arg0: number, arg1: { Location: string }) => void
+      end: () => void
     },
   ) {
-    let protocol = devMode ? "http://" : "https://";
-    let url = protocol + req?.headers?.host + path;
+    let protocol = devMode ? "http://" : "https://"
+    let url = protocol + req?.headers?.host + path
     res.writeHead(302, {
       Location: url,
-    });
-    res.end();
-  };
+    })
+    res.end()
+  }
 }
 
 // https://github.com/mindmup/3rdpartycookiecheck/
@@ -9358,11 +9448,11 @@ function makeRedirectorTo(path: string) {
 function fetchThirdPartyCookieTestPt1(
   req: any,
   res: {
-    set: (arg0: { "Content-Type": string }) => void;
-    send: (arg0: Buffer) => void;
+    set: (arg0: { "Content-Type": string }) => void
+    send: (arg0: Buffer) => void
   },
 ) {
-  res.set({ "Content-Type": "text/html" });
+  res.set({ "Content-Type": "text/html" })
   res.send(
     Buffer.from(
       "<body>\n" +
@@ -9372,16 +9462,16 @@ function fetchThirdPartyCookieTestPt1(
         "</script>\n" +
         "</body>",
     ),
-  );
+  )
 }
 function fetchThirdPartyCookieTestPt2(
   req: any,
   res: {
-    set: (arg0: { "Content-Type": string }) => void;
-    send: (arg0: Buffer) => void;
+    set: (arg0: { "Content-Type": string }) => void
+    send: (arg0: Buffer) => void
   },
 ) {
-  res.set({ "Content-Type": "text/html" });
+  res.set({ "Content-Type": "text/html" })
   res.send(
     Buffer.from(
       "<body>\n" +
@@ -9397,47 +9487,47 @@ function fetchThirdPartyCookieTestPt2(
         "</script>\n" +
         "</body>",
     ),
-  );
+  )
 }
 
 function ifDefinedFirstElseSecond(first: any, second: boolean) {
-  return _.isUndefined(first) ? second : first;
+  return _.isUndefined(first) ? second : first
 }
 
 function handle_GET_iip_conversation(
   req: { params: { conversation_id: any } },
   res: {
-    set: (arg0: { "Content-Type": string }) => void;
-    send: (arg0: string) => void;
+    set: (arg0: { "Content-Type": string }) => void
+    send: (arg0: string) => void
   },
 ) {
-  let conversation_id = req.params.conversation_id;
+  let conversation_id = req.params.conversation_id
   res.set({
     "Content-Type": "text/html",
-  });
+  })
   res.send(
     "<a href='https://metropolis.vote/" +
       conversation_id +
       "' target='_blank'>" +
       conversation_id +
       "</a>",
-  );
+  )
 }
 function handle_GET_iim_conversation(
   req: { p: { zid: any }; params: { conversation_id: any } },
   res: {
-    set: (arg0: { "Content-Type": string }) => void;
-    send: (arg0: string) => void;
+    set: (arg0: { "Content-Type": string }) => void
+    send: (arg0: string) => void
   },
 ) {
-  let zid = req.p.zid;
-  let conversation_id = req.params.conversation_id;
+  let zid = req.p.zid
+  let conversation_id = req.params.conversation_id
   getConversationInfo(zid)
     .then(function (info: { topic: any; created: any; description: string }) {
       res.set({
         "Content-Type": "text/html",
-      });
-      let title = info.topic || info.created;
+      })
+      let title = info.topic || info.created
       res.send(
         "<a href='https://metropolis.vote/" +
           conversation_id +
@@ -9448,11 +9538,11 @@ function handle_GET_iim_conversation(
           conversation_id +
           "' target='_blank'>moderate</a></p>" +
           (info.description ? "<p>" + info.description + "</p>" : ""),
-      );
+      )
     })
     .catch(function (err: any) {
-      fail(res, 500, "polis_err_fetching_conversation_info", err);
-    });
+      fail(res, 500, "polis_err_fetching_conversation_info", err)
+    })
 }
 
 function middleware_log_request_body(
@@ -9461,34 +9551,34 @@ function middleware_log_request_body(
   next: () => void,
 ) {
   if (devMode) {
-    let b = "";
+    let b = ""
     if (req.body) {
-      let temp = _.clone(req.body);
+      let temp = _.clone(req.body)
       // if (temp.email) {
       //     temp.email = "foo@foo.com";
       // }
       if (temp.password) {
-        temp.password = "some_password";
+        temp.password = "some_password"
       }
       if (temp.newPassword) {
-        temp.newPassword = "some_password";
+        temp.newPassword = "some_password"
       }
       if (temp.password2) {
-        temp.password2 = "some_password";
+        temp.password2 = "some_password"
       }
       if (temp.hname) {
-        temp.hname = "somebody";
+        temp.hname = "somebody"
       }
       if (temp.polisApiKey) {
-        temp.polisApiKey = "pkey_somePolisApiKey";
+        temp.polisApiKey = "pkey_somePolisApiKey"
       }
-      b = JSON.stringify(temp);
+      b = JSON.stringify(temp)
     }
-    logger.debug("middleware_log_request_body", { path: req.path, body: b });
+    logger.debug("middleware_log_request_body", { path: req.path, body: b })
   } else {
     // don't log the route or params, since Heroku does that for us.
   }
-  next();
+  next()
 }
 
 function middleware_log_middleware_errors(
@@ -9498,10 +9588,10 @@ function middleware_log_middleware_errors(
   next: (arg0?: any) => void,
 ) {
   if (!err) {
-    return next();
+    return next()
   }
-  logger.error("middleware_log_middleware_errors", err);
-  next(err);
+  logger.error("middleware_log_middleware_errors", err)
+  next(err)
 }
 
 function middleware_check_if_options(
@@ -9510,9 +9600,9 @@ function middleware_check_if_options(
   next: () => any,
 ) {
   if (req.method.toLowerCase() !== "options") {
-    return next();
+    return next()
   }
-  return res.sendStatus(204);
+  return res.sendStatus(204)
 }
 
 let middleware_responseTime_start = responseTime(function (
@@ -9521,11 +9611,11 @@ let middleware_responseTime_start = responseTime(function (
   time: number,
 ) {
   if (req && req.route && req.route.path) {
-    let path = req.route.path;
-    time = Math.trunc(time);
-    addInRamMetric(path, time);
+    let path = req.route.path
+    time = Math.trunc(time)
+    addInRamMetric(path, time)
   }
-});
+})
 
 export {
   addCorsHeader,
@@ -9646,4 +9736,4 @@ export {
   handle_PUT_ptptois,
   handle_PUT_reports,
   handle_PUT_users,
-};
+}

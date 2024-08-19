@@ -1,1 +1,1 @@
-declare module "akismet";
+declare module "akismet"

@@ -82,12 +82,12 @@ const graphUtil = (comments, math, badTids) => {
   var greatestAbsPtptX = Math.abs(
     _.maxBy(baseClusters, (pt) => {
       return Math.abs(pt.x)
-    }).x
+    }).x,
   )
   var greatestAbsPtptY = Math.abs(
     _.maxBy(baseClusters, (pt) => {
       return Math.abs(pt.y)
-    }).y
+    }).y,
   )
   // var greatestAbsCommentX = Math.abs(_.maxBy(commentsPoints, (pt) => { return Math.abs(pt.x); }).x);
   // var greatestAbsCommentY = Math.abs(_.maxBy(commentsPoints, (pt) => { return Math.abs(pt.y); }).y);
@@ -130,12 +130,12 @@ const graphUtil = (comments, math, badTids) => {
 
   var commentScaleupFactorX = Math.min(
     Math.abs(xScaleCandidateForRightSide),
-    Math.abs(xScaleCandidateForLeftSide)
+    Math.abs(xScaleCandidateForLeftSide),
   )
 
   var commentScaleupFactorY = Math.min(
     Math.abs(yScaleCandidateForBottomSide),
-    Math.abs(yScaleCandidateForTopSide)
+    Math.abs(yScaleCandidateForTopSide),
   )
 
   const baseClustersScaled = baseClusters.map((p) => {

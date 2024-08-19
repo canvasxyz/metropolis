@@ -1,1 +1,1 @@
-declare module "boolean";
+declare module "boolean"

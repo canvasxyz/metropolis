@@ -1,1 +1,1 @@
-declare module "sql";
+declare module "sql"

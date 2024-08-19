@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { queryP_readOnly } from "../db/pg-query";
-import fail from "../utils/fail";
-import { isAdministrator } from "../user";
+import { Request, Response } from "express"
+import { queryP_readOnly } from "../db/pg-query"
+import fail from "../utils/fail"
+import { isAdministrator } from "../user"
 
 export async function handle_GET_conversation_sentiment_comments(
   req: Request & { p: any },
@@ -26,17 +26,17 @@ export async function handle_GET_conversation_sentiment_comments(
     scc.zid = $1
   ORDER BY
     scc.created ASC;
-  `;
+  `
 
-  let queryResult;
+  let queryResult
   try {
-    queryResult = await queryP_readOnly(query.toString(), [req.p.zid]);
+    queryResult = await queryP_readOnly(query.toString(), [req.p.zid])
   } catch (err) {
-    fail(res, 500, "polis_err_get_conversation_sentiment_comments", err);
-    return;
+    fail(res, 500, "polis_err_get_conversation_sentiment_comments", err)
+    return
   }
 
-  const userIsAdministrator = isAdministrator(req.p.uid);
+  const userIsAdministrator = isAdministrator(req.p.uid)
 
   const result = queryResult.map((comment) => {
     // redact the content of comments that have been deleted, unless the user is an admin
@@ -48,16 +48,16 @@ export async function handle_GET_conversation_sentiment_comments(
         created: comment.created,
         can_delete: false,
         is_deleted: true,
-      };
+      }
     } else {
       return {
         ...comment,
         can_delete: comment.uid === req.p.uid || userIsAdministrator,
-      };
+      }
     }
-  });
+  })
 
-  res.status(200).json(result);
+  res.status(200).json(result)
 }
 
 export async function handle_POST_conversation_sentiment_check_comments(
@@ -65,28 +65,28 @@ export async function handle_POST_conversation_sentiment_check_comments(
   res: Response,
 ) {
   const query =
-    "INSERT INTO sentiment_check_comments (zid, uid, comment) VALUES ($1, $2, $3) RETURNING *;";
+    "INSERT INTO sentiment_check_comments (zid, uid, comment) VALUES ($1, $2, $3) RETURNING *;"
 
-  const MAX_COMMENT_LENGTH = 150;
+  const MAX_COMMENT_LENGTH = 150
   if (req.p.comment.length > 150) {
-    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments");
+    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments")
   } else if (req.p.comment.length === 0 || req.p.comment.trim().length === 0) {
-    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments");
+    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments")
   }
 
-  let result;
+  let result
   try {
     result = await queryP_readOnly(query.toString(), [
       req.p.zid,
       req.p.uid,
       req.p.comment,
-    ]);
+    ])
   } catch (err) {
-    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments", err);
-    return;
+    fail(res, 500, "polis_err_post_conversation_sentiment_check_comments", err)
+    return
   }
 
-  res.status(201).json(result);
+  res.status(201).json(result)
 }
 
 export async function handle_DELETE_conversation_sentiment_check_comments(
@@ -94,21 +94,19 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
   res: Response,
 ) {
   const selectQuery =
-    "SELECT zid, uid, comment FROM sentiment_check_comments WHERE id = $1;";
+    "SELECT zid, uid, comment FROM sentiment_check_comments WHERE id = $1;"
 
-  let comments;
+  let comments
   try {
-    comments = await queryP_readOnly(selectQuery.toString(), [
-      req.p.comment_id,
-    ]);
+    comments = await queryP_readOnly(selectQuery.toString(), [req.p.comment_id])
   } catch (err) {
     fail(
       res,
       500,
       "polis_err_delete_conversation_sentiment_check_comments",
       err,
-    );
-    return;
+    )
+    return
   }
 
   if (comments.length == 0) {
@@ -117,10 +115,10 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       404,
       "polis_err_delete_conversation_sentiment_check_comments",
       "sentiment check comment not found",
-    );
-    return;
+    )
+    return
   }
-  const comment = comments[0];
+  const comment = comments[0]
 
   if (comment.uid !== req.p.uid) {
     fail(
@@ -128,23 +126,23 @@ export async function handle_DELETE_conversation_sentiment_check_comments(
       403,
       "polis_err_delete_conversation_sentiment_check_comments",
       "user not authorized to delete this comment",
-    );
-    return;
+    )
+    return
   }
 
   const deleteQuery =
-    "UPDATE sentiment_check_comments SET is_deleted = true WHERE id = $1;";
+    "UPDATE sentiment_check_comments SET is_deleted = true WHERE id = $1;"
   try {
-    await queryP_readOnly(deleteQuery.toString(), [req.p.comment_id]);
+    await queryP_readOnly(deleteQuery.toString(), [req.p.comment_id])
   } catch (err) {
     fail(
       res,
       500,
       "polis_err_delete_conversation_sentiment_check_comments",
       err,
-    );
-    return;
+    )
+    return
   }
 
-  res.status(200).json(`comment with id ${req.p.comment_id} deleted`);
+  res.status(200).json(`comment with id ${req.p.comment_id} deleted`)
 }

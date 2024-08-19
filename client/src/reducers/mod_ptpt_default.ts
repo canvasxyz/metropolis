@@ -7,7 +7,7 @@ const default_participants = (
     loading: false,
     default_participants: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_DEFAULT_PARTICIPANTS:

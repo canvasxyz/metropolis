@@ -7,7 +7,7 @@ const hidden_participants = (
     loading: false,
     hidden_participants: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_HIDDEN_PARTICIPANTS:

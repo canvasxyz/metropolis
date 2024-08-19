@@ -8,7 +8,7 @@ const Participants = (
     participants: null,
     error: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_PARTICIPANTS:

@@ -7,7 +7,7 @@ const rejected_comments = (
     loading: false,
     rejected_comments: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_REJECTED_COMMENTS:

@@ -9,7 +9,7 @@ const seed_comments_tweet = (
     error: false,
     success: false,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.SEED_COMMENT_TWEET_LOCAL_UPDATE:
