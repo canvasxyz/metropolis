@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <title>Metropolis</title>
   <meta charset="UTF-8">
@@ -10,27 +11,37 @@
   <link rel="icon" href="/favicon.ico" type="image/x-icon" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;0,700&display=swap"
+    rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700&display=swap" rel="stylesheet">
+  <script type="module" src="/src/index.tsx"></script>
   <style>
     html {
       margin: 0;
       padding: 0;
     }
+
     body {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    body, input, textarea, select {
+
+    body,
+    input,
+    textarea,
+    select {
       font-size: 16px;
     }
+
     strong {
       font-weight: 500;
     }
+
     p {
       margin: 0.7em 0;
     }
+
     pre {
       background-color: #fefcf8;
       padding: 14px 20px;
@@ -38,25 +49,32 @@
       line-height: 1.175;
       white-space: pre-wrap;
     }
+
     code {
       font-size: 0.84rem;
       color: #5d73c9;
       margin: 0 1px;
     }
+
     pre code {
       font-size: 0.84rem;
     }
+
     a {
       text-decoration: none;
       color: #5f75c9;
     }
-    td, th {
+
+    td,
+    th {
       padding-left: 10px;
       padding-right: 10px;
     }
+
     td {
       vertical-align: top;
     }
+
     .react-markdown h1,
     .react-markdown h2,
     .react-markdown h3,
@@ -68,11 +86,13 @@
       font-weight: 600;
       margin: 0.4em 0;
     }
+
     .react-markdown ul,
     .react-markdown ol,
     .react-markdown p {
       margin: 0.6em 0;
     }
+
     .react-markdown h1:first-child,
     .react-markdown h2:first-child,
     .react-markdown h3:first-child,
@@ -82,6 +102,7 @@
     .react-markdown p:first-child {
       margin-top: 0;
     }
+
     .react-markdown-card p {
       margin: 0.3em 0;
     }
@@ -89,6 +110,7 @@
     .css-fade {
       position: relative;
     }
+
     .css-fade:after {
       content: "";
       position: absolute;
@@ -104,6 +126,7 @@
     .css-fade-more {
       position: relative;
     }
+
     .css-fade-more:after {
       content: "";
       position: absolute;
@@ -111,24 +134,23 @@
       bottom: 0;
       left: 0;
       pointer-events: none;
-      background-image: linear-gradient(
-        to bottom,
-        hsla(45, 28.57%, 97.25%, 0) 0%,
-        hsla(45, 28.57%, 97.25%, 0.013) 8.1%,
-        hsla(45, 28.57%, 97.25%, 0.049) 15.5%,
-        hsla(45, 28.57%, 97.25%, 0.104) 22.5%,
-        hsla(45, 28.57%, 97.25%, 0.175) 29%,
-        hsla(45, 28.57%, 97.25%, 0.259) 35.3%,
-        hsla(45, 28.57%, 97.25%, 0.352) 41.2%,
-        hsla(45, 28.57%, 97.25%, 0.45) 47.1%,
-        hsla(45, 28.57%, 97.25%, 0.55) 52.9%,
-        hsla(45, 28.57%, 97.25%, 0.648) 58.8%,
-        hsla(45, 28.57%, 97.25%, 0.741) 64.7%,
-        hsla(45, 28.57%, 97.25%, 0.825) 71%,
-        hsla(45, 28.57%, 97.25%, 0.896) 77.5%,
-        hsla(45, 28.57%, 97.25%, 0.951) 84.5%,
-        hsla(45, 28.57%, 97.25%, 0.987) 91.9%,
-        hsl(45, 28.57%, 97.25%) 100%);
+      background-image: linear-gradient(to bottom,
+          hsla(45, 28.57%, 97.25%, 0) 0%,
+          hsla(45, 28.57%, 97.25%, 0.013) 8.1%,
+          hsla(45, 28.57%, 97.25%, 0.049) 15.5%,
+          hsla(45, 28.57%, 97.25%, 0.104) 22.5%,
+          hsla(45, 28.57%, 97.25%, 0.175) 29%,
+          hsla(45, 28.57%, 97.25%, 0.259) 35.3%,
+          hsla(45, 28.57%, 97.25%, 0.352) 41.2%,
+          hsla(45, 28.57%, 97.25%, 0.45) 47.1%,
+          hsla(45, 28.57%, 97.25%, 0.55) 52.9%,
+          hsla(45, 28.57%, 97.25%, 0.648) 58.8%,
+          hsla(45, 28.57%, 97.25%, 0.741) 64.7%,
+          hsla(45, 28.57%, 97.25%, 0.825) 71%,
+          hsla(45, 28.57%, 97.25%, 0.896) 77.5%,
+          hsla(45, 28.57%, 97.25%, 0.951) 84.5%,
+          hsla(45, 28.57%, 97.25%, 0.987) 91.9%,
+          hsl(45, 28.57%, 97.25%) 100%);
       width: 100%;
       height: 5em;
     }
@@ -137,38 +159,54 @@
       box-shadow: rgb(0, 0, 0, 0.02) 4px 4px 8px 2px !important;
       padding: 28px 34px !important;
     }
+
     .ReactModal__Overlay {
       z-index: 2;
     }
 
-    * { font-variant-ligatures: none; }
-    ::placeholder { opacity: 0.7; }
+    * {
+      font-variant-ligatures: none;
+    }
+
+    ::placeholder {
+      opacity: 0.7;
+    }
 
     .ReactModal__Overlay {
-        opacity: 0;
-        transition: opacity 75ms ease-in-out;
-        background-color: rgb(192 190 186 / 63%) !important;
+      opacity: 0;
+      transition: opacity 75ms ease-in-out;
+      background-color: rgb(192 190 186 / 63%) !important;
     }
 
-    .ReactModal__Overlay--after-open{
-        opacity: 1;
+    .ReactModal__Overlay--after-open {
+      opacity: 1;
     }
 
-    .ReactModal__Overlay--before-close{
-        opacity: 0;
+    .ReactModal__Overlay--before-close {
+      opacity: 0;
     }
 
     @keyframes slideout {
-        0% {transform: translate3d(0,-4000%,0) scale(1); opacity:1;}
-        100% {transform: translate3d(0,0,0) scale(1); opacity:1;}
+      0% {
+        transform: translate3d(0, -4000%, 0) scale(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translate3d(0, 0, 0) scale(1);
+        opacity: 1;
+      }
     }
+
     .animation-exit {
-        animation: slideout 400ms forwards;
-        animation-direction: reverse;
+      animation: slideout 400ms forwards;
+      animation-direction: reverse;
     }
   </style>
 </head>
+
 <body class="viewport">
   <div id="root"></div>
 </body>
+
 </html>
