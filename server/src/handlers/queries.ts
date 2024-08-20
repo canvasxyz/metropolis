@@ -4,7 +4,7 @@ export type GitHubUserData = {
   id: number
   username: string
   email: string | null
-  isRepoCollaborator: boolean
+  isRepoCollaborator?: boolean
 }
 
 /** database queries used by the github integrations */
@@ -105,16 +105,28 @@ export async function createGitHubUser(
 export async function updateGitHubUserData(
   githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
-  const updateQuery =
-    "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4 returning uid;"
-  const vals = [
-    githubUserData.username,
-    githubUserData.email,
-    githubUserData.isRepoCollaborator,
-    githubUserData.id,
-  ]
-  const updateRes = await queryP(updateQuery, vals)
-  return updateRes[0]
+  if (githubUserData.isRepoCollaborator !== undefined) {
+    const updateQuery =
+      "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4 returning uid;"
+    const vals = [
+      githubUserData.username,
+      githubUserData.email,
+      githubUserData.isRepoCollaborator,
+      githubUserData.id,
+    ]
+    const updateRes = await queryP(updateQuery, vals)
+    return updateRes[0]
+  } else {
+    const updateQuery =
+      "UPDATE users SET github_username = $1, github_email = $2 WHERE github_user_id = $3 returning uid;"
+    const vals = [
+      githubUserData.username,
+      githubUserData.email,
+      githubUserData.id,
+    ]
+    const updateRes = await queryP(updateQuery, vals)
+    return updateRes[0]
+  }
 }
 
 export async function getUserUidByGithubUserId(

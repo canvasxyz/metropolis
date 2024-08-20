@@ -410,9 +410,6 @@ export async function handle_POST_github_sync(req: Request, res: Response) {
         id: pull.user.id,
         email,
         username: pull.user.login,
-        isRepoCollaborator:
-          repoCollaboratorIds.has(pull.user.id) ||
-          pull.user.login === process.env.FIP_REPO_OWNER,
       })
 
       const prFields: PrFields = {
