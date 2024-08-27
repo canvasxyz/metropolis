@@ -1,31 +1,31 @@
-import { queryP } from "../db/pg-query";
+import { queryP } from "../db/pg-query"
 
 export type GitHubUserData = {
-  id: number;
-  username: string;
-  email: string | null;
-  isRepoCollaborator: boolean;
-};
+  id: number
+  username: string
+  email: string | null
+  isRepoCollaborator?: boolean
+}
 
 /** database queries used by the github integrations */
 
 // fields that come from the PR
 export type PrFields = {
-  owner: number;
-  github_pr_id: number;
-  is_active: boolean;
-  is_archived: boolean;
-  github_repo_name: string;
-  github_repo_owner: string;
-  github_branch_name: string;
-  github_pr_title: string;
-  github_pr_submitter: string;
-  github_pr_opened_at: string;
-  github_pr_updated_at: string;
-  github_pr_closed_at: string | null;
-  github_pr_merged_at: string | null;
-  github_pr_is_draft: boolean | undefined;
-};
+  owner: number
+  github_pr_id: number
+  is_active: boolean
+  is_archived: boolean
+  github_repo_name: string
+  github_repo_owner: string
+  github_branch_name: string
+  github_pr_title: string
+  github_pr_submitter: string
+  github_pr_opened_at: string
+  github_pr_updated_at: string
+  github_pr_closed_at: string | null
+  github_pr_merged_at: string | null
+  github_pr_is_draft: boolean | undefined
+}
 
 const PR_FIELDS: (keyof PrFields)[] = [
   "github_pr_id",
@@ -41,22 +41,22 @@ const PR_FIELDS: (keyof PrFields)[] = [
   "github_pr_closed_at",
   "github_pr_merged_at",
   "github_pr_is_draft",
-];
+]
 
 // fields that come from the FIP
 export type FipFields = {
-  description?: string;
-  fip_number?: number;
-  fip_title?: string;
-  fip_author?: string;
-  fip_discussions_to?: string;
-  fip_status?: string;
-  fip_type?: string;
-  fip_category?: string;
-  fip_created?: string;
-  fip_files_created?: string;
-  fip_files_updated?: string;
-};
+  description?: string
+  fip_number?: number
+  fip_title?: string
+  fip_author?: string
+  fip_discussions_to?: string
+  fip_status?: string
+  fip_type?: string
+  fip_category?: string
+  fip_created?: string
+  fip_files_created?: string
+  fip_files_updated?: string
+}
 
 const FIP_FIELDS: (keyof FipFields)[] = [
   "description",
@@ -70,16 +70,16 @@ const FIP_FIELDS: (keyof FipFields)[] = [
   "fip_created",
   "fip_files_created",
   "fip_files_updated",
-];
+]
 
 export async function updateOrCreateGitHubUser(
   githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
-  const existingUser = await updateGitHubUserData(githubUserData);
+  const existingUser = await updateGitHubUserData(githubUserData)
   if (existingUser) {
-    return existingUser;
+    return existingUser
   } else {
-    return await createGitHubUser(githubUserData);
+    return await createGitHubUser(githubUserData)
   }
 }
 
@@ -90,43 +90,54 @@ export async function createGitHubUser(
     "insert into users " +
     "(github_user_id, github_username, github_email, is_repo_collaborator, is_owner) VALUES " +
     "($1, $2, $3, $4, $5) " +
-    "returning uid;";
+    "returning uid;"
   const vals = [
     githubUserData.id,
     githubUserData.username,
     githubUserData.email,
     githubUserData.isRepoCollaborator,
     false,
-  ];
-  const createRes = await queryP(createQuery, vals);
-  return createRes[0];
+  ]
+  const createRes = await queryP(createQuery, vals)
+  return createRes[0]
 }
 
 export async function updateGitHubUserData(
   githubUserData: GitHubUserData,
 ): Promise<{ uid: number }> {
-  const createQuery =
-    "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4" +
-    " returning uid;";
-  const vals = [
-    githubUserData.username,
-    githubUserData.email,
-    githubUserData.isRepoCollaborator,
-    githubUserData.id,
-  ];
-  const updateRes = await queryP(createQuery, vals);
-  return updateRes[0];
+  if (githubUserData.isRepoCollaborator !== undefined) {
+    const updateQuery =
+      "UPDATE users SET github_username = $1, github_email = $2, is_repo_collaborator = $3 WHERE github_user_id = $4 returning uid;"
+    const vals = [
+      githubUserData.username,
+      githubUserData.email,
+      githubUserData.isRepoCollaborator,
+      githubUserData.id,
+    ]
+    const updateRes = await queryP(updateQuery, vals)
+    return updateRes[0]
+  } else {
+    const updateQuery =
+      "UPDATE users SET github_username = $1, github_email = $2 WHERE github_user_id = $3 returning uid;"
+    const vals = [
+      githubUserData.username,
+      githubUserData.email,
+      githubUserData.id,
+    ]
+    const updateRes = await queryP(updateQuery, vals)
+    return updateRes[0]
+  }
 }
 
 export async function getUserUidByGithubUserId(
   githubUserId: number,
 ): Promise<{ uid: number } | undefined> {
-  const query = "SELECT uid FROM users WHERE github_user_id = $1";
-  const rows = await queryP(query, [githubUserId]);
+  const query = "SELECT uid FROM users WHERE github_user_id = $1"
+  const rows = await queryP(query, [githubUserId])
   if (rows.length > 1) {
-    throw Error("polis_more_than_one_user_with_same_github_user_id");
+    throw Error("polis_more_than_one_user_with_same_github_user_id")
   }
-  return rows[0];
+  return rows[0]
 }
 
 export async function getConversationByPrId(
@@ -140,61 +151,61 @@ export async function getConversationByPrId(
     "zinvites.zinvite",
   ].join(
     ", ",
-  )} FROM conversations LEFT JOIN zinvites ON conversations.zid = zinvites.zid WHERE github_pr_id = $1;`;
-  const rows = await queryP(query, [prId]);
-  return rows[0];
+  )} FROM conversations LEFT JOIN zinvites ON conversations.zid = zinvites.zid WHERE github_pr_id = $1;`
+  const rows = await queryP(query, [prId])
+  return rows[0]
 }
 
 export async function insertConversationPrAndFip(
   data: PrFields & FipFields,
 ): Promise<{ zid: number }[]> {
-  const fields = [...PR_FIELDS, ...FIP_FIELDS];
-  const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ");
+  const fields = [...PR_FIELDS, ...FIP_FIELDS]
+  const fieldPlaceholders = fields.map((_, i) => `$${i + 1}`).join(", ")
   const query = `INSERT INTO conversations (${fields.join(
     ", ",
-  )}) VALUES (${fieldPlaceholders}) RETURNING zid;`;
-  const values = fields.map((field) => data[field] ?? null);
-  return await queryP(query, values);
+  )}) VALUES (${fieldPlaceholders}) RETURNING zid;`
+  const values = fields.map((field) => data[field] ?? null)
+  return await queryP(query, values)
 }
 
 export async function updateConversationPrAndFip(data: PrFields & FipFields) {
-  const fields = [...PR_FIELDS, ...FIP_FIELDS];
+  const fields = [...PR_FIELDS, ...FIP_FIELDS]
   const fieldAssignments = fields
     .map((field, i) => `${field} = $${i + 1}`)
-    .join(", ");
+    .join(", ")
   const query = `UPDATE conversations SET ${fieldAssignments} WHERE github_pr_id = $${
     fields.length + 1
-  };`;
+  };`
   const values = [
     ...fields.map((field) => data[field] ?? null),
     data.github_pr_id,
-  ];
-  return await queryP(query, values);
+  ]
+  return await queryP(query, values)
 }
 
 export async function updateConversationPr(data: PrFields) {
-  const fields = PR_FIELDS;
+  const fields = PR_FIELDS
   const fieldAssignments = fields
     .map((field, i) => `${field} = $${i + 1}`)
-    .join(", ");
+    .join(", ")
   const query = `UPDATE conversations SET ${fieldAssignments} WHERE github_pr_id = $${
     fields.length + 1
-  };`;
+  };`
   const values = [
     ...fields.map((field) => data[field] ?? null),
     data.github_pr_id,
-  ];
-  return await queryP(query, values);
+  ]
+  return await queryP(query, values)
 }
 
 export async function insertSyncRecord() {
-  const query = `INSERT INTO github_syncs (fips_synced, prs_synced, discussions_synced) VALUES ($1, $2, $3);`;
-  const values = [0, 0, 0];
-  return await queryP(query, values);
+  const query = `INSERT INTO github_syncs (fips_synced, prs_synced, discussions_synced) VALUES ($1, $2, $3);`
+  const values = [0, 0, 0]
+  return await queryP(query, values)
 }
 
 export async function getLatestSync() {
-  const query = `SELECT * FROM github_syncs ORDER BY ts DESC LIMIT 1;`;
-  const rows = await queryP(query);
-  return rows[0];
+  const query = `SELECT * FROM github_syncs ORDER BY ts DESC LIMIT 1;`
+  const rows = await queryP(query)
+  return rows[0]
 }

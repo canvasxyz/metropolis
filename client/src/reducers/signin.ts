@@ -10,7 +10,7 @@ const signin = (
     error: null,
     facebookError: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.FACEBOOK_SIGNIN_INITIATED:

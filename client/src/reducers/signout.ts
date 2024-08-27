@@ -8,7 +8,7 @@ const signout = (
     signout: false,
     error: false,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.SIGNOUT_INITIATED:

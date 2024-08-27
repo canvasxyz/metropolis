@@ -9,6 +9,7 @@ import { populateUserStore } from "./actions"
 
 import { Toaster } from "react-hot-toast"
 import { Switch, Route, Redirect } from "react-router-dom"
+import { Route as CompatRoute, Routes as CompatRoutes, Navigate } from "react-router-dom-v5-compat"
 import { Box, jsx } from "theme-ui"
 
 import Header from "./components/header"
@@ -162,24 +163,15 @@ class App extends React.Component<
                 minHeight: "calc(100vh - 9em - 8px)",
               }}
             >
-              <Route
-                exact
-                path="/"
-                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
-              />
-              <Route
-                exact
-                path="/dashboard"
-                render={() => <Dashboard selectedConversationId={null} user={this.props.user} />}
-              />
-              <Route
-                path="/dashboard/c/:conversation_id"
-                render={({
-                  match: {
-                    params: { conversation_id },
-                  },
-                }) => <Dashboard selectedConversationId={conversation_id} user={this.props.user} />}
-              />
+              {/* routes defined with react-router-dom-v5-compat */}
+              {/* these use the newer react router dom v6 APIs */}
+              <CompatRoutes>
+                <CompatRoute path="/" element={<Navigate to="/dashboard" replace />} />
+                <CompatRoute
+                  path="/dashboard/*"
+                  element={<Dashboard user={this.props.user} />}
+                ></CompatRoute>
+              </CompatRoutes>
               <Route exact path="/about" render={() => <Home user={this.props.user} />} />
               <Route exact path="/about2" render={() => <About />} />
               <Route

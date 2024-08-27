@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === "production") {
   finalCreateStore = applyMiddleware(...middleware)(createStore)
 } else {
   finalCreateStore = compose(
-    applyMiddleware(...middleware)
+    applyMiddleware(...middleware),
     // window["devToolsExtension"] ? window["devToolsExtension"]() : (f) => f
   )(createStore)
 }

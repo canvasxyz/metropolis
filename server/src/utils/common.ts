@@ -1,50 +1,50 @@
-import _ from "underscore";
+import _ from "underscore"
 
 type PolisTypes = {
-  reactions: Reactions;
-  staractions: StarActions;
-  mod: Mod;
-  reactionValues?: any;
-  starValues?: any;
-};
+  reactions: Reactions
+  staractions: StarActions
+  mod: Mod
+  reactionValues?: any
+  starValues?: any
+}
 
 type Reactions = {
-  push: number;
-  pull: number;
-  see: number;
-  pass: number;
-};
+  push: number
+  pull: number
+  see: number
+  pass: number
+}
 
 type StarActions = {
-  unstar: number;
-  star: number;
-};
+  unstar: number
+  star: number
+}
 
 type Mod = {
-  ban: number;
-  unmoderated: number;
-  ok: number;
-};
+  ban: number
+  unmoderated: number
+  ok: number
+}
 
 function strToHex(str: string) {
-  let hex, i;
+  let hex, i
   // let str = "\u6f22\u5b57"; // "\u6f22\u5b57" === "漢字"
-  let result = "";
+  let result = ""
   for (i = 0; i < str.length; i++) {
-    hex = str.charCodeAt(i).toString(16);
-    result += ("000" + hex).slice(-4);
+    hex = str.charCodeAt(i).toString(16)
+    result += ("000" + hex).slice(-4)
   }
-  return result;
+  return result
 }
 
 function hexToStr(hexString: string) {
-  let j;
-  let hexes = hexString.match(/.{1,4}/g) || [];
-  let str = "";
+  let j
+  let hexes = hexString.match(/.{1,4}/g) || []
+  let str = ""
   for (j = 0; j < hexes.length; j++) {
-    str += String.fromCharCode(parseInt(hexes[j], 16));
+    str += String.fromCharCode(parseInt(hexes[j], 16))
   }
-  return str;
+  return str
 }
 
 let polisTypes: PolisTypes = {
@@ -63,10 +63,10 @@ let polisTypes: PolisTypes = {
     unmoderated: 0,
     ok: 1,
   },
-};
-polisTypes.reactionValues = _.values(polisTypes.reactions);
-polisTypes.starValues = _.values(polisTypes.staractions);
+}
+polisTypes.reactionValues = _.values(polisTypes.reactions)
+polisTypes.starValues = _.values(polisTypes.staractions)
 
-export { strToHex, hexToStr, polisTypes };
+export { strToHex, hexToStr, polisTypes }
 
-export default { strToHex, hexToStr, polisTypes };
+export default { strToHex, hexToStr, polisTypes }

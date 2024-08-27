@@ -5,6 +5,7 @@ import { usePopper } from "react-popper"
 import { toast } from "react-hot-toast"
 import { Heading, Link, Box, Text, Button, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
+import { useParams } from "react-router-dom-v5-compat"
 import { TbExclamationCircle, TbInfoCircle } from "react-icons/tb"
 
 import { RootState } from "../../store"
@@ -15,8 +16,8 @@ import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
-import { MIN_SEED_RESPONSES } from "./index"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
+import { MIN_SEED_RESPONSES } from "../../util/misc"
 
 type ReportComment = {
   active: boolean
@@ -96,22 +97,16 @@ const SentimentTooltip = () => {
   )
 }
 
-export const DashboardConversation = ({
-  selectedConversationId,
-  user,
-}: {
-  selectedConversationId: string
-  user
-}) => {
+export const DashboardConversation = ({ user }: { user }) => {
+  const { conversation_id: selectedConversationId } = useParams()
   const hist = useHistory()
   const dispatch = useAppDispatch()
   const { zid_metadata, error: zidMetadataError } = useAppSelector(
     (state: RootState) => state.zid_metadata,
   )
 
-  const summaryData = useAppSelector(
-    (state: RootState) =>
-      state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
+  const summaryData = useAppSelector((state: RootState) =>
+    state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
   )
 
   const [showReport, setShowReport] = useState<boolean>(false)

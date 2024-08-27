@@ -7,7 +7,7 @@ const accepted_comments = (
     loading: false,
     accepted_comments: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_ACCEPTED_COMMENTS:

@@ -14,6 +14,9 @@ export type ConversationSummary = {
   fip_title: string | null
   fip_number: number
   fip_status: string
+  fip_author: string | null
+  fip_type: string | null
+  fip_category: string | null
   github_pr_opened_at: string | null
   github_pr_updated_at: string | null
   github_pr_closed_at: string | null
@@ -21,6 +24,7 @@ export type ConversationSummary = {
   github_pr_is_draft: boolean
   github_pr_title: string | null
   github_pr_id: string | null
+  github_pr_url: string | null
   fip_files_created: string | null
   participant_count: number
   comment_count: number | null
@@ -33,6 +37,7 @@ export type ConversationSummary = {
   owner: number
   conversation_id: string
   created: number
+  description: string | null
 }
 
 type ConversationSummaryState =

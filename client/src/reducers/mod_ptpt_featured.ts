@@ -7,7 +7,7 @@ const featured_participants = (
     loading: false,
     featured_participants: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_FEATURED_PARTICIPANTS:

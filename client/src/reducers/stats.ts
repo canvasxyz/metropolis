@@ -7,7 +7,7 @@ const conversation_stats = (
     loading: false,
     conversation_stats: {},
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_CONVERSATION_STATS:

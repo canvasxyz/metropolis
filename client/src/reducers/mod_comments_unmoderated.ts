@@ -7,7 +7,7 @@ const unmoderated_comments = (
     loading: false,
     unmoderated_comments: null,
   },
-  action
+  action,
 ) => {
   switch (action.type) {
     case types.REQUEST_UNMODERATED_COMMENTS:

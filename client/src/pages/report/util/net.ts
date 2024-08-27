@@ -49,14 +49,14 @@ function polisAjax(api, data, type) {
       $.extend(config, {
         type: "GET",
         data: data,
-      })
+      }),
     )
   } else if ("POST" === type) {
     promise = $.ajax(
       $.extend(config, {
         type: "POST",
         data: JSON.stringify(data),
-      })
+      }),
     )
   }
 

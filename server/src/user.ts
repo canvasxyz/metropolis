@@ -1,32 +1,32 @@
-import _ from "underscore";
-import LruCache from "lru-cache";
+import _ from "underscore"
+import LruCache from "lru-cache"
 
-import pg from "./db/pg-query";
-import { meteredPromise } from "./utils/metered";
+import pg from "./db/pg-query"
+import { meteredPromise } from "./utils/metered"
 
 import {
   getXidRecord,
   getConversationInfo,
   isXidWhitelisted,
   createXidRecord,
-} from "./conversation";
-import LRUCache from "lru-cache";
-import logger from "./utils/logger";
-import Config from "./config";
+} from "./conversation"
+import LRUCache from "lru-cache"
+import logger from "./utils/logger"
+import Config from "./config"
 
-const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : [];
+const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : []
 
 async function getUserInfoForUid(uid: any) {
   const results = await pg.queryP_readOnly(
     "SELECT email, hname from users where uid = $1",
     [uid],
-  );
+  )
   // what is the point of this????
   if (results.length == 0) {
-    throw Error();
+    throw Error()
   }
 
-  return results[0];
+  return results[0]
 }
 
 function getUserInfoForUid2(uid: any) {
@@ -36,13 +36,13 @@ function getUserInfoForUid2(uid: any) {
       const results = (await pg.queryP_readOnly(
         "SELECT * from users where uid = $1",
         [uid],
-      )) as string | any[];
+      )) as string | any[]
       if (!results || !results.length) {
-        throw Error();
+        throw Error()
       }
-      return results[0];
+      return results[0]
     })(),
-  );
+  )
 }
 
 async function getUser(
@@ -53,30 +53,30 @@ async function getUser(
 ) {
   if (!uid) {
     // this api may be called by a new user, so we don't want to trigger a failure here.
-    return Promise.resolve({});
+    return Promise.resolve({})
   }
 
-  let xidInfoPromise = Promise.resolve<string | any[] | null>([]);
+  let xidInfoPromise = Promise.resolve<string | any[] | null>([])
   if (zid_optional && xid_optional) {
-    xidInfoPromise = getXidRecord(xid_optional, zid_optional);
+    xidInfoPromise = getXidRecord(xid_optional, zid_optional)
   } else if (xid_optional && owner_uid_optional) {
     xidInfoPromise = getXidRecordByXidOwnerId(
       xid_optional,
       owner_uid_optional,
       zid_optional,
-    );
+    )
   }
 
   const [info, xInfo]: any[] = await Promise.all([
     getUserInfoForUid2(uid),
     xidInfoPromise,
-  ]);
-  let hasXid = xInfo && xInfo.length && xInfo[0];
+  ])
+  let hasXid = xInfo && xInfo.length && xInfo[0]
 
   if (hasXid) {
-    delete xInfo[0].owner;
-    delete xInfo[0].created;
-    delete xInfo[0].uid;
+    delete xInfo[0].owner
+    delete xInfo[0].created
+    delete xInfo[0].uid
   }
 
   return {
@@ -84,7 +84,6 @@ async function getUser(
     email: info.email,
     githubUserId: info.github_user_id,
     githubUsername: info.github_username,
-    githubRepoCollaborator: info.is_repo_collaborator,
     hname: info.hname,
     hasXid: !!hasXid,
     xInfo: xInfo && xInfo[0],
@@ -92,66 +91,66 @@ async function getUser(
     site_ids: [info.site_id],
     created: Number(info.created),
     isRepoCollaborator: info.is_repo_collaborator,
-  };
+  }
 }
 
 function createDummyUser() {
   return meteredPromise(
     "createDummyUser",
     (async () => {
-      let results;
+      let results
 
       try {
         results = await pg.queryP(
           "INSERT INTO users (created) VALUES (default) RETURNING uid;",
           [],
-        );
+        )
       } catch (err) {
-        throw new Error("polis_err_create_empty_user");
+        throw new Error("polis_err_create_empty_user")
       }
 
       if (results.length == 0) {
-        throw new Error("polis_err_create_empty_user");
+        throw new Error("polis_err_create_empty_user")
       }
 
-      return results[0].uid;
+      return results[0].uid
     })(),
-  );
+  )
 }
 
 let pidCache: LRUCache<string, number> = new LruCache({
   max: 9000,
-});
+})
 
 // returns a pid of -1 if it's missing
 function getPidPromise(zid: string, uid: string, usePrimary?: boolean) {
-  let cacheKey = zid + "_" + uid;
-  let cachedPid = pidCache.get(cacheKey);
+  let cacheKey = zid + "_" + uid
+  let cachedPid = pidCache.get(cacheKey)
 
   return meteredPromise(
     "getPidPromise",
     new Promise<number>(function (resolve, reject) {
       if (!_.isUndefined(cachedPid)) {
-        resolve(cachedPid);
-        return;
+        resolve(cachedPid)
+        return
       }
-      const f = usePrimary ? pg.queryP : pg.queryP_readOnly;
+      const f = usePrimary ? pg.queryP : pg.queryP_readOnly
       f("SELECT pid FROM participants WHERE zid = ($1) AND uid = ($2);", [
         zid,
         uid,
       ])
         .then((rows) => {
           if (!rows.length) {
-            resolve(-1);
-            return;
+            resolve(-1)
+            return
           }
-          let pid = rows[0].pid;
-          pidCache.set(cacheKey, pid);
-          resolve(pid);
+          let pid = rows[0].pid
+          pidCache.set(cacheKey, pid)
+          resolve(pid)
         })
-        .catch((err) => reject(err));
+        .catch((err) => reject(err))
     }),
-  );
+  )
 }
 
 // must follow auth and need('zid'...) middleware
@@ -163,32 +162,32 @@ function getPidForParticipant(
     res: any,
     next: (arg0?: string) => void,
   ) {
-    let zid = req.p.zid;
-    let uid = req.p.uid;
+    let zid = req.p.zid
+    let uid = req.p.uid
 
     function finish(pid: any) {
-      assigner(req, "pid", pid);
-      next();
+      assigner(req, "pid", pid)
+      next()
     }
     getPidPromise(zid, uid).then(
       function (pid: number) {
         if (pid === -1) {
-          let msg = "polis_err_get_pid_for_participant_missing";
+          let msg = "polis_err_get_pid_for_participant_missing"
           logger.error(msg, {
             zid,
             uid,
             p: req.p,
-          });
-          next(msg);
+          })
+          next(msg)
         }
-        finish(pid);
+        finish(pid)
       },
       function (err: any) {
-        logger.error("polis_err_get_pid_for_participant", err);
-        next(err);
+        logger.error("polis_err_get_pid_for_participant", err)
+        next(err)
       },
-    );
-  };
+    )
+  }
 }
 
 function getXidRecordByXidOwnerId(
@@ -207,9 +206,9 @@ function getXidRecordByXidOwnerId(
     ])
     .then(function (rows: string | any[]) {
       if (!rows || !rows.length) {
-        logger.warn("getXidRecordByXidOwnerId: no xInfo yet");
+        logger.warn("getXidRecordByXidOwnerId: no xInfo yet")
         if (!createIfMissing) {
-          return null;
+          return null
         }
 
         const shouldCreateXidEntryPromise = !zid_optional
@@ -218,13 +217,13 @@ function getXidRecordByXidOwnerId(
               (conv: { use_xid_whitelist: any }) => {
                 return conv.use_xid_whitelist
                   ? isXidWhitelisted(owner, xid)
-                  : Promise.resolve(true);
+                  : Promise.resolve(true)
               },
-            );
+            )
 
         return shouldCreateXidEntryPromise.then((should: any) => {
           if (!should) {
-            return null;
+            return null
           }
           return createDummyUser().then((newUid: any) => {
             return createXidRecord(
@@ -244,67 +243,67 @@ function getXidRecordByXidOwnerId(
                   x_name: x_name,
                   x_email: x_email,
                 },
-              ];
-            });
-          });
-        });
+              ]
+            })
+          })
+        })
       }
-      return rows;
-    });
+      return rows
+    })
 }
 
 function getXidStuff(xid: any, zid: any) {
   return getXidRecord(xid, zid).then((rows: string | any[]) => {
     if (!rows || !rows.length) {
-      return "noXidRecord";
+      return "noXidRecord"
     }
-    let xidRecordForPtpt = rows[0];
+    let xidRecordForPtpt = rows[0]
     if (xidRecordForPtpt) {
       return getPidPromise(zid, xidRecordForPtpt.uid, true).then(
         (pidForXid: any) => {
-          xidRecordForPtpt.pid = pidForXid;
-          return xidRecordForPtpt;
+          xidRecordForPtpt.pid = pidForXid
+          return xidRecordForPtpt
         },
-      );
+      )
     }
-    return xidRecordForPtpt;
-  });
+    return xidRecordForPtpt
+  })
 }
 
 function isAdministrator(uid: number) {
-  return polisDevs.indexOf(uid) >= 0;
+  return polisDevs.indexOf(uid) >= 0
 }
 
 async function isRepoCollaborator(uid: number) {
   // get user
-  const user = await getUserInfoForUid2(uid);
-  return user.is_repo_collaborator;
+  const user = await getUserInfoForUid2(uid)
+  return user.is_repo_collaborator
 }
 
 async function isOwner(zid: number, uid: number) {
   if (isAdministrator(uid)) {
     // admins are owners of everything
-    return true;
+    return true
   }
 
   if (await isRepoCollaborator(uid)) {
-    return true;
+    return true
   }
 
-  return (await getConversationInfo(zid)).owner === uid;
+  return (await getConversationInfo(zid)).owner === uid
 }
 
 async function isOwnerOrParticipant(zid: any, uid?: any) {
-  let pid;
+  let pid
   try {
-    pid = await getPidPromise(zid, uid);
+    pid = await getPidPromise(zid, uid)
   } catch (err) {
-    return false;
+    return false
   }
   if (pid < 0) {
-    return false;
+    return false
   }
-  return await isOwner(zid, uid);
+  return await isOwner(zid, uid)
 }
 
 export {
@@ -321,4 +320,4 @@ export {
   isAdministrator,
   isOwner,
   isOwnerOrParticipant,
-};
+}

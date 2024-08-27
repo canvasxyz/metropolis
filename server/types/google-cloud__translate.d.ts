@@ -1,1 +1,1 @@
-declare module "@google-cloud/translate";
+declare module "@google-cloud/translate"

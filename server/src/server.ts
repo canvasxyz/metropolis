@@ -7852,6 +7852,10 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   SELECT
     conversations.created,
     conversations.topic,
+    conversations.description,
+    conversations.fip_author,
+    conversations.fip_category,
+    conversations.fip_type,
     conversations.fip_created,
     conversations.fip_title,
     conversations.fip_number,

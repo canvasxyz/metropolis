@@ -1,1 +1,1 @@
-declare module "badwords/object";
+declare module "badwords/object"
