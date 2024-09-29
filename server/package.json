@@ -11,6 +11,7 @@
     "serve:prod:dev": "nodemon --gc_interval=100 dist/index.js",
     "format": "prettier --config ./prettier.config.js --no-editorconfig 'src/**/*.{js,ts}' --write",
     "format:check": "prettier --config ./prettier.config.js --no-editorconfig 'src/**/*.{js,ts}' --check",
+    "sync": "tsx src/scripts/doGithubSync.ts",
     "lint": "eslint .",
     "test": "jest --forceExit test",
     "test:watch": "npm test -- --watchAll"
@@ -60,6 +61,7 @@
     "simple-oauth2": "~0.2.1",
     "sql": "~0.34.0",
     "swr": "^2.2.5",
+    "tsx": "^4.19.1",
     "underscore": "~1.12.1",
     "uuid": "^3.1.0",
     "valid-url": "~1.0.9",
