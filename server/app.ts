@@ -1043,7 +1043,7 @@ app.post(
   handle_POST_conversations,
 )
 
-app.get("/api/v3/conversations_summary", handle_GET_conversations_summary)
+app.get("/api/v3/conversations_summary", handle_GET_conversations_summary as any)
 
 app.post(
   "/api/v3/increment_conversation_view_count",
