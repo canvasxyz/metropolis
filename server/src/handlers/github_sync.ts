@@ -405,7 +405,6 @@ export async function do_github_sync() {
       id: pull.user.id,
       email,
       username: pull.user.login,
-      isRepoCollaborator: repoCollaboratorIds.has(pull.user.id),
     });
 
     const prFields: PrFields = {
