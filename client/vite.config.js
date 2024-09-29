@@ -18,11 +18,6 @@ export default defineConfig(({ mode }) => {
     },
     plugins: [nodePolyfills({ globals: { Buffer: true } })],
     assetsInclude: ["**/*.md"],
-    build: {
-      rollupOptions: {
-        external: ["@theme-ui/css"],
-      },
-    },
     server: {
       port: 8080,
       proxy: {
