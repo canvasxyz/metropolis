@@ -79,10 +79,8 @@ const ConversationsList = ({
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
-  const [
-    selectedConversations,
-    setSelectedConversations,
-  ] = useLocalStorage<ConversationListSelection>("selectedConversations", "all-fip")
+  const [selectedConversations, setSelectedConversations] =
+    useLocalStorage<ConversationListSelection>("selectedConversations", "all-fip")
 
   useEffect(() => {
     dispatch(populateConversationsSummary())
@@ -472,7 +470,7 @@ const ConversationListItem = ({
                     </Box>
                   </Menu.Item>
                 </Box>
-              ) */}
+                ) */}
                   </Box>
                 </Menu.Items>
               </Menu>

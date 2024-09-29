@@ -1,16 +1,16 @@
-"use strict";
+"use strict"
 
-import fs from "fs";
-import * as dotenv from "dotenv";
-import path from "path";
-dotenv.config();
+import fs from "fs"
+import * as dotenv from "dotenv"
+import path from "path"
+dotenv.config()
 
-import bodyParser from "body-parser";
-import compress from "compression";
-import cookieParser from "cookie-parser";
-import express from "express";
-import mime from "mime";
-import morgan from "morgan";
+import bodyParser from "body-parser"
+import compress from "compression"
+import cookieParser from "cookie-parser"
+import express from "express"
+import mime from "mime"
+import morgan from "morgan"
 
 import {
   addCorsHeader,
@@ -123,17 +123,17 @@ import {
   handle_PUT_ptptois,
   handle_PUT_reports,
   handle_PUT_users,
-} from "./src/server";
+} from "./src/server"
 
 import {
   handle_GET_github_init,
   handle_GET_github_oauth_callback,
-} from "./src/handlers/github_auth";
+} from "./src/handlers/github_auth"
 
 import {
   handle_GET_github_syncs,
   handle_POST_github_sync,
-} from "./src/handlers/github_sync";
+} from "./src/handlers/github_sync"
 
 import {
   assignToP,
@@ -159,25 +159,25 @@ import {
   want,
   wantCookie,
   wantHeader,
-} from "./src/utils/parameter";
+} from "./src/utils/parameter"
 import {
   handle_DELETE_conversation_sentiment_check_comments,
   handle_GET_conversation_sentiment_comments,
   handle_POST_conversation_sentiment_check_comments,
-} from "./src/handlers/sentiment_check_comments";
+} from "./src/handlers/sentiment_check_comments"
 
-const app = express();
+const app = express()
 
 // 'dev' format is
 // :method :url :status :response-time ms - :res[content-length]
-app.use(morgan("dev"));
+app.use(morgan("dev"))
 
 // Trust the X-Forwarded-Proto and X-Forwarded-Host, but only on private subnets.
 // See: https://github.com/pol-is/polis/issues/546
 // See: https://expressjs.com/en/guide/behind-proxies.html
-app.set("trust proxy", "uniquelocal");
+app.set("trust proxy", "uniquelocal")
 
-app.disable("x-powered-by");
+app.disable("x-powered-by")
 // app.disable('etag'); // seems to be eating CPU, and we're not using etags yet. https://www.dropbox.com/s/hgfd5dm0e29728w/Screenshot%202015-06-01%2023.42.47.png?dl=0
 
 ////////////////////////////////////////////
@@ -196,28 +196,28 @@ app.disable("x-powered-by");
 ////////////////////////////////////////////
 ////////////////////////////////////////////
 
-app.use(middleware_responseTime_start);
+app.use(middleware_responseTime_start)
 
-app.use(redirectIfNotHttps);
+app.use(redirectIfNotHttps)
 
-app.use(cookieParser());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(writeDefaultHead);
+app.use(cookieParser())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(writeDefaultHead)
 
 if (devMode) {
-  app.use(compress());
+  app.use(compress())
 } else {
   // Cloudflare would apply gzip if we didn't
   // but it's about 2x faster if we do the gzip (for the inbox query on mike's account)
-  app.use(compress());
+  app.use(compress())
 }
-app.use(middleware_log_request_body);
-app.use(middleware_log_middleware_errors);
+app.use(middleware_log_request_body)
+app.use(middleware_log_middleware_errors)
 
-app.all("/api/v3/(.+)", addCorsHeader);
-app.all("/font/(.+)", addCorsHeader);
-app.all("/api/v3/(.+)", middleware_check_if_options);
+app.all("/api/v3/(.+)", addCorsHeader)
+app.all("/font/(.+)", addCorsHeader)
+app.all("/api/v3/(.+)", middleware_check_if_options)
 
 ////////////////////////////////////////////
 ////////////////////////////////////////////
@@ -235,7 +235,7 @@ app.all("/api/v3/(.+)", middleware_check_if_options);
 ////////////////////////////////////////////
 ////////////////////////////////////////////
 
-app.get("/api/v3/math/pca", handle_GET_math_pca);
+app.get("/api/v3/math/pca", handle_GET_math_pca)
 
 app.get(
   "/api/v3/math/pca2",
@@ -249,7 +249,7 @@ app.get(
     assignToPCustom("ifNoneMatch"),
   ),
   handle_GET_math_pca2 as any,
-);
+)
 
 app.get(
   "/api/v3/math/correlationMatrix",
@@ -258,7 +258,7 @@ app.get(
   need("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("math_tick", getInt, assignToP, -1),
   handle_GET_math_correlationMatrix as any,
-);
+)
 
 app.get(
   "/api/v3/dataExport/:export",
@@ -267,7 +267,7 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP),
   handle_GET_dataExport,
-);
+)
 
 // TODO doesn't scale, stop sending entire mapping.
 app.get(
@@ -277,7 +277,7 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP, 0),
   handle_GET_bidToPid as any,
-);
+)
 
 app.get(
   "/api/v3/xids",
@@ -285,7 +285,7 @@ app.get(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_xids as any,
-);
+)
 
 // TODO cache
 app.get(
@@ -295,26 +295,26 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP, 0),
   handle_GET_bid as any,
-);
+)
 
 app.post(
   "/api/v3/auth/password",
   need("pwresettoken", getOptionalStringLimitLength(1000), assignToP),
   need("newPassword", getPasswordWithCreatePasswordRules, assignToP),
   handle_POST_auth_password as any,
-);
+)
 
 app.post(
   "/api/v3/auth/pwresettoken",
   need("email", getEmail, assignToP),
   handle_POST_auth_pwresettoken as any,
-);
+)
 
 app.post(
   "/api/v3/auth/deregister",
   want("showPage", getStringLimitLength(1, 99), assignToP),
   handle_POST_auth_deregister as any,
-);
+)
 
 app.get(
   "/api/v3/zinvites/:zid",
@@ -322,7 +322,7 @@ app.get(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_zinvites as any,
-);
+)
 
 app.post(
   "/api/v3/zinvites/:zid",
@@ -331,7 +331,7 @@ app.post(
   want("short_url", getBool, assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_zinvites as any,
-);
+)
 
 // // tags: ANON_RELATED
 app.get(
@@ -340,14 +340,14 @@ app.get(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_participants as any,
-);
+)
 
 app.get(
   "/api/v3/conversations/preload",
   moveToBody,
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   handle_GET_conversationPreloadInfo as any,
-);
+)
 
 app.get(
   "/api/v3/conversations/recently_started",
@@ -355,7 +355,7 @@ app.get(
   moveToBody,
   want("sinceUnixTimestamp", getStringLimitLength(99), assignToP),
   handle_GET_conversationsRecentlyStarted,
-);
+)
 
 app.get(
   "/api/v3/conversations/recent_activity",
@@ -363,7 +363,7 @@ app.get(
   moveToBody,
   want("sinceUnixTimestamp", getStringLimitLength(99), assignToP),
   handle_GET_conversationsRecentActivity,
-);
+)
 
 app.post(
   "/api/v3/participants",
@@ -373,7 +373,7 @@ app.post(
   want("parent_url", getStringLimitLength(9999), assignToP),
   want("referrer", getStringLimitLength(9999), assignToP),
   handle_POST_participants as any,
-);
+)
 
 app.get(
   "/api/v3/notifications/subscribe",
@@ -383,7 +383,7 @@ app.get(
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("email", getEmail, assignToP),
   handle_GET_notifications_subscribe as any,
-);
+)
 
 app.get(
   "/api/v3/notifications/unsubscribe",
@@ -393,7 +393,7 @@ app.get(
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("email", getEmail, assignToP),
   handle_GET_notifications_unsubscribe as any,
-);
+)
 
 app.post(
   "/api/v3/convSubscriptions",
@@ -402,14 +402,14 @@ app.post(
   need("type", getInt, assignToP),
   need("email", getEmail, assignToP),
   handle_POST_convSubscriptions as any,
-);
+)
 
 app.post(
   "/api/v3/auth/login",
   need("password", getPassword, assignToP),
   want("email", getEmail, assignToP),
   handle_POST_auth_login as any,
-);
+)
 
 app.post(
   "/api/v3/joinWithInvite",
@@ -425,7 +425,7 @@ app.post(
   want("referrer", getStringLimitLength(9999), assignToP),
   want("parent_url", getStringLimitLength(9999), assignToP),
   handle_POST_joinWithInvite as any,
-);
+)
 
 app.post(
   "/api/v3/sendEmailExportReady",
@@ -435,7 +435,7 @@ app.post(
   need("conversation_id", getStringLimitLength(1, 1000), assignToP), // we actually need conversation_id to build a url
   need("filename", getStringLimitLength(9999), assignToP),
   handle_POST_sendEmailExportReady as any,
-);
+)
 
 app.post(
   "/api/v3/notifyTeam",
@@ -444,21 +444,21 @@ app.post(
   need("subject", getStringLimitLength(9999), assignToP),
   need("body", getStringLimitLength(99999), assignToP),
   handle_POST_notifyTeam as any,
-);
+)
 
 app.get(
   "/api/v3/domainWhitelist",
   moveToBody,
   auth(assignToP),
   handle_GET_domainWhitelist as any,
-);
+)
 
 app.post(
   "/api/v3/domainWhitelist",
   auth(assignToP),
   need("domain_whitelist", getOptionalStringLimitLength(999), assignToP),
   handle_POST_domainWhitelist as any,
-);
+)
 
 app.post(
   "/api/v3/xidWhitelist",
@@ -469,7 +469,7 @@ app.post(
     assignToP,
   ),
   handle_POST_xidWhitelist as any,
-);
+)
 
 app.get(
   "/api/v3/conversationStats",
@@ -479,7 +479,7 @@ app.get(
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("until", getInt, assignToP),
   handle_GET_conversationStats as any,
-);
+)
 
 app.post(
   "/api/v3/auth/new",
@@ -494,14 +494,14 @@ app.post(
   want("gatekeeperTosPrivacy", getBool, assignToP),
   want("owner", getBool, assignToP, true),
   handle_POST_auth_new,
-);
+)
 
 app.post(
   "/api/v3/tutorial",
   auth(assignToP),
   need("step", getInt, assignToP),
   handle_POST_tutorial as any,
-);
+)
 
 app.get(
   "/api/v3/users",
@@ -509,7 +509,7 @@ app.get(
   authOptional(assignToP),
   want("errIfNoAuth", getBool, assignToP),
   handle_GET_users as any,
-);
+)
 
 app.get(
   "/api/v3/participation",
@@ -518,7 +518,7 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("strict", getBool, assignToP),
   handle_GET_participation as any,
-);
+)
 
 app.get(
   "/api/v3/group_demographics",
@@ -527,7 +527,7 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   handle_GET_groupDemographics as any,
-);
+)
 
 app.get(
   "/api/v3/comments",
@@ -556,7 +556,7 @@ app.get(
   ),
   resolve_pidThing("pid", assignToP, "get:comments:pid"),
   handle_GET_comments,
-);
+)
 
 // TODO probably need to add a retry mechanism like on joinConversation to handle possibility of duplicate tid race-condition exception
 app.post(
@@ -571,7 +571,7 @@ app.post(
   want("xid", getStringLimitLength(1, 999), assignToP),
   resolve_pidThing("pid", assignToP, "post:comments"),
   handle_POST_comments as any,
-);
+)
 
 app.get(
   "/api/v3/comments/translations",
@@ -580,7 +580,7 @@ app.get(
   want("tid", getInt, assignToP),
   want("lang", getStringLimitLength(1, 10), assignToP),
   handle_GET_comments_translations as any,
-);
+)
 
 app.get(
   "/api/v3/votes/me",
@@ -588,7 +588,7 @@ app.get(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_votes_me,
-);
+)
 
 app.get(
   "/api/v3/votes",
@@ -598,7 +598,7 @@ app.get(
   want("tid", getInt, assignToP),
   resolve_pidThing("pid", assignToP, "get:votes"),
   handle_GET_votes,
-);
+)
 
 app.get(
   "/api/v3/nextComment",
@@ -612,11 +612,11 @@ app.get(
   want("lang", getStringLimitLength(1, 10), assignToP), // preferred language of nextComment
   haltOnTimeout,
   handle_GET_nextComment as any,
-);
+)
 
-app.get("/api/v3/testConnection", moveToBody, handle_GET_testConnection as any);
+app.get("/api/v3/testConnection", moveToBody, handle_GET_testConnection as any)
 
-app.get("/api/v3/testDatabase", moveToBody, handle_GET_testDatabase as any);
+app.get("/api/v3/testDatabase", moveToBody, handle_GET_testDatabase as any)
 
 app.get(
   "/api/v3/participationInit",
@@ -637,7 +637,7 @@ app.get(
   want("xid", getStringLimitLength(1, 999), assignToP),
   resolve_pidThing("pid", assignToP, "get:votes"), // must be after zid getter
   handle_GET_participationInit as any,
-);
+)
 
 app.post(
   "/api/v3/votes",
@@ -652,14 +652,14 @@ app.post(
   want("xid", getStringLimitLength(1, 999), assignToP),
   want("lang", getStringLimitLength(1, 10), assignToP), // language of the next comment to be returned
   handle_POST_votes,
-);
+)
 
 app.get(
   "/api/v3/participants",
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_participants as any,
-);
+)
 
 app.put(
   "/api/v3/participants_extended",
@@ -667,7 +667,7 @@ app.put(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("show_translation_activated", getBool, assignToP),
   handle_PUT_participants_extended as any,
-);
+)
 
 app.get(
   "/api/v3/logMaxmindResponse",
@@ -675,7 +675,7 @@ app.get(
   need("user_uid", getInt, assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_logMaxmindResponse as any,
-);
+)
 
 app.post(
   "/api/v3/ptptCommentMod",
@@ -694,14 +694,14 @@ app.post(
   want("as_unsure", getBool, assignToP, null),
   getPidForParticipant(assignToP) as any,
   handle_POST_ptptCommentMod,
-);
+)
 
 app.post(
   "/api/v3/upvotes",
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_upvotes as any,
-);
+)
 
 app.post(
   "/api/v3/stars",
@@ -711,7 +711,7 @@ app.post(
   need("starred", getIntInRange(0, 1), assignToP),
   getPidForParticipant(assignToP) as any,
   handle_POST_stars as any,
-);
+)
 
 app.post(
   "/api/v3/trashes",
@@ -721,7 +721,7 @@ app.post(
   need("trashed", getIntInRange(0, 1), assignToP),
   getPidForParticipant(assignToP) as any,
   handle_POST_trashes as any,
-);
+)
 
 app.put(
   "/api/v3/comments",
@@ -734,7 +734,7 @@ app.put(
   need("is_meta", getBool, assignToP),
   need("velocity", getNumberInRange(0, 1), assignToP),
   handle_PUT_comments as any,
-);
+)
 
 app.post(
   "/api/v3/reportCommentSelections",
@@ -744,7 +744,7 @@ app.post(
   need("tid", getInt, assignToP),
   need("include", getBool, assignToP),
   handle_POST_reportCommentSelections as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/close",
@@ -752,7 +752,7 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_close as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/reopen",
@@ -760,7 +760,7 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_reopen as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/moderate",
@@ -768,7 +768,7 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_moderate as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/unmoderate",
@@ -776,7 +776,7 @@ app.post(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_unmoderate as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/sentiment",
@@ -785,7 +785,7 @@ app.post(
   need("vote", getStringLimitLength(10), assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_conversation_sentiment as any,
-);
+)
 
 app.put(
   "/api/v3/conversations",
@@ -844,7 +844,7 @@ app.put(
   want("link_url", getStringLimitLength(1, 9999), assignToP),
   want("subscribe_type", getInt, assignToP),
   handle_PUT_conversations,
-);
+)
 
 app.get(
   "/api/v3/conversation/sentiment_comments",
@@ -852,7 +852,7 @@ app.get(
   authOptional(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_conversation_sentiment_comments as any,
-);
+)
 
 app.post(
   "/api/v3/conversation/sentiment_comments",
@@ -861,7 +861,7 @@ app.post(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("comment", getStringLimitLength(999), assignToP),
   handle_POST_conversation_sentiment_check_comments as any,
-);
+)
 
 app.delete(
   "/api/v3/conversation/sentiment_comments",
@@ -869,7 +869,7 @@ app.delete(
   auth(assignToP),
   need("comment_id", getInt, assignToP),
   handle_DELETE_conversation_sentiment_check_comments as any,
-);
+)
 
 app.put(
   "/api/v3/users",
@@ -879,7 +879,7 @@ app.put(
   want("hname", getOptionalStringLimitLength(9999), assignToP),
   want("uid_of_user", getInt, assignToP),
   handle_PUT_users as any,
-);
+)
 
 app.delete(
   "/api/v3/metadata/questions/:pmqid",
@@ -887,7 +887,7 @@ app.delete(
   auth(assignToP),
   need("pmqid", getInt, assignToP),
   handle_DELETE_metadata_questions as any,
-);
+)
 
 app.delete(
   "/api/v3/metadata/answers/:pmaid",
@@ -895,7 +895,7 @@ app.delete(
   auth(assignToP),
   need("pmaid", getInt, assignToP),
   handle_DELETE_metadata_answers as any,
-);
+)
 
 app.get(
   "/api/v3/metadata/questions",
@@ -906,7 +906,7 @@ app.get(
   want("zinvite", getOptionalStringLimitLength(300), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
   handle_GET_metadata_questions,
-);
+)
 
 app.post(
   "/api/v3/metadata/questions",
@@ -915,7 +915,7 @@ app.post(
   need("key", getOptionalStringLimitLength(999), assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_metadata_questions,
-);
+)
 
 app.post(
   "/api/v3/metadata/answers",
@@ -925,7 +925,7 @@ app.post(
   need("pmqid", getInt, assignToP),
   need("value", getOptionalStringLimitLength(999), assignToP),
   handle_POST_metadata_answers,
-);
+)
 
 app.get(
   "/api/v3/metadata/choices",
@@ -933,7 +933,7 @@ app.get(
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_metadata_choices,
-);
+)
 
 app.get(
   "/api/v3/metadata/answers",
@@ -945,7 +945,7 @@ app.get(
   want("zinvite", getOptionalStringLimitLength(300), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
   handle_GET_metadata_answers,
-);
+)
 
 app.get(
   "/api/v3/metadata",
@@ -956,14 +956,14 @@ app.get(
   want("suzinvite", getOptionalStringLimitLength(32), assignToP),
   // TODO want('lastMetaTime', getInt, assignToP, 0),
   handle_GET_metadata as any,
-);
+)
 
 app.get(
   "/api/v3/conversation/:conversation_id",
   moveToBody,
   authOptional(assignToP),
   handle_GET_conversation as any,
-);
+)
 
 app.get(
   "/api/v3/conversations",
@@ -971,7 +971,7 @@ app.get(
   authOptional(assignToP),
   want("limit", getIntInRange(1, 9999), assignToP), // not allowing a super high limit to prevent DOS attacks
   handle_GET_conversations,
-);
+)
 
 app.get(
   "/api/v3/reports",
@@ -980,13 +980,13 @@ app.get(
   want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")), // Knowing the report_id grants the user permission to view the report
   handle_GET_reports as any,
-);
+)
 
 app.post(
   "/api/v3/reports",
   want("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_reports as any,
-);
+)
 
 app.put(
   "/api/v3/reports",
@@ -1010,27 +1010,27 @@ app.put(
   want("label_group_8", getStringLimitLength(999), assignToP),
   want("label_group_9", getStringLimitLength(999), assignToP),
   handle_PUT_reports as any,
-);
+)
 
 app.get(
   "/api/v3/contexts",
   moveToBody,
   authOptional(assignToP),
   handle_GET_contexts as any,
-);
+)
 
 app.post(
   "/api/v3/contexts",
   auth(assignToP),
   need("name", getStringLimitLength(1, 300), assignToP),
   handle_POST_contexts as any,
-);
+)
 
 app.post(
   "/api/v3/reserve_conversation_id",
   auth(assignToP),
   handle_POST_reserve_conversation_id,
-);
+)
 
 // This is used by the "Add survey" modal in the dashboard
 app.post(
@@ -1041,9 +1041,9 @@ app.post(
   want("auth_needed_to_vote", getBool, assignToP, true),
   want("auth_needed_to_write", getBool, assignToP, true),
   handle_POST_conversations,
-);
+)
 
-app.get("/api/v3/conversations_summary", handle_GET_conversations_summary);
+app.get("/api/v3/conversations_summary", handle_GET_conversations_summary as any)
 
 app.post(
   "/api/v3/increment_conversation_view_count",
@@ -1051,7 +1051,7 @@ app.post(
   moveToBody,
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_increment_conversation_view_count as any,
-);
+)
 
 app.post(
   "/api/v3/query_participants_by_metadata",
@@ -1059,14 +1059,14 @@ app.post(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("pmaids", getArrayOfInt, assignToP),
   handle_POST_query_participants_by_metadata as any,
-);
+)
 
 app.post(
   "/api/v3/sendCreatedLinkToEmail",
   auth(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_POST_sendCreatedLinkToEmail as any,
-);
+)
 
 app.get(
   "/api/v3/github_oauth_init",
@@ -1075,7 +1075,7 @@ app.get(
   want("dest", getStringLimitLength(9999), assignToP),
   want("owner", getBool, assignToP, true),
   handle_GET_github_init as any,
-);
+)
 
 app.get(
   "/api/v3/github_oauth_callback",
@@ -1086,15 +1086,15 @@ app.get(
   want("dest", getStringLimitLength(9999), assignToP),
   want("owner", getBool, assignToP, true),
   handle_GET_github_oauth_callback,
-);
+)
 
 app.post(
   "/api/v3/github_sync",
   // auth(assignToP),
   handle_POST_github_sync,
-);
+)
 
-app.get("/api/v3/github_syncs", handle_GET_github_syncs);
+app.get("/api/v3/github_syncs", handle_GET_github_syncs)
 
 app.get(
   "/api/v3/locations",
@@ -1103,7 +1103,7 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("gid", getInt, assignToP),
   handle_GET_locations as any,
-);
+)
 
 app.put(
   "/api/v3/ptptois",
@@ -1113,7 +1113,7 @@ app.put(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   resolve_pidThing("pid", assignToP),
   handle_PUT_ptptois as any,
-);
+)
 
 app.get(
   "/api/v3/ptptois",
@@ -1123,20 +1123,20 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   need("conversation_id", getStringLimitLength(1, 1000), assignToP),
   handle_GET_ptptois as any,
-);
+)
 
 app.post(
   "/api/v3/einvites",
   need("email", getEmail, assignToP),
   handle_POST_einvites as any,
-);
+)
 
 app.get(
   "/api/v3/einvites",
   moveToBody,
   need("einvite", getStringLimitLength(1, 100), assignToP),
   handle_GET_einvites as any,
-);
+)
 
 app.post(
   "/api/v3/users/invite",
@@ -1147,7 +1147,7 @@ app.post(
   // need('single_use_tokens', getBool, assignToP),
   need("emails", getArrayOfStringNonEmpty, assignToP),
   handle_POST_users_invite as any,
-);
+)
 
 // TODO this should probably be exempt from the CORS restrictions
 app.get(
@@ -1155,16 +1155,16 @@ app.get(
   moveToBody,
   need("dest", getStringLimitLength(1, 10000), assignToP),
   handle_GET_launchPrep as any,
-);
+)
 
-app.get("/api/v3/tryCookie", moveToBody, handle_GET_tryCookie as any);
+app.get("/api/v3/tryCookie", moveToBody, handle_GET_tryCookie as any)
 
 app.get(
   "/api/v3/verify",
   moveToBody,
   need("e", getStringLimitLength(1, 1000), assignToP),
   handle_GET_verification as any,
-);
+)
 
 app.post(
   "/api/v3/metrics",
@@ -1174,7 +1174,7 @@ app.post(
   need("durs", getArrayOfInt, assignToP),
   need("clientTimestamp", getInt, assignToP),
   handle_POST_metrics as any,
-);
+)
 
 ////////////////////////////////////////////
 ////////////////////////////////////////////
@@ -1194,7 +1194,7 @@ app.get(
   moveToBody,
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_iip_conversation,
-);
+)
 
 // inbox item admin
 app.get(
@@ -1202,98 +1202,104 @@ app.get(
   moveToBody,
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   handle_GET_iim_conversation as any,
-);
+)
 
 app.get("/robots.txt", (req: express.Request, res: express.Response) => {
-  res.send("User-agent: *\n" + "Disallow: /api/");
-});
+  res.send("User-agent: *\n" + "Disallow: /api/")
+})
 
 const fetchIndexForAdminPage = (
   req: express.Request,
   res: express.Response,
 ) => {
-  res.setHeader("Content-Type", "text/html");
-  res.sendFile(__dirname + "/client/index.html");
-};
+  res.setHeader("Content-Type", "text/html")
+  res.sendFile(__dirname + "/client/index.html")
+}
 
-app.get("^/$", fetchIndexForAdminPage);
-app.get(/^\/about(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/pwreset.*/, fetchIndexForAdminPage);
-app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage);
-app.get(/^\/tos$/, fetchIndexForAdminPage);
-app.get(/^\/privacy$/, fetchIndexForAdminPage);
-app.get(/^\/dashboard(\/.*)?/, fetchIndexForAdminPage);
+app.get("^/$", fetchIndexForAdminPage)
+app.get(/^\/about(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/pwreset.*/, fetchIndexForAdminPage)
+app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage)
+app.get(/^\/tos$/, fetchIndexForAdminPage)
+app.get(/^\/privacy$/, fetchIndexForAdminPage)
+app.get(/^\/dashboard(\/.*)?/, fetchIndexForAdminPage)
 
-app.get(/^\/conversations(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
-app.get(/^\/r\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage);
+app.get(/^\/conversations(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/account(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/m\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/c\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage)
+app.get(/^\/r\/[0-9][0-9A-Za-z]+(\/.*)?/, fetchIndexForAdminPage)
 
 mime.define({
   "text/html": ["html"],
   "image/svg+xml": ["svg"],
-});
+})
 
 app.use(
   express.static(path.join(__dirname, "client"), {
     maxAge: "1d",
     setHeaders: (res, path) => {
       if (path.endsWith(".html")) {
-        res.setHeader("Content-Type", "text/html; charset=UTF-8");
-        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Content-Type", "text/html; charset=UTF-8")
+        res.setHeader("Cache-Control", "no-cache")
       }
       if (path.endsWith(".svg")) {
-        res.setHeader("Content-Type", "image/svg+xml");
+        res.setHeader("Content-Type", "image/svg+xml")
+      }
+      if (path.endsWith(".js")) {
+        res.setHeader("Content-Type", "application/javascript")
+      }
+      if (path.endsWith(".css")) {
+        res.setHeader("Content-Type", "text/css")
       }
     },
   }),
-);
+)
 
 const fetchEmbed = (req: express.Request, res: express.Response) => {
-  const isIndex = req.path === "/embed";
-  const isEmbedJs = req.path === "/embed.js";
-  const isConversation = req.path.match(/^\/embed\/[a-z0-9]+$/);
+  const isIndex = req.path === "/embed"
+  const isEmbedJs = req.path === "/embed.js"
+  const isConversation = req.path.match(/^\/embed\/[a-z0-9]+$/)
 
   // embed.js is on a different root path
   if (isEmbedJs) {
     const headers = fs.readFileSync(__dirname + "/embed/embed.js.headersJson", {
       encoding: "utf8",
-    });
-    res.set(JSON.parse(headers));
-    res.sendFile(__dirname + "/embed/embed.js");
-    return;
+    })
+    res.set(JSON.parse(headers))
+    res.sendFile(__dirname + "/embed/embed.js")
+    return
   }
 
   // conversations need preload data
-  const path = isIndex || isConversation ? "/embed/index.html" : req.path;
+  const path = isIndex || isConversation ? "/embed/index.html" : req.path
   const headers = fs.readFileSync(__dirname + path + ".headersJson", {
     encoding: "utf8",
-  });
-  res.set(JSON.parse(headers));
+  })
+  res.set(JSON.parse(headers))
   if (isConversation) {
-    const conversation_id = req.path.match(/^\/embed\/([0-9a-z]+)$/)![1];
+    const conversation_id = req.path.match(/^\/embed\/([0-9a-z]+)$/)![1]
     doGetConversationPreloadInfo(conversation_id).then(function (x: any) {
-      const file = fs.readFileSync(__dirname + path, { encoding: "utf8" });
-      const preloadData = JSON.stringify({ conversation: x });
+      const file = fs.readFileSync(__dirname + path, { encoding: "utf8" })
+      const preloadData = JSON.stringify({ conversation: x })
       res.send(
         file
           .toString()
           .replace('"REPLACE_THIS_WITH_PRELOAD_DATA"', preloadData),
-      );
-    });
-    return;
+      )
+    })
+    return
   }
   // all other files just need headers
-  res.sendFile(__dirname + path);
-};
+  res.sendFile(__dirname + path)
+}
 
-app.get(/^\/embed$/, fetchEmbed);
-app.get(/^\/embed.js$/, fetchEmbed);
-app.get(/^\/embed\/(.*)/, fetchEmbed);
+app.get(/^\/embed$/, fetchEmbed)
+app.get(/^\/embed.js$/, fetchEmbed)
+app.get(/^\/embed\/(.*)/, fetchEmbed)
 
-export default app;
+export default app
