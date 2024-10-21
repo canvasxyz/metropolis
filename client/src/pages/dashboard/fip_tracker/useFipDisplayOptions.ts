@@ -9,6 +9,7 @@ export const useFipDisplayOptions = () => {
       showCreationDate: true,
       showType: true,
       showCategory: true,
+      sortBy: "desc"
     }),
   )
   const initialSavedDisplayOptions = JSON.parse(savedDisplayOptions)
@@ -19,6 +20,9 @@ export const useFipDisplayOptions = () => {
   const [showType, setShowType] = useState(initialSavedDisplayOptions.showType)
   const [showCategory, setShowCategory] = useState(initialSavedDisplayOptions.showCategory)
 
+
+  const [sortBy, setSortBy] = useState<"desc" | "asc">(initialSavedDisplayOptions.sortBy)
+
   const resetDisplayOptions = () => {
     setShowAuthors(true)
     setShowCategory(true)
@@ -28,7 +32,7 @@ export const useFipDisplayOptions = () => {
 
   const saveDisplayOptions = () => {
     setSavedDisplayOptions(
-      JSON.stringify({ showAuthors, showCategory, showCreationDate, showType }),
+      JSON.stringify({ showAuthors, showCategory, showCreationDate, showType, sortBy }),
     )
   }
 
@@ -41,6 +45,8 @@ export const useFipDisplayOptions = () => {
     setShowCreationDate,
     showType,
     setShowType,
+    sortBy,
+    setSortBy,
     resetDisplayOptions,
     saveDisplayOptions,
   }

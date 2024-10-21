@@ -58,12 +58,12 @@ export default ({ user }: { user: any }) => {
     setShowCreationDate,
     showType,
     setShowType,
+    sortBy,
+    setSortBy,
     resetDisplayOptions,
     saveDisplayOptions,
   } = useFipDisplayOptions()
 
-  const sortByInitial = "desc"
-  const [sortBy, setSortBy] = useState<"desc" | "asc">(sortByInitial)
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -311,7 +311,7 @@ export default ({ user }: { user: any }) => {
             <DropdownMenu.Label>
               Sort by&nbsp;
               <Select.Root
-                defaultValue={sortByInitial}
+                defaultValue={sortBy || "desc"}
                 value={sortBy}
                 onValueChange={(v) => setSortBy(v as "asc" | "desc")}
               >
