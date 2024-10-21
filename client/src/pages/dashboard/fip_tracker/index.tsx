@@ -63,7 +63,7 @@ export default ({ user }: { user: any }) => {
   } = useFipDisplayOptions()
 
   const sortByInitial = "desc"
-  const [sortBy, setSortBy] = useState(sortByInitial)
+  const [sortBy, setSortBy] = useState<"desc" | "asc">(sortByInitial)
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -121,10 +121,14 @@ export default ({ user }: { user: any }) => {
     const allFipAuthors = Array.from(allFipAuthorsSet)
     allFipAuthors.sort()
 
-    conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
+    if (sortBy === "asc") {
+      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1))
+    } else {
+      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
+    }
 
     return { conversations, allFipTypes, allFipAuthors }
-  }, [conversationsData])
+  }, [conversationsData, sortBy])
 
   const {
     selectedValues: selectedFipTypes,
@@ -309,7 +313,7 @@ export default ({ user }: { user: any }) => {
               <Select.Root
                 defaultValue={sortByInitial}
                 value={sortBy}
-                onValueChange={(v) => setSortBy(v)}
+                onValueChange={(v) => setSortBy(v as "asc" | "desc")}
               >
                 <Select.Trigger />
                 <Select.Content>
