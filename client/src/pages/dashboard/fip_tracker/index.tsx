@@ -167,6 +167,10 @@ export default ({ user }: { user: any }) => {
       return false
     }
 
+    if(conversation.fip_type && !selectedFipTypes[conversation.fip_type]) {
+      return false
+    }
+
     if (rangeValue.start && rangeValue.end) {
       const conversationDate = new Date(Date.parse(conversation.fip_created))
       if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
