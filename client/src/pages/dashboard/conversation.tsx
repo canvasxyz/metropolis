@@ -365,9 +365,9 @@ export const DashboardConversation = ({ user }: { user }) => {
           {
             <Box sx={dashboardBox}>
               <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
-              {/*<Box sx={{ color: "mediumGray", pb: [1] }}>
+              {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
                 Have more to say? You can leave a short comment here.
-                </Box>*/}
+                </Box> */}
               <Box sx={{ mx: "-8px", pt: "8px" }}>
                 <SentimentCheckComments user={user} conversationId={zid_metadata.conversation_id} />
               </Box>
