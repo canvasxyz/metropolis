@@ -111,7 +111,11 @@ export const DatePicker = ({
           <Button
             color="red"
             variant="soft"
-            onClick={() => onRangeValueChange({ start: null, end: null })}
+            onClick={(e) => {
+              onRangeValueChange({ start: null, end: null })
+              // @ts-expect-error - blur is a valid method
+              e.target.blur()
+            }}
           >
             Clear
           </Button>
