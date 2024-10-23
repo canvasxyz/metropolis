@@ -37,7 +37,7 @@ const splitAuthors = (authorList = "") => {
   return result
 }
 
-export default ({ user }: { user: any }) => {
+export default () => {
   const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>({
     draft: true,
     "last-call": true,
@@ -68,7 +68,7 @@ export default ({ user }: { user: any }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchParam = searchParams.get("search") || ""
-  let filterStatuses = Object.keys(selectedFipStatuses).filter(
+  const filterStatuses = Object.keys(selectedFipStatuses).filter(
     (status) => selectedFipStatuses[status],
   )
   // if draft is selected, also request WIP
@@ -78,7 +78,7 @@ export default ({ user }: { user: any }) => {
 
   const { data: conversationsData } = useSWR<ConversationSummary[]>(
     `conversations_summary`,
-    (query) => fetch(`/api/v3/conversations_summary`).then((response) => response.json()),
+    () => fetch(`/api/v3/conversations_summary`).then((response) => response.json()),
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
 

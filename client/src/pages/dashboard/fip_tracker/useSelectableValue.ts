@@ -8,7 +8,8 @@ export const useSelectableValue = (items: string[] | null) => {
       setSelectedValues((oldSelectedValues) => {
         const newSelectedValues = { ...oldSelectedValues }
         for (const item of items) {
-          if (!oldSelectedValues.hasOwnProperty(item)) {
+          // if there is a new selectable item that has not been seen before, select it by default
+          if (oldSelectedValues[item] === undefined) {
             newSelectedValues[item] = true
           }
         }

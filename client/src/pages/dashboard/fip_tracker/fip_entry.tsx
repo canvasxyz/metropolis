@@ -52,9 +52,9 @@ export const FipEntry = ({
   const simpleSummary = extractParagraphByTitle(conversation.description, "Simple Summary")
 
   let fipStatusKey
-  if (conversation.fip_status == "Last Call") {
+  if (conversation.fip_status === "Last Call") {
     fipStatusKey = "last-call"
-  } else if (conversation.fip_status == "WIP") {
+  } else if (conversation.fip_status === "WIP") {
     fipStatusKey = "draft"
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
@@ -160,7 +160,7 @@ export const FipEntry = ({
         {isOpen && (
           <>
             <Box></Box>
-            {/* display the simple summary if possible otherwise display the whole fip description*/}
+            {/* display the simple summary if possible otherwise display the whole fip description */}
             <Box>
               <h3>Authors</h3>
               {conversation.fip_authors.map((author, i) => {

@@ -1,5 +1,3 @@
-import { labelPadding } from "../../report/components/globals"
-
 export const statusOptions = {
   draft: {
     label: "Draft",

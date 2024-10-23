@@ -48,7 +48,7 @@ type ConversationListSelection =
   | "archived"
   | "hidden"
 
-const ViewCount = ({ initialViewCount, conversation }) => {
+const ViewCount = ({ initialViewCount, conversation }: {initialViewCount: number; conversation: ConversationSummary}) => {
   const viewCount = useViewCount(conversation.conversation_id)
   return <Text>{Math.max(viewCount, initialViewCount)}</Text>
 }

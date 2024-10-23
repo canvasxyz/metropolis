@@ -7,10 +7,10 @@ const MAX_COMMENT_LENGTH = 150
 
 const fetcher = (url) => fetch(url).then((r) => r.json())
 
-export const SentimentCheckComments: React.FC<{ user; conversationId: string }> = ({
+export const SentimentCheckComments= ({
   user,
   conversationId,
-}) => {
+}: { user: any; conversationId: string }) => {
   const { data, mutate } = useSWR(
     `/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`,
     fetcher,
@@ -38,7 +38,7 @@ export const SentimentCheckComments: React.FC<{ user; conversationId: string }> 
         mutate()
         setComment("")
         if (commentTextareaRef) {
-          ;(commentTextareaRef.current as any).value = ""
+          (commentTextareaRef.current as any).value = ""
         }
       })
     },

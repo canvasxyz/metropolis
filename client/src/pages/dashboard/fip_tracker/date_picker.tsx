@@ -70,11 +70,6 @@ export const DatePicker = ({
   })
   const { month, year } = viewInfo
 
-  const [] = useState<DateRange>({
-    start: null,
-    end: null,
-  })
-
   const monthLabel = new Date(year, month).toLocaleDateString(undefined, {
     month: "long",
     year: "numeric",
