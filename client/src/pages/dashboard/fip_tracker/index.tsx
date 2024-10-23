@@ -27,7 +27,7 @@ const splitAuthors = (authorList = "") => {
       "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
       "",
     )
-    .replace(/"/g, "")
+    .replace(/"|,$/g, "")
     .split(/, | and /)
   if (result && result.length === 1) {
     return result[0].split(/ @/).map((i) => {
