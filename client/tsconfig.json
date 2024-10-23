@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "noImplicitAny": false,
-    "target": "ES5",
-    "module": "ES2015",
+    "target": "ESNext",
+    "module": "ESNext",
     "jsx": "react",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
@@ -13,8 +13,5 @@
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-use-before-define": ["warn", "nofunc"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx"]
 }

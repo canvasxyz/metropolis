@@ -7,28 +7,35 @@ import { createRoot } from "react-dom/client"
 import { Provider } from "react-redux"
 import { BrowserRouter as Router, Route } from "react-router-dom"
 import { IconContext } from "react-icons"
+import "@radix-ui/themes/styles.css"
+import { Theme } from "@radix-ui/themes"
 
 import { ThemeProvider } from "theme-ui"
 import theme from "./theme"
 import App from "./app"
 import { store } from "./store"
+import { CompatRouter } from "react-router-dom-v5-compat"
 
 class Root extends React.Component {
   render() {
     return (
-      <ThemeProvider theme={theme}>
-        <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
-          <Provider store={store}>
-            <Router>
-              <Route
-                render={(routeProps) => {
-                  return <App {...routeProps} />
-                }}
-              ></Route>
-            </Router>
-          </Provider>
-        </IconContext.Provider>
-      </ThemeProvider>
+      <Theme>
+        <ThemeProvider theme={theme}>
+          <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
+            <Provider store={store}>
+              <Router>
+                <CompatRouter>
+                  <Route
+                    render={(routeProps) => {
+                      return <App {...routeProps} />
+                    }}
+                  ></Route>
+                </CompatRouter>
+              </Router>
+            </Provider>
+          </IconContext.Provider>
+        </ThemeProvider>
+      </Theme>
     )
   }
 }

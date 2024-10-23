@@ -31,3 +31,7 @@ export const formatTimeAgo = (epochTime: number, short?: boolean) => {
     return val + (short ? `y` : ` year${val === 1 ? "" : "s"} ago`)
   }
 }
+
+// TODO: put this constant somewhere that is logically related to discussions
+// maybe it there should be a selector for "active conversations" that uses it
+export const MIN_SEED_RESPONSES = 5

@@ -202,6 +202,25 @@
       animation: slideout 400ms forwards;
       animation-direction: reverse;
     }
+
+    .calendar-day-button {
+      color: var(--accent-10);
+      border-style: none;
+      background-color: var(--accent-1);
+      box-shadow: inset 0 0 0 1px var(--accent-3);
+    }
+
+    .calendar-day-button[data-highlighted] {
+      box-shadow: inset 0 0 0 1px var(--accent-10);
+    }
+
+
+
+    .calendar-day-button[data-range-start],
+    .calendar-day-button[data-range-end],
+    .calendar-day-button[data-in-range] {
+      background-color: var(--accent-3);
+    }
   </style>
 </head>
 
