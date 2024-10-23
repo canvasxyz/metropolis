@@ -212,7 +212,7 @@ export default ({ user }: { user: any }) => {
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <RadixButton variant="surface">
-              <BiFilter size="1.1em" style={{ color: "#B6B8C4", top: "-1px" }} />
+              <BiFilter size="1.1em" style={{ color: "var(--accent-a11)", top: "-1px" }} />
               Filters
             </RadixButton>
           </DropdownMenu.Trigger>
@@ -303,7 +303,7 @@ export default ({ user }: { user: any }) => {
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <RadixButton variant="surface">
-              <TbAdjustmentsHorizontal style={{ color: "#B6B8C4" }} />
+              <TbAdjustmentsHorizontal style={{ color: "var(--accent-a11)" }} />
               Display
             </RadixButton>
           </DropdownMenu.Trigger>
