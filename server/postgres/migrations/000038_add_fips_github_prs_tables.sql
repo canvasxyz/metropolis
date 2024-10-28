@@ -7,7 +7,7 @@ CREATE TABLE fip_versions (
   -- this is the "logical" key, in that this is what we will actually be using to
   -- look up fips
   fip_number INTEGER DEFAULT null,
-  github_pr_id INTEGER DEFAULT null,
+  github_pr_id INTEGER NOT NULL,
   UNIQUE (fip_number, github_pr_id),
 
   -- the fip data
@@ -19,18 +19,27 @@ CREATE TABLE fip_versions (
   fip_files_updated text,
   fip_status character varying(255),
   fip_title text,
-  fip_type character varying(255),
-
-  -- the github pr data
-  github_branch_name character varying(255),
-  github_pr_closed_at character varying(255),
-  github_pr_is_draft boolean default false,
-  github_pr_merged_at character varying(255),
-  github_pr_opened_at character varying(255),
-  github_pr_submitter character varying(255),
-  github_pr_title character varying(255),
-  github_pr_updated_at character varying(255),
-  github_repo_name character varying(255),
-  github_repo_owner character varying(255),
-  github_sync_enabled boolean default true
+  fip_type character varying(255)
 );
+
+
+CREATE TABLE github_prs (
+  -- the pr id on github
+  id INTEGER PRIMARY KEY,
+
+  -- github PR metadata
+  title character varying(255),
+  is_draft boolean default false,
+  closed_at character varying(255),
+  merged_at character varying(255),
+  opened_at character varying(255),
+  updated_at character varying(255),
+  submitter character varying(255),
+  branch_name character varying(255),
+  repo_name character varying(255),
+  repo_owner character varying(255),
+  sync_enabled boolean default true
+);
+
+-- unsure what this does if github_pr_id is null
+ALTER TABLE fip_versions ADD CONSTRAINT fip_versions_github_pr_id_fkey FOREIGN KEY (github_pr_id) REFERENCES github_prs (id);
