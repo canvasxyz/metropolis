@@ -130,7 +130,6 @@ import logger from "./utils/logger"
 import { sendTextEmail } from "./email/senders"
 import { Request, Response } from "express"
 import { getConversationIdFetchZid } from "./utils/parameter"
-import { insertConversationPrAndFip } from "./handlers/queries"
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : []
 const polisFromAddress = Config.polisFromAddress
@@ -7916,21 +7915,21 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     conversations.created,
     conversations.topic,
     conversations.description,
-    conversations.fip_author,
-    conversations.fip_category,
-    conversations.fip_type,
-    conversations.fip_created,
-    conversations.fip_title,
-    conversations.fip_number,
-    conversations.fip_status,
-    conversations.github_pr_opened_at,
-    conversations.github_pr_updated_at,
-    conversations.github_pr_closed_at,
-    conversations.github_pr_merged_at,
-    conversations.github_pr_is_draft,
-    conversations.github_pr_title,
-    conversations.github_pr_id,
-    conversations.fip_files_created,
+    fip_versions.fip_author,
+    fip_versions.fip_category,
+    fip_versions.fip_type,
+    fip_versions.fip_created,
+    fip_versions.fip_title,
+    fip_versions.fip_number,
+    fip_versions.fip_status,
+    fip_versions.github_pr_opened_at,
+    fip_versions.github_pr_updated_at,
+    fip_versions.github_pr_closed_at,
+    fip_versions.github_pr_merged_at,
+    fip_versions.github_pr_is_draft,
+    fip_versions.github_pr_title,
+    fip_versions.github_pr_id,
+    fip_versions.fip_files_created,
     conversations.is_archived,
     conversations.is_hidden,
     conversations.participant_count,
@@ -7938,15 +7937,13 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     cast(comment_counts.comment_count as INTEGER),
     cast(sentiment_counts.sentiment_count as INTEGER),
     conversations.owner,
-    users.hname,
-    users.github_username,
     zinvites.zinvite as conversation_id
   FROM
     conversations
   LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
   LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
   LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
-  JOIN users ON conversations.owner = users.uid
+  LEFT JOIN fip_versions ON conversations.fip_version_id = fip_versions.id
   JOIN zinvites ON conversations.zid = zinvites.zid;
   `
 
@@ -7971,6 +7968,34 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   })
 
   return res.json(rows)
+}
+
+async function handle_GET_fips(req: Request, res: Response) {
+  // pagination and filtering happens here
+  const fip_rows = await queryP_readOnly(`SELECT * FROM fip_versions;`, [])
+
+  // const fip_version_ids = fip_rows.map((fip: any) => fip.id)
+  const github_pr_ids = fip_rows.map((fip: any) => fip.github_pr_id).filter((id: any) => id !== -1)
+
+  const github_prs_by_id: Record<string, any> = {}
+  const pr_rows = await queryP_readOnly(`SELECT * FROM github_prs WHERE id = ANY($1::integer[]);`, [github_pr_ids])
+  for(const pr_row of pr_rows) {
+    github_prs_by_id[pr_row.id] = pr_row
+  }
+
+  for(const fip_row of fip_rows) {
+    const pr = github_prs_by_id[fip_row.github_pr_id]
+    fip_row.github_pr = pr || null
+    delete fip_row.github_pr_id
+
+
+    if (fip_row.github_pr !== null) {
+      fip_row.github_pr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${fip_row.github_pr.id}/files`
+    }
+
+  }
+
+  return res.json(fip_rows)
 }
 
 function createReport(zid: any) {
@@ -9668,6 +9693,7 @@ export {
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
   handle_GET_einvites,
+  handle_GET_fips,
   handle_GET_groupDemographics,
   handle_GET_iim_conversation,
   handle_GET_iip_conversation,

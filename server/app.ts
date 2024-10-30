@@ -123,6 +123,7 @@ import {
   handle_PUT_ptptois,
   handle_PUT_reports,
   handle_PUT_users,
+  handle_GET_fips,
 } from "./src/server"
 
 import {
@@ -1044,6 +1045,8 @@ app.post(
 )
 
 app.get("/api/v3/conversations_summary", handle_GET_conversations_summary as any)
+
+app.get("/api/v3/fips", handle_GET_fips as any)
 
 app.post(
   "/api/v3/increment_conversation_view_count",

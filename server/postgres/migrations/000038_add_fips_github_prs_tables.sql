@@ -12,6 +12,7 @@ CREATE TABLE fip_versions (
 
   -- the fip data
   fip_author text,
+  fip_content text,
   fip_category character varying(255),
   fip_created character varying(255),
   fip_discussions_to character varying(255),

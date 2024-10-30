@@ -17,4 +17,3 @@ ALTER TABLE conversations DROP github_pr_title;
 ALTER TABLE conversations DROP github_pr_updated_at;
 ALTER TABLE conversations DROP github_repo_name;
 ALTER TABLE conversations DROP github_repo_owner;
-ALTER TABLE conversations DROP github_sync_enabled;
