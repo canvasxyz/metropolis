@@ -13,13 +13,35 @@ import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
 import { Box, Flex, Text } from "theme-ui"
 
-import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { useSelectableValue } from "./useSelectableValue"
 import { DatePicker, DateRange } from "./date_picker"
+
+export type Fip = {
+  id: number
+  fip_created: string | null
+  fip_title: string | null
+  fip_content: string | null
+  fip_number: number
+  fip_status: string
+  fip_author: string | null
+  fip_type: string | null
+  fip_category: string | null
+  fip_files_created: string | null
+  github_pr: {
+    opened_at: string | null
+    updated_at: string | null
+    closed_at: string | null
+    merged_at: string | null
+    is_draft: boolean
+    title: string | null
+    id: string | null
+    url: string | null
+  } | null
+}
 
 const splitAuthors = (authorList = "") => {
   const result = authorList
@@ -76,9 +98,9 @@ export default () => {
     filterStatuses.push("WIP")
   }
 
-  const { data: conversationsData } = useSWR<ConversationSummary[]>(
-    `conversations_summary`,
-    () => fetch(`/api/v3/conversations_summary`).then((response) => response.json()),
+  const { data: conversationsData } = useSWR<Fip[]>(
+    `fips`,
+    () => fetch(`/api/v3/fips`).then((response) => response.json()),
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
 
@@ -87,7 +109,7 @@ export default () => {
       return {}
     }
 
-    const conversations: (ConversationSummary & {
+    const conversations: (Fip & {
       fip_authors: string[]
       displayed_title: string
     })[] = []
@@ -123,8 +145,11 @@ export default () => {
 
     if (sortBy === "asc") {
       conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1))
-    } else {
+    } else if(sortBy === "desc"){
       conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
+    } else {
+      conversations.sort((c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1))
+      // fip_number_asc
     }
 
     return { conversations, allFipTypes, allFipAuthors }
@@ -142,48 +167,50 @@ export default () => {
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
-  const displayedFips = (conversations || []).filter((conversation) => {
-    // the conversation's displayed title must include the search string, if it is given
-    if (
-      searchParam &&
-      !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
-    ) {
-      return false
-    }
-
-    // the conversation must have one of the selected fip authors
-    let hasMatchingFipAuthor = false
-    for (const fipAuthor of conversation.fip_authors) {
-      if (selectedFipAuthors[fipAuthor]) {
-        hasMatchingFipAuthor = true
-        break
-      }
-    }
-    if (!hasMatchingFipAuthor) {
-      return false
-    }
-
-    // the conversation's fip type must be one of the selected fip types
-    if (
-      conversation.fip_status &&
-      !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
-    ) {
-      return false
-    }
-
-    if(conversation.fip_type && !selectedFipTypes[conversation.fip_type]) {
-      return false
-    }
-
-    if (rangeValue.start && rangeValue.end) {
-      const conversationDate = new Date(Date.parse(conversation.fip_created))
-      if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
+  const displayedFips = useMemo(() => {
+    return (conversations || []).filter((conversation) => {
+      // the conversation's displayed title must include the search string, if it is given
+      if (
+        searchParam &&
+        !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
+      ) {
         return false
       }
-    }
 
-    return true
-  })
+      // the conversation must have one of the selected fip authors
+      let hasMatchingFipAuthor = false
+      for (const fipAuthor of conversation.fip_authors) {
+        if (selectedFipAuthors[fipAuthor]) {
+          hasMatchingFipAuthor = true
+          break
+        }
+      }
+      if (!hasMatchingFipAuthor) {
+        return false
+      }
+
+      // the conversation's fip type must be one of the selected fip types
+      if (
+        conversation.fip_status &&
+        !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
+      ) {
+        return false
+      }
+
+      if(conversation.fip_type && !selectedFipTypes[conversation.fip_type]) {
+        return false
+      }
+
+      if (rangeValue.start && rangeValue.end) {
+        const conversationDate = new Date(Date.parse(conversation.fip_created))
+        if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
+          return false
+        }
+      }
+
+      return true
+    })
+  }, [conversations, searchParam, selectedFipAuthors, selectedFipStatuses, selectedFipTypes, rangeValue])
 
   return (
     <Flex
@@ -320,6 +347,7 @@ export default () => {
                   <Select.Group>
                     <Select.Item value="desc">Newest to Oldest</Select.Item>
                     <Select.Item value="asc">Oldest to Newest</Select.Item>
+                    <Select.Item value="fip_number_asc">FIP number ascending</Select.Item>
                   </Select.Group>
                 </Select.Content>
               </Select.Root>
@@ -358,7 +386,7 @@ export default () => {
       <Flex sx={{ flexDirection: "column", gap: [3] }}>
         {displayedFips.map((conversation) => (
           <FipEntry
-            key={conversation.conversation_id}
+            key={conversation.id}
             conversation={conversation}
             showAuthors={showAuthors}
             showCategory={showCategory}

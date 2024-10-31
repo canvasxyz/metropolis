@@ -632,13 +632,9 @@ async function do_master_sync() {
     const fipNameParts = fipFileNameParts[fipFileNameParts.length - 1].replace(".md", "").split("-")
     const number = parseInt(fipNameParts[fipNameParts.length - 1], 10)
 
-    const fipVersionId = await upsertFipVersion({
+    await upsertFipVersion({
       fip_number: number,
-      // we want to be able to set this to a "null" value
-      // but still have the uniqueness constraint fire on
-      // (fip_number, github_pr_id)
-      // in postgres 15+ we could use a "UNIQUE NULLS NOT DISTINCT" constraint instead
-      github_pr_id: -1,
+      github_pr_id: null,
       fip_content: fipData.description,
       fip_author: fipData.author || null,
       fip_category: fipData.category || null,
@@ -650,9 +646,6 @@ async function do_master_sync() {
       fip_title: fipData.title || null,
       fip_type: fipData.type || null,
     })
-
-      // TODO: do we want to create conversations for each FIP on master?
-    // i'm not convinced we do
 
     result.push({...fipData, number})
   }

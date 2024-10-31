@@ -6,9 +6,9 @@ import { remark } from "remark"
 import { unified } from "unified"
 import { Box, Flex, Grid } from "theme-ui"
 
-import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
+import { Fip } from "."
 
 const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
@@ -41,7 +41,7 @@ export const FipEntry = ({
   showCreationDate,
   showType,
 }: {
-  conversation: ConversationSummary & { displayed_title: string; fip_authors: string[] }
+  conversation: Fip & { displayed_title: string; fip_authors: string[] }
   showAuthors: boolean
   showCategory: boolean
   showCreationDate: boolean
@@ -49,7 +49,7 @@ export const FipEntry = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const simpleSummary = extractParagraphByTitle(conversation.description, "Simple Summary")
+  const simpleSummary = extractParagraphByTitle(conversation.fip_content, "Simple Summary")
 
   let fipStatusKey
   if (conversation.fip_status === "Last Call") {
@@ -106,7 +106,7 @@ export const FipEntry = ({
         // this uses the color palette defined by radix-ui
         borderColor: `var(--${fipStatusInfo.color}-10)`,
       }}
-      key={conversation.conversation_id}
+      key={conversation.id}
       onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
@@ -130,8 +130,8 @@ export const FipEntry = ({
           <Badge size="3" color={fipStatusInfo.color} variant="surface">
             {fipStatusLabel}
           </Badge>
-          <Link
-            to={conversation.github_pr_url}
+          {conversation.github_pr && (          <Link
+            to={conversation.github_pr.url}
             target="_blank"
             noreferrer="noreferrer"
             noopener="noopener"
@@ -145,7 +145,7 @@ export const FipEntry = ({
             }}
           >
             GitHub <TbArrowUpRight />
-          </Link>
+          </Link>)}
         </Flex>
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center" }}>
