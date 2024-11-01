@@ -17,7 +17,6 @@ import { ClickableChecklistItem } from "../../../components/ClickableChecklistIt
 import { FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
-import { useSelectableValue } from "./useSelectableValue"
 import { DatePicker, DateRange } from "./date_picker"
 
 export type Fip = {
@@ -104,6 +103,9 @@ export default () => {
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
 
+  const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string,boolean>>({})
+  const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string,boolean>>({})
+
   const { conversations, allFipTypes, allFipAuthors } = useMemo(() => {
     if (!conversationsData) {
       return {}
@@ -134,7 +136,7 @@ export default () => {
         ...conversation,
         fip_authors: authors,
         displayed_title:
-          conversation.fip_title || conversation.github_pr_title || conversation.topic,
+          conversation.fip_title || conversation.github_pr.title,
       })
     }
 
@@ -149,21 +151,10 @@ export default () => {
       conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
     } else {
       conversations.sort((c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1))
-      // fip_number_asc
     }
 
     return { conversations, allFipTypes, allFipAuthors }
   }, [conversationsData, sortBy])
-
-  const {
-    selectedValues: selectedFipTypes,
-    setSelectedValues: setSelectedFipTypes,
-  } = useSelectableValue(allFipTypes || null)
-
-  const {
-    selectedValues: selectedFipAuthors,
-    setSelectedValues: setSelectedFipAuthors,
-  } = useSelectableValue(allFipAuthors || null)
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
@@ -180,7 +171,7 @@ export default () => {
       // the conversation must have one of the selected fip authors
       let hasMatchingFipAuthor = false
       for (const fipAuthor of conversation.fip_authors) {
-        if (selectedFipAuthors[fipAuthor]) {
+        if (deselectedFipAuthors[fipAuthor] !== true) {
           hasMatchingFipAuthor = true
           break
         }
@@ -197,7 +188,7 @@ export default () => {
         return false
       }
 
-      if(conversation.fip_type && !selectedFipTypes[conversation.fip_type]) {
+      if(conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
         return false
       }
 
@@ -210,7 +201,7 @@ export default () => {
 
       return true
     })
-  }, [conversations, searchParam, selectedFipAuthors, selectedFipStatuses, selectedFipTypes, rangeValue])
+  }, [conversations, searchParam, deselectedFipAuthors, selectedFipStatuses, deselectedFipTypes, rangeValue])
 
   return (
     <Flex
@@ -249,15 +240,14 @@ export default () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {Object.keys(selectedFipAuthors)
-                  .toSorted()
+                {(allFipAuthors || [])
                   .map((fipAuthor) => (
                     <ClickableChecklistItem
                       key={fipAuthor}
                       color={"blue"}
-                      checked={selectedFipAuthors[fipAuthor]}
+                      checked={deselectedFipAuthors[fipAuthor] !== true}
                       setChecked={(value) => {
-                        setSelectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: value }))
+                        setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
                       }}
                     >
                       {fipAuthor}
@@ -309,15 +299,14 @@ export default () => {
                 <TbLayoutGrid /> Type
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {Object.keys(selectedFipTypes)
-                  .toSorted()
+                {(allFipTypes || [])
                   .map((fipType) => (
                     <ClickableChecklistItem
                       key={fipType}
                       color={"blue"}
-                      checked={selectedFipTypes[fipType]}
+                      checked={deselectedFipTypes[fipType] !== true}
                       setChecked={(value) => {
-                        setSelectedFipTypes((prev) => ({ ...prev, [fipType]: value }))
+                        setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
                       }}
                     >
                       {fipType}
