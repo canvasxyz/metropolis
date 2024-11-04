@@ -49,19 +49,15 @@ export const FipEntry = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  let fipStatusKey
-  if (conversation.fip_status === "Last Call") {
-    fipStatusKey = "last-call"
-  } else if (conversation.fip_status === "WIP") {
+  let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+  if (conversation.fip_status === "wip") {
     fipStatusKey = "draft"
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
-  } else {
-    fipStatusKey = conversation.fip_status.toLowerCase()
   }
 
   const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
-  const fipStatusLabel = statusOptions[fipStatusKey].label
+  const fipStatusLabel = statusOptions[fipStatusKey] ? statusOptions[fipStatusKey].label : fipStatusKey
 
   const fipAttributes = []
   if (showType && conversation.fip_type) {
