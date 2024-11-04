@@ -155,22 +155,16 @@ async function getFipFromPR(
   const remote = `pull-${pull.id}`;
 
   // add remote
-  const remoteAddCommand = `git remote add ${remote} https://github.com/${owner}/${repo}`
-  console.log(remoteAddCommand)
   await execAsync(
-    remoteAddCommand,
+    `git remote add ${remote} https://github.com/${owner}/${repo}`,
     { cwd: repoDir },
   );
 
   // fetch the branches from the remote
-  const fetchCommand = `git fetch ${remote}`
-  console.log(fetchCommand)
-  await execAsync(fetchCommand, { cwd: repoDir });
+  await execAsync(`git fetch ${remote}`, { cwd: repoDir });
 
   // check out the branch locally
-  const switchCommand = `git switch -c ${remote}-branch ${remote}/${pull.head.ref}`
-  console.log(switchCommand)
-  await execAsync(switchCommand, {
+  await execAsync(`git switch -c ${remote}-branch ${remote}/${pull.head.ref}`, {
     cwd: repoDir,
   });
 
@@ -196,8 +190,6 @@ async function getFipFromPR(
         filename.toLowerCase().startsWith("fips/") ||
         filename.toLowerCase().startsWith("frcs/"),
     );
-    console.log(`createdFilenames:`)
-    console.log(createdFilenames)
 
   const updatedFilenames = updatedFilenamesText
     .trim()
@@ -210,8 +202,6 @@ async function getFipFromPR(
         filename.toLowerCase().startsWith("fips/") ||
         filename.toLowerCase().startsWith("frcs/"),
     );
-  console.log(`updatedFilenames:`)
-  console.log(updatedFilenames)
 
   if (createdFilenames.length > 1) {
     console.error(
@@ -367,12 +357,8 @@ export async function do_github_sync() {
   await fsPromises.mkdir(workingDir);
 
   // clone the repo
-  console.log(`Cloning into ${workingDir}...`);
-
-  const cloneCommand = `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`
-  console.log(cloneCommand)
   child_process.execSync(
-    cloneCommand,
+    `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
     { cwd: workingDir },
   );
 
@@ -458,7 +444,6 @@ export async function do_github_sync() {
         mainBranchName,
       );
     } catch (err) {
-      console.log(err)
       console.log(
         `[${pull.head?.label}] could not get fip for PR #${pull.number}`,
       );
@@ -488,8 +473,6 @@ export async function do_github_sync() {
 
       userIds[pull.user.login] = uid;
     }
-
-    const existingConversation = await getConversationWithFipVersionId(fipVersionId)
 
     const zid = await upsertConversation({
       owner: userIds[pull.user.login],
@@ -604,16 +587,12 @@ async function do_master_sync() {
   await fsPromises.mkdir(workingDir);
 
   // clone the repo
-  console.log(`Cloning into ${workingDir}...`);
-
   child_process.execSync(
     `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
     { cwd: workingDir },
   );
-  console.log(`Cloned into ${workingDir}`);
 
   const repoDir = path.join(workingDir, process.env.FIP_REPO_NAME);
-  console.log(`repoDir:`, repoDir)
 
   const fipFilenames = await getFipFilenames(repoDir);
 
