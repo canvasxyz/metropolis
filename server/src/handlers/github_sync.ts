@@ -634,6 +634,7 @@ async function do_master_sync() {
 
 export async function handle_POST_github_sync(req: Request, res: Response) {
   try {
+    await do_master_sync();
     res.json(await do_github_sync());
   } catch (err) {
     console.error(err);

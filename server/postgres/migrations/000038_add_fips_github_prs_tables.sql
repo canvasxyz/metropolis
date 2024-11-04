@@ -7,7 +7,7 @@ CREATE TABLE fip_versions (
   -- this is the "logical" key, in that this is what we will actually be using to
   -- look up fips
   fip_number INTEGER DEFAULT null,
-  github_pr_id INTEGER NOT NULL,
+  github_pr_id INTEGER DEFAULT NULL,
   UNIQUE NULLS NOT DISTINCT (fip_number, github_pr_id),
 
   -- the fip data
