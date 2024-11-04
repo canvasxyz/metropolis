@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { TbArrowUpRight, TbCalendar, TbCaretDown, TbCaretRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
 import markdown from "remark-parse"
@@ -10,11 +10,11 @@ import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
 import { Fip } from "."
 
-const extractParagraphByTitle = (markdownText, title) => {
+export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
 
   let inDesiredSection = false
-  let extractedParagraph = null
+  let extractedParagraph: string | null = null
 
   function visitNode(node) {
     if (node.type === "heading" && node.children[0].value === title) {
@@ -41,15 +41,13 @@ export const FipEntry = ({
   showCreationDate,
   showType,
 }: {
-  conversation: Fip & { displayed_title: string; fip_authors: string[] }
+  conversation: Fip & { displayed_title: string; fip_authors: string[]; simple_summary: string }
   showAuthors: boolean
   showCategory: boolean
   showCreationDate: boolean
   showType: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
-
-  const simpleSummary = extractParagraphByTitle(conversation.fip_content, "Simple Summary")
 
   let fipStatusKey
   if (conversation.fip_status === "Last Call") {
@@ -185,7 +183,7 @@ export const FipEntry = ({
 
               <h3>Simple Summary</h3>
 
-              {simpleSummary || conversation.description}
+              {conversation.simple_summary || conversation.fip_content}
             </Box>
           </>
         )}

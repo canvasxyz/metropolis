@@ -1,5 +1,5 @@
 import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
-import React, { useMemo, useState } from "react"
+import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
   TbAdjustmentsHorizontal,
@@ -14,7 +14,7 @@ import useSWR from "swr"
 import { Box, Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
-import { FipEntry } from "./fip_entry"
+import { extractParagraphByTitle, FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
@@ -58,6 +58,50 @@ const splitAuthors = (authorList = "") => {
   return result
 }
 
+function processThings(data: Fip[]) {
+  if (!data) {
+    return {}
+  }
+
+  const conversations: (Fip & {
+    simple_summary: string
+    fip_authors: string[]
+    displayed_title: string
+  })[] = []
+
+  const allFipTypesSet = new Set<string | null>()
+  const allFipAuthorsSet = new Set<string>()
+
+  for (const conversation of data) {
+    // don't show fips that don't have a fip status
+    if (conversation.fip_status == null) {
+      continue
+    }
+
+    allFipTypesSet.add(conversation.fip_type)
+
+    const authors = splitAuthors(conversation.fip_author) || []
+    for (const author of authors) {
+      allFipAuthorsSet.add(author)
+    }
+
+    conversations.push({
+      ...conversation,
+      simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
+      fip_authors: authors,
+      displayed_title:
+        conversation.fip_title || conversation.github_pr.title,
+    })
+  }
+
+  const allFipTypes = Array.from(allFipTypesSet)
+  allFipTypes.sort()
+  const allFipAuthors = Array.from(allFipAuthorsSet)
+  allFipAuthors.sort()
+
+  return { conversations, allFipTypes, allFipAuthors }
+}
+
 export default () => {
   const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>({
     draft: true,
@@ -85,7 +129,6 @@ export default () => {
     saveDisplayOptions,
   } = useFipDisplayOptions()
 
-
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchParam = searchParams.get("search") || ""
@@ -97,111 +140,73 @@ export default () => {
     filterStatuses.push("WIP")
   }
 
-  const { data: conversationsData } = useSWR<Fip[]>(
+  const { data } = useSWR(
     `fips`,
-    () => fetch(`/api/v3/fips`).then((response) => response.json()),
+    async () => {
+      const response = await fetch(`/api/v3/fips`)
+      const data = await response.json()
+      return processThings(data)
+    },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
+  const {conversations, allFipTypes, allFipAuthors} = data || {}
 
   const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string,boolean>>({})
   const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string,boolean>>({})
 
-  const { conversations, allFipTypes, allFipAuthors } = useMemo(() => {
-    if (!conversationsData) {
-      return {}
-    }
-
-    const conversations: (Fip & {
-      fip_authors: string[]
-      displayed_title: string
-    })[] = []
-
-    const allFipTypesSet = new Set<string | null>()
-    const allFipAuthorsSet = new Set<string>()
-
-    for (const conversation of conversationsData) {
-      // don't show fips that don't have a fip status
-      if (conversation.fip_status == null) {
-        continue
-      }
-
-      allFipTypesSet.add(conversation.fip_type)
-
-      const authors = splitAuthors(conversation.fip_author) || []
-      for (const author of authors) {
-        allFipAuthorsSet.add(author)
-      }
-
-      conversations.push({
-        ...conversation,
-        fip_authors: authors,
-        displayed_title:
-          conversation.fip_title || conversation.github_pr.title,
-      })
-    }
-
-    const allFipTypes = Array.from(allFipTypesSet)
-    allFipTypes.sort()
-    const allFipAuthors = Array.from(allFipAuthorsSet)
-    allFipAuthors.sort()
-
-    if (sortBy === "asc") {
-      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1))
-    } else if(sortBy === "desc"){
-      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
-    } else {
-      conversations.sort((c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1))
-    }
-
-    return { conversations, allFipTypes, allFipAuthors }
-  }, [conversationsData, sortBy])
-
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
-  const displayedFips = useMemo(() => {
-    return (conversations || []).filter((conversation) => {
-      // the conversation's displayed title must include the search string, if it is given
-      if (
-        searchParam &&
-        !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
-      ) {
+  let sortFunction;
+  if (sortBy === "asc") {
+    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
+  } else if(sortBy === "desc"){
+    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1)
+  } else {
+    sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
+  }
+
+  const displayedFips = (conversations || []).filter((conversation) => {
+    // the conversation's displayed title must include the search string, if it is given
+    if (
+      searchParam &&
+      !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
+    ) {
+      return false
+    }
+
+    // the conversation must have one of the selected fip authors
+    let hasMatchingFipAuthor = false
+    for (const fipAuthor of conversation.fip_authors) {
+      if (deselectedFipAuthors[fipAuthor] !== true) {
+        hasMatchingFipAuthor = true
+        break
+      }
+    }
+    if (!hasMatchingFipAuthor) {
+      return false
+    }
+
+    // the conversation's fip type must be one of the selected fip types
+    if (
+      conversation.fip_status &&
+      !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
+    ) {
+      return false
+    }
+
+    if(conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
+      return false
+    }
+
+    if (rangeValue.start && rangeValue.end) {
+      const conversationDate = new Date(Date.parse(conversation.fip_created))
+      if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
         return false
       }
+    }
 
-      // the conversation must have one of the selected fip authors
-      let hasMatchingFipAuthor = false
-      for (const fipAuthor of conversation.fip_authors) {
-        if (deselectedFipAuthors[fipAuthor] !== true) {
-          hasMatchingFipAuthor = true
-          break
-        }
-      }
-      if (!hasMatchingFipAuthor) {
-        return false
-      }
-
-      // the conversation's fip type must be one of the selected fip types
-      if (
-        conversation.fip_status &&
-        !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
-      ) {
-        return false
-      }
-
-      if(conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
-        return false
-      }
-
-      if (rangeValue.start && rangeValue.end) {
-        const conversationDate = new Date(Date.parse(conversation.fip_created))
-        if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
-          return false
-        }
-      }
-
-      return true
-    })
-  }, [conversations, searchParam, deselectedFipAuthors, selectedFipStatuses, deselectedFipTypes, rangeValue])
+    return true
+  }).toSorted(sortFunction)
 
   return (
     <Flex
