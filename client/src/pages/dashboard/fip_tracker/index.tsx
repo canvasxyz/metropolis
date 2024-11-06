@@ -18,29 +18,7 @@ import { extractParagraphByTitle, FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
-
-export type Fip = {
-  id: number
-  fip_created: string | null
-  fip_title: string | null
-  fip_content: string | null
-  fip_number: number
-  fip_status: string
-  fip_author: string | null
-  fip_type: string | null
-  fip_category: string | null
-  fip_files_created: string | null
-  github_pr: {
-    opened_at: string | null
-    updated_at: string | null
-    closed_at: string | null
-    merged_at: string | null
-    is_draft: boolean
-    title: string | null
-    id: string | null
-    url: string | null
-  } | null
-}
+import { FipVersion } from "../../../util/types"
 
 const splitAuthors = (authorList = "") => {
   const result = authorList
@@ -58,12 +36,12 @@ const splitAuthors = (authorList = "") => {
   return result
 }
 
-function processThings(data: Fip[]) {
+function processFipVersions(data: FipVersion[]) {
   if (!data) {
     return {}
   }
 
-  const conversations: (Fip & {
+  const conversations: (FipVersion & {
     simple_summary: string
     fip_authors: string[]
     displayed_title: string
@@ -145,7 +123,7 @@ export default () => {
     async () => {
       const response = await fetch(`/api/v3/fips`)
       const data = await response.json()
-      return processThings(data)
+      return processFipVersions(data)
     },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )

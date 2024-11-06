@@ -14,6 +14,7 @@ export type GitHubPr = {
 }
 
 export type FipVersion = {
+  id: number
   fip_number: number | null,
   github_pr_id: number | null,
   github_pr: GitHubPr | null,

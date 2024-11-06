@@ -8,7 +8,7 @@ import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
-import { Fip } from "."
+import { FipVersion } from "../../../util/types"
 
 export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
@@ -41,7 +41,7 @@ export const FipEntry = ({
   showCreationDate,
   showType,
 }: {
-  conversation: Fip & { displayed_title: string; fip_authors: string[]; simple_summary: string }
+  conversation: FipVersion & { displayed_title: string; fip_authors: string[]; simple_summary: string }
   showAuthors: boolean
   showCategory: boolean
   showCreationDate: boolean
@@ -100,7 +100,6 @@ export const FipEntry = ({
         // this uses the color palette defined by radix-ui
         borderColor: `var(--${fipStatusInfo.color}-10)`,
       }}
-      key={conversation.id}
       onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
