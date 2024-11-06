@@ -418,7 +418,7 @@ export async function do_github_sync() {
       continue;
     }
 
-    const updatedGithubPrFields: GithubPrFields = {
+    await upsertGitHubPr({
       repo_name: pull.head.repo?.name,
       repo_owner: pull.head.repo?.owner?.login,
       branch_name: pull.head.ref,
@@ -430,9 +430,7 @@ export async function do_github_sync() {
       updated_at: pull.updated_at,
       merged_at: pull.merged_at,
       is_draft: pull.draft,
-    };
-
-    await upsertGitHubPr(updatedGithubPrFields);
+    });
 
     // extract the fip data from the pr
     let fipFields;
@@ -474,16 +472,18 @@ export async function do_github_sync() {
       userIds[pull.user.login] = uid;
     }
 
-    const zid = await upsertConversation({
+    const {zid, isNew} = await upsertConversation({
       owner: userIds[pull.user.login],
-      is_active: pull.closed_at == null,
-      is_archived: false,
+      is_active: pull.state == "open",
+      is_archived: pull.state === "closed",
       fip_version_id: fipVersionId,
       github_sync_enabled: true
     })
 
     // TODO: we should only do this if it's a new conversation
-    await generateAndRegisterZinvite(zid, false)
+    if(isNew) {
+      await generateAndRegisterZinvite(zid, false)
+    }
 
     // const welcomeMessage = getWelcomeMessage(
     //   getServerNameWithProtocol(req),

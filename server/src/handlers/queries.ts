@@ -274,17 +274,32 @@ export async function upsertConversation(data: {
     ($1, $2, $3, $4, $5)
   ON CONFLICT
     (fip_version_id)
-  DO UPDATE SET
-    owner = $1,
-    is_active = $2,
-    is_archived = $3,
-    github_sync_enabled = $5
+  DO NOTHING
   RETURNING
     zid
   ;`
   const values = [data.owner, data.is_active, data.is_archived, data.fip_version_id, data.github_sync_enabled]
   const rows = await queryP(query, values)
-  return rows[0].zid
+
+  if(rows.length === 0) {
+    // conflict, update instead
+    const updateQuery = `
+      UPDATE conversations
+      SET owner = $1, is_active = $2, is_archived = $3, github_sync_enabled = $5
+      WHERE fip_version_id = $4
+      RETURNING zid;
+    `
+    const updatedRows = await queryP(updateQuery, values)
+    return {
+      zid: updatedRows[0].zid,
+      isNew: false
+    }
+  }
+
+  return {
+    zid: rows[0].zid,
+    isNew: true
+  }
 }
 
 export async function insertSyncRecord() {
