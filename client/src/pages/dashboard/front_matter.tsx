@@ -76,9 +76,10 @@ export const Collapsible = ({
   )
 }
 
-export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) => {
-  const matches = conversation.fip_discussions_to?.match(/\[.+\]\((.+)\)/)
-  const links = matches && matches[1] ? [matches[1]] : conversation.fip_discussions_to?.split(", ")
+export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
+  const { fip_version } = zid_metadata
+  const matches = fip_version.fip_discussions_to?.match(/\[.+\]\((.+)\)/)
+  const links = matches && matches[1] ? [matches[1]] : fip_version.fip_discussions_to?.split(", ")
   const discussions = (links || []).map((link) => (
     <Link
       key={link}
@@ -101,19 +102,15 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
   return (
     <table style={{ tableLayout: "fixed", width: "100%" }}>
       <tbody className="border">
-        {(conversation.github_pr_url || conversation.github_pr_title) && (
+        {fip_version.github_pr && (
           <tr>
             <td width="100">
               <Text sx={{ fontWeight: "700" }}>PR</Text>
             </td>
             <td>
-              {conversation.github_pr_url !== null ? (
-                <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
-                  {conversation.github_pr_title} (#{conversation.github_pr_id})
-                </Link>
-              ) : (
-                conversation.github_pr_title
-              )}
+              <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
+                {fip_version.github_pr.title} (#{fip_version.github_pr.id})
+              </Link>
             </td>
           </tr>
         )}
@@ -125,13 +122,13 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
             <td>{discussions}</td>
           </tr>
         )}
-        {conversation.fip_author && (
+        {fip_version.fip_author && (
           <tr>
             <td>
               <Text sx={{ fontWeight: "700" }}>Author</Text>
             </td>
             <td>
-              {splitAuthors(conversation.fip_author)?.map((author, i) => {
+              {splitAuthors(fip_version.fip_author)?.map((author, i) => {
                 const matches = author.match(/.*@(\w+)/)
                 if (!matches) return author
                 const username = matches[1]
@@ -145,25 +142,25 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
                     >
                       {author}
                     </Link>
-                    {i < splitAuthors(conversation.fip_author).length - 1 ? ", " : ""}
+                    {i < splitAuthors(fip_version.fip_author).length - 1 ? ", " : ""}
                   </React.Fragment>
                 )
               })}
             </td>
           </tr>
         )}
-        {!conversation.description &&
-        !conversation.fip_number &&
-        !conversation.fip_status &&
-        !conversation.fip_type ? (
+        {!fip_version.fip_content &&
+        !fip_version.fip_number &&
+        !fip_version.fip_status &&
+        !fip_version.fip_type ? (
           <React.Fragment>
             <tr>
               <td>
                 <Text sx={{ fontWeight: "700" }}>Files Updated</Text>
               </td>
               <td>
-                <Link target="_blank" rel="noopener noreferrer" href={conversation.github_pr_url}>
-                  {conversation.fip_files_updated}
+                <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
+                  {fip_version.fip_files_updated}
                 </Link>
               </td>
             </tr>
@@ -175,12 +172,11 @@ export const Frontmatter = ({ zid_metadata: conversation }: FrontmatterProps) =>
               <Text sx={{ fontWeight: "700" }}>Text</Text>
             </td>
             <td style={{ display: "grid", paddingTop: 8 }}>
-              {conversation.description ? (
+              {fip_version.fip_content ? (
                 <Collapsible
-                  title={conversation.fip_title}
-                  key={conversation.conversation_id}
-                  shouldCollapse={conversation.description?.length > 300}
-                  content={conversation.description}
+                  title={fip_version.fip_title}
+                  shouldCollapse={fip_version.fip_content?.length > 300}
+                  content={fip_version.fip_content}
                 ></Collapsible>
               ) : (
                 <Box sx={{ pb: [1] }}>

@@ -9,7 +9,7 @@ import { Box, Button, Text, jsx } from "theme-ui"
 import { TbThumbUp, TbThumbDown } from "react-icons/tb"
 
 import api from "../../util/api"
-import type { Comment } from "../../util/types"
+import type { Comment, ZidMetadata } from "../../util/types"
 import { DropdownMenu } from "../../components/dropdown"
 
 type SurveyCardProps = {
@@ -19,7 +19,7 @@ type SurveyCardProps = {
   hasVoted: boolean
   cardHeight?: number
   topCard?: boolean
-  zid_metadata
+  zid_metadata: ZidMetadata
   user
 }
 

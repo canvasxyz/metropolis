@@ -7,6 +7,7 @@ import { TbExternalLink } from "react-icons/tb"
 import { Box, Heading, Button, Text, jsx } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
+import { ZidMetadata } from "../../util/types"
 
 const PostSurvey = ({
   submittedComments,
@@ -19,7 +20,7 @@ const PostSurvey = ({
   submittedComments
   votedComments
   unvotedComments
-  zid_metadata
+  zid_metadata: ZidMetadata
   goTo
   setVotingAfterPostSurvey
 }) => {

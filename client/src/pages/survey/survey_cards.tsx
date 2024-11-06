@@ -5,6 +5,7 @@ import { Box, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
+import { ZidMetadata } from "../../util/types"
 
 const SurveyCards = ({
   conversation_id,
@@ -20,7 +21,7 @@ const SurveyCards = ({
   unvotedComments
   onVoted
   goTo
-  zid_metadata
+  zid_metadata: ZidMetadata
   user
 }) => {
   // className={collapsed ? "react-markdown css-fade" : "react-markdown"}

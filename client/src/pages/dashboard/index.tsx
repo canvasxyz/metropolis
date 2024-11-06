@@ -147,7 +147,7 @@ const Dashboard = ({ user }: DashboardProps) => {
               element={
                 <Suspense>
                   {" "}
-                  <FipTracker user={user} />
+                  <FipTracker />
                 </Suspense>
               }
             />

@@ -88,31 +88,31 @@ const ConversationsList = ({
 
   const nonFIPConversations = conversations.filter(
     (conversation) =>
-      !conversation.github_pr_title &&
+      !conversation.fip_version &&
       !conversation.is_archived &&
       !conversation.is_hidden &&
       (conversation.comment_count >= MIN_SEED_RESPONSES || conversation.owner === user?.uid),
   )
   const emptyFIPConversations = conversations.filter(
     (conversation) =>
-      conversation.github_pr_title &&
       !conversation.is_archived &&
       !conversation.is_hidden &&
-      !conversation.fip_files_created,
+      conversation.fip_version &&
+      !conversation.fip_version.fip_files_created,
   )
   const openConversations = conversations.filter(
     (conversation) =>
-      conversation.github_pr_title &&
       !conversation.is_archived &&
       !conversation.is_hidden &&
-      conversation.fip_files_created,
+      conversation.fip_version &&
+      conversation.fip_version.fip_files_created,
   )
   const allConversations = conversations.filter(
     (conversation) =>
       !conversation.is_archived &&
       !conversation.is_hidden &&
-      (conversation.github_pr_title
-        ? conversation.fip_files_created
+      (conversation.fip_version
+        ? conversation.fip_version.fip_files_created
         : conversation.comment_count >= MIN_SEED_RESPONSES || conversation.owner === user?.uid),
   )
   const archivedConversations = conversations.filter(
@@ -124,8 +124,8 @@ const ConversationsList = ({
   if (selectedConversations === "all-fip") {
     allConversations.sort((c1, c2) => {
       return (
-        (c2.github_pr_opened_at ? new Date(c2.github_pr_opened_at).getTime() : c2.created) -
-        (c1.github_pr_opened_at ? new Date(c1.github_pr_opened_at).getTime() : c1.created)
+        (c2.fip_version?.github_pr?.opened_at ? new Date(c2.fip_version.github_pr.opened_at).getTime() : c2.created) -
+        (c1.fip_version?.github_pr?.opened_at ? new Date(c1.fip_version.github_pr.opened_at).getTime() : c1.created)
       )
     })
     conversationsToDisplay = allConversations
@@ -308,17 +308,18 @@ type ConversationListItemProps = {
 }
 
 export const getIconForConversation = (conversation: ConversationSummary) => {
-  if (conversation.github_pr_id) {
+  const githubPr = conversation.fip_version?.github_pr
+  if (githubPr) {
     // conversation is a github pr
-    if (conversation.github_pr_merged_at) {
+    if (githubPr.merged_at) {
       // pr is merged
       return <TbGitMerge color="#9C73EF" />
-    } else if (conversation.github_pr_closed_at) {
+    } else if (githubPr.closed_at) {
       // pr is closed
       return <TbGitPullRequestClosed color="#E55E51" />
     } else {
       // pr is open
-      if (conversation.github_pr_is_draft) {
+      if (githubPr.is_draft) {
         // pr is a draft
         return <TbGitPullRequestDraft color="#868D96" />
       } else {
@@ -338,15 +339,14 @@ const ConversationListItem = ({
   initialViewCount,
   dispatch,
 }: ConversationListItemProps) => {
-  const date = new Date(conversation.fip_created || +conversation.created)
+  const date = new Date(conversation.fip_version ? conversation.fip_version.fip_created : +conversation.created)
   const timeAgo = formatTimeAgo(+date, true)
 
-  const shouldHideDiscussion =
-    !conversation.fip_title &&
-    !conversation.github_pr_title &&
-    conversation.comment_count < MIN_SEED_RESPONSES
+  const shouldHideDiscussion = !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES
 
-  const emptyFIP = conversation.github_pr_title && !conversation.fip_files_created
+  const emptyFIP = conversation.fip_version !== null && conversation.fip_version.fip_files_created
+
+  const displayTitle = conversation.fip_version ? conversation.fip_version.fip_title : conversation.topic
 
   if (shouldHideDiscussion && conversation.owner !== user?.uid) return
 
@@ -382,7 +382,7 @@ const ConversationListItem = ({
               {getIconForConversation(conversation)}
             </Box>
             <Box sx={{ fontWeight: 500, flex: 1 }}>
-              {conversation.fip_title || conversation.github_pr_title || conversation.topic || (
+              {displayTitle || (
                 <Text sx={{ color: "#84817D" }}>Untitled</Text>
               )}
               <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
@@ -420,8 +420,6 @@ const ConversationListItem = ({
                         onClick={() => hist.push(`/m/${conversation.conversation_id}/comments`)}
                       >
                         <TbHammer /> Moderate comments
-                        {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
-                        {conversation.is_archived ? "Reopen" : "Close"}
                       </Box>
                     </Menu.Item>
                     {user &&

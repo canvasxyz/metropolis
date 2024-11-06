@@ -1,3 +1,34 @@
+export type GitHubPr = {
+  id: number
+  repo_name: string
+  repo_owner: string
+  branch_name: string
+  title: string
+  submitter: string
+  opened_at: string
+  updated_at: string
+  closed_at: string | null
+  merged_at: string | null
+  is_draft: boolean | undefined
+  url: string
+}
+
+export type FipVersion = {
+  fip_number: number | null,
+  github_pr_id: number | null,
+  github_pr: GitHubPr | null,
+  fip_author: string | null,
+  fip_category: string | null
+  fip_content: string | null,
+  fip_created: string | null,
+  fip_discussions_to: string | null,
+  fip_files_created: string | null,
+  fip_files_updated: string | null,
+  fip_status: string | null,
+  fip_title: string | null,
+  fip_type: string | null
+}
+
 export type User = {
   hname: string
   email: string
@@ -33,30 +64,11 @@ export type ZidMetadata = {
   created: string
   description: string
   email_domain: string | null
-  /* github sync */
-  fip_author: string | null
-  fip_category: string | null
-  fip_created: string | null
-  fip_discussions_to: string | null
-  fip_files_created: string | null
-  fip_files_updated: string | null
-  fip_number: string | number | null // ?
-  fip_status: string | null
-  fip_title: string | null
-  fip_type: string | null
-  github_branch_name: string | null
-  github_pr_closed_at: string | null
-  github_pr_id: string | null
-  github_pr_merged_at: string | null
-  github_pr_opened_at: string | null
-  github_pr_submitter: string | null
-  github_pr_title: string | null
-  github_pr_updated_at: string | null
-  github_pr_url: string | null
-  github_repo_name: string | null
-  github_repo_owner: string | null
-  github_sync_enabled: boolean | null
-  github_username: string | null
+  sentiment: Sentiment[]
+  comment_count: number | null
+  // git fip sync
+  fip_version: FipVersion
+  github_sync_enabled: boolean
   /* more unused stuff */
   help_bgcolor: string | null
   help_color: string | null
@@ -101,40 +113,7 @@ export type ZidMetadata = {
   write_type: number
 }
 
-export type Conversation = {
-  conversation_id: string
-  is_archived: boolean
-  is_hidden: boolean
-  is_owner: boolean
-  is_mod: boolean
-  topic: string
-  description: string
-  postsurvey: string
-  postsurvey_redirect: string
-  postsurvey_limit: string
-  postsurvey_submissions: string
-  github_sync_enabled: boolean
-  github_repo_name: string
-  github_repo_owner: string
-  github_branch_name: string
-  github_pr_id: string
-  github_pr_title: string
-  github_pr_submitter: string
-  github_pr_url: string | null
-  github_pr_opened_at: string
-  github_pr_updated_at: string
-  github_pr_closed_at: string
-  github_pr_merged_at: string
-  fip_number: number
-  fip_title: string
-  fip_author: string
-  fip_discussions_to: string
-  fip_status: string
-  fip_type: string
-  fip_category: string
-  fip_created: string
-  hname: string
-  participant_count: number
-  created: number
-  // TODO ...
+export type Sentiment = {
+  github_username: string,
+  vote: string
 }

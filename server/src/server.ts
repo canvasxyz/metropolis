@@ -7802,10 +7802,23 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
 }
 
 async function getOneConversation(zid: any, uid?: number, lang?: null) {
+
   const conversationRows = await queryP_readOnly(
-    `select *, u.github_username from conversations
-left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
-where conversations.zid = ($1);`,
+    `
+    WITH
+      comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid),
+      sentiment_counts AS (SELECT zid, count(*) as sentiment_count FROM conversation_sentiment_votes GROUP BY zid)
+    SELECT
+      *,
+      u.github_username,
+      cast(comment_counts.comment_count as INTEGER),
+      cast(sentiment_counts.sentiment_count as INTEGER)
+    FROM conversations
+    LEFT JOIN (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
+    LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
+    LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
+    LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
+    WHERE conversations.zid = ($1);`,
     [zid],
   )
   const conv = conversationRows[0]
@@ -7818,10 +7831,23 @@ where conversation_sentiment_votes.zid = ($1);`,
   )
   conv.sentiment = sentimentVoterRows
 
-  if (conv.github_pr_id !== null) {
-    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-  } else {
-    conv.github_pr_url = null
+  if(conv.fip_version_id) {
+    const fipVersionRows = await queryP_readOnly(
+      `select * from fip_versions where id = ($1);`,
+      [conv.fip_version_id],
+    );
+
+    conv.fip_version = fipVersionRows[0]
+    if(conv.fip_version.github_pr_id !== null) {
+      const githubPrRows = await queryP_readOnly(
+        `select * from github_prs where id = ($1);`,
+        [conv.fip_version.github_pr_id],
+      );
+      conv.fip_version.github_pr = githubPrRows[0];
+      conv.fip_version.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
+    } else {
+      conv.fip_version.github_pr_url = null
+    }
   }
 
   const convHasMetadata = await getConversationHasMetadata(zid)
@@ -7912,24 +7938,10 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid),
     sentiment_counts AS (SELECT zid, count(*) as sentiment_count FROM conversation_sentiment_votes GROUP BY zid)
   SELECT
+    conversations.fip_version_id,
     conversations.created,
     conversations.topic,
     conversations.description,
-    fip_versions.fip_author,
-    fip_versions.fip_category,
-    fip_versions.fip_type,
-    fip_versions.fip_created,
-    fip_versions.fip_title,
-    fip_versions.fip_number,
-    fip_versions.fip_status,
-    fip_versions.github_pr_opened_at,
-    fip_versions.github_pr_updated_at,
-    fip_versions.github_pr_closed_at,
-    fip_versions.github_pr_merged_at,
-    fip_versions.github_pr_is_draft,
-    fip_versions.github_pr_title,
-    fip_versions.github_pr_id,
-    fip_versions.fip_files_created,
     conversations.is_archived,
     conversations.is_hidden,
     conversations.participant_count,
@@ -7943,31 +7955,50 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
   LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
   LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
-  LEFT JOIN fip_versions ON conversations.fip_version_id = fip_versions.id
   JOIN zinvites ON conversations.zid = zinvites.zid;
   `
 
-  const rows = await queryP_readOnly(query, [])
+  const conversations = await queryP_readOnly(query, [])
+  const fipVersionIds = conversations.map((conv) => conv.fip_version_id)
 
-  rows.forEach(function (conv) {
-    conv.created = Number(conv.created)
-    conv.modified = Number(conv.modified)
+  // request fip versions
+  // and github prs
+  const fipVersions = await queryP_readOnly(
+    `SELECT * FROM fip_versions WHERE id = ANY($1::integer[]);`,
+    [fipVersionIds],
+  )
+  const fipVersionsById = _.indexBy(fipVersions, "id")
+
+  const githubPrIds = fipVersions.map((fip) => fip.github_pr_id).filter((id) => id !== null)
+
+  const githubPrs = await queryP_readOnly(
+    `SELECT * FROM github_prs WHERE id = ANY($1::integer[]);`,
+    [githubPrIds],
+  )
+  const githubPrsById = _.indexBy(githubPrs, "id")
+
+  for(const conversation of conversations) {
+    conversation.created = Number(conversation.created)
+    conversation.modified = Number(conversation.modified)
+
+    if(fipVersionsById[conversation.fip_version_id]) {
+      conversation.fip_version = fipVersionsById[conversation.fip_version_id]
+      if (conversation.fip_version.github_pr_id !== null) {
+        const githubPr = githubPrsById[conversation.fip_version.github_pr_id]
+        githubPr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conversation.fip_version.github_pr_id}/files`
+        conversation.fip_version.github_pr = githubPr
+      }
+    } else {
+      conversation.fip_version = null
+    }
 
     // if there is no topic, provide a UTC timstamp instead
-    if (_.isUndefined(conv.topic) || conv.topic === "") {
-      conv.topic = new Date(conv.created).toUTCString()
+    if (_.isUndefined(conversation.topic) || conversation.topic === "") {
+      conversation.topic = new Date(conversation.created).toUTCString()
     }
+  }
 
-    if (conv.github_pr_id !== null) {
-      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-    } else {
-      conv.github_pr_url = null
-    }
-
-    return conv
-  })
-
-  return res.json(rows)
+  return res.json(conversations)
 }
 
 async function handle_GET_fips(req: Request, res: Response) {
@@ -7992,7 +8023,6 @@ async function handle_GET_fips(req: Request, res: Response) {
     if (fip_row.github_pr !== null) {
       fip_row.github_pr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${fip_row.github_pr.id}/files`
     }
-
   }
 
   return res.json(fip_rows)
@@ -8199,6 +8229,7 @@ async function handle_GET_conversation(
   const zid = await getConversationIdFetchZid(req.body.conversation_id)
   const lang = null // for now just return the default
   const data = await getOneConversation(zid, req.p.uid, lang)
+  data.conversation_id = req.body.conversation_id
   finishOne(res, data)
 }
 

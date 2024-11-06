@@ -103,7 +103,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
     return <NoPermission />
   }
 
-  const hasGithubPr = zid_metadata.github_pr_id !== null && zid_metadata.github_pr_id !== undefined
+  const hasGithubPr = zid_metadata.fip_version.github_pr !== null
 
   return (
     <Box>
@@ -132,7 +132,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             Go to FIP dashboard
           </Button>
         </RouterLink>
-        {!zid_metadata.github_pr_id && (
+        {!zid_metadata.fip_version && (
           <RouterLink to={"/c/" + zid_metadata.conversation_id}>
             <Button sx={{ ml: [2] }} variant="outlineSecondary">
               Go to survey
@@ -166,7 +166,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
-      {zid_metadata.github_pr_id && (
+      {zid_metadata.fip_version && (
         <a
           href="#"
           onClick={(e) => {
@@ -212,21 +212,21 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               PR{" "}
               <a
-                href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.github_pr_id}`}
+                href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.fip_version.github_pr.id}`}
               >
-                #{zid_metadata.github_pr_id}
+                #{zid_metadata.fip_version.github_pr.id}
               </a>
             </Box>
 
             <Box sx={{ mb: [3] }}>
-              Branch <strong>{zid_metadata.github_branch_name}</strong> on{" "}
+              Branch <strong>{zid_metadata.fip_version.github_pr.branch_name}</strong> on{" "}
               <strong>
-                {zid_metadata.github_repo_owner}/{zid_metadata.github_repo_name}
+                {zid_metadata.fip_version.github_pr.repo_owner}/{zid_metadata.fip_version.github_pr.repo_name}
               </strong>
             </Box>
 
             <Box sx={{ mb: [3] }}>
-              Submitted by <strong>{zid_metadata.github_pr_submitter}</strong>
+              Submitted by <strong>{zid_metadata.fip_version.github_pr.submitter}</strong>
             </Box>
           </Fragment>
         )}
@@ -235,7 +235,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP title</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_title", e.target)}
-            defaultValue={zid_metadata.fip_title}
+            defaultValue={zid_metadata.fip_version.fip_title}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -244,7 +244,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP author</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_author", e.target)}
-            defaultValue={zid_metadata.fip_author}
+            defaultValue={zid_metadata.fip_version.fip_author}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -253,7 +253,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP number</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_number", e.target)}
-            defaultValue={zid_metadata.fip_number}
+            defaultValue={zid_metadata.fip_version.fip_number}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -262,7 +262,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP discussions link</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
-            defaultValue={zid_metadata.fip_discussions_to}
+            defaultValue={zid_metadata.fip_version.fip_discussions_to}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -271,7 +271,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP status</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_status", e.target)}
-            defaultValue={zid_metadata.fip_status}
+            defaultValue={zid_metadata.fip_version.fip_status}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -280,7 +280,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP type</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_type", e.target)}
-            defaultValue={zid_metadata.fip_type}
+            defaultValue={zid_metadata.fip_version.fip_type}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -289,7 +289,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP category</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_category", e.target)}
-            defaultValue={zid_metadata.fip_category}
+            defaultValue={zid_metadata.fip_version.fip_category}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -298,7 +298,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
           <Text sx={{ mb: [2] }}>FIP created</Text>
           <Input
             onBlur={(e) => handleStringValueChange("fip_created", e.target)}
-            defaultValue={zid_metadata.fip_created}
+            defaultValue={zid_metadata.fip_version.fip_created}
             disabled={zid_metadata.github_sync_enabled}
           />
         </Box>
@@ -436,7 +436,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         Add seed comments
       </Heading>
 
-      <SeedComment params={{ conversation_id: zid_metadata.conversation_id }} dispatch={dispatch} />*/}
+      <SeedComment params={{ conversation_id: zid_metadata.conversation_id }} dispatch={dispatch} /> */}
     </Box>
   )
 }

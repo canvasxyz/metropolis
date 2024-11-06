@@ -105,10 +105,6 @@ export const DashboardConversation = ({ user }: { user }) => {
     (state: RootState) => state.zid_metadata,
   )
 
-  const summaryData = useAppSelector((state: RootState) =>
-    state.conversations_summary.data?.find((c) => c.conversation_id === selectedConversationId),
-  )
-
   const [showReport, setShowReport] = useState<boolean>(false)
   const [report, setReport] = useState<{ report_id: string }>()
   const [reportComments, setReportComments] = useState<ReportComment[]>([])
@@ -170,6 +166,12 @@ export const DashboardConversation = ({ user }: { user }) => {
     }
   }, [zidMetadataError])
 
+  if(Object.keys(zid_metadata).length === 0) {
+    return <Box>Loading...</Box>
+  }
+
+  const displayTitle = zid_metadata.fip_version ? zid_metadata.fip_version.fip_title : zid_metadata.topic
+
   return (
     <Box>
       <Box sx={{ mt: [6, "none"], width: "100%" }}>
@@ -186,9 +188,9 @@ export const DashboardConversation = ({ user }: { user }) => {
           }}
         >
           <Heading as="h2" sx={{ mb: [2] }}>
-            {zid_metadata.fip_title || zid_metadata.github_pr_title || zid_metadata.topic}
+            {displayTitle}
           </Heading>
-          {zid_metadata.github_username && (
+          {zid_metadata.fip_version?.github_pr?.submitter && (
             <Box>
               Created by{" "}
               <Link
@@ -196,13 +198,13 @@ export const DashboardConversation = ({ user }: { user }) => {
                 as="a"
                 target="_blank"
                 rel="noreferrer"
-                href={`https://github.com/${zid_metadata.github_username}`}
+                href={`https://github.com/${zid_metadata.fip_version.github_pr.submitter}`}
               >
-                {zid_metadata.github_username}
+                {zid_metadata.fip_version.github_pr.submitter}
               </Link>
               <Text> &middot; </Text>
               {(() => {
-                const date = new Date(zid_metadata.fip_created || +zid_metadata.created)
+                const date = new Date(zid_metadata.fip_version?.fip_created || +zid_metadata.created)
                 return date.toLocaleDateString("en-us", {
                   year: "numeric",
                   month: "short",
@@ -212,7 +214,7 @@ export const DashboardConversation = ({ user }: { user }) => {
               })()}
               <Text> &middot; </Text>
               {viewCount || "..."} views
-              {zid_metadata.github_username === user?.githubUsername && (
+              {zid_metadata.fip_version.github_pr.submitter === user?.githubUsername && (
                 <Text>
                   <Text> &middot; </Text>
                   <RouterLink
@@ -225,7 +227,7 @@ export const DashboardConversation = ({ user }: { user }) => {
               )}
             </Box>
           )}
-          {zid_metadata.github_pr_id ? (
+          {zid_metadata.fip_version ? (
             <Box sx={{ ...dashboardBox, px: "6px", pt: "10px", pb: "6px" }}>
               <Frontmatter zid_metadata={zid_metadata} />
             </Box>
@@ -233,7 +235,7 @@ export const DashboardConversation = ({ user }: { user }) => {
             zid_metadata.description && (
               <Box sx={{ pt: "18px" }}>
                 <Collapsible
-                  title={zid_metadata.fip_title}
+                  title={displayTitle}
                   key={zid_metadata.conversation_id}
                   shouldCollapse={false}
                   content={zid_metadata.description}
@@ -311,7 +313,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                         {reportComments.length === 0 && (
                           <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
                             No responses for this{" "}
-                            {zid_metadata.github_pr_title ? "FIP" : "discussion"} yet.
+                            {zid_metadata.fip_version ? "FIP" : "discussion"} yet.
                           </Box>
                         )}
                       </Box>
