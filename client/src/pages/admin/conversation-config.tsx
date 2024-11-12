@@ -18,6 +18,7 @@ import api from "../../util/api"
 import Url from "../../util/url"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
+import { useSelector } from "react-redux"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME
@@ -62,6 +63,7 @@ type ConversationConfigProps = {
 }
 
 const ConversationConfig = ({ error }: ConversationConfigProps) => {
+  const {user} = useAppSelector(state => state.user)
   const [showFIPMetadata, setShowFIPMetadata] = useState(false)
   const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
   const dispatch = useAppDispatch()
@@ -99,11 +101,16 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       })
   }, [zid_metadata.conversation_id])
 
-  if (zid_metadata && !zid_metadata.is_owner) {
+  if (!zid_metadata) {
+    // zid not found
+  }
+
+  if (!(zid_metadata.is_owner || user.isRepoCollaborator || user.isAdmin) ) {
     return <NoPermission />
   }
 
-  const hasGithubPr = zid_metadata.fip_version.github_pr !== null
+  const hasFip = !!zid_metadata?.fip_version
+  const hasGithubPr = !!zid_metadata?.fip_version?.github_pr
 
   return (
     <Box>
@@ -167,142 +174,139 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       </Box>
 
       {zid_metadata.fip_version && (
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault()
-            setShowFIPMetadata(!showFIPMetadata)
-          }}
-        >
-          <Text variant="links.a" sx={{ mb: [2] }}>
-            {showFIPMetadata ? "Hide" : "Show"} FIP Metadata
-          </Text>
-        </a>
+        <Fragment>
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault()
+              setShowFIPMetadata(!showFIPMetadata)
+            }}
+          >
+            <Text variant="links.a" sx={{ mb: [2] }}>
+              {showFIPMetadata ? "Hide" : "Show"} FIP Metadata
+            </Text>
+          </a>
+
+          <Box
+            sx={{
+              border: "1px solid #ddd",
+              px: [3],
+              py: [3],
+              display: showFIPMetadata ? "block" : "none",
+            }}
+          >
+            {hasGithubPr && (
+              <Fragment>
+                <Heading as="h3" sx={{ mt: 0, mb: 4 }}>
+                  GitHub Synced Data
+                </Heading>
+
+                <Box sx={{ mb: [4], fontStyle: "italic" }}>
+                  The fields in this section are automatically synced from GitHub. To change them,
+                  please modify the source pull request, or disable syncing by unchecking the box below.
+                </Box>
+
+                <CheckboxField
+                  field="github_sync_enabled"
+                  label="Enable GitHub sync"
+                  subtitle="Uncheck in order to disable syncing"
+                />
+                <Box sx={{ mb: [3] }}>
+                  PR{" "}
+                  <a
+                    href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.fip_version.github_pr.id}`}
+                  >
+                    #{zid_metadata.fip_version.github_pr.id}
+                  </a>
+                </Box>
+
+                <Box sx={{ mb: [3] }}>
+                  Branch <strong>{zid_metadata.fip_version.github_pr.branch_name}</strong> on{" "}
+                  <strong>
+                    {zid_metadata.fip_version.github_pr.repo_owner}/{zid_metadata.fip_version.github_pr.repo_name}
+                  </strong>
+                </Box>
+
+                <Box sx={{ mb: [3] }}>
+                  Submitted by <strong>{zid_metadata.fip_version.github_pr.submitter}</strong>
+                </Box>
+              </Fragment>
+            )}
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP title</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_title", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_title}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP author</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_author", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_author}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP number</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_number", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_number}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP discussions link</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_discussions_to}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP status</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_status", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_status}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP type</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_type", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_type}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP category</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_category", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_category}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
+              <Text sx={{ mb: [2] }}>FIP created</Text>
+              <Input
+                onBlur={(e) => handleStringValueChange("fip_created", e.target)}
+                defaultValue={zid_metadata.fip_version.fip_created}
+                disabled={zid_metadata.github_sync_enabled}
+              />
+            </Box>
+          </Box>
+        </Fragment>
       )}
-
-      <Box
-        sx={{
-          border: "1px solid #ddd",
-          px: [3],
-          py: [3],
-          display: showFIPMetadata ? "block" : "none",
-        }}
-      >
-        {hasGithubPr && (
-          <Fragment>
-            <Heading as="h3" sx={{ mt: 0, mb: 4 }}>
-              GitHub Synced Data
-            </Heading>
-
-            <Box sx={{ mb: [4], fontStyle: "italic" }}>
-              The fields in this section are automatically synced from GitHub. To change them,
-              please modify the source pull request, or disable syncing by unchecking the box below.
-            </Box>
-
-            <CheckboxField
-              field="github_sync_enabled"
-              label="Enable GitHub sync"
-              subtitle="Uncheck in order to disable syncing"
-            />
-          </Fragment>
-        )}
-
-        {hasGithubPr && (
-          <Fragment>
-            <Box sx={{ mb: [3] }}>
-              PR{" "}
-              <a
-                href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.fip_version.github_pr.id}`}
-              >
-                #{zid_metadata.fip_version.github_pr.id}
-              </a>
-            </Box>
-
-            <Box sx={{ mb: [3] }}>
-              Branch <strong>{zid_metadata.fip_version.github_pr.branch_name}</strong> on{" "}
-              <strong>
-                {zid_metadata.fip_version.github_pr.repo_owner}/{zid_metadata.fip_version.github_pr.repo_name}
-              </strong>
-            </Box>
-
-            <Box sx={{ mb: [3] }}>
-              Submitted by <strong>{zid_metadata.fip_version.github_pr.submitter}</strong>
-            </Box>
-          </Fragment>
-        )}
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP title</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_title", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_title}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP author</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_author", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_author}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP number</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_number", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_number}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP discussions link</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_discussions_to}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP status</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_status", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_status}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP type</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_type", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_type}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP category</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_category", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_category}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-
-        <Box sx={{ mb: [3] }}>
-          <Text sx={{ mb: [2] }}>FIP created</Text>
-          <Input
-            onBlur={(e) => handleStringValueChange("fip_created", e.target)}
-            defaultValue={zid_metadata.fip_version.fip_created}
-            disabled={zid_metadata.github_sync_enabled}
-          />
-        </Box>
-      </Box>
       {/*
       <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
         Post-Survey Redirect
