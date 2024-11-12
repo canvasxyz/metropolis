@@ -42,7 +42,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
             onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
           >
             <Box sx={{ pr: "13px", pt: "1px" }}>
-              {c.github_pr_title ? (
+              {c.fip_version?.github_pr?.title ? (
                 getIconForConversation(c)
               ) : (
                 <BiSolidBarChartAlt2 color="#0090ff" />
@@ -50,8 +50,8 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
             </Box>
             <Box>
               <Box>
-                {c.github_pr_title && <Text sx={{ fontWeight: 600 }}>FIP: </Text>}
-                {c.fip_title || c.github_pr_title || c.topic}
+                {c.fip_version?.github_pr?.title && <Text sx={{ fontWeight: 600 }}>FIP: </Text>}
+                {c.fip_version?.fip_title || c.fip_version?.github_pr?.title || c.topic}
               </Box>
               <Box sx={{ opacity: 0.6, fontSize: "0.94em", mt: "3px", fontWeight: 400 }}>
                 Created {timeAgo}
@@ -87,7 +87,7 @@ export const Placeholder = () => {
       </Flex>
       <ConversationsPreview
         conversations={conversations
-          .filter((c) => !c.is_archived && !c.is_hidden && c.github_pr_title && c.fip_files_created)
+          .filter((c) => !c.is_archived && !c.is_hidden && c.fip_version?.github_pr?.title && c.fip_version?.fip_files_created)
           .slice(0, 5)}
       />
       {/* discussions */}
@@ -111,7 +111,7 @@ export const Placeholder = () => {
             (c) =>
               !c.is_archived &&
               !c.is_hidden &&
-              !c.github_pr_title &&
+              !c.fip_version?.github_pr?.title &&
               c.comment_count >= MIN_SEED_RESPONSES,
           )
           .slice(0, 5)}

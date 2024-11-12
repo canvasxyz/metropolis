@@ -243,7 +243,7 @@ export const DashboardConversation = ({ user }: { user }) => {
               </Box>
             )
           )}
-          {zid_metadata.github_pr_title && (
+          {zid_metadata.fip_version && (
             <Box sx={dashboardBox}>
               <Box
                 sx={{
@@ -262,9 +262,7 @@ export const DashboardConversation = ({ user }: { user }) => {
               />
             </Box>
           )}
-          {!zid_metadata.github_pr_title &&
-            (zid_metadata.topic || zid_metadata.fip_title || zid_metadata.github_pr_title) &&
-            summaryData?.comment_count < MIN_SEED_RESPONSES && (
+          {!zid_metadata.is_archived && zid_metadata?.comment_count < MIN_SEED_RESPONSES && (
               <Box
                 sx={{
                   ...surveyBox,
@@ -282,8 +280,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 vote on. This poll will be hidden from other viewers until then.
               </Box>
             )}
-          {!zid_metadata.github_pr_title &&
-            (zid_metadata.topic || zid_metadata.fip_title || zid_metadata.github_pr_title) && (
+          {!zid_metadata.is_archived && (
               <Box sx={{ ...dashboardBox, bg: "bgOffWhite" }}>
                 <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
                   <Text sx={{ flex: 1 }}>Polls for this discussion thread</Text>
