@@ -6992,7 +6992,7 @@ function handle_PUT_users(
     })
 }
 
-function handle_PUT_conversations(
+async function handle_PUT_conversations(
   req: {
     p: {
       short_url: any
@@ -7003,14 +7003,16 @@ function handle_PUT_conversations(
       is_anon: any
       is_data_open: any
       github_sync_enabled: any
-      fip_number: any
-      fip_author: any
-      fip_discussions_to: any
-      fip_status: any
-      fip_type: any
-      fip_category: any
-      fip_created: any
-      fip_title: any
+      fip_version: {
+        fip_number: any
+        fip_author: any
+        fip_discussions_to: any
+        fip_status: any
+        fip_type: any
+        fip_category: any
+        fip_created: any
+        fip_title: any
+      }
       profanity_filter: any
       spam_filter: any
       strict_moderation: any
@@ -7038,220 +7040,194 @@ function handle_PUT_conversations(
   },
   res: any,
 ) {
-  let generateShortUrl = req.p.short_url
-  isOwner(req.p.zid, req.p.uid)
-    .then(function (ok: any) {
-      if (!ok) {
-        fail(res, 403, "polis_err_update_conversation_permission")
-        return
-      }
+  try {
+    const ok = await isOwner(req.p.zid, req.p.uid)
+    if (!ok) {
+      fail(res, 403, "polis_err_update_conversation_permission")
+      return
+    }
 
-      let verifyMetaPromise
-      if (req.p.verifyMeta) {
-        verifyMetaPromise = verifyMetadataAnswersExistForEachQuestion(req.p.zid)
+    let fields: ConversationType = {}
+    if (!_.isUndefined(req.p.is_active)) {
+      fields.is_active = req.p.is_active
+    }
+    if (!_.isUndefined(req.p.is_anon)) {
+      fields.is_anon = req.p.is_anon
+    }
+    if (!_.isUndefined(req.p.is_data_open)) {
+      fields.is_data_open = req.p.is_data_open
+    }
+    if (!_.isUndefined(req.p.github_sync_enabled)) {
+      fields.github_sync_enabled = req.p.github_sync_enabled
+    }
+
+    // FIP fields
+    // we only want to update these if github_sync_enabled is false
+    // this is because if github sync was to be enabled, then the FIP fields would be overwritten
+    let fip_version_fields: any = {}
+    if (req.p.github_sync_enabled == false) {
+      if (!_.isUndefined(req.p.fip_version.fip_title)) {
+        fip_version_fields.fip_title = req.p.fip_version.fip_title
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_author)) {
+        fip_version_fields.fip_author = req.p.fip_version.fip_author
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_discussions_to)) {
+        fip_version_fields.fip_discussions_to = req.p.fip_version.fip_discussions_to
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_status)) {
+        fip_version_fields.fip_status = req.p.fip_version.fip_status
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_type)) {
+        fip_version_fields.fip_type = req.p.fip_version.fip_type
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_category)) {
+        fip_version_fields.fip_category = req.p.fip_version.fip_category
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_created)) {
+        fip_version_fields.fip_created = req.p.fip_version.fip_created
+      }
+    }
+
+    if (!_.isUndefined(req.p.profanity_filter)) {
+      fields.profanity_filter = req.p.profanity_filter
+    }
+    if (!_.isUndefined(req.p.spam_filter)) {
+      fields.spam_filter = req.p.spam_filter
+    }
+    if (!_.isUndefined(req.p.strict_moderation)) {
+      fields.strict_moderation = req.p.strict_moderation
+    }
+    if (!_.isUndefined(req.p.topic)) {
+      fields.topic = req.p.topic
+    }
+    if (!_.isUndefined(req.p.description)) {
+      fields.description = req.p.description
+    }
+    if (!_.isUndefined(req.p.survey_caption)) {
+      fields.survey_caption = req.p.survey_caption
+    }
+    if (!_.isUndefined(req.p.postsurvey)) {
+      fields.postsurvey = req.p.postsurvey
+    }
+    if (!_.isUndefined(req.p.postsurvey_limit)) {
+      fields.postsurvey_limit = req.p.postsurvey_limit
+    }
+    if (!_.isUndefined(req.p.postsurvey_submissions)) {
+      fields.postsurvey_submissions = req.p.postsurvey_submissions
+    }
+    if (!_.isUndefined(req.p.postsurvey_redirect)) {
+      fields.postsurvey_redirect = req.p.postsurvey_redirect
+    }
+    if (!_.isUndefined(req.p.vis_type)) {
+      fields.vis_type = req.p.vis_type
+    }
+    if (!_.isUndefined(req.p.help_type)) {
+      fields.help_type = req.p.help_type
+    }
+    if (!_.isUndefined(req.p.socialbtn_type)) {
+      fields.socialbtn_type = req.p.socialbtn_type
+    }
+    if (!_.isUndefined(req.p.bgcolor)) {
+      if (req.p.bgcolor === "default") {
+        fields.bgcolor = null
       } else {
-        verifyMetaPromise = Promise.resolve()
+        fields.bgcolor = req.p.bgcolor
       }
+    }
+    if (!_.isUndefined(req.p.help_color)) {
+      if (req.p.help_color === "default") {
+        fields.help_color = null
+      } else {
+        fields.help_color = req.p.help_color
+      }
+    }
+    if (!_.isUndefined(req.p.help_bgcolor)) {
+      if (req.p.help_bgcolor === "default") {
+        fields.help_bgcolor = null
+      } else {
+        fields.help_bgcolor = req.p.help_bgcolor
+      }
+    }
+    if (!_.isUndefined(req.p.style_btn)) {
+      fields.style_btn = req.p.style_btn
+    }
+    if (!_.isUndefined(req.p.write_type)) {
+      fields.write_type = req.p.write_type
+    }
+    ifDefinedSet("auth_needed_to_vote", req.p, fields)
+    ifDefinedSet("auth_needed_to_write", req.p, fields)
+    ifDefinedSet("auth_opt_fb", req.p, fields)
+    ifDefinedSet("auth_opt_tw", req.p, fields)
+    ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields)
 
-      let fields: ConversationType = {}
-      if (!_.isUndefined(req.p.is_active)) {
-        fields.is_active = req.p.is_active
-      }
-      if (!_.isUndefined(req.p.is_anon)) {
-        fields.is_anon = req.p.is_anon
-      }
-      if (!_.isUndefined(req.p.is_data_open)) {
-        fields.is_data_open = req.p.is_data_open
-      }
-      if (!_.isUndefined(req.p.github_sync_enabled)) {
-        fields.github_sync_enabled = req.p.github_sync_enabled
-      }
+    if (!_.isUndefined(req.p.link_url)) {
+      fields.link_url = req.p.link_url
+    }
 
-      // FIP fields
-      // we only want to update these if github_sync_enabled is false
-      // this is because if github sync was to be enabled, then the FIP fields would be overwritten
-      if (req.p.github_sync_enabled == false) {
-        if (!_.isUndefined(req.p.fip_title)) {
-          fields.fip_title = req.p.fip_title
-        }
-        if (!_.isUndefined(req.p.fip_author)) {
-          fields.fip_author = req.p.fip_author
-        }
-        if (!_.isUndefined(req.p.fip_discussions_to)) {
-          fields.fip_discussions_to = req.p.fip_discussions_to
-        }
-        if (!_.isUndefined(req.p.fip_status)) {
-          fields.fip_status = req.p.fip_status
-        }
-        if (!_.isUndefined(req.p.fip_type)) {
-          fields.fip_type = req.p.fip_type
-        }
-        if (!_.isUndefined(req.p.fip_category)) {
-          fields.fip_category = req.p.fip_category
-        }
-        if (!_.isUndefined(req.p.fip_created)) {
-          fields.fip_created = req.p.fip_created
-        }
-      }
+    ifDefinedSet("subscribe_type", req.p, fields)
 
-      if (!_.isUndefined(req.p.profanity_filter)) {
-        fields.profanity_filter = req.p.profanity_filter
-      }
-      if (!_.isUndefined(req.p.spam_filter)) {
-        fields.spam_filter = req.p.spam_filter
-      }
-      if (!_.isUndefined(req.p.strict_moderation)) {
-        fields.strict_moderation = req.p.strict_moderation
-      }
-      if (!_.isUndefined(req.p.topic)) {
-        fields.topic = req.p.topic
-      }
-      if (!_.isUndefined(req.p.description)) {
-        fields.description = req.p.description
-      }
-      if (!_.isUndefined(req.p.survey_caption)) {
-        fields.survey_caption = req.p.survey_caption
-      }
-      if (!_.isUndefined(req.p.postsurvey)) {
-        fields.postsurvey = req.p.postsurvey
-      }
-      if (!_.isUndefined(req.p.postsurvey_limit)) {
-        fields.postsurvey_limit = req.p.postsurvey_limit
-      }
-      if (!_.isUndefined(req.p.postsurvey_submissions)) {
-        fields.postsurvey_submissions = req.p.postsurvey_submissions
-      }
-      if (!_.isUndefined(req.p.postsurvey_redirect)) {
-        fields.postsurvey_redirect = req.p.postsurvey_redirect
-      }
-      if (!_.isUndefined(req.p.vis_type)) {
-        fields.vis_type = req.p.vis_type
-      }
-      if (!_.isUndefined(req.p.help_type)) {
-        fields.help_type = req.p.help_type
-      }
-      if (!_.isUndefined(req.p.socialbtn_type)) {
-        fields.socialbtn_type = req.p.socialbtn_type
-      }
-      if (!_.isUndefined(req.p.bgcolor)) {
-        if (req.p.bgcolor === "default") {
-          fields.bgcolor = null
-        } else {
-          fields.bgcolor = req.p.bgcolor
-        }
-      }
-      if (!_.isUndefined(req.p.help_color)) {
-        if (req.p.help_color === "default") {
-          fields.help_color = null
-        } else {
-          fields.help_color = req.p.help_color
-        }
-      }
-      if (!_.isUndefined(req.p.help_bgcolor)) {
-        if (req.p.help_bgcolor === "default") {
-          fields.help_bgcolor = null
-        } else {
-          fields.help_bgcolor = req.p.help_bgcolor
-        }
-      }
-      if (!_.isUndefined(req.p.style_btn)) {
-        fields.style_btn = req.p.style_btn
-      }
-      if (!_.isUndefined(req.p.write_type)) {
-        fields.write_type = req.p.write_type
-      }
-      ifDefinedSet("auth_needed_to_vote", req.p, fields)
-      ifDefinedSet("auth_needed_to_write", req.p, fields)
-      ifDefinedSet("auth_opt_fb", req.p, fields)
-      ifDefinedSet("auth_opt_tw", req.p, fields)
-      ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields)
+    let q = sql_conversations
+      .update(fields)
+      .where(sql_conversations.zid.equals(req.p.zid))
+      // .and( sql_conversations.owner.equals(req.p.uid) )
+      .returning("*")
 
-      if (!_.isUndefined(req.p.link_url)) {
-        fields.link_url = req.p.link_url
+
+    if (req.p.verifyMeta) {
+      await verifyMetadataAnswersExistForEachQuestion(req.p.zid)
+    }
+
+    const rows = await queryP(q.toString(), [])
+
+    let conv = rows[0]
+    // The first check with isOwner implictly tells us this can be returned in HTTP response.
+    conv.is_mod = true
+    conv.is_owner = true
+
+    let generateShortUrl = req.p.short_url
+    if(generateShortUrl) {
+      await generateAndReplaceZinvite(req.p.zid, generateShortUrl)
+    }
+    let successCode = generateShortUrl ? 201 : 200
+
+    // send notification email
+    if (req.p.send_created_email) {
+      try {
+        const hname = await getUserInfoForUid2(req.p.uid)
+        const url = await getConversationUrl(req, req.p.zid, true)
+
+        await sendEmailByUid(
+          req.p.uid,
+          "Conversation created",
+          "Hi " +
+            hname +
+            ",\n" +
+            "\n" +
+            "Here's a link to the conversation you just created. Use it to invite participants to the conversation. Share it by whatever network you prefer - Gmail, Facebook, Twitter, etc., or just post it to your website or blog. Try it now! Click this link to go to your conversation:" +
+            "\n" +
+            url +
+            "\n" +
+            "\n" +
+            "With gratitude,\n" +
+            "\n" +
+            "The team\n",
+        )
+      } catch (err) {
+        logger.error(
+          "polis_err_sending_conversation_created_email",
+          err,
+        )
       }
+    }
 
-      ifDefinedSet("subscribe_type", req.p, fields)
+    finishOne(res, conv, true, successCode)
 
-      let q = sql_conversations
-        .update(fields)
-        .where(sql_conversations.zid.equals(req.p.zid))
-        // .and( sql_conversations.owner.equals(req.p.uid) )
-        .returning("*")
-      verifyMetaPromise.then(
-        function () {
-          query(q.toString(), function (err: any, result: { rows: any[] }) {
-            if (err) {
-              fail(res, 500, "polis_err_update_conversation", err)
-              return
-            }
-            let conv = result && result.rows && result.rows[0]
-            // The first check with isOwner implictly tells us this can be returned in HTTP response.
-            conv.is_mod = true
-            conv.is_owner = true
-
-            let promise = generateShortUrl
-              ? generateAndReplaceZinvite(req.p.zid, generateShortUrl)
-              : Promise.resolve()
-            let successCode = generateShortUrl ? 201 : 200
-
-            promise
-              .then(function () {
-                // send notification email
-                if (req.p.send_created_email) {
-                  Promise.all([
-                    getUserInfoForUid2(req.p.uid),
-                    getConversationUrl(req, req.p.zid, true),
-                  ])
-                    .then(function (results: any[]) {
-                      let hname = results[0].hname
-                      let url = results[1]
-                      sendEmailByUid(
-                        req.p.uid,
-                        "Conversation created",
-                        "Hi " +
-                          hname +
-                          ",\n" +
-                          "\n" +
-                          "Here's a link to the conversation you just created. Use it to invite participants to the conversation. Share it by whatever network you prefer - Gmail, Facebook, Twitter, etc., or just post it to your website or blog. Try it now! Click this link to go to your conversation:" +
-                          "\n" +
-                          url +
-                          "\n" +
-                          "\n" +
-                          "With gratitude,\n" +
-                          "\n" +
-                          "The team\n",
-                      ).catch(function (err: any) {
-                        logger.error(
-                          "polis_err_sending_conversation_created_email",
-                          err,
-                        )
-                      })
-                    })
-                    .catch(function (err: any) {
-                      logger.error(
-                        "polis_err_sending_conversation_created_email",
-                        err,
-                      )
-                    })
-                }
-
-                finishOne(res, conv, true, successCode)
-
-                updateConversationModifiedTime(req.p.zid)
-              })
-              .catch(function (err: any) {
-                fail(res, 500, "polis_err_update_conversation", err)
-              })
-          })
-        },
-        function (err: { message: any }) {
-          fail(res, 500, err.message, err)
-        },
-      )
-    })
-    .catch(function (err: any) {
-      fail(res, 500, "polis_err_update_conversation", err)
-    })
+    updateConversationModifiedTime(req.p.zid)
+  } catch (err) {
+    fail(res, 500, "polis_err_update_conversation", err)
+    return
+  }
 }
 
 async function handle_DELETE_metadata_questions(
