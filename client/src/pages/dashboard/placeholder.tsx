@@ -5,11 +5,11 @@ import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { useHistory } from "react-router-dom"
 import { Box, Flex, Text } from "theme-ui"
 
-import { getIconForConversation } from "./conversations_list"
 import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
+import { getIconForConversation } from "./conversation_list_item"
 
 const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
@@ -20,7 +20,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
         <Box sx={{ fontWeight: 500, mt: [3], mb: [3], opacity: 0.5 }}>None found</Box>
       )}
       {conversations.map((c) => {
-        const date = new Date(c.fip_created || +c.created)
+        const date = new Date(c.fip_version?.fip_created || +c.created)
         const timeAgo = formatTimeAgo(+date)
 
         return (
