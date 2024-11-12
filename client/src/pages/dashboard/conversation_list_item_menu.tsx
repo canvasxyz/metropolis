@@ -19,12 +19,12 @@ const ConversationListItemMenu = ({conversation}: {conversation: ConversationSum
   )
 
   return <Box
-    sx={{ position: "absolute", top: "13px", right: "15px" }}
+    sx={{ position: "absolute", top: "13px", right: "13px" }}
     onClick={(e) => e.stopPropagation()}
   >
     <DropdownMenu.Root>
       <DropdownMenu.Trigger>
-        <IconButton variant="ghost">
+        <IconButton variant="ghost" size="1">
           <TbDots />
         </IconButton>
       </DropdownMenu.Trigger>
