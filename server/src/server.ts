@@ -7068,25 +7068,26 @@ async function handle_PUT_conversations(
     // this is because if github sync was to be enabled, then the FIP fields would be overwritten
     let fip_version_fields: any = {}
     if (req.p.github_sync_enabled == false && req.p.fip_version) {
-      if (!_.isUndefined(req.p.fip_version.fip_title)) {
+      if (!_.isUndefined(req.p.fip_version.fip_title) && req.p.fip_version.fip_title.length <= 5000) {
         fip_version_fields.fip_title = req.p.fip_version.fip_title
       }
-      if (!_.isUndefined(req.p.fip_version.fip_author)) {
+      if (!_.isUndefined(req.p.fip_version.fip_author && req.p.fip_version.fip_author.length <= 5000)) {
         fip_version_fields.fip_author = req.p.fip_version.fip_author
       }
-      if (!_.isUndefined(req.p.fip_version.fip_discussions_to)) {
+      if (!_.isUndefined(req.p.fip_version.fip_discussions_to) && req.p.fip_version.fip_discussions_to.length <= 5000) {
         fip_version_fields.fip_discussions_to = req.p.fip_version.fip_discussions_to
       }
-      if (!_.isUndefined(req.p.fip_version.fip_status)) {
+      if (!_.isUndefined(req.p.fip_version.fip_status) && req.p.fip_version.fip_status.length <= 5000) {
         fip_version_fields.fip_status = req.p.fip_version.fip_status
       }
-      if (!_.isUndefined(req.p.fip_version.fip_type)) {
+      if (!_.isUndefined(req.p.fip_version.fip_type) && req.p.fip_version.fip_type.length <= 5000) {
         fip_version_fields.fip_type = req.p.fip_version.fip_type
       }
-      if (!_.isUndefined(req.p.fip_version.fip_category)) {
+      if (!_.isUndefined(req.p.fip_version.fip_category) && req.p.fip_version.fip_category.length <= 5000) {
         fip_version_fields.fip_category = req.p.fip_version.fip_category
       }
-      if (!_.isUndefined(req.p.fip_version.fip_created)) {
+      // TODO validation for timestamps
+      if (!_.isUndefined(req.p.fip_version.fip_created) && req.p.fip_version.fip_created.length <= 5000) {
         fip_version_fields.fip_created = req.p.fip_version.fip_created
       }
     }
