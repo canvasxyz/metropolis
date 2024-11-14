@@ -123,6 +123,8 @@ import {
   sql_participants_extended,
   sql_reports,
   sql_users,
+  sql_fip_versions,
+  sql_github_prs,
 } from "./db/sqlUtils"
 
 import logger from "./utils/logger"
@@ -7065,7 +7067,7 @@ async function handle_PUT_conversations(
     // we only want to update these if github_sync_enabled is false
     // this is because if github sync was to be enabled, then the FIP fields would be overwritten
     let fip_version_fields: any = {}
-    if (req.p.github_sync_enabled == false) {
+    if (req.p.github_sync_enabled == false && req.p.fip_version) {
       if (!_.isUndefined(req.p.fip_version.fip_title)) {
         fip_version_fields.fip_title = req.p.fip_version.fip_title
       }
@@ -7184,6 +7186,31 @@ async function handle_PUT_conversations(
     // The first check with isOwner implictly tells us this can be returned in HTTP response.
     conv.is_mod = true
     conv.is_owner = true
+
+    // get/update the fip version fields
+    if(conv.fip_version_id == null) {
+      conv.fip_version = null
+    } else {
+      // if github sync is disabled, update the fip version
+      // otherwise just return the existing fip version
+      const fipVersionQuery = (conv.github_sync_enabled == false && Object.keys(fip_version_fields).length)
+        ? sql_fip_versions.update(fip_version_fields).where(sql_fip_versions.id.equals(conv.fip_version_id)).returning("*")
+        : sql_fip_versions.select().where(sql_fip_versions.id.equals(conv.fip_version_id))
+
+      const fipVersionRows = await queryP(fipVersionQuery.toString(), [])
+      const fipVersion = fipVersionRows[0]
+
+      // get the github pr for this fip, if it exists
+      if(fipVersion.github_pr_id !== null) {
+        const githubPrQuery = sql_github_prs.select().where(sql_github_prs.id.equals(fipVersion.github_pr_id))
+        const githubPrRows = await queryP(githubPrQuery.toString(), [])
+        const githubPr = githubPrRows[0]
+        fipVersion.github_pr = githubPr
+      } else {
+        fipVersion.github_pr = null
+      }
+      conv.fip_version = fipVersion
+    }
 
     let generateShortUrl = req.p.short_url
     if(generateShortUrl) {

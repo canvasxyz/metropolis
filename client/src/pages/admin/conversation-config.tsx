@@ -2,23 +2,15 @@
 
 import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { Heading, Box, Text, Link, Button, jsx } from "theme-ui"
-import toast from "react-hot-toast"
+import { Heading, Box, Text, Button, jsx } from "theme-ui"
 
-import {
-  handleZidMetadataUpdate,
-  handleCloseConversation,
-  handleReopenConversation,
-} from "../../actions"
+import { handleZidMetadataUpdate } from "../../actions"
 import NoPermission from "./no-permission"
 import { CheckboxField } from "./CheckboxField"
-import SeedComment from "./seed-comment"
 
 import api from "../../util/api"
-import Url from "../../util/url"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
-import { useSelector } from "react-redux"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME
@@ -57,6 +49,14 @@ const Textarea = (props: ComponentProps<"textarea">) => (
   />
 )
 
+function updatePath(obj: any, path: string[], value: any) {
+  if(path.length === 0) {
+    return value
+  } else {
+    return {...obj, [path[0]]: updatePath(obj[path[0]], path.slice(1), value)}
+  }
+}
+
 type ConversationConfigProps = {
   error: string
   loading: boolean
@@ -66,26 +66,12 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
   const {user} = useAppSelector(state => state.user)
   const [showFIPMetadata, setShowFIPMetadata] = useState(false)
   const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
+
   const dispatch = useAppDispatch()
 
-  const handleStringValueChange = useCallback(
-    (field: string, element) => {
-      dispatch(handleZidMetadataUpdate(zid_metadata, field, element.value))
-    },
-    [dispatch, handleZidMetadataUpdate, zid_metadata],
-  )
-
-  const handleIntegerValueChange = useCallback(
-    (field: string, element) => {
-      if (element.value === "") {
-        dispatch(handleZidMetadataUpdate(zid_metadata, field, 0))
-      } else {
-        if (isNaN(element.value) || element.value.toString() !== element.value) {
-          toast.error("Invalid value")
-          return
-        }
-        dispatch(handleZidMetadataUpdate(zid_metadata, field, element.value))
-      }
+  const handleValueChange = useCallback(
+    (fieldPath: string[], value) => {
+      dispatch(handleZidMetadataUpdate(updatePath(zid_metadata, fieldPath, value)))
     },
     [dispatch, handleZidMetadataUpdate, zid_metadata],
   )
@@ -128,7 +114,8 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
 
       <CheckboxField
-        field="is_active"
+        checked={zid_metadata.is_active}
+        onCheckedChange={(checked) => handleValueChange(["is_active"], checked)}
         label="Conversation is open"
         subtitle="Uncheck to disable voting"
       />
@@ -158,7 +145,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       <Box sx={{ mb: [3] }}>
         <Text sx={{ mb: [2] }}>Title</Text>
         <Input
-          onBlur={(e) => handleStringValueChange("topic", e.target)}
+          onBlur={(e) => handleValueChange(["topic"], e.target.value)}
           defaultValue={zid_metadata.topic}
         />
       </Box>
@@ -167,7 +154,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         <Text sx={{ mb: [2] }}>Description</Text>
         <Textarea
           data-test-id="description"
-          onBlur={(e) => handleStringValueChange("description", e.target)}
+          onBlur={(e) => handleValueChange(["description"], e.target.value)}
           defaultValue={zid_metadata.description}
           disabled={zid_metadata.github_sync_enabled}
         />
@@ -207,7 +194,8 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
                 </Box>
 
                 <CheckboxField
-                  field="github_sync_enabled"
+                  checked={zid_metadata.github_sync_enabled}
+                  onCheckedChange={(checked) => handleValueChange(["github_sync_enabled"], checked)}
                   label="Enable GitHub sync"
                   subtitle="Uncheck in order to disable syncing"
                 />
@@ -236,7 +224,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP title</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_title", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_title"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_title}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -245,7 +233,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP author</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_author", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_author"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_author}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -254,7 +242,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP number</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_number", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_number"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_number}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -263,7 +251,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP discussions link</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_discussions_to", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_discussions_to"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_discussions_to}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -272,7 +260,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP status</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_status", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_status"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_status}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -281,7 +269,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP type</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_type", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_type"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_type}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -290,7 +278,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP category</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_category", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_category"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_category}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -299,7 +287,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP created</Text>
               <Input
-                onBlur={(e) => handleStringValueChange("fip_created", e.target)}
+                onBlur={(e) => handleValueChange(["fip_version", "fip_created"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_created}
                 disabled={zid_metadata.github_sync_enabled}
               />
@@ -384,20 +372,22 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       </Heading>
 
       <CheckboxField
-        field="write_type"
+        checked={zid_metadata.write_type === 1}
+        onCheckedChange={(checked) => handleValueChange(["write_type"], checked ? 1 : 0)}
         label="Enable user-submitted responses"
         subtitle="Recommended: ON"
-        isIntegerBool
       />
 
       <CheckboxField
-        field="auth_needed_to_write"
+        checked={zid_metadata.auth_needed_to_write}
+        onCheckedChange={(checked) => handleValueChange(["auth_needed_to_write"], checked)}
         label="Login required to submit responses"
         subtitle="Recommended: ON"
       />
 
       <CheckboxField
-        field="strict_moderation"
+        checked={zid_metadata.strict_moderation}
+        onCheckedChange={(checked) => handleValueChange(["strict_moderation"], checked)}
         label="Moderator approval required for responses"
         subtitle="Moderators must approve responses before they are displayed (Recommended: OFF)"
       />
