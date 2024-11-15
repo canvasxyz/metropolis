@@ -222,6 +222,10 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
             )}
 
             <Box sx={{ mb: [3] }}>
+              FIP number{" "}{zid_metadata.fip_version.fip_number ? zid_metadata.fip_version.fip_number : "-"}
+            </Box>
+
+            <Box sx={{ mb: [3] }}>
               <Text sx={{ mb: [2] }}>FIP title</Text>
               <Input
                 onBlur={(e) => handleValueChange(["fip_version", "fip_title"], e.target.value)}
@@ -235,15 +239,6 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
               <Input
                 onBlur={(e) => handleValueChange(["fip_version", "fip_author"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_author}
-                disabled={zid_metadata.github_sync_enabled}
-              />
-            </Box>
-
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP number</Text>
-              <Input
-                onBlur={(e) => handleValueChange(["fip_version", "fip_number"], e.target.value)}
-                defaultValue={zid_metadata.fip_version.fip_number}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
