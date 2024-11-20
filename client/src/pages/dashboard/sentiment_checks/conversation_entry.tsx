@@ -30,9 +30,6 @@ export const ConversationEntry = ({
   const color = conversation.is_archived ? "gray" : "blue"
   const statusLabel = conversation.is_archived ? "Archived" : "Active"
 
-  console.log(fipBadges)
-  console.log(fipAttributes)
-
   return (
     <div
       style={{
