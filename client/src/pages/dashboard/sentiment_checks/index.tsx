@@ -109,7 +109,7 @@ export default () => {
         gap: [3],
       }}
     >
-      <Text sx={{ fontWeight: 600, fontSize: [2] }}>FIP Tracker</Text>
+      <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
       <Flex sx={{ gap: [2], width: "100%" }}>
         <Box sx={{ flexGrow: "1", maxWidth: "400px" }}>
           <TextField.Root
