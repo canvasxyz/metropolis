@@ -71,7 +71,7 @@ export const Placeholder = () => {
   return (
     <Box sx={{ maxWidth: [null, "540px"], px: [3], py: [3], pt: [8], margin: "0 auto" }}>
       <Box>
-        Welcome to Metropolis, a nonbinding sentiment check tool for the Filecoin community. You
+        Welcome to Fil Poll, a nonbinding sentiment check tool for the Filecoin community. You
         can:
       </Box>
       {/* FIPs */}

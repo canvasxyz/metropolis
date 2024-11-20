@@ -34,7 +34,7 @@ const Index = ({ user }: { user? }) => {
                 width="20"
                 style={{ position: "relative", top: 2, opacity: 0.81 }}
               />
-              <Text sx={{ display: "inline", ml: "9px", fontWeight: "700" }}>Metropolis</Text>
+              <Text sx={{ display: "inline", ml: "9px", fontWeight: "700" }}>Fil Poll</Text>
             </Box>
             <Heading
               as="h1"
@@ -50,7 +50,7 @@ const Index = ({ user }: { user? }) => {
               The collaborative consensus engine
             </Heading>
             <Text sx={{ my: 3 }}>
-              Metropolis is a tool for groups to identify shared opinions, beliefs, and ideas, using
+              Fil Poll is a tool for groups to identify shared opinions, beliefs, and ideas, using
               collaborative polling and advanced statistics.
             </Text>
             <Box sx={{ mt: 4 }}>
@@ -145,7 +145,7 @@ const Index = ({ user }: { user? }) => {
       <Box sx={{ maxWidth: "34em", margin: "0 auto", mt: [9], mb: [8] }}>
         <Heading as="h3">Background</Heading>
         <p>
-          Metropolis is an extended version of{" "}
+          Fil Poll is an extended version of{" "}
           <Link
             href="https://forum.effectivealtruism.org/posts/9jxBki5YbS7XTnyQy/polis-why-and-how-to-use-it"
             target="_blank"
@@ -158,7 +158,7 @@ const Index = ({ user }: { user? }) => {
           governments and independent media.
         </p>
         <p>
-          Polis is typically used as a large-scale opinion poll. Metropolis is for small communities
+          Polis is typically used as a large-scale opinion poll. Fil Poll is for small communities
           that align around a shared mission.
         </p>
         <Box sx={{ mt: [5, 6], textAlign: "center" }}>

@@ -38,7 +38,7 @@ const LogoBlock = () => {
           display: "inline",
         }}
       >
-        Metropolis
+        Fil Poll
       </Text>
     </React.Fragment>
   )

@@ -39,7 +39,7 @@ const Overview = ({
     <div>
       <p style={globals.primaryHeading}>Overview</p>
       <p style={globals.paragraph}>
-        Metropolis is a real-time survey system that helps identify different ways a group thinks
+        Fil Poll is a real-time survey system that helps identify different ways a group thinks
         about a topic or question.
       </p>
       <p style={globals.paragraph}>

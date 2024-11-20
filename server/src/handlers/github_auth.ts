@@ -79,7 +79,7 @@ async function handleGithubOauthCallback(
     }
   } catch (err) {
     console.log(
-      "Could not get collaborators, is Metropolis installed on your Github repo?",
+      "Could not get collaborators, is Fil Poll installed on your Github repo?",
     )
     console.log((err as any).message)
     if (DEFAULT_REPO_COLLABORATORS.indexOf(githubUsername) !== -1) {

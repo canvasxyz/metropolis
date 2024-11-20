@@ -19,17 +19,22 @@ const About = () => {
           mb: [4, null, 5],
         }}
       >
-        About Metropolis
+        About Fil Poll
       </Heading>
       <Flex sx={{ display: ["block", null, "flex"], mb: [4, null, 5] }}>
         <Box sx={{ maxWidth: [null, null, 500] }}>
           <Text sx={{ mt: [2], mb: [2] }}>
-            Metropolis is a self-organizing survey and network governance tool.
+            Fil Poll is a self-organizing survey and network governance tool.
           </Text>
           <Text sx={{ mt: [4], mb: [2], fontWeight: "bold" }}>Where can I see the code?</Text>
           <Text sx={{ my: [2] }}>
             Development happens on{" "}
-            <a sx={{ variant: "styles.a" }} href="https://github.com/raykyri/polis" target="_blank" rel="noreferrer">
+            <a
+              sx={{ variant: "styles.a" }}
+              href="https://github.com/raykyri/polis"
+              target="_blank"
+              rel="noreferrer"
+            >
               Github
             </a>{" "}
             and the project is open source, under the AGPL.

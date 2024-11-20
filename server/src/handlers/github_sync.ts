@@ -294,7 +294,7 @@ function getWelcomeMessage(serverNameWithProtocol: string, zinvite: string) {
 
   return (
     `Thank you for contributing a proposal! A discussion ` +
-    `on Metropolis has been automatically opened [here](${url}) where users can give feedback.`
+    `on Fil Poll has been automatically opened [here](${url}) where users can give feedback.`
   );
 }
 

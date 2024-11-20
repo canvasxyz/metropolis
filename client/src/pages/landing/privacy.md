@@ -2,7 +2,7 @@
 
 Last Updated: June 19, 2023
 
-This privacy policy (this "Policy") describes the collection of personal information by Canvas Technologies (the "Company"), from users of Metropolis (the "Site"), as well as all related applications, widgets, software, tools, and other services provided by us and on which a link to this Policy is displayed (collectively, together with the Site, our "Services").
+This privacy policy (this "Policy") describes the collection of personal information by Canvas Technologies (the "Company"), from users of Fil Poll (the "Site"), as well as all related applications, widgets, software, tools, and other services provided by us and on which a link to this Policy is displayed (collectively, together with the Site, our "Services").
 
 This Policy also describes our use and disclosure of such information.
 

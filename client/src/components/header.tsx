@@ -52,7 +52,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
         )}
         {!inSurvey && (
           <Link sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }} to="/">
-            Metropolis
+            Fil Poll
           </Link>
         )}
       </Box>

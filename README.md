@@ -1,4 +1,4 @@
-# Metropolis
+# Metropolis (Fil Poll)
 
 Metropolis is an extended version of the Polis collective-response
 tool. So far, we have implemented:
