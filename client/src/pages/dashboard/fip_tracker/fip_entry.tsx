@@ -1,7 +1,9 @@
 import React, { useState } from "react"
-import { TbArrowUpRight, TbCalendar, TbCaretDown, TbCaretRight } from "react-icons/tb"
+import ReactMarkdown from "react-markdown"
+import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
 import markdown from "remark-parse"
+import remarkGfm from "remark-gfm"
 import { remark } from "remark"
 import { unified } from "unified"
 import { Box, Flex, Grid } from "theme-ui"
@@ -123,6 +125,7 @@ export const FipEntry = ({
         borderColor: fipStatusInfo.color === "gray" ? `#ccc` : `var(--${fipStatusInfo.color}-10)`,
         padding: "3px 0 6px",
         background: "#fff",
+        fontSize: "95%",
       }}
       onClick={() => setIsOpen(!isOpen)}
     >
@@ -131,12 +134,13 @@ export const FipEntry = ({
           margin: "10px",
           gridTemplateColumns: "20px 1fr",
           gridRow: "auto auto",
-          gridColumnGap: "20px",
+          gridColumnGap: "10px",
           gridRowGap: "10px",
+          paddingRight: "10px",
         }}
       >
         <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
-          {isOpen ? <TbCaretDown /> : <TbCaretRight />}
+          {isOpen ? <TbChevronDown /> : <TbChevronRight />}
         </Flex>
         <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
           <Text
@@ -145,12 +149,11 @@ export const FipEntry = ({
               display: "inline-block",
               width: "48px",
               flex: "0 0 auto",
-              fontSize: "95%",
             }}
           >
             {conversation.fip_number ? String(conversation.fip_number).padStart(4, "0") : "Draft"}
           </Text>
-          <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
+          <Text style={{ flex: 1, lineHeight: 1.3, fontWeight: 500 }}>
             {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
           </Text>
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
@@ -171,7 +174,7 @@ export const FipEntry = ({
                 width: "calc(100% - 20px)",
               }}
               style={{
-                fontSize: "84%",
+                fontSize: "90%",
                 fontWeight: "500",
               }}
             >
@@ -180,7 +183,7 @@ export const FipEntry = ({
           )}
         </Flex>
         <Box></Box>
-        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
+        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "95%" }}>
           {fipBadges}
           {fipAttributes.map((attr, i) => (
             <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
@@ -206,8 +209,8 @@ export const FipEntry = ({
           <>
             <Box></Box>
             {/* display the simple summary if possible otherwise display the whole fip description */}
-            <Box sx={{ mb: [3] }}>
-              <h3 style={{ margin: "0 0 10px" }}>Authors</h3>
+            <Box sx={{ mb: "6px" }}>
+              <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
               {conversation.fip_authors.map((author, i) => {
                 const matches = author.match(/.*@(\w+)/)
                 if (!matches) return author
@@ -230,7 +233,19 @@ export const FipEntry = ({
 
               <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 
-              {conversation.simple_summary || conversation.fip_content}
+              <div
+                onClick={(e) => {
+                  // It's possible that there could be a tag inside the link,
+                  // but we don't handle that case here
+                  if (e.target.tagName === "A") {
+                    e.stopPropagation()
+                  }
+                }}
+              >
+                <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
+                  {conversation.simple_summary || conversation.fip_content}
+                </ReactMarkdown>
+              </div>
             </Box>
           </>
         )}
