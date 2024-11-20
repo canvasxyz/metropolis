@@ -17,15 +17,17 @@ import {
   getRepoCollaborators,
 } from "./api_wrappers";
 import {
-  FipFields,
-  PrFields,
-  getConversationByPrId,
   updateOrCreateGitHubUser,
-  insertConversationPrAndFip,
-  updateConversationPr,
-  updateConversationPrAndFip,
   insertSyncRecord,
   getLatestSync,
+  upsertFipVersion,
+  upsertGitHubPr,
+  FipVersionFields,
+  isGitHubSyncEnabledforPr,
+  getGitHubPr,
+  GithubPrFields,
+  upsertConversation,
+  getConversationWithFipVersionId,
 } from "./queries";
 
 const getServerNameWithProtocol = Config.getServerNameWithProtocol;
@@ -146,7 +148,7 @@ async function getFipFromPR(
   pull: PullRequest,
   existingFipFilenames: Set<string>,
   mainBranchName: string,
-): Promise<FipFields> {
+): Promise<FipVersionFields> {
   const owner = pull.head.user?.login as string;
   const repo = pull.head.repo?.name as string;
 
@@ -255,14 +257,15 @@ async function getFipFromPR(
     }
 
     return {
-      description,
-      fip_number: isNaN(fipNumber) ? undefined : fipNumber,
+      fip_content: description,
+      github_pr_id: pull.number,
+      fip_number: isNaN(fipNumber) ? null : fipNumber,
       fip_title: fipTitle,
-      fip_author: frontmatterData.author,
-      fip_discussions_to: frontmatterData["discussions-to"],
-      fip_status: frontmatterData.status,
-      fip_type: frontmatterData.type,
-      fip_category: frontmatterData.category,
+      fip_author: frontmatterData.author || null,
+      fip_discussions_to: frontmatterData["discussions-to"] || null,
+      fip_status: frontmatterData.status || null,
+      fip_type: frontmatterData.type || null,
+      fip_category: frontmatterData.category || null,
       fip_created: pull.created_at,
       fip_files_created: createdFilenames.join("\n"),
       fip_files_updated: updatedFilenames.join("\n"),
@@ -270,9 +273,15 @@ async function getFipFromPR(
   } else {
     // fip that only changed a file
     return {
-      fip_number: undefined,
+      github_pr_id: pull.number,
+      fip_number: null,
       fip_title: pull.title,
-      fip_author: pull.user?.login,
+      fip_author: pull.user?.login || null,
+      fip_content: null,
+      fip_category: null,
+      fip_discussions_to: null,
+      fip_status: null,
+      fip_type: null,
       fip_created: pull.created_at,
       fip_files_created: createdFilenames.join("\n"),
       fip_files_updated: updatedFilenames.join("\n"),
@@ -348,8 +357,6 @@ export async function do_github_sync() {
   await fsPromises.mkdir(workingDir);
 
   // clone the repo
-  console.log(`Cloning into ${workingDir}...`);
-
   child_process.execSync(
     `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
     { cwd: workingDir },
@@ -382,6 +389,8 @@ export async function do_github_sync() {
     repoCollaboratorIds = new Set(response);
   }
 
+  const userIds: Record<string, number> = {}
+
   let fipsUpdated = 0;
   let fipsCreated = 0;
 
@@ -390,158 +399,129 @@ export async function do_github_sync() {
       continue;
     }
 
-    // We have to do a separate request to get the email address from the user's profile
-    // because this information is not returned by the pulls endpoint
-    const {
-      data: { email },
-    } = await installationOctokit.request("GET /users/{username}", {
-      username: pull.user.login,
-      headers: {
-        "X-GitHub-Api-Version": "2022-11-28",
-      },
-    });
-
-    const { uid } = await updateOrCreateGitHubUser({
-      id: pull.user.id,
-      email,
-      username: pull.user.login,
-    });
-
-    const prFields: PrFields = {
-      owner: uid,
-      is_active: pull.state == "open",
-      is_archived: pull.state == "closed",
-      github_repo_name: pull.head.repo?.name,
-      github_repo_owner: pull.head.repo?.owner?.login,
-      github_branch_name: pull.head.ref,
-      github_pr_id: pull.number,
-      github_pr_title: pull.title,
-      github_pr_submitter: pull.user?.login,
-      github_pr_opened_at: pull.created_at,
-      github_pr_closed_at: pull.closed_at,
-      github_pr_updated_at: pull.updated_at,
-      github_pr_merged_at: pull.merged_at,
-      github_pr_is_draft: pull.draft,
-    };
-
-    // check if there is a conversation with this PR id already
-    const existingConversation = await getConversationByPrId(pull.number);
-    if (existingConversation) {
-      if (!existingConversation.github_sync_enabled) {
-        console.log(
-          `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`,
-        );
-        continue;
-      }
-
-      // update
-      if (pull.state == "open") {
-        console.log(
-          `[${pull.head?.label}] updating metadata for PR #${pull.number}`,
-        );
-        // get fip
-        let fipFields;
-        try {
-          fipFields = await getFipFromPR(
-            repoDir,
-            pull,
-            existingFipFilenames,
-            mainBranchName,
-          );
-        } catch (err) {
-          console.log(
-            `[${pull.head?.label}] could not get fip for PR #${pull.number}`,
-          );
-          continue;
-        }
-
-        // update conversation
-        await updateConversationPrAndFip({ ...prFields, ...fipFields });
-        fipsUpdated++;
-      } else {
-        console.log(
-          `[${pull.head?.label}] closing conversation with PR #${pull.number}`,
-        );
-        // we don't care about getting the FIP since it's no longer being discussed
-        // but we want to update the PR status to closed
-        await updateConversationPr(prFields);
-      }
-    } else {
-      if (pull.state == "open") {
-        // we only care about inserting conversations that are open
-        console.log(
-          `[${pull.head?.label}] creating new polis conversation for PR #${pull.number}`,
-        );
-
-        // TODO: this PR has just been opened, we should trigger something here, e.g. post a comment/notification
-
-        let fipFields;
-        try {
-          fipFields = await getFipFromPR(
-            repoDir,
-            pull,
-            existingFipFilenames,
-            mainBranchName,
-          );
-        } catch (err) {
-          console.log(
-            `[${pull.head?.label}] skipping PR #${pull.number}: ${err}`,
-          );
-          continue;
-        }
-
-        const insertedRows = await insertConversationPrAndFip({
-          ...prFields,
-          ...fipFields,
-        });
-        const zid = insertedRows[0].zid;
-        const zinvite = await generateAndRegisterZinvite(zid, false);
-
-        console.log(
-          `[${pull.head?.label}] created polis conversation for PR #${pull.number}`,
-        );
-
-        fipsCreated++;
-
-        // const welcomeMessage = getWelcomeMessage(
-        //   getServerNameWithProtocol(req),
-        //   zinvite,
-        // );
-        // post comment to PR
-        // await installationOctokit.request(
-        //   "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-        //   {
-        //     owner: process.env.FIP_REPO_OWNER,
-        //     repo: process.env.FIP_REPO_NAME,
-        //     issue_number: pull.number,
-        //     body: welcomeMessage,
-        //   },
-        // );
-
-        // // this will only work if the discussions_to field contains a single link to a discussion
-        // // so it's kind of brittle
-        // if (fipFields.fip_discussions_to) {
-        //   try {
-        //     // post the welcome message to the discussion as well
-        //     const match =
-        //       fipFields.fip_discussions_to.match(DISCUSSION_REGEX);
-        //     if (match !== null) {
-        //       const discussionNumber = match[1];
-        //       // post to the discussion
-        //       await addDiscussionComment(welcomeMessage, {
-        //         repoOwner: process.env.FIP_REPO_OWNER as string,
-        //         repoName: process.env.FIP_REPO_NAME as string,
-        //         discussionNumber: parseInt(discussionNumber),
-        //       });
-        //     }
-        //   } catch (err) {
-        //     console.log(
-        //       `could not post welcome message to discussion for PR ${pull.number} ${pull.head?.label}`,
-        //     );
-        //   }
-        // }
-      }
+    // if github sync is disabled for this pr, skip
+    if(!await isGitHubSyncEnabledforPr(pull.number)) {
+      console.log(
+        `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`,
+      );
+      continue;
     }
+
+    // try to get the existing github pr from the database
+    // this is used to detect whether github PRs have changed state
+    const existingGitHubPr = await getGitHubPr(pull.number)
+
+    if(existingGitHubPr && existingGitHubPr.closed_at && pull.state === "closed") {
+      console.log(
+        `[${pull.head?.label}] PR #${pull.number} is already closed, skipping`,
+      );
+      continue;
+    }
+
+    await upsertGitHubPr({
+      repo_name: pull.head.repo?.name,
+      repo_owner: pull.head.repo?.owner?.login,
+      branch_name: pull.head.ref,
+      id: pull.number,
+      title: pull.title,
+      submitter: pull.user?.login,
+      opened_at: pull.created_at,
+      closed_at: pull.closed_at,
+      updated_at: pull.updated_at,
+      merged_at: pull.merged_at,
+      is_draft: pull.draft,
+    });
+
+    // extract the fip data from the pr
+    let fipFields;
+    try {
+      fipFields = await getFipFromPR(
+        repoDir,
+        pull,
+        existingFipFilenames,
+        mainBranchName,
+      );
+    } catch (err) {
+      console.log(
+        `[${pull.head?.label}] could not get fip for PR #${pull.number}`,
+      );
+      continue;
+    }
+
+    const fipVersionId = await upsertFipVersion(fipFields);
+
+    // update or insert conversation
+    if(userIds[pull.user.login] === undefined) {
+      // We have to do a separate request to get the email address from the user's profile
+      // because this information is not returned by the pulls endpoint
+      const {
+        data: { email },
+      } = await installationOctokit.request("GET /users/{username}", {
+        username: pull.user.login,
+        headers: {
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      });
+
+      const { uid } = await updateOrCreateGitHubUser({
+        id: pull.user.id,
+        email,
+        username: pull.user.login,
+      });
+
+      userIds[pull.user.login] = uid;
+    }
+
+    const {zid, isNew} = await upsertConversation({
+      owner: userIds[pull.user.login],
+      is_active: pull.state == "open",
+      is_archived: pull.state === "closed",
+      fip_version_id: fipVersionId,
+      github_sync_enabled: true
+    })
+
+    // TODO: we should only do this if it's a new conversation
+    if(isNew) {
+      await generateAndRegisterZinvite(zid, false)
+    }
+
+    // const welcomeMessage = getWelcomeMessage(
+    //   getServerNameWithProtocol(req),
+    //   zinvite,
+    // );
+    // post comment to PR
+    // await installationOctokit.request(
+    //   "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+    //   {
+    //     owner: process.env.FIP_REPO_OWNER,
+    //     repo: process.env.FIP_REPO_NAME,
+    //     issue_number: pull.number,
+    //     body: welcomeMessage,
+    //   },
+    // );
+
+    // // this will only work if the discussions_to field contains a single link to a discussion
+    // // so it's kind of brittle
+    // if (fipFields.fip_discussions_to) {
+    //   try {
+    //     // post the welcome message to the discussion as well
+    //     const match =
+    //       fipFields.fip_discussions_to.match(DISCUSSION_REGEX);
+    //     if (match !== null) {
+    //       const discussionNumber = match[1];
+    //       // post to the discussion
+    //       await addDiscussionComment(welcomeMessage, {
+    //         repoOwner: process.env.FIP_REPO_OWNER as string,
+    //         repoName: process.env.FIP_REPO_NAME as string,
+    //         discussionNumber: parseInt(discussionNumber),
+    //       });
+    //     }
+    //   } catch (err) {
+    //     console.log(
+    //       `could not post welcome message to discussion for PR ${pull.number} ${pull.head?.label}`,
+    //     );
+    //   }
+    // }
   }
 
   await insertSyncRecord();
@@ -554,8 +534,107 @@ export async function do_github_sync() {
   };
 }
 
+
+function parseFipContent(content: string) {
+  // try to extract frontmatter
+  const contentParts = content.split("---");
+  const frontmatterSource = contentParts[1];
+  const description = contentParts[2];
+
+  let frontmatterData;
+  try {
+    frontmatterData = parseFrontmatter(frontmatterSource);
+  } catch (err) {
+    console.error(err);
+    frontmatterData = {};
+  }
+
+  let fipTitle;
+  try {
+    if (
+      frontmatterData.title &&
+      typeof JSON.parse(frontmatterData.title) === "string"
+    ) {
+      fipTitle = JSON.parse(frontmatterData.title);
+    }
+  } catch (err) {
+    fipTitle = frontmatterData.title;
+  }
+
+  return {
+    description,
+    title: fipTitle,
+    author: frontmatterData.author,
+    created: frontmatterData.created,
+    discussions_to: frontmatterData["discussions-to"],
+    status: frontmatterData.status,
+    type: frontmatterData.type,
+    category: frontmatterData.category,
+  };
+}
+
+
+async function do_master_sync() {
+  if (!process.env.FIP_REPO_OWNER) {
+    throw Error("FIP_REPO_OWNER not set");
+  }
+
+  if (!process.env.FIP_REPO_NAME) {
+    throw Error("FIP_REPO_NAME not set");
+  }
+
+  const workingDir = path.join(os.tmpdir(), uuidv4());
+  await fsPromises.mkdir(workingDir);
+
+  // clone the repo
+  child_process.execSync(
+    `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
+    { cwd: workingDir },
+  );
+
+  const repoDir = path.join(workingDir, process.env.FIP_REPO_NAME);
+
+  const fipFilenames = await getFipFilenames(repoDir);
+
+  const result = []
+
+  // for each fip, extract the metadata and insert it into the database
+  for(const fipFileName of fipFilenames) {
+    const content = await fsPromises.readFile(
+      path.join(repoDir, fipFileName),
+      "utf8",
+    );
+
+    const fipData = parseFipContent(content);
+
+    const fipFileNameParts = fipFileName.split("/")
+    const fipNameParts = fipFileNameParts[fipFileNameParts.length - 1].replace(".md", "").split("-")
+    const number = parseInt(fipNameParts[fipNameParts.length - 1], 10)
+
+    await upsertFipVersion({
+      fip_number: number,
+      github_pr_id: null,
+      fip_content: fipData.description,
+      fip_author: fipData.author || null,
+      fip_category: fipData.category || null,
+      fip_created: fipData.created || null,
+      fip_discussions_to: fipData.discussions_to || null,
+      fip_files_created: null,
+      fip_files_updated: null,
+      fip_status: fipData.status || null,
+      fip_title: fipData.title || null,
+      fip_type: fipData.type || null,
+    })
+
+    result.push({...fipData, number})
+  }
+
+  return result
+}
+
 export async function handle_POST_github_sync(req: Request, res: Response) {
   try {
+    await do_master_sync();
     res.json(await do_github_sync());
   } catch (err) {
     console.error(err);
@@ -570,4 +649,13 @@ export async function handle_GET_github_syncs(req: Request, res: Response) {
     success: true,
     latest,
   });
+}
+
+export async function handle_POST_initial_sync(req: Request, res: Response) {
+  try {
+    res.json(await do_github_sync());
+  } catch (err) {
+    console.error(err);
+    res.status(500).send((err as any).message);
+  }
 }

@@ -123,6 +123,8 @@ import {
   sql_participants_extended,
   sql_reports,
   sql_users,
+  sql_fip_versions,
+  sql_github_prs,
 } from "./db/sqlUtils"
 
 import logger from "./utils/logger"
@@ -130,7 +132,6 @@ import logger from "./utils/logger"
 import { sendTextEmail } from "./email/senders"
 import { Request, Response } from "express"
 import { getConversationIdFetchZid } from "./utils/parameter"
-import { insertConversationPrAndFip } from "./handlers/queries"
 
 const adminEmails = Config.adminEmails ? JSON.parse(Config.adminEmails) : []
 const polisFromAddress = Config.polisFromAddress
@@ -6993,7 +6994,7 @@ function handle_PUT_users(
     })
 }
 
-function handle_PUT_conversations(
+async function handle_PUT_conversations(
   req: {
     p: {
       short_url: any
@@ -7004,14 +7005,16 @@ function handle_PUT_conversations(
       is_anon: any
       is_data_open: any
       github_sync_enabled: any
-      fip_number: any
-      fip_author: any
-      fip_discussions_to: any
-      fip_status: any
-      fip_type: any
-      fip_category: any
-      fip_created: any
-      fip_title: any
+      fip_version: {
+        fip_number: any
+        fip_author: any
+        fip_discussions_to: any
+        fip_status: any
+        fip_type: any
+        fip_category: any
+        fip_created: any
+        fip_title: any
+      }
       profanity_filter: any
       spam_filter: any
       strict_moderation: any
@@ -7039,220 +7042,220 @@ function handle_PUT_conversations(
   },
   res: any,
 ) {
-  let generateShortUrl = req.p.short_url
-  isOwner(req.p.zid, req.p.uid)
-    .then(function (ok: any) {
-      if (!ok) {
-        fail(res, 403, "polis_err_update_conversation_permission")
-        return
-      }
+  try {
+    const ok = await isOwner(req.p.zid, req.p.uid)
+    if (!ok) {
+      fail(res, 403, "polis_err_update_conversation_permission")
+      return
+    }
 
-      let verifyMetaPromise
-      if (req.p.verifyMeta) {
-        verifyMetaPromise = verifyMetadataAnswersExistForEachQuestion(req.p.zid)
+    let fields: ConversationType = {}
+    if (!_.isUndefined(req.p.is_active)) {
+      fields.is_active = req.p.is_active
+    }
+    if (!_.isUndefined(req.p.is_anon)) {
+      fields.is_anon = req.p.is_anon
+    }
+    if (!_.isUndefined(req.p.is_data_open)) {
+      fields.is_data_open = req.p.is_data_open
+    }
+    if (!_.isUndefined(req.p.github_sync_enabled)) {
+      fields.github_sync_enabled = req.p.github_sync_enabled
+    }
+
+    // FIP fields
+    // we only want to update these if github_sync_enabled is false
+    // this is because if github sync was to be enabled, then the FIP fields would be overwritten
+    let fip_version_fields: any = {}
+    if (req.p.github_sync_enabled == false && req.p.fip_version) {
+      if (!_.isUndefined(req.p.fip_version.fip_title) && req.p.fip_version.fip_title.length <= 5000) {
+        fip_version_fields.fip_title = req.p.fip_version.fip_title
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_author && req.p.fip_version.fip_author.length <= 5000)) {
+        fip_version_fields.fip_author = req.p.fip_version.fip_author
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_discussions_to) && req.p.fip_version.fip_discussions_to.length <= 5000) {
+        fip_version_fields.fip_discussions_to = req.p.fip_version.fip_discussions_to
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_status) && req.p.fip_version.fip_status.length <= 5000) {
+        fip_version_fields.fip_status = req.p.fip_version.fip_status
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_type) && req.p.fip_version.fip_type.length <= 5000) {
+        fip_version_fields.fip_type = req.p.fip_version.fip_type
+      }
+      if (!_.isUndefined(req.p.fip_version.fip_category) && req.p.fip_version.fip_category.length <= 5000) {
+        fip_version_fields.fip_category = req.p.fip_version.fip_category
+      }
+      // TODO validation for timestamps
+      if (!_.isUndefined(req.p.fip_version.fip_created) && req.p.fip_version.fip_created.length <= 5000) {
+        fip_version_fields.fip_created = req.p.fip_version.fip_created
+      }
+    }
+
+    if (!_.isUndefined(req.p.profanity_filter)) {
+      fields.profanity_filter = req.p.profanity_filter
+    }
+    if (!_.isUndefined(req.p.spam_filter)) {
+      fields.spam_filter = req.p.spam_filter
+    }
+    if (!_.isUndefined(req.p.strict_moderation)) {
+      fields.strict_moderation = req.p.strict_moderation
+    }
+    if (!_.isUndefined(req.p.topic)) {
+      fields.topic = req.p.topic
+    }
+    if (!_.isUndefined(req.p.description)) {
+      fields.description = req.p.description
+    }
+    if (!_.isUndefined(req.p.survey_caption)) {
+      fields.survey_caption = req.p.survey_caption
+    }
+    if (!_.isUndefined(req.p.postsurvey)) {
+      fields.postsurvey = req.p.postsurvey
+    }
+    if (!_.isUndefined(req.p.postsurvey_limit)) {
+      fields.postsurvey_limit = req.p.postsurvey_limit
+    }
+    if (!_.isUndefined(req.p.postsurvey_submissions)) {
+      fields.postsurvey_submissions = req.p.postsurvey_submissions
+    }
+    if (!_.isUndefined(req.p.postsurvey_redirect)) {
+      fields.postsurvey_redirect = req.p.postsurvey_redirect
+    }
+    if (!_.isUndefined(req.p.vis_type)) {
+      fields.vis_type = req.p.vis_type
+    }
+    if (!_.isUndefined(req.p.help_type)) {
+      fields.help_type = req.p.help_type
+    }
+    if (!_.isUndefined(req.p.socialbtn_type)) {
+      fields.socialbtn_type = req.p.socialbtn_type
+    }
+    if (!_.isUndefined(req.p.bgcolor)) {
+      if (req.p.bgcolor === "default") {
+        fields.bgcolor = null
       } else {
-        verifyMetaPromise = Promise.resolve()
+        fields.bgcolor = req.p.bgcolor
       }
+    }
+    if (!_.isUndefined(req.p.help_color)) {
+      if (req.p.help_color === "default") {
+        fields.help_color = null
+      } else {
+        fields.help_color = req.p.help_color
+      }
+    }
+    if (!_.isUndefined(req.p.help_bgcolor)) {
+      if (req.p.help_bgcolor === "default") {
+        fields.help_bgcolor = null
+      } else {
+        fields.help_bgcolor = req.p.help_bgcolor
+      }
+    }
+    if (!_.isUndefined(req.p.style_btn)) {
+      fields.style_btn = req.p.style_btn
+    }
+    if (!_.isUndefined(req.p.write_type)) {
+      fields.write_type = req.p.write_type
+    }
+    ifDefinedSet("auth_needed_to_vote", req.p, fields)
+    ifDefinedSet("auth_needed_to_write", req.p, fields)
+    ifDefinedSet("auth_opt_fb", req.p, fields)
+    ifDefinedSet("auth_opt_tw", req.p, fields)
+    ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields)
 
-      let fields: ConversationType = {}
-      if (!_.isUndefined(req.p.is_active)) {
-        fields.is_active = req.p.is_active
-      }
-      if (!_.isUndefined(req.p.is_anon)) {
-        fields.is_anon = req.p.is_anon
-      }
-      if (!_.isUndefined(req.p.is_data_open)) {
-        fields.is_data_open = req.p.is_data_open
-      }
-      if (!_.isUndefined(req.p.github_sync_enabled)) {
-        fields.github_sync_enabled = req.p.github_sync_enabled
-      }
+    if (!_.isUndefined(req.p.link_url)) {
+      fields.link_url = req.p.link_url
+    }
 
-      // FIP fields
-      // we only want to update these if github_sync_enabled is false
-      // this is because if github sync was to be enabled, then the FIP fields would be overwritten
-      if (req.p.github_sync_enabled == false) {
-        if (!_.isUndefined(req.p.fip_title)) {
-          fields.fip_title = req.p.fip_title
-        }
-        if (!_.isUndefined(req.p.fip_author)) {
-          fields.fip_author = req.p.fip_author
-        }
-        if (!_.isUndefined(req.p.fip_discussions_to)) {
-          fields.fip_discussions_to = req.p.fip_discussions_to
-        }
-        if (!_.isUndefined(req.p.fip_status)) {
-          fields.fip_status = req.p.fip_status
-        }
-        if (!_.isUndefined(req.p.fip_type)) {
-          fields.fip_type = req.p.fip_type
-        }
-        if (!_.isUndefined(req.p.fip_category)) {
-          fields.fip_category = req.p.fip_category
-        }
-        if (!_.isUndefined(req.p.fip_created)) {
-          fields.fip_created = req.p.fip_created
-        }
-      }
+    ifDefinedSet("subscribe_type", req.p, fields)
 
-      if (!_.isUndefined(req.p.profanity_filter)) {
-        fields.profanity_filter = req.p.profanity_filter
-      }
-      if (!_.isUndefined(req.p.spam_filter)) {
-        fields.spam_filter = req.p.spam_filter
-      }
-      if (!_.isUndefined(req.p.strict_moderation)) {
-        fields.strict_moderation = req.p.strict_moderation
-      }
-      if (!_.isUndefined(req.p.topic)) {
-        fields.topic = req.p.topic
-      }
-      if (!_.isUndefined(req.p.description)) {
-        fields.description = req.p.description
-      }
-      if (!_.isUndefined(req.p.survey_caption)) {
-        fields.survey_caption = req.p.survey_caption
-      }
-      if (!_.isUndefined(req.p.postsurvey)) {
-        fields.postsurvey = req.p.postsurvey
-      }
-      if (!_.isUndefined(req.p.postsurvey_limit)) {
-        fields.postsurvey_limit = req.p.postsurvey_limit
-      }
-      if (!_.isUndefined(req.p.postsurvey_submissions)) {
-        fields.postsurvey_submissions = req.p.postsurvey_submissions
-      }
-      if (!_.isUndefined(req.p.postsurvey_redirect)) {
-        fields.postsurvey_redirect = req.p.postsurvey_redirect
-      }
-      if (!_.isUndefined(req.p.vis_type)) {
-        fields.vis_type = req.p.vis_type
-      }
-      if (!_.isUndefined(req.p.help_type)) {
-        fields.help_type = req.p.help_type
-      }
-      if (!_.isUndefined(req.p.socialbtn_type)) {
-        fields.socialbtn_type = req.p.socialbtn_type
-      }
-      if (!_.isUndefined(req.p.bgcolor)) {
-        if (req.p.bgcolor === "default") {
-          fields.bgcolor = null
-        } else {
-          fields.bgcolor = req.p.bgcolor
-        }
-      }
-      if (!_.isUndefined(req.p.help_color)) {
-        if (req.p.help_color === "default") {
-          fields.help_color = null
-        } else {
-          fields.help_color = req.p.help_color
-        }
-      }
-      if (!_.isUndefined(req.p.help_bgcolor)) {
-        if (req.p.help_bgcolor === "default") {
-          fields.help_bgcolor = null
-        } else {
-          fields.help_bgcolor = req.p.help_bgcolor
-        }
-      }
-      if (!_.isUndefined(req.p.style_btn)) {
-        fields.style_btn = req.p.style_btn
-      }
-      if (!_.isUndefined(req.p.write_type)) {
-        fields.write_type = req.p.write_type
-      }
-      ifDefinedSet("auth_needed_to_vote", req.p, fields)
-      ifDefinedSet("auth_needed_to_write", req.p, fields)
-      ifDefinedSet("auth_opt_fb", req.p, fields)
-      ifDefinedSet("auth_opt_tw", req.p, fields)
-      ifDefinedSet("auth_opt_allow_3rdparty", req.p, fields)
+    let q = sql_conversations
+      .update(fields)
+      .where(sql_conversations.zid.equals(req.p.zid))
+      // .and( sql_conversations.owner.equals(req.p.uid) )
+      .returning("*")
 
-      if (!_.isUndefined(req.p.link_url)) {
-        fields.link_url = req.p.link_url
+
+    if (req.p.verifyMeta) {
+      await verifyMetadataAnswersExistForEachQuestion(req.p.zid)
+    }
+
+    const rows = await queryP(q.toString(), [])
+
+    let conv = rows[0]
+    // The first check with isOwner implictly tells us this can be returned in HTTP response.
+    conv.is_mod = true
+    conv.is_owner = true
+
+    // get/update the fip version fields
+    if(conv.fip_version_id == null) {
+      conv.fip_version = null
+    } else {
+      // if github sync is disabled, update the fip version
+      // otherwise just return the existing fip version
+      const fipVersionQuery = (conv.github_sync_enabled == false && Object.keys(fip_version_fields).length)
+        ? sql_fip_versions.update(fip_version_fields).where(sql_fip_versions.id.equals(conv.fip_version_id)).returning("*")
+        : sql_fip_versions.select().where(sql_fip_versions.id.equals(conv.fip_version_id))
+
+      const fipVersionRows = await queryP(fipVersionQuery.toString(), [])
+      const fipVersion = fipVersionRows[0]
+
+      // get the github pr for this fip, if it exists
+      if(fipVersion.github_pr_id !== null) {
+        const githubPrQuery = sql_github_prs.select().where(sql_github_prs.id.equals(fipVersion.github_pr_id))
+        const githubPrRows = await queryP(githubPrQuery.toString(), [])
+        const githubPr = githubPrRows[0]
+        fipVersion.github_pr = githubPr
+      } else {
+        fipVersion.github_pr = null
       }
+      conv.fip_version = fipVersion
+    }
 
-      ifDefinedSet("subscribe_type", req.p, fields)
+    let generateShortUrl = req.p.short_url
+    if(generateShortUrl) {
+      await generateAndReplaceZinvite(req.p.zid, generateShortUrl)
+    }
+    let successCode = generateShortUrl ? 201 : 200
 
-      let q = sql_conversations
-        .update(fields)
-        .where(sql_conversations.zid.equals(req.p.zid))
-        // .and( sql_conversations.owner.equals(req.p.uid) )
-        .returning("*")
-      verifyMetaPromise.then(
-        function () {
-          query(q.toString(), function (err: any, result: { rows: any[] }) {
-            if (err) {
-              fail(res, 500, "polis_err_update_conversation", err)
-              return
-            }
-            let conv = result && result.rows && result.rows[0]
-            // The first check with isOwner implictly tells us this can be returned in HTTP response.
-            conv.is_mod = true
-            conv.is_owner = true
+    // send notification email
+    if (req.p.send_created_email) {
+      try {
+        const hname = await getUserInfoForUid2(req.p.uid)
+        const url = await getConversationUrl(req, req.p.zid, true)
 
-            let promise = generateShortUrl
-              ? generateAndReplaceZinvite(req.p.zid, generateShortUrl)
-              : Promise.resolve()
-            let successCode = generateShortUrl ? 201 : 200
+        await sendEmailByUid(
+          req.p.uid,
+          "Conversation created",
+          "Hi " +
+            hname +
+            ",\n" +
+            "\n" +
+            "Here's a link to the conversation you just created. Use it to invite participants to the conversation. Share it by whatever network you prefer - Gmail, Facebook, Twitter, etc., or just post it to your website or blog. Try it now! Click this link to go to your conversation:" +
+            "\n" +
+            url +
+            "\n" +
+            "\n" +
+            "With gratitude,\n" +
+            "\n" +
+            "The team\n",
+        )
+      } catch (err) {
+        logger.error(
+          "polis_err_sending_conversation_created_email",
+          err,
+        )
+      }
+    }
 
-            promise
-              .then(function () {
-                // send notification email
-                if (req.p.send_created_email) {
-                  Promise.all([
-                    getUserInfoForUid2(req.p.uid),
-                    getConversationUrl(req, req.p.zid, true),
-                  ])
-                    .then(function (results: any[]) {
-                      let hname = results[0].hname
-                      let url = results[1]
-                      sendEmailByUid(
-                        req.p.uid,
-                        "Conversation created",
-                        "Hi " +
-                          hname +
-                          ",\n" +
-                          "\n" +
-                          "Here's a link to the conversation you just created. Use it to invite participants to the conversation. Share it by whatever network you prefer - Gmail, Facebook, Twitter, etc., or just post it to your website or blog. Try it now! Click this link to go to your conversation:" +
-                          "\n" +
-                          url +
-                          "\n" +
-                          "\n" +
-                          "With gratitude,\n" +
-                          "\n" +
-                          "The team\n",
-                      ).catch(function (err: any) {
-                        logger.error(
-                          "polis_err_sending_conversation_created_email",
-                          err,
-                        )
-                      })
-                    })
-                    .catch(function (err: any) {
-                      logger.error(
-                        "polis_err_sending_conversation_created_email",
-                        err,
-                      )
-                    })
-                }
+    finishOne(res, conv, true, successCode)
 
-                finishOne(res, conv, true, successCode)
-
-                updateConversationModifiedTime(req.p.zid)
-              })
-              .catch(function (err: any) {
-                fail(res, 500, "polis_err_update_conversation", err)
-              })
-          })
-        },
-        function (err: { message: any }) {
-          fail(res, 500, err.message, err)
-        },
-      )
-    })
-    .catch(function (err: any) {
-      fail(res, 500, "polis_err_update_conversation", err)
-    })
+    updateConversationModifiedTime(req.p.zid)
+  } catch (err) {
+    fail(res, 500, "polis_err_update_conversation", err)
+    return
+  }
 }
 
 async function handle_DELETE_metadata_questions(
@@ -7803,10 +7806,23 @@ function getConversationTranslationsMinimal(zid: any, lang: any) {
 }
 
 async function getOneConversation(zid: any, uid?: number, lang?: null) {
+
   const conversationRows = await queryP_readOnly(
-    `select *, u.github_username from conversations
-left join (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
-where conversations.zid = ($1);`,
+    `
+    WITH
+      comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid),
+      sentiment_counts AS (SELECT zid, count(*) as sentiment_count FROM conversation_sentiment_votes GROUP BY zid)
+    SELECT
+      *,
+      u.github_username,
+      cast(comment_counts.comment_count as INTEGER),
+      cast(sentiment_counts.sentiment_count as INTEGER)
+    FROM conversations
+    LEFT JOIN (select uid, site_id, github_username from users) as u on conversations.owner = u.uid
+    LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
+    LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
+    LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
+    WHERE conversations.zid = ($1);`,
     [zid],
   )
   const conv = conversationRows[0]
@@ -7819,10 +7835,23 @@ where conversation_sentiment_votes.zid = ($1);`,
   )
   conv.sentiment = sentimentVoterRows
 
-  if (conv.github_pr_id !== null) {
-    conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-  } else {
-    conv.github_pr_url = null
+  if(conv.fip_version_id) {
+    const fipVersionRows = await queryP_readOnly(
+      `select * from fip_versions where id = ($1);`,
+      [conv.fip_version_id],
+    );
+
+    conv.fip_version = fipVersionRows[0]
+    if(conv.fip_version.github_pr_id !== null) {
+      const githubPrRows = await queryP_readOnly(
+        `select * from github_prs where id = ($1);`,
+        [conv.fip_version.github_pr_id],
+      );
+      conv.fip_version.github_pr = githubPrRows[0];
+      conv.fip_version.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
+    } else {
+      conv.fip_version.github_pr_url = null
+    }
   }
 
   const convHasMetadata = await getConversationHasMetadata(zid)
@@ -7913,24 +7942,10 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     comment_counts AS (SELECT zid, count(*) as comment_count FROM comments GROUP BY zid),
     sentiment_counts AS (SELECT zid, count(*) as sentiment_count FROM conversation_sentiment_votes GROUP BY zid)
   SELECT
+    conversations.fip_version_id,
     conversations.created,
     conversations.topic,
     conversations.description,
-    conversations.fip_author,
-    conversations.fip_category,
-    conversations.fip_type,
-    conversations.fip_created,
-    conversations.fip_title,
-    conversations.fip_number,
-    conversations.fip_status,
-    conversations.github_pr_opened_at,
-    conversations.github_pr_updated_at,
-    conversations.github_pr_closed_at,
-    conversations.github_pr_merged_at,
-    conversations.github_pr_is_draft,
-    conversations.github_pr_title,
-    conversations.github_pr_id,
-    conversations.fip_files_created,
     conversations.is_archived,
     conversations.is_hidden,
     conversations.participant_count,
@@ -7938,39 +7953,83 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     cast(comment_counts.comment_count as INTEGER),
     cast(sentiment_counts.sentiment_count as INTEGER),
     conversations.owner,
-    users.hname,
-    users.github_username,
     zinvites.zinvite as conversation_id
   FROM
     conversations
   LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
   LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
   LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
-  JOIN users ON conversations.owner = users.uid
   JOIN zinvites ON conversations.zid = zinvites.zid;
   `
 
-  const rows = await queryP_readOnly(query, [])
+  const conversations = await queryP_readOnly(query, [])
+  const fipVersionIds = conversations.map((conv) => conv.fip_version_id)
 
-  rows.forEach(function (conv) {
-    conv.created = Number(conv.created)
-    conv.modified = Number(conv.modified)
+  // request fip versions
+  // and github prs
+  const fipVersions = await queryP_readOnly(
+    `SELECT * FROM fip_versions WHERE id = ANY($1::integer[]);`,
+    [fipVersionIds],
+  )
+  const fipVersionsById = _.indexBy(fipVersions, "id")
+
+  const githubPrIds = fipVersions.map((fip) => fip.github_pr_id).filter((id) => id !== null)
+
+  const githubPrs = await queryP_readOnly(
+    `SELECT * FROM github_prs WHERE id = ANY($1::integer[]);`,
+    [githubPrIds],
+  )
+  const githubPrsById = _.indexBy(githubPrs, "id")
+
+  for(const conversation of conversations) {
+    conversation.created = Number(conversation.created)
+    conversation.modified = Number(conversation.modified)
+
+    if(fipVersionsById[conversation.fip_version_id]) {
+      conversation.fip_version = fipVersionsById[conversation.fip_version_id]
+      if (conversation.fip_version.github_pr_id !== null) {
+        const githubPr = githubPrsById[conversation.fip_version.github_pr_id]
+        githubPr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conversation.fip_version.github_pr_id}/files`
+        conversation.fip_version.github_pr = githubPr
+      }
+    } else {
+      conversation.fip_version = null
+    }
 
     // if there is no topic, provide a UTC timstamp instead
-    if (_.isUndefined(conv.topic) || conv.topic === "") {
-      conv.topic = new Date(conv.created).toUTCString()
+    if (_.isUndefined(conversation.topic) || conversation.topic === "") {
+      conversation.topic = new Date(conversation.created).toUTCString()
     }
+  }
 
-    if (conv.github_pr_id !== null) {
-      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-    } else {
-      conv.github_pr_url = null
+  return res.json(conversations)
+}
+
+async function handle_GET_fips(req: Request, res: Response) {
+  // pagination and filtering happens here
+  const fip_rows = await queryP_readOnly(`SELECT * FROM fip_versions;`, [])
+
+  // const fip_version_ids = fip_rows.map((fip: any) => fip.id)
+  const github_pr_ids = fip_rows.map((fip: any) => fip.github_pr_id).filter((id: any) => id !== -1)
+
+  const github_prs_by_id: Record<string, any> = {}
+  const pr_rows = await queryP_readOnly(`SELECT * FROM github_prs WHERE id = ANY($1::integer[]);`, [github_pr_ids])
+  for(const pr_row of pr_rows) {
+    github_prs_by_id[pr_row.id] = pr_row
+  }
+
+  for(const fip_row of fip_rows) {
+    const pr = github_prs_by_id[fip_row.github_pr_id]
+    fip_row.github_pr = pr || null
+    delete fip_row.github_pr_id
+
+
+    if (fip_row.github_pr !== null) {
+      fip_row.github_pr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${fip_row.github_pr.id}/files`
     }
+  }
 
-    return conv
-  })
-
-  return res.json(rows)
+  return res.json(fip_rows)
 }
 
 function createReport(zid: any) {
@@ -8174,6 +8233,7 @@ async function handle_GET_conversation(
   const zid = await getConversationIdFetchZid(req.body.conversation_id)
   const lang = null // for now just return the default
   const data = await getOneConversation(zid, req.p.uid, lang)
+  data.conversation_id = req.body.conversation_id
   finishOne(res, data)
 }
 
@@ -9668,6 +9728,7 @@ export {
   handle_GET_dataExport,
   handle_GET_domainWhitelist,
   handle_GET_einvites,
+  handle_GET_fips,
   handle_GET_groupDemographics,
   handle_GET_iim_conversation,
   handle_GET_iip_conversation,

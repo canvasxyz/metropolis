@@ -1,5 +1,5 @@
 import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
-import React, { useMemo, useState } from "react"
+import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
   TbAdjustmentsHorizontal,
@@ -13,13 +13,12 @@ import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
 import { Box, Flex, Text } from "theme-ui"
 
-import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
-import { FipEntry } from "./fip_entry"
+import { extractParagraphByTitle, FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
-import { useSelectableValue } from "./useSelectableValue"
 import { DatePicker, DateRange } from "./date_picker"
+import { FipVersion } from "../../../util/types"
 
 const splitAuthors = (authorList = "") => {
   const result = authorList
@@ -35,6 +34,50 @@ const splitAuthors = (authorList = "") => {
     })
   }
   return result
+}
+
+function processFipVersions(data: FipVersion[]) {
+  if (!data) {
+    return {}
+  }
+
+  const conversations: (FipVersion & {
+    simple_summary: string
+    fip_authors: string[]
+    displayed_title: string
+  })[] = []
+
+  const allFipTypesSet = new Set<string | null>()
+  const allFipAuthorsSet = new Set<string>()
+
+  for (const conversation of data) {
+    // don't show fips that don't have a fip status
+    if (conversation.fip_status == null) {
+      continue
+    }
+
+    allFipTypesSet.add(conversation.fip_type)
+
+    const authors = splitAuthors(conversation.fip_author) || []
+    for (const author of authors) {
+      allFipAuthorsSet.add(author)
+    }
+
+    conversations.push({
+      ...conversation,
+      simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
+      fip_authors: authors,
+      displayed_title:
+        conversation.fip_title || conversation.github_pr.title,
+    })
+  }
+
+  const allFipTypes = Array.from(allFipTypesSet)
+  allFipTypes.sort()
+  const allFipAuthors = Array.from(allFipAuthorsSet)
+  allFipAuthors.sort()
+
+  return { conversations, allFipTypes, allFipAuthors }
 }
 
 export default () => {
@@ -64,7 +107,6 @@ export default () => {
     saveDisplayOptions,
   } = useFipDisplayOptions()
 
-
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchParam = searchParams.get("search") || ""
@@ -76,71 +118,30 @@ export default () => {
     filterStatuses.push("WIP")
   }
 
-  const { data: conversationsData } = useSWR<ConversationSummary[]>(
-    `conversations_summary`,
-    () => fetch(`/api/v3/conversations_summary`).then((response) => response.json()),
+  const { data } = useSWR(
+    `fips`,
+    async () => {
+      const response = await fetch(`/api/v3/fips`)
+      const data = await response.json()
+      return processFipVersions(data)
+    },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
+  const {conversations, allFipTypes, allFipAuthors} = data || {}
 
-  const { conversations, allFipTypes, allFipAuthors } = useMemo(() => {
-    if (!conversationsData) {
-      return {}
-    }
-
-    const conversations: (ConversationSummary & {
-      fip_authors: string[]
-      displayed_title: string
-    })[] = []
-
-    const allFipTypesSet = new Set<string | null>()
-    const allFipAuthorsSet = new Set<string>()
-
-    for (const conversation of conversationsData) {
-      // don't show fips that don't have a fip status
-      if (conversation.fip_status == null) {
-        continue
-      }
-
-      allFipTypesSet.add(conversation.fip_type)
-
-      const authors = splitAuthors(conversation.fip_author) || []
-      for (const author of authors) {
-        allFipAuthorsSet.add(author)
-      }
-
-      conversations.push({
-        ...conversation,
-        fip_authors: authors,
-        displayed_title:
-          conversation.fip_title || conversation.github_pr_title || conversation.topic,
-      })
-    }
-
-    const allFipTypes = Array.from(allFipTypesSet)
-    allFipTypes.sort()
-    const allFipAuthors = Array.from(allFipAuthorsSet)
-    allFipAuthors.sort()
-
-    if (sortBy === "asc") {
-      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1))
-    } else {
-      conversations.sort((c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1))
-    }
-
-    return { conversations, allFipTypes, allFipAuthors }
-  }, [conversationsData, sortBy])
-
-  const {
-    selectedValues: selectedFipTypes,
-    setSelectedValues: setSelectedFipTypes,
-  } = useSelectableValue(allFipTypes || null)
-
-  const {
-    selectedValues: selectedFipAuthors,
-    setSelectedValues: setSelectedFipAuthors,
-  } = useSelectableValue(allFipAuthors || null)
+  const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string,boolean>>({})
+  const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string,boolean>>({})
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
+
+  let sortFunction;
+  if (sortBy === "asc") {
+    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
+  } else if(sortBy === "desc"){
+    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1)
+  } else {
+    sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
+  }
 
   const displayedFips = (conversations || []).filter((conversation) => {
     // the conversation's displayed title must include the search string, if it is given
@@ -154,7 +155,7 @@ export default () => {
     // the conversation must have one of the selected fip authors
     let hasMatchingFipAuthor = false
     for (const fipAuthor of conversation.fip_authors) {
-      if (selectedFipAuthors[fipAuthor]) {
+      if (deselectedFipAuthors[fipAuthor] !== true) {
         hasMatchingFipAuthor = true
         break
       }
@@ -171,7 +172,7 @@ export default () => {
       return false
     }
 
-    if(conversation.fip_type && !selectedFipTypes[conversation.fip_type]) {
+    if(conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
       return false
     }
 
@@ -183,7 +184,7 @@ export default () => {
     }
 
     return true
-  })
+  }).toSorted(sortFunction)
 
   return (
     <Flex
@@ -222,15 +223,14 @@ export default () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {Object.keys(selectedFipAuthors)
-                  .toSorted()
+                {(allFipAuthors || [])
                   .map((fipAuthor) => (
                     <ClickableChecklistItem
                       key={fipAuthor}
                       color={"blue"}
-                      checked={selectedFipAuthors[fipAuthor]}
+                      checked={deselectedFipAuthors[fipAuthor] !== true}
                       setChecked={(value) => {
-                        setSelectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: value }))
+                        setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
                       }}
                     >
                       {fipAuthor}
@@ -282,15 +282,14 @@ export default () => {
                 <TbLayoutGrid /> Type
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {Object.keys(selectedFipTypes)
-                  .toSorted()
+                {(allFipTypes || [])
                   .map((fipType) => (
                     <ClickableChecklistItem
                       key={fipType}
                       color={"blue"}
-                      checked={selectedFipTypes[fipType]}
+                      checked={deselectedFipTypes[fipType] !== true}
                       setChecked={(value) => {
-                        setSelectedFipTypes((prev) => ({ ...prev, [fipType]: value }))
+                        setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
                       }}
                     >
                       {fipType}
@@ -320,6 +319,7 @@ export default () => {
                   <Select.Group>
                     <Select.Item value="desc">Newest to Oldest</Select.Item>
                     <Select.Item value="asc">Oldest to Newest</Select.Item>
+                    <Select.Item value="fip_number_asc">FIP number ascending</Select.Item>
                   </Select.Group>
                 </Select.Content>
               </Select.Root>
@@ -358,7 +358,7 @@ export default () => {
       <Flex sx={{ flexDirection: "column", gap: [3] }}>
         {displayedFips.map((conversation) => (
           <FipEntry
-            key={conversation.conversation_id}
+            key={conversation.id}
             conversation={conversation}
             showAuthors={showAuthors}
             showCategory={showCategory}

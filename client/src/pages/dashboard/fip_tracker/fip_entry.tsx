@@ -6,15 +6,15 @@ import { remark } from "remark"
 import { unified } from "unified"
 import { Box, Flex, Grid } from "theme-ui"
 
-import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
+import { FipVersion } from "../../../util/types"
 
-const extractParagraphByTitle = (markdownText, title) => {
+export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
 
   let inDesiredSection = false
-  let extractedParagraph = null
+  let extractedParagraph: string | null = null
 
   function visitNode(node) {
     if (node.type === "heading" && node.children[0].value === title) {
@@ -41,7 +41,11 @@ export const FipEntry = ({
   showCreationDate,
   showType,
 }: {
-  conversation: ConversationSummary & { displayed_title: string; fip_authors: string[] }
+  conversation: FipVersion & {
+    displayed_title: string
+    fip_authors: string[]
+    simple_summary: string
+  }
   showAuthors: boolean
   showCategory: boolean
   showCreationDate: boolean
@@ -49,38 +53,44 @@ export const FipEntry = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  const simpleSummary = extractParagraphByTitle(conversation.description, "Simple Summary")
-
-  let fipStatusKey
-  if (conversation.fip_status === "Last Call") {
-    fipStatusKey = "last-call"
-  } else if (conversation.fip_status === "WIP") {
+  let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+  if (conversation.fip_status === "wip") {
     fipStatusKey = "draft"
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
-  } else {
-    fipStatusKey = conversation.fip_status.toLowerCase()
   }
 
   const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
-  const fipStatusLabel = statusOptions[fipStatusKey].label
+  const fipStatusLabel = statusOptions[fipStatusKey]
+    ? statusOptions[fipStatusKey].label
+    : fipStatusKey
 
   const fipBadges = []
   const fipAttributes = []
   if (showType && conversation.fip_type) {
     fipBadges.push(
-      <Badge size="2" variant="outline" radius="full" style={{ 
-        boxShadow: "inset 0 0 0 1px var(--accent-a5)"
-      }}>
+      <Badge
+        size="2"
+        variant="outline"
+        radius="full"
+        style={{
+          boxShadow: "inset 0 0 0 1px var(--accent-a5)",
+        }}
+      >
         {conversation.fip_type}
       </Badge>,
     )
   }
   if (showCategory && conversation.fip_category) {
     fipBadges.push(
-      <Badge size="2" variant="outline" radius="full" style={{
-        boxShadow: "inset 0 0 0 1px var(--accent-a5)"
-      }}>
+      <Badge
+        size="2"
+        variant="outline"
+        radius="full"
+        style={{
+          boxShadow: "inset 0 0 0 1px var(--accent-a5)",
+        }}
+      >
         {conversation.fip_category}
       </Badge>,
     )
@@ -114,7 +124,6 @@ export const FipEntry = ({
         padding: "3px 0 6px",
         background: "#fff",
       }}
-      key={conversation.conversation_id}
       onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
@@ -147,26 +156,28 @@ export const FipEntry = ({
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
           </Badge>
-          <Link
-            to={conversation.github_pr_url}
-            target="_blank"
-            noreferrer="noreferrer"
-            noopener="noopener"
-            onClick={(e) => e.stopPropagation()}
-            sx={{
-              display: "block",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              width: "calc(100% - 20px)",
-            }}
-            style={{
-              fontSize: "84%",
-              fontWeight: "500",
-            }}
-          >
-            GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
-          </Link>
+          {conversation.github_pr && (
+            <Link
+              to={conversation.github_pr.url}
+              target="_blank"
+              noreferrer="noreferrer"
+              noopener="noopener"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                display: "block",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                width: "calc(100% - 20px)",
+              }}
+              style={{
+                fontSize: "84%",
+                fontWeight: "500",
+              }}
+            >
+              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+            </Link>
+          )}
         </Flex>
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
@@ -219,7 +230,7 @@ export const FipEntry = ({
 
               <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 
-              {simpleSummary || conversation.description}
+              {conversation.simple_summary || conversation.fip_content}
             </Box>
           </>
         )}

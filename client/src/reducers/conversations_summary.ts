@@ -1,5 +1,6 @@
 import * as types from "../actions"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import { FipVersion } from "../util/types"
 
 const populateConversationsSummary = createAsyncThunk(
   "conversations_summary/populateConversationsSummary",
@@ -10,22 +11,7 @@ const populateConversationsSummary = createAsyncThunk(
 )
 
 export type ConversationSummary = {
-  fip_created: string | null
-  fip_title: string | null
-  fip_number: number
-  fip_status: string
-  fip_author: string | null
-  fip_type: string | null
-  fip_category: string | null
-  github_pr_opened_at: string | null
-  github_pr_updated_at: string | null
-  github_pr_closed_at: string | null
-  github_pr_merged_at: string | null
-  github_pr_is_draft: boolean
-  github_pr_title: string | null
-  github_pr_id: string | null
-  github_pr_url: string | null
-  fip_files_created: string | null
+  fip_version: FipVersion | null
   participant_count: number
   comment_count: number | null
   sentiment_count: number | null

@@ -545,9 +545,7 @@ const updateZidMetadataError = (err) => {
   }
 }
 
-const updateZidMetadata = (zm, field, value) => {
-  const data = {}
-  data[field] = value
+const updateZidMetadata = (zm) => {
   return $.ajax({
     url: "/api/v3/conversations",
     method: "PUT",
@@ -555,14 +553,14 @@ const updateZidMetadata = (zm, field, value) => {
     headers: { "Cache-Control": "max-age=0" },
     xhrFields: { withCredentials: true },
     dataType: "json",
-    data: JSON.stringify(Object.assign({}, zm, data)),
+    data: JSON.stringify(zm),
   })
 }
 
-export const handleZidMetadataUpdate = (zm, field, value) => {
+export const handleZidMetadataUpdate = (newZidMetadata) => {
   return (dispatch) => {
     dispatch(updateZidMetadataStarted())
-    return updateZidMetadata(zm, field, value)
+    return updateZidMetadata(newZidMetadata)
       .then((res) => dispatch(updateZidMetadataSuccess(res)))
       .fail((err) => dispatch(updateZidMetadataError(err)))
   }

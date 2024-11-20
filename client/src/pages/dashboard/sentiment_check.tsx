@@ -11,16 +11,17 @@ import {
 } from "react-icons/tb"
 
 import api from "../../util/api"
+import { ZidMetadata } from "../../util/types"
 
 const LIKE_VOTE = "like"
 const DISLIKE_VOTE = "dislike"
 
-export const SentimentCheck: React.FC<{ user; zid_metadata }> = ({
+export const SentimentCheck = ({
   user,
   zid_metadata,
 }: {
   user?: { isAdmin: boolean; isRepoCollaborator: boolean; githubUsername: string; uid?: number }
-  zid_metadata
+  zid_metadata: ZidMetadata
 }) => {
   const [liked, setLiked] = useState(() =>
     zid_metadata.sentiment.filter((v) => v.vote === LIKE_VOTE).map((v) => v.github_username),

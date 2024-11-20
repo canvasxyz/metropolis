@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"
 
-import type { Comment } from "../../util/types"
+import type { Comment, ZidMetadata } from "../../util/types"
 import api from "../../util/api"
 import { surveyHeadingMini } from "./index"
 
@@ -23,7 +23,7 @@ const SurveyComposeBox = ({
   onSubmit,
 }: {
   user
-  zid_metadata
+  zid_metadata: ZidMetadata
   unvotedComments
   setUnvotedComments
   submittedComments
@@ -189,7 +189,7 @@ const SurveyCompose = ({
   onSubmit,
 }: {
   user
-  zid_metadata
+  zid_metadata: ZidMetadata
   votedComments
   unvotedComments
   setUnvotedComments

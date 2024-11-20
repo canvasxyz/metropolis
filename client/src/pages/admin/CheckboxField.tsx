@@ -1,55 +1,34 @@
-import React, { useState } from "react"
+import React, { ChangeEventHandler, useRef } from "react"
 import { Box, Text } from "theme-ui"
-import PropTypes from "prop-types"
 
-import { handleZidMetadataUpdate } from "../../actions"
-import { RootState } from "../../store"
-import { useAppDispatch, useAppSelector } from "../../hooks"
+type CheckboxFieldProps = {
+  label: string
+  subtitle?: string
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+}
 
-export const CheckboxField = ({ field, label = "", subtitle = "", isIntegerBool = false }) => {
-  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
-  const [state, setState] = useState(zid_metadata[field])
-  const dispatch = useAppDispatch()
+export const CheckboxField = ({ label, subtitle, checked, onCheckedChange }: CheckboxFieldProps) => {
 
-  const handleBoolValueChange = (field) => {
-    const val = !state
-    setState(val)
-    dispatch(handleZidMetadataUpdate(zid_metadata, field, val))
-  }
-
-  const transformBoolToInt = (value) => {
-    return value ? 1 : 0
-  }
-
-  const handleIntegerBoolValueChange = (field) => {
-    const val = transformBoolToInt(!state)
-    setState(val)
-    dispatch(handleZidMetadataUpdate(zid_metadata, field, val))
-  }
+  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
     <Box sx={{ mb: [3] }}>
       <label>
         <input
+          ref={inputRef}
           type="checkbox"
-          data-test-id={field}
-          checked={isIntegerBool ? zid_metadata[field] === 1 : zid_metadata[field]}
-          onChange={
-            isIntegerBool
-              ? () => handleIntegerBoolValueChange(field)
-              : () => handleBoolValueChange(field)
-          }
+          checked={checked}
+          onChange={() => {
+            if (inputRef.current) {
+              console.log("updating check box, checked:", inputRef.current.checked)
+              onCheckedChange(inputRef.current.checked)
+            }
+          }}
         />
         &nbsp;<strong>{label}</strong>
       </label>
       {subtitle && <Text sx={{ display: "inline", ml: [2], color: "lightGray" }}>{subtitle}</Text>}
     </Box>
   )
-}
-
-CheckboxField.propTypes = {
-  field: PropTypes.string.isRequired,
-  label: PropTypes.string,
-  subtitle: PropTypes.string,
-  isIntegerBool: PropTypes.bool,
 }

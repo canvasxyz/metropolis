@@ -17,16 +17,7 @@ const sql_conversations: any = sql.define({
     "is_public", // TODO remove this column
     "is_data_open",
     "github_sync_enabled",
-    "fip_number",
-    "fip_author",
-    "fip_discussions_to",
-    "fip_status",
-    "fip_type",
-    "fip_category",
-    "fip_created",
-    "fip_files_created",
-    "fip_files_updated",
-    "fip_title",
+    "fip_version_id",
     "profanity_filter",
     "spam_filter",
     "strict_moderation",
@@ -53,6 +44,41 @@ const sql_conversations: any = sql.define({
     "auth_opt_tw",
     "auth_opt_allow_3rdparty",
   ],
+})
+
+const sql_fip_versions  = sql.define({
+  name: "fip_versions",
+  columns: [
+    "id",
+    "fip_number",
+    "fip_author",
+    "fip_discussions_to",
+    "fip_status",
+    "fip_type",
+    "fip_category",
+    "fip_created",
+    "fip_files_created",
+    "fip_files_updated",
+    "fip_title",
+  ]
+})
+
+const sql_github_prs = sql.define({
+  name: "github_prs",
+  columns: [
+    "id",
+    "title",
+    "is_draft",
+    "closed_at",
+    "merged_at",
+    "opened_at",
+    "updated_at",
+    "submitter",
+    "branch_name",
+    "repo_name",
+    "repo_owner",
+    "sync_enabled",
+  ]
 })
 
 // 'sql_comments' implicitly has type 'any' because it does not have a type annotation and is referenced directly or indirectly in its own initializer.ts(7022)
@@ -137,6 +163,8 @@ const sql_reports = sql.define({
 
 export {
   sql_conversations,
+  sql_fip_versions,
+  sql_github_prs,
   sql_comments,
   sql_votes_latest_unique,
   sql_participant_metadata_answers,

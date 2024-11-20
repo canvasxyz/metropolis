@@ -123,6 +123,7 @@ import {
   handle_PUT_ptptois,
   handle_PUT_reports,
   handle_PUT_users,
+  handle_GET_fips,
 } from "./src/server"
 
 import {
@@ -805,14 +806,8 @@ app.put(
   want("description", getOptionalStringLimitLength(5000000), assignToP),
 
   // FIP fields
-  want("fip_number", getInt, assignToP),
-  want("fip_title", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_author", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_discussions_to", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_status", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_type", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_category", getOptionalStringLimitLength(5000), assignToP),
-  want("fip_created", getOptionalStringLimitLength(5000), assignToP),
+  // this is a nested object, the nested fields are handled in handle_PUT_conversations
+  want("fip_version", async (value: any) => value, assignToP),
 
   want("survey_caption", getOptionalStringLimitLength(1024), assignToP, ""),
   want("postsurvey", getOptionalStringLimitLength(5000), assignToP, ""),
@@ -1044,6 +1039,8 @@ app.post(
 )
 
 app.get("/api/v3/conversations_summary", handle_GET_conversations_summary as any)
+
+app.get("/api/v3/fips", handle_GET_fips as any)
 
 app.post(
   "/api/v3/increment_conversation_view_count",
