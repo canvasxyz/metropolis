@@ -65,32 +65,37 @@ export const FipEntry = ({
   const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
   const fipStatusLabel = statusOptions[fipStatusKey].label
 
+  const fipBadges = []
   const fipAttributes = []
   if (showType && conversation.fip_type) {
-    fipAttributes.push(
-      <Badge size="3" variant="outline">
-        Type: {conversation.fip_type}
+    fipBadges.push(
+      <Badge size="2" variant="outline" radius="full" style={{ 
+        boxShadow: "inset 0 0 0 1px var(--accent-a5)"
+      }}>
+        {conversation.fip_type}
       </Badge>,
     )
   }
   if (showCategory && conversation.fip_category) {
-    fipAttributes.push(
-      <Badge size="3" variant="outline">
-        Category: {conversation.fip_category}
+    fipBadges.push(
+      <Badge size="2" variant="outline" radius="full" style={{
+        boxShadow: "inset 0 0 0 1px var(--accent-a5)"
+      }}>
+        {conversation.fip_category}
       </Badge>,
     )
   }
   if (showCreationDate) {
     fipAttributes.push(
-      <Flex sx={{ alignItems: "center", gap: [1] }}>
-        <TbCalendar style={{ top: "0px", paddingRight: 0 }} />
-        <Text>{new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
+      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+        <TbCalendar />
+        <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
       </Flex>,
     )
   }
   if (showAuthors) {
     fipAttributes.push(
-      <Text>
+      <Text sx={{ whiteSpace: "nowrap" }}>
         {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
       </Text>,
     )
@@ -103,8 +108,11 @@ export const FipEntry = ({
         borderRadius: "8px",
         borderStyle: "solid",
         borderWidth: "1px",
+        borderLeftWidth: "4px",
         // this uses the color palette defined by radix-ui
-        borderColor: `var(--${fipStatusInfo.color}-10)`,
+        borderColor: fipStatusInfo.color === "gray" ? `#ccc` : `var(--${fipStatusInfo.color}-10)`,
+        padding: "3px 0 6px",
+        background: "#fff",
       }}
       key={conversation.conversation_id}
       onClick={() => setIsOpen(!isOpen)}
@@ -115,19 +123,28 @@ export const FipEntry = ({
           gridTemplateColumns: "20px 1fr",
           gridRow: "auto auto",
           gridColumnGap: "20px",
-          gridRowGap: "20px",
+          gridRowGap: "10px",
         }}
       >
         <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
           {isOpen ? <TbCaretDown /> : <TbCaretRight />}
         </Flex>
-        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
-          <Text>{conversation.fip_number || "-"}</Text>
-          <Text>
+        <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
+          <Text
+            style={{
+              fontWeight: "bold",
+              display: "inline-block",
+              width: "48px",
+              flex: "0 0 auto",
+              fontSize: "95%",
+            }}
+          >
+            {conversation.fip_number ? String(conversation.fip_number).padStart(4, "0") : "Draft"}
+          </Text>
+          <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
             {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
           </Text>
-          <Box sx={{ flexGrow: "1" }}></Box>
-          <Badge size="3" color={fipStatusInfo.color} variant="surface">
+          <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
           </Badge>
           <Link
@@ -143,17 +160,34 @@ export const FipEntry = ({
               overflow: "hidden",
               width: "calc(100% - 20px)",
             }}
+            style={{
+              fontSize: "84%",
+              fontWeight: "500",
+            }}
           >
-            GitHub <TbArrowUpRight />
+            GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
           </Link>
         </Flex>
         <Box></Box>
-        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center" }}>
+        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
+          {fipBadges}
           {fipAttributes.map((attr, i) => (
-            <React.Fragment key={i}>
-              {i > 0 && <Text>|</Text>}
+            <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
+              {i >= 0 && (
+                <Text
+                  style={{
+                    marginLeft: "2px",
+                    marginRight: "9px",
+                    top: "-1px",
+                    position: "relative",
+                    opacity: 0.5,
+                  }}
+                >
+                  |
+                </Text>
+              )}
               {attr}
-            </React.Fragment>
+            </Text>
           ))}
           <Box sx={{ flexGrow: "1" }}></Box>
         </Flex>
@@ -161,8 +195,8 @@ export const FipEntry = ({
           <>
             <Box></Box>
             {/* display the simple summary if possible otherwise display the whole fip description */}
-            <Box>
-              <h3>Authors</h3>
+            <Box sx={{ mb: [3] }}>
+              <h3 style={{ margin: "0 0 10px" }}>Authors</h3>
               {conversation.fip_authors.map((author, i) => {
                 const matches = author.match(/.*@(\w+)/)
                 if (!matches) return author
@@ -183,7 +217,7 @@ export const FipEntry = ({
                 )
               })}
 
-              <h3>Simple Summary</h3>
+              <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 
               {simpleSummary || conversation.description}
             </Box>
