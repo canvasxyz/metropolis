@@ -13,7 +13,7 @@ import { DashboardUserButton } from "./user_button"
 import ConversationsList from "./conversations_list"
 import { Placeholder } from "./placeholder"
 import { DashboardConversation } from "./conversation"
-import { SentimentChecks } from "./sentiment_checks"
+const SentimentChecks = React.lazy(() => import("./sentiment_checks"))
 const FipTracker = React.lazy(() => import("./fip_tracker/index.js"))
 
 const LogoBlock = () => {
