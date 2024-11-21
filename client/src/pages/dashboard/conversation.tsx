@@ -299,9 +299,12 @@ export const DashboardConversation = ({ user }: { user }) => {
                 {!showReport ? (
                   <Survey
                     key={zid_metadata.conversation_id}
-                    match={{
-                      params: { conversation_id: zid_metadata.conversation_id },
-                    }}
+                    conversation_id={zid_metadata.conversation_id}
+                    help_type={zid_metadata.help_type}
+                    postsurvey={zid_metadata.postsurvey}
+                    postsurvey_limit={zid_metadata.postsurvey_limit}
+                    postsurvey_redirect={zid_metadata.postsurvey_redirect}
+                    auth_needed_to_write={zid_metadata.auth_needed_to_write}
                   />
                 ) : (
                   <Box>

@@ -4,6 +4,7 @@ import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
+import Survey from "../../survey"
 
 export const ConversationEntry = ({
   conversation,
@@ -93,7 +94,13 @@ export const ConversationEntry = ({
             <Box></Box>
             <Box sx={{ mb: [3] }}>
               {conversation.description}
+              <Survey match={{
+                params: {
+                  conversation_id: conversation.conversation_id
+                }
+              }}  />
             </Box>
+
           </>
         }
       </Grid>

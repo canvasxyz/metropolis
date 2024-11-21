@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"
 
-import type { Comment, ZidMetadata } from "../../util/types"
+import type { Comment } from "../../util/types"
 import api from "../../util/api"
 import { surveyHeadingMini } from "./index"
 
@@ -14,26 +14,26 @@ Modal.setAppElement("#root")
 
 const SurveyComposeBox = ({
   user,
-  zid_metadata,
   unvotedComments,
   setUnvotedComments,
   submittedComments,
   setSubmittedComments,
   setState,
   onSubmit,
+  conversation_id,
 }: {
   user
-  zid_metadata: ZidMetadata
   unvotedComments
   setUnvotedComments
   submittedComments
   setSubmittedComments
   setState
   onSubmit
+  conversation_id: string
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>()
   const [cachedComment, setCachedComment] = useLocalStorage(
-    "cachedComment-" + zid_metadata.conversation_id,
+    "cachedComment-" + conversation_id,
     "",
   )
   const [error, setError] = useState("")
@@ -44,7 +44,7 @@ const SurveyComposeBox = ({
     const finalTxt = txt.replace(/\n/g, " ").trim() // replace newlines with whitespace
     const params = {
       pid: "mypid",
-      conversation_id: zid_metadata.conversation_id,
+      conversation_id: conversation_id,
       vote,
       txt: finalTxt,
       agid: 1,
@@ -178,7 +178,6 @@ const SurveyComposeBox = ({
 
 const SurveyCompose = ({
   user,
-  zid_metadata,
   votedComments,
   unvotedComments,
   setUnvotedComments,
@@ -187,9 +186,10 @@ const SurveyCompose = ({
   setState,
   showAsModal = false,
   onSubmit,
+  help_type,
+  conversation_id,
 }: {
   user
-  zid_metadata: ZidMetadata
   votedComments
   unvotedComments
   setUnvotedComments
@@ -198,6 +198,8 @@ const SurveyCompose = ({
   setState
   showAsModal
   onSubmit
+  help_type: number
+  conversation_id: string
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -218,13 +220,13 @@ const SurveyCompose = ({
       {!showAsModal ? (
         <SurveyComposeBox
           user={user}
-          zid_metadata={zid_metadata}
           unvotedComments={unvotedComments}
           setUnvotedComments={setUnvotedComments}
           submittedComments={submittedComments}
           setSubmittedComments={setSubmittedComments}
           setState={setState}
           onSubmit={onSubmit}
+          conversation_id={conversation_id}
         />
       ) : (
         <Modal
@@ -255,7 +257,7 @@ const SurveyCompose = ({
             Add new response
           </Heading>
 
-          {zid_metadata.help_type !== 0 && (
+          {help_type !== 0 && (
             <Text sx={{ mb: [4] }}>
               <p>Add your perspectives, experiences, or ideas here. Good responses should:</p>
               <ul>
@@ -268,13 +270,13 @@ const SurveyCompose = ({
 
           <SurveyComposeBox
             user={user}
-            zid_metadata={zid_metadata}
             unvotedComments={unvotedComments}
             setUnvotedComments={setUnvotedComments}
             submittedComments={submittedComments}
             setSubmittedComments={setSubmittedComments}
             setState={setState}
             onSubmit={onSubmit}
+            conversation_id={conversation_id}
           />
         </Modal>
       )}
