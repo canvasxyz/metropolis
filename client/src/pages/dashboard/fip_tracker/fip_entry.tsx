@@ -116,7 +116,6 @@ export const FipEntry = ({
   return (
     <div
       style={{
-        cursor: "pointer",
         borderRadius: "8px",
         borderStyle: "solid",
         borderWidth: "1px",
@@ -161,7 +160,8 @@ export const FipEntry = ({
           </Badge>
           {conversation.github_pr && (
             <Link
-              to={conversation.github_pr.url}
+              className="link"
+              to={conversation.github_pr.url.replace(/\/files$/, "")}
               target="_blank"
               noreferrer="noreferrer"
               noopener="noopener"
@@ -218,6 +218,7 @@ export const FipEntry = ({
                 return (
                   <React.Fragment key={author}>
                     <Link
+                      className="link"
                       onClick={(e) => e.stopPropagation()}
                       to={`https://github.com/${username}`}
                       target="_blank"
@@ -242,7 +243,12 @@ export const FipEntry = ({
                   }
                 }}
               >
-                <ReactMarkdown skipHtml={true} remarkPlugins={[remarkGfm]} linkTarget="_blank">
+                <ReactMarkdown
+                  skipHtml={true}
+                  remarkPlugins={[remarkGfm]}
+                  linkTarget="_blank"
+                  className="react-markdown"
+                >
                   {conversation.simple_summary || conversation.fip_content}
                 </ReactMarkdown>
               </div>
