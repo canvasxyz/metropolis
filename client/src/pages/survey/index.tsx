@@ -167,6 +167,8 @@ const Survey = ({
     history.pushState({}, "", document.location.pathname + "#" + state)
   }, [])
 
+  const voteDisabled = auth_needed_to_write && !user
+
   return (
     <Box>
       {state === "voting" && (
@@ -175,10 +177,9 @@ const Survey = ({
             votedComments={votedComments}
             unvotedComments={unvotedComments}
             goTo={goTo}
-            user={user}
             postsurvey={postsurvey}
             postsurvey_redirect={postsurvey_redirect}
-            auth_needed_to_write={auth_needed_to_write}
+            voteDisabled={voteDisabled}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c && c.tid === commentId)
               const newUnvotedComments = unvotedComments.filter((c) => c && c.tid !== commentId)

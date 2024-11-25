@@ -19,8 +19,7 @@ type SurveyCardProps = {
   hasVoted: boolean
   cardHeight?: number
   topCard?: boolean
-  user
-  auth_needed_to_write: boolean
+  voteDisabled: boolean
 }
 
 const SurveyCard = ({
@@ -30,12 +29,9 @@ const SurveyCard = ({
   hasVoted,
   cardHeight,
   topCard,
-  user,
-  auth_needed_to_write,
+  voteDisabled,
 }: SurveyCardProps) => {
   const { tid: commentId, txt } = comment
-
-  const voteDisabled = auth_needed_to_write && !user
 
   const [editingVote, setEditingVote] = useState(false)
 

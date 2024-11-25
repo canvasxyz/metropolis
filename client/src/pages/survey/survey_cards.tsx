@@ -12,20 +12,18 @@ const SurveyCards = ({
   unvotedComments,
   onVoted,
   goTo,
-  user,
   postsurvey,
   postsurvey_redirect,
-  auth_needed_to_write,
+  voteDisabled,
 }: {
   conversation_id
   votedComments
   unvotedComments
   onVoted
   goTo
-  user
   postsurvey,
   postsurvey_redirect,
-  auth_needed_to_write,
+  voteDisabled: boolean,
 }) => {
   // className={collapsed ? "react-markdown css-fade" : "react-markdown"}
   const [collapsed, setCollapsed] = useState(true)
@@ -46,12 +44,11 @@ const SurveyCards = ({
               }}
             >
               <SurveyCard
-                user={user}
                 comment={comment}
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
-                auth_needed_to_write={auth_needed_to_write}
+                voteDisabled={voteDisabled}
               />
             </Box>
           ))}
