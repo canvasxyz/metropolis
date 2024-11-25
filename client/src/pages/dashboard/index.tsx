@@ -141,7 +141,11 @@ const Dashboard = ({ user }: DashboardProps) => {
           <DashboardUserButton />
           <CompatRoutes>
             <CompatRoute path="/" element={<Placeholder />} />
-            <CompatRoute path="/sentiment_checks" element={<SentimentChecks />} />
+            <CompatRoute path="/sentiment_checks" element={
+              <Suspense>
+                {" "}
+                <SentimentChecks />
+              </Suspense>} />
             <CompatRoute
               path="/fip_tracker"
               element={
