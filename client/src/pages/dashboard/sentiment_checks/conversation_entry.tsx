@@ -5,6 +5,16 @@ import { Box, Flex, Grid } from "theme-ui"
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import ReportAndSurveyInfo from "../report_and_survey_info"
+import { SentimentCheckComments } from "../sentiment_check_comments"
+
+const dashboardBox = {
+  bg: "bgWhite",
+  py: "18px",
+  px: "22px",
+  // my: [3],
+  lineHeight: 1.35,
+  border: "1px solid #ddd",
+}
 
 export const ConversationEntry = ({
   conversation,
@@ -93,6 +103,16 @@ export const ConversationEntry = ({
           <>
             <Box></Box>
             <ReportAndSurveyInfo conversation_info={conversation}/>
+            <Box></Box>
+            <Box sx={dashboardBox}>
+              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
+              {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
+                Have more to say? You can leave a short comment here.
+                </Box> */}
+              <Box sx={{ mx: "-8px", pt: "8px" }}>
+                <SentimentCheckComments conversationId={conversation.conversation_id} />
+              </Box>
+            </Box>
           </>
         }
       </Grid>

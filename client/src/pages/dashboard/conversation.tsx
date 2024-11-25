@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { usePopper } from "react-popper"
 import { toast } from "react-hot-toast"
 import { Heading, Link, Box, Text, jsx } from "theme-ui"
@@ -226,7 +226,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 Have more to say? You can leave a short comment here.
                 </Box> */}
               <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <SentimentCheckComments user={user} conversationId={zid_metadata.conversation_id} />
+                <SentimentCheckComments conversationId={zid_metadata.conversation_id} />
               </Box>
             </Box>
           }
