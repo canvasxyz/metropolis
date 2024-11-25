@@ -94,11 +94,14 @@ export const ConversationEntry = ({
             <Box></Box>
             <Box sx={{ mb: [3] }}>
               {conversation.description}
-              <Survey match={{
-                params: {
-                  conversation_id: conversation.conversation_id
-                }
-              }}  />
+              <Survey
+                conversation_id={conversation.conversation_id}
+                help_type={conversation.help_type}
+                postsurvey={conversation.postsurvey}
+                postsurvey_limit={conversation.postsurvey_limit}
+                postsurvey_redirect={conversation.postsurvey_redirect}
+                auth_needed_to_write={conversation.auth_needed_to_write}
+              />
             </Box>
 
           </>

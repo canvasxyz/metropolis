@@ -176,6 +176,9 @@ const Survey = ({
             unvotedComments={unvotedComments}
             goTo={goTo}
             user={user}
+            postsurvey={postsurvey}
+            postsurvey_redirect={postsurvey_redirect}
+            auth_needed_to_write={auth_needed_to_write}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c && c.tid === commentId)
               const newUnvotedComments = unvotedComments.filter((c) => c && c.tid !== commentId)
@@ -200,7 +203,6 @@ const Survey = ({
               }
             }}
             conversation_id={conversation_id}
-            zid_metadata={zid_metadata}
           />
         </React.Fragment>
       )}
@@ -241,6 +243,8 @@ const Survey = ({
                 onSubmit={() => {
                   dispatch(handleSubmitNewComment(conversation_id))
                 }}
+                conversation_id={conversation_id}
+                help_type={help_type}
               />
             </Box>
           ) : (

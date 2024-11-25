@@ -1,13 +1,17 @@
 import React from "react"
 import Survey from "."
 import useSWR from "swr"
+import { ZidMetadata } from "../../util/types"
 
 type SurveyProps = { match: { params: { conversation_id: string } } }
 
 const SurveyWithLoader = ({ match }: SurveyProps) => {
-  const { data } = useSWR(
+  const { data } = useSWR<ZidMetadata>(
     `conversation_${match.params.conversation_id}`,
-    async () => fetch(`/api/v3/conversation/${match.params.conversation_id}`),
+    async () => {
+      const response = await fetch(`/api/v3/conversation/${match.params.conversation_id}`)
+      return await response.json()
+    },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
 

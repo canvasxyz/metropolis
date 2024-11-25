@@ -24,6 +24,11 @@ export type ConversationSummary = {
   conversation_id: string
   created: number
   description: string | null
+  help_type: number
+  postsurvey: string | null
+  postsurvey_limit: string | null
+  postsurvey_redirect: string | null
+  auth_needed_to_write: boolean
 }
 
 type ConversationSummaryState =

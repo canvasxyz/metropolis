@@ -5,7 +5,6 @@ import { Box, Button, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
-import { ZidMetadata } from "../../util/types"
 
 const SurveyCards = ({
   conversation_id,
@@ -13,16 +12,20 @@ const SurveyCards = ({
   unvotedComments,
   onVoted,
   goTo,
-  zid_metadata,
   user,
+  postsurvey,
+  postsurvey_redirect,
+  auth_needed_to_write,
 }: {
   conversation_id
   votedComments
   unvotedComments
   onVoted
   goTo
-  zid_metadata: ZidMetadata
   user
+  postsurvey,
+  postsurvey_redirect,
+  auth_needed_to_write,
 }) => {
   // className={collapsed ? "react-markdown css-fade" : "react-markdown"}
   const [collapsed, setCollapsed] = useState(true)
@@ -48,7 +51,7 @@ const SurveyCards = ({
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
-                zid_metadata={zid_metadata}
+                auth_needed_to_write={auth_needed_to_write}
               />
             </Box>
           ))}
@@ -86,18 +89,18 @@ const SurveyCards = ({
             <br />
             Come back later for more to vote on, or add your own.
           </Box>
-          {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
+          {(postsurvey || postsurvey_redirect) && (
             <Button
               variant="primary"
               onClick={() =>
-                zid_metadata.postsurvey
+                postsurvey
                   ? goTo("postsurvey")
-                  : window.open(zid_metadata.postsurvey_redirect)
+                  : window.open(postsurvey_redirect)
               }
               sx={{ width: "100%", mb: [3] }}
             >
               Go to next steps
-              {!zid_metadata.postsurvey && (
+              {!postsurvey && (
                 <TbExternalLink style={{ marginLeft: "5px", position: "relative", top: "2px" }} />
               )}
             </Button>

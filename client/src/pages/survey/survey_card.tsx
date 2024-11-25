@@ -19,8 +19,8 @@ type SurveyCardProps = {
   hasVoted: boolean
   cardHeight?: number
   topCard?: boolean
-  zid_metadata: ZidMetadata
   user
+  auth_needed_to_write: boolean
 }
 
 const SurveyCard = ({
@@ -30,12 +30,12 @@ const SurveyCard = ({
   hasVoted,
   cardHeight,
   topCard,
-  zid_metadata,
   user,
+  auth_needed_to_write,
 }: SurveyCardProps) => {
   const { tid: commentId, txt } = comment
 
-  const voteDisabled = zid_metadata.auth_needed_to_write && !user
+  const voteDisabled = auth_needed_to_write && !user
 
   const [editingVote, setEditingVote] = useState(false)
 
