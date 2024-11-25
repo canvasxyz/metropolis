@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import React, { useState } from "react"
-import { Box, Button, Text, jsx } from "theme-ui"
+import { Box, Button, Flex, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
@@ -59,7 +59,10 @@ const SurveyCards = ({
           as="div"
           sx={{ textAlign: "center", fontWeight: 600, width: "100%", mt: "16px", mb: "10px" }}
           variant="links.a"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setCollapsed(!collapsed)
+          }}
         >
           {collapsed
             ? `Show more comments (${unvotedComments.length} total)`
@@ -72,7 +75,7 @@ const SurveyCards = ({
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
-        <React.Fragment>
+        <Flex sx={{flexDirection: "column", gap: 3}}>
           <Box
             sx={{
               ...surveyBox,
@@ -89,11 +92,12 @@ const SurveyCards = ({
           {(postsurvey || postsurvey_redirect) && (
             <Button
               variant="primary"
-              onClick={() =>
+              onClick={(e) => {
+                e.stopPropagation()
                 postsurvey
                   ? goTo("postsurvey")
                   : window.open(postsurvey_redirect)
-              }
+              }}
               sx={{ width: "100%", mb: [3] }}
             >
               Go to next steps
@@ -102,7 +106,7 @@ const SurveyCards = ({
               )}
             </Button>
           )}
-        </React.Fragment>
+        </Flex>
       )}
     </Box>
   )

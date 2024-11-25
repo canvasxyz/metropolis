@@ -124,6 +124,9 @@ const SurveyComposeBox = ({
           onBlur={() => {
             setCachedComment(inputRef.current.value)
           }}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter" && e.metaKey) {
               e.preventDefault()
@@ -154,7 +157,8 @@ const SurveyComposeBox = ({
               fontSize: "0.98em",
               fontWeight: 500,
             }}
-            onClick={() => {
+            onClick={(e) => {
+              e.stopPropagation()
               submitComment(inputRef.current.value, 1)
                 .then(() => {
                   inputRef.current.value = ""

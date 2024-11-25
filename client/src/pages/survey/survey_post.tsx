@@ -4,7 +4,7 @@ import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbExternalLink } from "react-icons/tb"
-import { Box, Heading, Button, Text, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, jsx, Flex } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
 
@@ -26,7 +26,7 @@ const PostSurvey = ({
   postsurvey_redirect: string
 }) => {
   return (
-    <React.Fragment>
+    <Flex sx={{flexDirection: "column", gap: 3}}>
       {postsurvey ? (
         <Box sx={{ ...surveyBox, pt: [5], pb: [5] }}>
           <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
@@ -57,7 +57,7 @@ const PostSurvey = ({
       {postsurvey_redirect && (
         <Button
           variant="primary"
-          sx={{ width: "100%", mt: [3] }}
+          sx={{ width: "100%" }}
           onClick={() => window.open(postsurvey_redirect)}
         >
           Continue to next steps
@@ -67,15 +67,16 @@ const PostSurvey = ({
 
       <Button
         variant="outline"
-        sx={{ width: "100%", mt: [3] }}
-        onClick={() => {
+        sx={{ width: "100%" }}
+        onClick={(e) => {
+          e.stopPropagation()
           setVotingAfterPostSurvey(true)
           goTo("voting")
         }}
       >
         Go back to voting
       </Button>
-    </React.Fragment>
+    </Flex>
   )
 }
 export default PostSurvey

@@ -149,12 +149,24 @@ const SurveyCard = ({
               options={
                 editingVote
                   ? [
-                      { name: "Agree", onClick: (e) => agree(commentId, e.target) },
-                      { name: "Disagree", onClick: (e) => disagree(commentId, e.target) },
-                      { name: "Skip", onClick: (e) => skip(commentId, e.target) },
+                      { name: "Agree", onClick: (e) => {
+                        e.stopPropagation()
+                        agree(commentId, e.target)
+                      } },
+                      { name: "Disagree", onClick: (e) => {
+                        e.stopPropagation()
+                        disagree(commentId, e.target)
+                      } },
+                      { name: "Skip", onClick: (e) => {
+                        e.stopPropagation()
+                        skip(commentId, e.target)
+                      } },
                       {
                         name: "Cancel",
-                        onClick: () => setEditingVote(false),
+                        onClick: (e) => {
+                          e.stopPropagation()
+                          setEditingVote(false)
+                        },
                       },
                     ]
                   : [{ name: "Edit your vote", onClick: () => setEditingVote(true) }]
@@ -165,7 +177,10 @@ const SurveyCard = ({
         <Box sx={{ pt: [2] }}>
           <Button
             variant={voteDisabled ? "voteDisabled" : "vote"}
-            onClick={(e: any) => agree(commentId, e.target)}
+            onClick={(e: any) => {
+              e.stopPropagation()
+              agree(commentId, e.target)
+            }}
             sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbUp style={{ width: 18, color: "#2fcc71", position: "relative", top: 1 }} />{" "}
@@ -173,7 +188,10 @@ const SurveyCard = ({
           </Button>
           <Button
             variant={voteDisabled ? "voteDisabled" : "vote"}
-            onClick={(e: any) => disagree(commentId, e.target)}
+            onClick={(e: any) => {
+              e.stopPropagation()
+              disagree(commentId, e.target)
+            }}
             sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbDown style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
@@ -181,7 +199,10 @@ const SurveyCard = ({
           </Button>
           <Button
             variant={voteDisabled ? "voteDisabled" : "vote"}
-            onClick={(e: any) => skip(commentId, e.target)}
+            onClick={(e: any) => {
+              e.stopPropagation()
+              skip(commentId, e.target)
+            }}
             sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             Skip
