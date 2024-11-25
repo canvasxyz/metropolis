@@ -1,43 +1,23 @@
 /** @jsx jsx */
 
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { usePopper } from "react-popper"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Text, Button, jsx } from "theme-ui"
+import { Heading, Link, Box, Text, jsx } from "theme-ui"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom-v5-compat"
 import { TbExclamationCircle, TbInfoCircle } from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
-import api from "../../util/api"
-import Survey, { surveyBox } from "../survey"
+import { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
 import { MIN_SEED_RESPONSES } from "../../util/misc"
-
-type ReportComment = {
-  active: boolean
-  agree_count: number
-  conversation_id: string
-  count: number
-  created: string
-  disagree_count: number
-  is_meta: boolean
-  is_seed: boolean
-  lang: string | null
-  mod: number
-  pass_count: number
-  pid: number
-  quote_src_url: string | null
-  tid: number
-  tweet_id: string | null
-  txt: string
-  velocity: number
-}
+import ReportAndSurveyInfo from "./report_and_survey_info"
 
 const dashboardBox = {
   bg: "bgWhite",
@@ -105,54 +85,12 @@ export const DashboardConversation = ({ user }: { user }) => {
     (state: RootState) => state.zid_metadata,
   )
 
-  const [showReport, setShowReport] = useState<boolean>(false)
-  const [report, setReport] = useState<{ report_id: string }>()
-  const [reportComments, setReportComments] = useState<ReportComment[]>([])
-  const [maxCount, setMaxCount] = useState<number>(0)
-  const [refreshInProgress, setRefreshInProgress] = useState(false)
   const viewCount = useViewCount(zid_metadata.conversation_id)
 
   useEffect(() => {
-    setReport(undefined)
-    setReportComments([])
     if (!zid_metadata.conversation_id) return
     dispatch(incrementViewCount(zid_metadata.conversation_id))
-    refreshReport()
   }, [zid_metadata.conversation_id])
-
-  const generateReport = () => {
-    api
-      .post("/api/v3/reports", { conversation_id: zid_metadata.conversation_id })
-      .then(() => refreshReport())
-  }
-
-  const refreshReport = () => {
-    setRefreshInProgress(true)
-    api
-      .get("/api/v3/reports", { conversation_id: zid_metadata.conversation_id })
-      .then((reports) => {
-        setReport(reports[0])
-        if (!reports[0]) return
-        api
-          .get("/api/v3/comments", {
-            conversation_id: zid_metadata.conversation_id,
-            report_id: reports[0].report_id,
-            mod_gt: -1,
-            moderation: true,
-            include_voting_patterns: true,
-          })
-          .then((comments) => {
-            setReportComments(comments)
-            setMaxCount(
-              Math.max.apply(
-                this,
-                comments.map((comment) => comment.count),
-              ),
-            )
-          })
-      })
-      .always(() => setRefreshInProgress(false))
-  }
 
   useEffect(() => {
     dispatch(populateZidMetadataStore(selectedConversationId))
@@ -280,90 +218,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 vote on. This poll will be hidden from other viewers until then.
               </Box>
             )}
-          {!zid_metadata.is_archived && (
-              <Box sx={{ ...dashboardBox, bg: "bgOffWhite" }}>
-                <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
-                  <Text sx={{ flex: 1 }}>Polls for this discussion thread</Text>
-                  <Link
-                    variant="links.a"
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setShowReport(!showReport)
-                    }}
-                    sx={{ fontSize: "0.96em" }}
-                  >
-                    {showReport ? "Back to voting" : "Preview results"}
-                  </Link>
-                </Box>
-                {!showReport ? (
-                  <Survey
-                    key={zid_metadata.conversation_id}
-                    conversation_id={zid_metadata.conversation_id}
-                    help_type={zid_metadata.help_type}
-                    postsurvey={zid_metadata.postsurvey}
-                    postsurvey_limit={zid_metadata.postsurvey_limit}
-                    postsurvey_redirect={zid_metadata.postsurvey_redirect}
-                    auth_needed_to_write={zid_metadata.auth_needed_to_write}
-                  />
-                ) : (
-                  <Box>
-                    {!refreshInProgress && report && (
-                      <Box>
-                        {reportComments.length === 0 && (
-                          <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
-                            No responses for this{" "}
-                            {zid_metadata.fip_version ? "FIP" : "discussion"} yet.
-                          </Box>
-                        )}
-                      </Box>
-                    )}
-                    {!refreshInProgress &&
-                      reportComments.map((c: ReportComment) => (
-                        <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
-                      ))}
-                    <Box
-                      sx={{
-                        fontSize: "0.94em",
-                        mt: "20px",
-                        color: "#9f9e9b",
-                        fontWeight: 500,
-                        textAlign: "center",
-                      }}
-                    >
-                      {!report && (
-                        <Box>
-                          <Box sx={{ pt: [2], pb: [3] }}>
-                            <Box>A report is only generated once a user has requested it.</Box>
-                            <Box>Click continue to generate a report:</Box>
-                          </Box>
-                          <Button variant="buttons.black" onClick={generateReport} sx={{ mb: [3] }}>
-                            Continue to report...
-                          </Button>
-                        </Box>
-                      )}
-                      {report && (
-                        <RouterLink to={`/r/${zid_metadata?.conversation_id}/${report?.report_id}`}>
-                          <Text as="span" variant="links.text">
-                            View full report
-                          </Text>
-                        </RouterLink>
-                      )}
-                      {report && (
-                        <Text
-                          as="span"
-                          variant="links.text"
-                          onClick={refreshReport}
-                          sx={{ ml: [2] }}
-                        >
-                          Refresh report
-                        </Text>
-                      )}
-                    </Box>
-                  </Box>
-                )}
-              </Box>
-            )}
+          {!zid_metadata.is_archived && <ReportAndSurveyInfo conversation_info={zid_metadata} /> }
           {
             <Box sx={dashboardBox}>
               <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
@@ -375,87 +230,6 @@ export const DashboardConversation = ({ user }: { user }) => {
               </Box>
             </Box>
           }
-        </Box>
-      </Box>
-    </Box>
-  )
-}
-
-const ReportCommentRow = ({
-  reportComment,
-  maxCount,
-}: {
-  reportComment: ReportComment
-  maxCount: number
-}) => {
-  const { agree_count, disagree_count, pass_count, tid, txt } = reportComment
-  const row = { display: "flex" }
-  const bar = { px: "1px", py: "2px", lineHeight: 1.2 }
-  const text = { display: "inline-block", fontSize: "0.88em", left: "4px" }
-
-  return (
-    <Box key={tid}>
-      <Box
-        sx={{
-          bg: "bgOffWhite",
-          border: "1px solid #e2ddd5",
-          borderRadius: "7px",
-          mb: [1],
-          pt: "12px",
-          pb: "10px",
-          pl: "20px",
-          pr: "15px",
-          display: "flex",
-        }}
-      >
-        <Text sx={{ margin: "auto", fontSize: "0.91em", lineHeight: 1.3, flex: 1, pr: [1] }}>
-          {txt}
-        </Text>
-        <Box sx={{ position: "relative", pl: [3] }}>
-          <Box sx={row}>
-            <Box sx={{ width: 70, ...text }}>Agree</Box>
-            <Box sx={{ width: 70 }}>
-              <Box
-                sx={{
-                  width: `${Math.ceil((agree_count / maxCount) * 100)}%`,
-                  bg: "#2fcc71",
-                  color: agree_count / maxCount < 0.2 ? "#222" : "#fff",
-                  ...bar,
-                }}
-              >
-                <Text sx={text}>{agree_count}</Text>
-              </Box>
-            </Box>
-          </Box>
-          <Box sx={row}>
-            <Box sx={{ width: 70, ...text }}>Disagree</Box>
-            <Box sx={{ width: 70 }}>
-              <Box
-                sx={{
-                  width: `${Math.ceil((disagree_count / maxCount) * 100)}%`,
-                  bg: "#e74b3c",
-                  color: disagree_count / maxCount < 0.2 ? "#222" : "#fff",
-                  ...bar,
-                }}
-              >
-                <Text sx={text}>{disagree_count}</Text>
-              </Box>
-            </Box>
-          </Box>
-          <Box sx={row}>
-            <Box sx={{ width: 70, ...text }}>Pass</Box>
-            <Box sx={{ width: 70 }}>
-              <Box
-                sx={{
-                  width: `${Math.ceil((pass_count / maxCount) * 100)}%`,
-                  bg: "#e6e6e6",
-                  ...bar,
-                }}
-              >
-                <Text sx={text}>{pass_count}</Text>
-              </Box>
-            </Box>
-          </Box>
         </Box>
       </Box>
     </Box>

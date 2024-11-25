@@ -4,7 +4,7 @@ import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
-import Survey from "../../survey"
+import ReportAndSurveyInfo from "../report_and_survey_info"
 
 export const ConversationEntry = ({
   conversation,
@@ -92,18 +92,7 @@ export const ConversationEntry = ({
         { isOpen &&
           <>
             <Box></Box>
-            <Box sx={{ mb: [3] }}>
-              {conversation.description}
-              <Survey
-                conversation_id={conversation.conversation_id}
-                help_type={conversation.help_type}
-                postsurvey={conversation.postsurvey}
-                postsurvey_limit={conversation.postsurvey_limit}
-                postsurvey_redirect={conversation.postsurvey_redirect}
-                auth_needed_to_write={conversation.auth_needed_to_write}
-              />
-            </Box>
-
+            <ReportAndSurveyInfo conversation_info={conversation}/>
           </>
         }
       </Grid>
