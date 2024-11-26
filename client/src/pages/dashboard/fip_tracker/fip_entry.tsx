@@ -113,6 +113,24 @@ export const FipEntry = ({
     )
   }
 
+  let fileUrl = null
+  if (conversation.github_pr === null) {
+    // file link
+    const updatedFiles = (conversation.fip_files_updated || "").split("\n")
+    if (updatedFiles.length > 0) {
+      // strip leading and trailing slashes and join the rest
+      const updatedFile = updatedFiles[0].split("/").filter((x) => x !== "").join("/")
+      fileUrl = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/blob/master/${updatedFile}`
+    }
+
+    const createdFiles = (conversation.fip_files_created || "").split("\n")
+    if (createdFiles.length > 0) {
+      // strip leading and trailing slashes and join the rest
+      const createdFile = createdFiles[0].split("/").filter((x) => x !== "").join("/")
+      fileUrl = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/blob/master/${createdFile}`
+    }
+  }
+
   return (
     <div
       style={{
@@ -158,6 +176,29 @@ export const FipEntry = ({
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
           </Badge>
+          {fileUrl && (
+            <Link
+              className="link"
+              to={fileUrl}
+              target="_blank"
+              noreferrer="noreferrer"
+              noopener="noopener"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                display: "block",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                width: "calc(100% - 20px)",
+              }}
+              style={{
+                fontSize: "90%",
+                fontWeight: "500",
+              }}
+            >
+              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+            </Link>
+          )}
           {conversation.github_pr && (
             <Link
               className="link"

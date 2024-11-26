@@ -619,7 +619,7 @@ async function do_master_sync() {
       fip_category: fipData.category || null,
       fip_created: fipData.created || null,
       fip_discussions_to: fipData.discussions_to || null,
-      fip_files_created: null,
+      fip_files_created: fipFileName,
       fip_files_updated: null,
       fip_status: fipData.status || null,
       fip_title: fipData.title || null,
