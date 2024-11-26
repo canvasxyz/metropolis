@@ -178,7 +178,7 @@ export const FipEntry = ({
                 fontWeight: "500",
               }}
             >
-              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+              PR <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
             </Link>
           )}
         </Flex>
