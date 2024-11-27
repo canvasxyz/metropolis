@@ -19,42 +19,77 @@ import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
 import { FipVersion } from "../../../util/types"
-import { splitAuthors, UserInfo } from "./splitAuthors"
+import { splitAuthors } from "./splitAuthors"
 
 function processFipVersions(data: FipVersion[]) {
   if (!data) {
     return {}
   }
 
-  const conversations: (FipVersion & {
-    simple_summary: string
-    fip_authors: UserInfo[]
-    displayed_title: string
-  })[] = []
-
   const allFipTypesSet = new Set<string | null>()
   const allFipAuthorsSet = new Set<string>()
 
-  for (const conversation of data) {
-    // don't show fips that don't have a fip status
-    if (conversation.fip_status == null) {
-      continue
+  // don't show fips that don't have a fip status
+  const conversationsWithStatuses = data.filter((conversation) => conversation.fip_status !== null)
+
+  const conversations = conversationsWithStatuses.map((conversation) => {
+    // parse fip type
+    let fip_type = ""
+    const fip_categories = []
+
+    if(conversation.fip_type.indexOf("Core") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Core")
+    }
+    if(conversation.fip_type.indexOf("Networking") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Networking")
+    }
+    if(conversation.fip_type.indexOf("Interface") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Interface")
+    }
+    if(conversation.fip_type.indexOf("Informational") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Informational")
     }
 
-    allFipTypesSet.add(conversation.fip_type)
+    if(conversation.fip_type.indexOf("Technical") !== -1){
+      fip_type = "Technical"
+    }
+
+    if(conversation.fip_type.indexOf("Organizational") !== -1){
+      fip_type = "Organizational"
+    }
+
+    if(conversation.fip_type.indexOf("FRC") !== -1){
+      fip_type = "FRC"
+    }
+
+    if(conversation.fip_type.indexOf("Standards") !== -1){
+      fip_type = "Standards"
+    }
+
+    if(conversation.fip_type.indexOf("N/A") !== -1){
+      fip_type = "N/A"
+    }
+
+    allFipTypesSet.add(fip_type)
 
     const authors = splitAuthors(conversation.fip_author) || []
     for (const author of authors) {
       allFipAuthorsSet.add(author.username || author.email || author.name)
     }
 
-    conversations.push({
+    return {
       ...conversation,
       simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
       fip_authors: authors,
+      fip_type,
+      fip_category: fip_categories.join(", "),
       displayed_title: conversation.fip_title || conversation.github_pr.title,
-    })
-  }
+    }
+  })
 
   const allFipTypes = Array.from(allFipTypesSet)
   allFipTypes.sort((a, b) => a.localeCompare(b))
@@ -95,13 +130,6 @@ export default () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchParam = searchParams.get("search") || ""
-  const filterStatuses = Object.keys(selectedFipStatuses).filter(
-    (status) => selectedFipStatuses[status],
-  )
-  // if draft is selected, also request WIP
-  if (filterStatuses.indexOf("draft") !== -1) {
-    filterStatuses.push("WIP")
-  }
 
   const { data } = useSWR(
     `fips`,
@@ -150,18 +178,23 @@ export default () => {
         return false
       }
 
-      // the conversation's fip type must be one of the selected fip types
-      if (conversation.fip_status) {
-        if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
-          // conversation is closed
-          if (!selectedFipStatuses.closed) {
-            return false
-          }
-        } else if (!selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]) {
+      if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+        // conversation is closed
+        if (!selectedFipStatuses.closed) {
+          return false
+        }
+      } else if (conversation.fip_status) {
+        let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+        if (fipStatusKey === "wip") {
+          fipStatusKey = "draft"
+        }
+
+         if (!selectedFipStatuses[fipStatusKey]) {
           return false
         }
       }
 
+      // the conversation's fip type must be one of the selected fip types
       if (conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
         return false
       }

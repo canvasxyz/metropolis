@@ -57,7 +57,7 @@ export const FipEntry = ({
   const [isOpen, setIsOpen] = useState(false)
 
   let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
-  if (conversation.fip_status === "wip") {
+  if (fipStatusKey === "wip") {
     fipStatusKey = "draft"
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
