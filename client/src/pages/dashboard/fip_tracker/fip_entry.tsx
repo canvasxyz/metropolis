@@ -62,6 +62,9 @@ export const FipEntry = ({
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
   }
+  if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+    fipStatusKey = "closed"
+  }
 
   const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
   const fipStatusLabel = statusOptions[fipStatusKey]

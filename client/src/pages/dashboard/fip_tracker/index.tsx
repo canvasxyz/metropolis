@@ -74,6 +74,7 @@ export default () => {
     deferred: true,
     rejected: true,
     superseded: true,
+    closed: true,
   })
 
   const {
@@ -150,11 +151,15 @@ export default () => {
       }
 
       // the conversation's fip type must be one of the selected fip types
-      if (
-        conversation.fip_status &&
-        !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
-      ) {
-        return false
+      if (conversation.fip_status) {
+        if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+          // conversation is closed
+          if (!selectedFipStatuses.closed) {
+            return false
+          }
+        } else if (!selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]) {
+          return false
+        }
       }
 
       if (conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
@@ -240,6 +245,7 @@ export default () => {
                   "deferred",
                   "rejected",
                   "superseded",
+                  "closed",
                 ].map((fipStatus) => (
                   <ClickableChecklistItem
                     key={fipStatus}
