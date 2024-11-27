@@ -22,7 +22,7 @@ export const extractParagraphByTitle = (markdownText, title) => {
     if (node.type === "heading" && node.children[0].value === title) {
       inDesiredSection = true
     } else if (inDesiredSection) {
-      if (node.type === "paragraph") {
+      if (node.type === "paragraph" || node.type === "list") {
         extractedParagraph = remark().stringify(node)
         inDesiredSection = false // Stop after finding the first paragraph
       } else if (node.type === "heading" && node.depth <= 2) {
