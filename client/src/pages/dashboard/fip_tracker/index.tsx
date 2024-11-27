@@ -11,7 +11,7 @@ import {
 } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Box, Flex, Text } from "theme-ui"
+import { Box, Flex } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { extractParagraphByTitle, FipEntry } from "./fip_entry"
@@ -19,22 +19,7 @@ import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
 import { FipVersion } from "../../../util/types"
-
-const splitAuthors = (authorList = "") => {
-  const result = authorList
-    ?.replace(
-      "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
-      "",
-    )
-    .replace(/"|,$/g, "")
-    .split(/, | and /)
-  if (result && result.length === 1) {
-    return result[0].split(/ @/).map((i) => {
-      return `${i.slice(1).indexOf("@") !== -1 ? "" : "@"}${i.replace(/^@/, "").trim()}`
-    })
-  }
-  return result
-}
+import { splitAuthors, UserInfo } from "./splitAuthors"
 
 function processFipVersions(data: FipVersion[]) {
   if (!data) {
@@ -43,7 +28,7 @@ function processFipVersions(data: FipVersion[]) {
 
   const conversations: (FipVersion & {
     simple_summary: string
-    fip_authors: string[]
+    fip_authors: UserInfo[]
     displayed_title: string
   })[] = []
 
@@ -60,7 +45,7 @@ function processFipVersions(data: FipVersion[]) {
 
     const authors = splitAuthors(conversation.fip_author) || []
     for (const author of authors) {
-      allFipAuthorsSet.add(author)
+      allFipAuthorsSet.add(author.username || author.email || author.name)
     }
 
     conversations.push({
@@ -72,9 +57,9 @@ function processFipVersions(data: FipVersion[]) {
   }
 
   const allFipTypes = Array.from(allFipTypesSet)
-  allFipTypes.sort()
+  allFipTypes.sort((a, b) => a.localeCompare(b))
   const allFipAuthors = Array.from(allFipAuthorsSet)
-  allFipAuthors.sort()
+  allFipAuthors.sort((a, b) => a.localeCompare(b))
 
   return { conversations, allFipTypes, allFipAuthors }
 }
@@ -155,7 +140,7 @@ export default () => {
       // the conversation must have one of the selected fip authors
       let hasMatchingFipAuthor = false
       for (const fipAuthor of conversation.fip_authors) {
-        if (deselectedFipAuthors[fipAuthor] !== true) {
+        if (deselectedFipAuthors[fipAuthor.name] !== true && deselectedFipAuthors[fipAuthor.email] !== true && deselectedFipAuthors[fipAuthor.username] !== true) {
           hasMatchingFipAuthor = true
           break
         }

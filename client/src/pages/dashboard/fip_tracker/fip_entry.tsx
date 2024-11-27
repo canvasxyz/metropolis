@@ -11,6 +11,7 @@ import { Box, Flex, Grid } from "theme-ui"
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
+import { UserInfo } from "./splitAuthors"
 
 export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
@@ -45,7 +46,7 @@ export const FipEntry = ({
 }: {
   conversation: FipVersion & {
     displayed_title: string
-    fip_authors: string[]
+    fip_authors: UserInfo[]
     simple_summary: string
   }
   showAuthors: boolean
@@ -68,10 +69,10 @@ export const FipEntry = ({
     : fipStatusKey
 
   const fipBadges = []
-  const fipAttributes = []
   if (showType && conversation.fip_type) {
     fipBadges.push(
       <Badge
+        key="type"
         size="2"
         variant="outline"
         radius="full"
@@ -86,6 +87,7 @@ export const FipEntry = ({
   if (showCategory && conversation.fip_category) {
     fipBadges.push(
       <Badge
+        key="category"
         size="2"
         variant="outline"
         radius="full"
@@ -95,21 +97,6 @@ export const FipEntry = ({
       >
         {conversation.fip_category}
       </Badge>,
-    )
-  }
-  if (showCreationDate) {
-    fipAttributes.push(
-      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
-        <TbCalendar />
-        <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
-      </Flex>,
-    )
-  }
-  if (showAuthors) {
-    fipAttributes.push(
-      <Text sx={{ whiteSpace: "nowrap" }}>
-        {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
-      </Text>,
     )
   }
 
@@ -226,24 +213,43 @@ export const FipEntry = ({
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "95%" }}>
           {fipBadges}
-          {fipAttributes.map((attr, i) => (
-            <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {i >= 0 && (
-                <Text
-                  style={{
-                    marginLeft: "2px",
-                    marginRight: "9px",
-                    top: "-1px",
-                    position: "relative",
-                    opacity: 0.5,
-                  }}
-                >
-                  |
-                </Text>
-              )}
-              {attr}
+          {showCreationDate && (
+            <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
+              {fipBadges.length > 0 && <Text
+                style={{
+                  marginLeft: "2px",
+                  marginRight: "9px",
+                  top: "-1px",
+                  position: "relative",
+                  opacity: 0.5,
+                }}
+              >
+                |
+              </Text>}
+            <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+              <TbCalendar />
+              <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
+            </Flex>
+          </Text>
+          )}
+          {showAuthors && (
+            <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
+              {fipBadges.length > 0 || showCreationDate && <Text
+                style={{
+                  marginLeft: "2px",
+                  marginRight: "9px",
+                  top: "-1px",
+                  position: "relative",
+                  opacity: 0.5,
+                }}
+              >
+                |
+              </Text>}
+              <Text sx={{ whiteSpace: "nowrap" }}>
+                {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
+              </Text>
             </Text>
-          ))}
+          )}
           <Box sx={{ flexGrow: "1" }}></Box>
         </Flex>
         {isOpen && (
@@ -253,21 +259,19 @@ export const FipEntry = ({
             <Box sx={{ mb: "6px" }}>
               <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
               {conversation.fip_authors.map((author, i) => {
-                const matches = author.match(/.*@(\w+)/)
-                if (!matches) return author
-                const username = matches[1]
                 return (
-                  <React.Fragment key={author}>
-                    <Link
-                      className="link"
-                      onClick={(e) => e.stopPropagation()}
-                      to={`https://github.com/${username}`}
-                      target="_blank"
-                      noreferrer="noreferrer"
-                      noopener="noopener"
-                    >
-                      {author}
-                    </Link>
+                  <React.Fragment key={author.username || author.email || author.name}>
+                    {author.username ? <Link
+                        className="link"
+                        onClick={(e) => e.stopPropagation()}
+                        to={`https://github.com/${author.username}`}
+                        target="_blank"
+                        noreferrer="noreferrer"
+                        noopener="noopener"
+                      >
+                        @{author.username}
+                      </Link>
+                    : author.email }
                     {i < conversation.fip_authors.length - 1 ? ", " : ""}
                   </React.Fragment>
                 )
