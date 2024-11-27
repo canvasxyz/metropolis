@@ -1,4 +1,4 @@
-import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
+import { Button as RadixButton, DropdownMenu, TextField, Select, Button, Text } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
@@ -215,6 +215,10 @@ export default () => {
                     checked={deselectedFipAuthors[fipAuthor] !== true}
                     setChecked={(value) => {
                       setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
+                    }}
+                    showOnly={true}
+                    selectOnly={() => {
+                      setDeselectedFipAuthors(() => Object.fromEntries(allFipAuthors.map((key) => [key, key !== fipAuthor])))
                     }}
                   >
                     {fipAuthor}
