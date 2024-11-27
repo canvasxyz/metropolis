@@ -225,7 +225,7 @@ async function getFipFromPR(
     // try to extract frontmatter
     const contentParts = content.split("---");
     const frontmatterSource = contentParts[1];
-    const description = contentParts[2];
+    const description = contentParts.slice(2).join("---")
 
     let frontmatterData;
     try {
@@ -539,7 +539,7 @@ function parseFipContent(content: string) {
   // try to extract frontmatter
   const contentParts = content.split("---");
   const frontmatterSource = contentParts[1];
-  const description = contentParts[2];
+  const description = contentParts.slice(2).join("---")
 
   let frontmatterData;
   try {
