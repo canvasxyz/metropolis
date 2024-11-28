@@ -20,25 +20,29 @@ const FipEntryInner = ({ conversation }: {
     {/* display the simple summary if possible otherwise display the whole fip description */}
     <Box sx={{ mb: "6px" }}>
       <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
-      {conversation.fip_authors.map((author, i) => {
-        console.log(author.username, author.email, author.name)
-        return (
-          <React.Fragment key={author.username || author.email || author.name}>
-            {author.username ? <Link
-                className="link"
-                onClick={(e) => e.stopPropagation()}
-                to={`https://github.com/${author.username}`}
-                target="_blank"
-                noreferrer="noreferrer"
-                noopener="noopener"
-              >
-                @{author.username}
-              </Link>
-            : author.email }
-            {i < conversation.fip_authors.length - 1 ? ", " : ""}
-          </React.Fragment>
-        )
-      })}
+      {
+        conversation.fip_authors.length === 0 ?
+        conversation.fip_author :
+        conversation.fip_authors.map((author, i) => {
+          console.log(author.username, author.email, author.name)
+          return (
+            <React.Fragment key={author.username || author.email || author.name}>
+              {author.username ? <Link
+                  className="link"
+                  onClick={(e) => e.stopPropagation()}
+                  to={`https://github.com/${author.username}`}
+                  target="_blank"
+                  noreferrer="noreferrer"
+                  noopener="noopener"
+                >
+                  @{author.username}
+                </Link>
+              : author.email }
+              {i < conversation.fip_authors.length - 1 ? ", " : ""}
+            </React.Fragment>
+          )
+        })
+      }
 
       <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 

@@ -1,4 +1,4 @@
-import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
+import { Button as RadixButton, DropdownMenu, TextField, Select, Separator } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
@@ -143,6 +143,7 @@ const FipTracker = () => {
 
   const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string, boolean>>({})
   const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string, boolean>>({})
+  const [unlabeledAuthorDeselected, setUnlabeledAuthorDeselected] = useState<boolean>(false)
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
@@ -166,16 +167,22 @@ const FipTracker = () => {
       }
 
       // the conversation must have one of the selected fip authors
-      let hasMatchingFipAuthor = false
-      for (const fipAuthor of conversation.fip_authors) {
-        const key = getAuthorKey(fipAuthor)
-        if(deselectedFipAuthors[key] !== true) {
-          hasMatchingFipAuthor = true
-          break
+      if(conversation.fip_authors.length === 0) {
+        if(unlabeledAuthorDeselected) {
+          return false
+         }
+      } else {
+        let hasMatchingFipAuthor = false
+        for (const fipAuthor of conversation.fip_authors) {
+          const key = getAuthorKey(fipAuthor)
+          if(deselectedFipAuthors[key] !== true) {
+            hasMatchingFipAuthor = true
+            break
+          }
         }
-      }
-      if(!hasMatchingFipAuthor) {
-        return false
+        if(!hasMatchingFipAuthor) {
+          return false
+        }
       }
 
       if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
@@ -246,6 +253,20 @@ const FipTracker = () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
+              <ClickableChecklistItem
+                color={"blue"}
+                checked={!unlabeledAuthorDeselected}
+                setChecked={(value) => {
+                  setUnlabeledAuthorDeselected(!value)
+                }}
+                showOnly={true}
+                selectOnly={() => {
+                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, true])))
+                  setUnlabeledAuthorDeselected(false)
+                }}
+              >
+                Unlabeled
+              </ClickableChecklistItem>
                 {(Object.keys(allFipAuthors || {}).toSorted((a, b) => a.localeCompare(b))).map((fipAuthor) => (
                   <ClickableChecklistItem
                     key={fipAuthor}
