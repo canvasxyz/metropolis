@@ -255,6 +255,16 @@ const FipTracker = () => {
               <DropdownMenu.SubContent>
               <ClickableChecklistItem
                 color={"blue"}
+                checked={Object.values(deselectedFipAuthors).every((value) => value !== true) && !unlabeledAuthorDeselected}
+                setChecked={(value) => {
+                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, !value])))
+                  setUnlabeledAuthorDeselected(!value)
+                }}
+              >
+                All
+              </ClickableChecklistItem>
+              <ClickableChecklistItem
+                color={"blue"}
                 checked={!unlabeledAuthorDeselected}
                 setChecked={(value) => {
                   setUnlabeledAuthorDeselected(!value)
@@ -267,6 +277,7 @@ const FipTracker = () => {
               >
                 Unlabeled
               </ClickableChecklistItem>
+              <DropdownMenu.Separator />
                 {(Object.keys(allFipAuthors || {}).toSorted((a, b) => a.localeCompare(b))).map((fipAuthor) => (
                   <ClickableChecklistItem
                     key={fipAuthor}
