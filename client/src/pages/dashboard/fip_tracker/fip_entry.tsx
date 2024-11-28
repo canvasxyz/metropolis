@@ -1,41 +1,13 @@
 import React, { useState } from "react"
-import ReactMarkdown from "react-markdown"
 import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
-import markdown from "remark-parse"
-import remarkGfm from "remark-gfm"
-import { remark } from "remark"
-import { unified } from "unified"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
-
-export const extractParagraphByTitle = (markdownText, title) => {
-  const tree = unified().use(markdown).parse(markdownText)
-
-  let inDesiredSection = false
-  let extractedParagraph: string | null = null
-
-  function visitNode(node) {
-    if (node.type === "heading" && node.children[0].value === title) {
-      inDesiredSection = true
-    } else if (inDesiredSection) {
-      if (node.type === "paragraph" || node.type === "list") {
-        extractedParagraph = remark().stringify(node)
-        inDesiredSection = false // Stop after finding the first paragraph
-      } else if (node.type === "heading" && node.depth <= 2) {
-        inDesiredSection = false // Stop if another heading of depth 1 or 2 is found
-      }
-    }
-  }
-
-  tree.children.forEach(visitNode)
-
-  return extractedParagraph
-}
+import SimpleSummary from "./simple_summary"
 
 export const FipEntry = ({
   conversation,
@@ -47,7 +19,6 @@ export const FipEntry = ({
   conversation: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
-    simple_summary: string
   }
   showAuthors: boolean
   showCategory: boolean
@@ -291,14 +262,7 @@ export const FipEntry = ({
                   }
                 }}
               >
-                <ReactMarkdown
-                  skipHtml={true}
-                  remarkPlugins={[remarkGfm]}
-                  linkTarget="_blank"
-                  className="react-markdown"
-                >
-                  {conversation.simple_summary || conversation.fip_content}
-                </ReactMarkdown>
+                <SimpleSummary content={conversation.fip_content} />
               </div>
             </Box>
           </>

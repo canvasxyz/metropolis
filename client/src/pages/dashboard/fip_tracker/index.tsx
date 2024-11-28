@@ -14,7 +14,7 @@ import useSWR from "swr"
 import { Box, Flex } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
-import { extractParagraphByTitle, FipEntry } from "./fip_entry"
+import { FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
@@ -83,7 +83,6 @@ function processFipVersions(data: FipVersion[]) {
 
     return {
       ...conversation,
-      simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
       fip_authors: authors,
       fip_type,
       fip_category: fip_categories.join(", "),
