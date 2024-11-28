@@ -9,6 +9,54 @@ import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
 import SimpleSummary from "./simple_summary"
 
+const FipEntryInner = ({ conversation }: {
+  conversation: FipVersion & {
+    displayed_title: string
+    fip_authors: UserInfo[]
+  }} ) => {
+  console.log(conversation)
+  return <>
+    <Box></Box>
+    {/* display the simple summary if possible otherwise display the whole fip description */}
+    <Box sx={{ mb: "6px" }}>
+      <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
+      {conversation.fip_authors.map((author, i) => {
+        console.log(author.username, author.email, author.name)
+        return (
+          <React.Fragment key={author.username || author.email || author.name}>
+            {author.username ? <Link
+                className="link"
+                onClick={(e) => e.stopPropagation()}
+                to={`https://github.com/${author.username}`}
+                target="_blank"
+                noreferrer="noreferrer"
+                noopener="noopener"
+              >
+                @{author.username}
+              </Link>
+            : author.email }
+            {i < conversation.fip_authors.length - 1 ? ", " : ""}
+          </React.Fragment>
+        )
+      })}
+
+      <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
+
+      <div
+        onClick={(e) => {
+          // It's possible that there could be a tag inside the link,
+          // but we don't handle that case here
+          if (e.target.tagName === "A") {
+            e.stopPropagation()
+          }
+        }}
+      >
+        <SimpleSummary content={conversation.fip_content} />
+      </div>
+    </Box>
+  </>
+}
+
 export const FipEntry = ({
   conversation,
   showAuthors,
@@ -226,47 +274,7 @@ export const FipEntry = ({
           )}
           <Box sx={{ flexGrow: "1" }}></Box>
         </Flex>
-        {isOpen && (
-          <>
-            <Box></Box>
-            {/* display the simple summary if possible otherwise display the whole fip description */}
-            <Box sx={{ mb: "6px" }}>
-              <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
-              {conversation.fip_authors.map((author, i) => {
-                return (
-                  <React.Fragment key={author.username || author.email || author.name}>
-                    {author.username ? <Link
-                        className="link"
-                        onClick={(e) => e.stopPropagation()}
-                        to={`https://github.com/${author.username}`}
-                        target="_blank"
-                        noreferrer="noreferrer"
-                        noopener="noopener"
-                      >
-                        @{author.username}
-                      </Link>
-                    : author.email }
-                    {i < conversation.fip_authors.length - 1 ? ", " : ""}
-                  </React.Fragment>
-                )
-              })}
-
-              <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
-
-              <div
-                onClick={(e) => {
-                  // It's possible that there could be a tag inside the link,
-                  // but we don't handle that case here
-                  if (e.target.tagName === "A") {
-                    e.stopPropagation()
-                  }
-                }}
-              >
-                <SimpleSummary content={conversation.fip_content} />
-              </div>
-            </Box>
-          </>
-        )}
+        {isOpen && <FipEntryInner conversation={conversation} />}
       </Grid>
     </div>
   )

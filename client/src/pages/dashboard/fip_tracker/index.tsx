@@ -19,7 +19,7 @@ import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
 import { FipVersion } from "../../../util/types"
-import { splitAuthors } from "./splitAuthors"
+import { getAuthorKey, splitAuthors, UserInfo } from "./splitAuthors"
 
 function processFipVersions(data: FipVersion[]) {
   if (!data) {
@@ -27,7 +27,9 @@ function processFipVersions(data: FipVersion[]) {
   }
 
   const allFipTypesSet = new Set<string | null>()
-  const allFipAuthorsSet = new Set<string>()
+
+  // map holding all fip authors
+  const allFipAuthors: Map<string, UserInfo> = new Map()
 
   // don't show fips that don't have a fip status
   const conversationsWithStatuses = data.filter((conversation) => conversation.fip_status !== null)
@@ -78,7 +80,7 @@ function processFipVersions(data: FipVersion[]) {
 
     const authors = splitAuthors(conversation.fip_author) || []
     for (const author of authors) {
-      allFipAuthorsSet.add(author.username || author.email || author.name)
+      allFipAuthors[getAuthorKey(author)] = author
     }
 
     return {
@@ -92,13 +94,11 @@ function processFipVersions(data: FipVersion[]) {
 
   const allFipTypes = Array.from(allFipTypesSet)
   allFipTypes.sort((a, b) => a.localeCompare(b))
-  const allFipAuthors = Array.from(allFipAuthorsSet)
-  allFipAuthors.sort((a, b) => a.localeCompare(b))
 
   return { conversations, allFipTypes, allFipAuthors }
 }
 
-export default () => {
+const FipTracker = () => {
   const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>({
     draft: true,
     "last-call": true,
@@ -168,12 +168,13 @@ export default () => {
       // the conversation must have one of the selected fip authors
       let hasMatchingFipAuthor = false
       for (const fipAuthor of conversation.fip_authors) {
-        if (deselectedFipAuthors[fipAuthor.name] !== true && deselectedFipAuthors[fipAuthor.email] !== true && deselectedFipAuthors[fipAuthor.username] !== true) {
+        const key = getAuthorKey(fipAuthor)
+        if(deselectedFipAuthors[key] !== true) {
           hasMatchingFipAuthor = true
           break
         }
       }
-      if (!hasMatchingFipAuthor) {
+      if(!hasMatchingFipAuthor) {
         return false
       }
 
@@ -245,7 +246,7 @@ export default () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {(allFipAuthors || []).map((fipAuthor) => (
+                {(Object.keys(allFipAuthors || {}).toSorted((a, b) => a.localeCompare(b))).map((fipAuthor) => (
                   <ClickableChecklistItem
                     key={fipAuthor}
                     color={"blue"}
@@ -255,10 +256,10 @@ export default () => {
                     }}
                     showOnly={true}
                     selectOnly={() => {
-                      setDeselectedFipAuthors(() => Object.fromEntries(allFipAuthors.map((key) => [key, key !== fipAuthor])))
+                      setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, key !== fipAuthor])))
                     }}
                   >
-                    {fipAuthor}
+                    {allFipAuthors[fipAuthor].username ? `@${allFipAuthors[fipAuthor].username}` : allFipAuthors[fipAuthor].email}
                   </ClickableChecklistItem>
                 ))}
               </DropdownMenu.SubContent>
@@ -395,3 +396,5 @@ export default () => {
     </Flex>
   )
 }
+
+export default FipTracker

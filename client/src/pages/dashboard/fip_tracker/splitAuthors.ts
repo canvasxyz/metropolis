@@ -144,3 +144,15 @@ export function splitAuthors(fip_authors) {
 
   return null
 }
+
+export function getAuthorKey(author: UserInfo) {
+  let key: string
+  if(author.username){
+    key = `username:${author.username.toLowerCase()}`
+  } else if (author.email){
+    key = `email:${author.email.toLowerCase()}`
+  } else {
+    key = `name:${author.name.toLowerCase()}`
+  }
+  return key
+}
