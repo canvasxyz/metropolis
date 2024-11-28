@@ -1,4 +1,4 @@
-import { Button as RadixButton, DropdownMenu, TextField, Select, Button, Text } from "@radix-ui/themes"
+import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
