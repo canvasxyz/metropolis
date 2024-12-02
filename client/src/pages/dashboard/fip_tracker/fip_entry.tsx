@@ -9,6 +9,9 @@ import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
 import SimpleSummary from "./simple_summary"
 
+const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || 'filecoin-project'
+const FIP_REPO_NAME = process.env.FIP_REPO_NAME || 'FIPs'
+
 const FipEntryInner = ({ conversation }: {
   conversation: FipVersion & {
     displayed_title: string
@@ -133,14 +136,14 @@ export const FipEntry = ({
     if (updatedFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
       const updatedFile = updatedFiles[0].split("/").filter((x) => x !== "").join("/")
-      fileUrl = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/blob/master/${updatedFile}`
+      fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${updatedFile}`
     }
 
     const createdFiles = (conversation.fip_files_created || "").split("\n")
     if (createdFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
       const createdFile = createdFiles[0].split("/").filter((x) => x !== "").join("/")
-      fileUrl = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/blob/master/${createdFile}`
+      fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${createdFile}`
     }
   }
 

@@ -96,8 +96,12 @@ const ConversationsList = ({
   if (selectedConversations === "all-fip") {
     allConversations.sort((c1, c2) => {
       return (
-        (c2.fip_version?.github_pr?.opened_at ? new Date(c2.fip_version.github_pr.opened_at).getTime() : c2.created) -
-        (c1.fip_version?.github_pr?.opened_at ? new Date(c1.fip_version.github_pr.opened_at).getTime() : c1.created)
+        (c2.fip_version?.github_pr?.opened_at
+          ? new Date(c2.fip_version.github_pr.opened_at).getTime()
+          : c2.created) -
+        (c1.fip_version?.github_pr?.opened_at
+          ? new Date(c1.fip_version.github_pr.opened_at).getTime()
+          : c1.created)
       )
     })
     conversationsToDisplay = allConversations
@@ -249,7 +253,7 @@ const ConversationsList = ({
           as="a"
           target="_blank"
           rel="noreferrer"
-          href="https://github.com/filecoin-project/FIPs"
+          href={`https://github.com/${process.env.FIP_REPO_OWNER || "filecoin-project"}/${process.env.FIP_REPO_NAME || "FIPs"}`}
         >
           FIPs <TbExternalLink style={{ position: "relative", top: 1, left: -1 }} />
         </Link>{" "}
