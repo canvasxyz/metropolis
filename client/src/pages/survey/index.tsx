@@ -65,14 +65,22 @@ const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id,
 }
 
 type SurveyProps = {
-  updateCommentCount?: () => void
-  match: { params: { conversation_id: string } }
+  conversation_id: string
+  help_type: number
+  postsurvey: string
+  // why can't this just be returned from the backend as a number?
+  postsurvey_limit: string
+  postsurvey_redirect: string
+  auth_needed_to_write: boolean
 }
+
 const Survey = ({
-  updateCommentCount,
-  match: {
-    params: { conversation_id },
-  },
+  conversation_id,
+  help_type,
+  postsurvey,
+  postsurvey_limit,
+  postsurvey_redirect,
+  auth_needed_to_write,
 }: SurveyProps) => {
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -84,13 +92,10 @@ const Survey = ({
   const [state, setState] = useState<SurveyState>("loading")
   const [votingAfterPostSurvey, setVotingAfterPostSurvey] = useState(false)
 
-  const { zid_metadata } = useAppSelector((state: RootState) => state.zid_metadata)
   const { user } = useAppSelector((state: RootState) => state.user)
   const dispatch = useAppDispatch()
 
   useEffect(() => {
-    if (!zid_metadata || Object.keys(zid_metadata).length === 0) return
-
     Promise.all([
       api.get("api/v3/comments", {
         conversation_id,
@@ -133,7 +138,7 @@ const Survey = ({
           selectNextComment(
             newUnvotedComments,
             setUnvotedComments,
-            zid_metadata.conversation_id,
+            conversation_id,
             newUnvotedComments[0]?.tid,
           )
         }, 0)
@@ -154,13 +159,15 @@ const Survey = ({
     }
     window.addEventListener("popstate", onpopstate)
     return () => window.removeEventListener("popstate", onpopstate)
-  }, [zid_metadata && Object.keys(zid_metadata).length > 0])
+  }, [])
 
   const goTo = useCallback((state) => {
     // preserve the root page
     setState(state)
     history.pushState({}, "", document.location.pathname + "#" + state)
   }, [])
+
+  const voteDisabled = auth_needed_to_write && !user
 
   return (
     <Box>
@@ -170,7 +177,9 @@ const Survey = ({
             votedComments={votedComments}
             unvotedComments={unvotedComments}
             goTo={goTo}
-            user={user}
+            postsurvey={postsurvey}
+            postsurvey_redirect={postsurvey_redirect}
+            voteDisabled={voteDisabled}
             onVoted={(commentId: string) => {
               const comment = unvotedComments.find((c) => c && c.tid === commentId)
               const newUnvotedComments = unvotedComments.filter((c) => c && c.tid !== commentId)
@@ -180,8 +189,8 @@ const Survey = ({
               setVotedComments(newVotedComments)
 
               if (
-                zid_metadata.postsurvey &&
-                newVotedComments.length > parseInt(zid_metadata.postsurvey_limit, 10) &&
+                postsurvey &&
+                newVotedComments.length > parseInt(postsurvey_limit, 10) &&
                 !votingAfterPostSurvey
               ) {
                 goTo("postsurvey")
@@ -189,13 +198,12 @@ const Survey = ({
                 selectNextComment(
                   newUnvotedComments,
                   setUnvotedComments,
-                  zid_metadata.conversation_id,
+                  conversation_id,
                   newUnvotedComments[0]?.tid,
                 )
               }
             }}
             conversation_id={conversation_id}
-            zid_metadata={zid_metadata}
           />
         </React.Fragment>
       )}
@@ -206,13 +214,14 @@ const Survey = ({
           submittedComments={submittedComments}
           goTo={goTo}
           setVotingAfterPostSurvey={setVotingAfterPostSurvey}
-          zid_metadata={zid_metadata}
+          postsurvey={postsurvey}
+          postsurvey_redirect={postsurvey_redirect}
         />
       )}
 
       {state === "voting" && (
         <Box>
-          {!zid_metadata.auth_needed_to_write ||
+          {!auth_needed_to_write ||
           !!user?.email ||
           !!user?.githubUserId ||
           !!user?.xInfo ? (
@@ -224,8 +233,7 @@ const Survey = ({
               </Box>
               <SurveyCompose
                 user={user}
-                key={zid_metadata.conversation_id}
-                zid_metadata={zid_metadata}
+                key={conversation_id}
                 votedComments={votedComments}
                 unvotedComments={unvotedComments}
                 setUnvotedComments={setUnvotedComments}
@@ -234,8 +242,10 @@ const Survey = ({
                 setState={setState}
                 showAsModal={false}
                 onSubmit={() => {
-                  dispatch(handleSubmitNewComment(zid_metadata))
+                  dispatch(handleSubmitNewComment(conversation_id))
                 }}
+                conversation_id={conversation_id}
+                help_type={help_type}
               />
             </Box>
           ) : (
@@ -257,6 +267,8 @@ const Survey = ({
           )}
         </Box>
       )}
+
+      {state === "loading" && <Box>Loading...</Box>}
     </Box>
   )
 }

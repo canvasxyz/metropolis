@@ -13,7 +13,7 @@ import { DashboardUserButton } from "./user_button"
 import ConversationsList from "./conversations_list"
 import { Placeholder } from "./placeholder"
 import { DashboardConversation } from "./conversation"
-import { SentimentChecks } from "./sentiment_checks"
+const SentimentChecks = React.lazy(() => import("./sentiment_checks"))
 const FipTracker = React.lazy(() => import("./fip_tracker/index.js"))
 
 const LogoBlock = () => {
@@ -141,7 +141,11 @@ const Dashboard = ({ user }: DashboardProps) => {
           <DashboardUserButton />
           <CompatRoutes>
             <CompatRoute path="/" element={<Placeholder />} />
-            <CompatRoute path="/sentiment_checks" element={<SentimentChecks />} />
+            <CompatRoute path="/sentiment_checks" element={
+              <Suspense>
+                {" "}
+                <SentimentChecks />
+              </Suspense>} />
             <CompatRoute
               path="/fip_tracker"
               element={

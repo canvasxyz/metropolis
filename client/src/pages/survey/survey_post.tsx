@@ -4,35 +4,36 @@ import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbExternalLink } from "react-icons/tb"
-import { Box, Heading, Button, Text, jsx } from "theme-ui"
+import { Box, Heading, Button, Text, jsx, Flex } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
-import { ZidMetadata } from "../../util/types"
 
 const PostSurvey = ({
   submittedComments,
   votedComments,
   unvotedComments,
-  zid_metadata,
   goTo,
   setVotingAfterPostSurvey,
+  postsurvey,
+  postsurvey_redirect,
 }: {
   submittedComments
   votedComments
   unvotedComments
-  zid_metadata: ZidMetadata
   goTo
   setVotingAfterPostSurvey
+  postsurvey: string
+  postsurvey_redirect: string
 }) => {
   return (
-    <React.Fragment>
-      {zid_metadata.postsurvey ? (
+    <Flex sx={{flexDirection: "column", gap: 3}}>
+      {postsurvey ? (
         <Box sx={{ ...surveyBox, pt: [5], pb: [5] }}>
           <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
             Nice work!
           </Heading>
           <Text className="react-markdown">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>{zid_metadata.postsurvey}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{postsurvey}</ReactMarkdown>
           </Text>
         </Box>
       ) : (
@@ -53,11 +54,11 @@ const PostSurvey = ({
           </Text>
         </Box>
       )}
-      {zid_metadata.postsurvey_redirect && (
+      {postsurvey_redirect && (
         <Button
           variant="primary"
-          sx={{ width: "100%", mt: [3] }}
-          onClick={() => window.open(zid_metadata.postsurvey_redirect)}
+          sx={{ width: "100%" }}
+          onClick={() => window.open(postsurvey_redirect)}
         >
           Continue to next steps
           <TbExternalLink style={{ marginLeft: "5px", position: "relative", top: "2px" }} />
@@ -66,15 +67,16 @@ const PostSurvey = ({
 
       <Button
         variant="outline"
-        sx={{ width: "100%", mt: [3] }}
-        onClick={() => {
+        sx={{ width: "100%" }}
+        onClick={(e) => {
+          e.stopPropagation()
           setVotingAfterPostSurvey(true)
           goTo("voting")
         }}
       >
         Go back to voting
       </Button>
-    </React.Fragment>
+    </Flex>
   )
 }
 export default PostSurvey

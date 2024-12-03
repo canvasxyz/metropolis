@@ -1,11 +1,10 @@
 /** @jsx jsx */
 
 import React, { useState } from "react"
-import { Box, Button, Text, jsx } from "theme-ui"
+import { Box, Button, Flex, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
-import { ZidMetadata } from "../../util/types"
 
 const SurveyCards = ({
   conversation_id,
@@ -13,16 +12,18 @@ const SurveyCards = ({
   unvotedComments,
   onVoted,
   goTo,
-  zid_metadata,
-  user,
+  postsurvey,
+  postsurvey_redirect,
+  voteDisabled,
 }: {
   conversation_id
   votedComments
   unvotedComments
   onVoted
   goTo
-  zid_metadata: ZidMetadata
-  user
+  postsurvey,
+  postsurvey_redirect,
+  voteDisabled: boolean,
 }) => {
   // className={collapsed ? "react-markdown css-fade" : "react-markdown"}
   const [collapsed, setCollapsed] = useState(true)
@@ -43,12 +44,11 @@ const SurveyCards = ({
               }}
             >
               <SurveyCard
-                user={user}
                 comment={comment}
                 conversationId={conversation_id}
                 onVoted={onVoted}
                 hasVoted={false}
-                zid_metadata={zid_metadata}
+                voteDisabled={voteDisabled}
               />
             </Box>
           ))}
@@ -59,7 +59,10 @@ const SurveyCards = ({
           as="div"
           sx={{ textAlign: "center", fontWeight: 600, width: "100%", mt: "16px", mb: "10px" }}
           variant="links.a"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setCollapsed(!collapsed)
+          }}
         >
           {collapsed
             ? `Show more comments (${unvotedComments.length} total)`
@@ -72,7 +75,7 @@ const SurveyCards = ({
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
-        <React.Fragment>
+        <Flex sx={{flexDirection: "column", gap: 3}}>
           <Box
             sx={{
               ...surveyBox,
@@ -86,23 +89,24 @@ const SurveyCards = ({
             <br />
             Come back later for more to vote on, or add your own.
           </Box>
-          {(zid_metadata.postsurvey || zid_metadata.postsurvey_redirect) && (
+          {(postsurvey || postsurvey_redirect) && (
             <Button
               variant="primary"
-              onClick={() =>
-                zid_metadata.postsurvey
+              onClick={(e) => {
+                e.stopPropagation()
+                postsurvey
                   ? goTo("postsurvey")
-                  : window.open(zid_metadata.postsurvey_redirect)
-              }
+                  : window.open(postsurvey_redirect)
+              }}
               sx={{ width: "100%", mb: [3] }}
             >
               Go to next steps
-              {!zid_metadata.postsurvey && (
+              {!postsurvey && (
                 <TbExternalLink style={{ marginLeft: "5px", position: "relative", top: "2px" }} />
               )}
             </Button>
           )}
-        </React.Fragment>
+        </Flex>
       )}
     </Box>
   )
