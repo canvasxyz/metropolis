@@ -2,15 +2,17 @@ import React, { useCallback, useState, useRef } from "react"
 import { Box, Flex, Image, Link, Text, Button, Textarea } from "theme-ui"
 import useSWR from "swr"
 import { formatTimeAgo } from "../../util/misc"
+import { useAppSelector } from "../../hooks"
 
 const MAX_COMMENT_LENGTH = 150
 
 const fetcher = (url) => fetch(url).then((r) => r.json())
 
 export const SentimentCheckComments= ({
-  user,
   conversationId,
-}: { user: any; conversationId: string }) => {
+}: { conversationId: string }) => {
+  const { user } = useAppSelector((state) => state.user)
+
   const { data, mutate } = useSWR(
     `/api/v3/conversation/sentiment_comments?conversation_id=${conversationId}`,
     fetcher,
@@ -116,7 +118,10 @@ export const SentimentCheckComments= ({
                   <Text
                     variant="links.textGray"
                     sx={{ fontWeight: 400 }}
-                    onClick={() => deleteComment(comment.id)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      deleteComment(comment.id)
+                    }}
                   >
                     Delete
                   </Text>
@@ -133,6 +138,9 @@ export const SentimentCheckComments= ({
           disabled={!user}
           sx={{ borderColor: "lightGray" }}
           placeholder={user ? "Add a comment..." : "Must be signed in to comment"}
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
           onChange={(e) => {
             setComment(e.target.value)
             setRemainingCharCount(MAX_COMMENT_LENGTH - e.target.value.length)
@@ -144,7 +152,8 @@ export const SentimentCheckComments= ({
           <Box sx={{ flex: 1 }}>
             <Button
               variant={user ? "buttons.primary" : "buttons.disabled"}
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation()
                 if (!comment || comment.trim() === "") return
                 submitComment(comment)
               }}

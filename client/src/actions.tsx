@@ -566,10 +566,10 @@ export const handleZidMetadataUpdate = (newZidMetadata) => {
   }
 }
 
-export const handleSubmitNewComment = (zid_metadata) => {
+export const handleSubmitNewComment = (conversation_id: string) => {
   return {
     type: SUBMIT_NEW_COMMENT,
-    conversation_id: zid_metadata.conversation_id,
+    conversation_id,
   }
 }
 
