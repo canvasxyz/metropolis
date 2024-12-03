@@ -225,7 +225,7 @@ async function getFipFromPR(
     // try to extract frontmatter
     const contentParts = content.split("---");
     const frontmatterSource = contentParts[1];
-    const description = contentParts[2];
+    const description = contentParts.slice(2).join("---")
 
     let frontmatterData;
     try {
@@ -539,7 +539,7 @@ function parseFipContent(content: string) {
   // try to extract frontmatter
   const contentParts = content.split("---");
   const frontmatterSource = contentParts[1];
-  const description = contentParts[2];
+  const description = contentParts.slice(2).join("---")
 
   let frontmatterData;
   try {
@@ -619,7 +619,7 @@ async function do_master_sync() {
       fip_category: fipData.category || null,
       fip_created: fipData.created || null,
       fip_discussions_to: fipData.discussions_to || null,
-      fip_files_created: null,
+      fip_files_created: fipFileName,
       fip_files_updated: null,
       fip_status: fipData.status || null,
       fip_title: fipData.title || null,

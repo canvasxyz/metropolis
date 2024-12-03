@@ -35,4 +35,8 @@ export const statusOptions = {
     label: "Unknown",
     color: "slate",
   },
+  closed: {
+    label: "Closed",
+    color: "red",
+  }
 }

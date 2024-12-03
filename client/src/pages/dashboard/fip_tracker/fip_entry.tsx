@@ -1,39 +1,65 @@
 import React, { useState } from "react"
-import ReactMarkdown from "react-markdown"
 import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
-import markdown from "remark-parse"
-import remarkGfm from "remark-gfm"
-import { remark } from "remark"
-import { unified } from "unified"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
+import { UserInfo } from "./splitAuthors"
+import SimpleSummary from "./simple_summary"
 
-export const extractParagraphByTitle = (markdownText, title) => {
-  const tree = unified().use(markdown).parse(markdownText)
+const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || 'filecoin-project'
+const FIP_REPO_NAME = process.env.FIP_REPO_NAME || 'FIPs'
 
-  let inDesiredSection = false
-  let extractedParagraph: string | null = null
-
-  function visitNode(node) {
-    if (node.type === "heading" && node.children[0].value === title) {
-      inDesiredSection = true
-    } else if (inDesiredSection) {
-      if (node.type === "paragraph") {
-        extractedParagraph = remark().stringify(node)
-        inDesiredSection = false // Stop after finding the first paragraph
-      } else if (node.type === "heading" && node.depth <= 2) {
-        inDesiredSection = false // Stop if another heading of depth 1 or 2 is found
+const FipEntryInner = ({ conversation }: {
+  conversation: FipVersion & {
+    displayed_title: string
+    fip_authors: UserInfo[]
+  }} ) => {
+  return <>
+    <Box></Box>
+    {/* display the simple summary if possible otherwise display the whole fip description */}
+    <Box sx={{ mb: "6px" }}>
+      <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
+      {
+        conversation.fip_authors.length === 0 ?
+        conversation.fip_author :
+        conversation.fip_authors.map((author, i) => {
+          return (
+            <React.Fragment key={author.username || author.email || author.name}>
+              {author.username ? <Link
+                  className="link"
+                  onClick={(e) => e.stopPropagation()}
+                  to={`https://github.com/${author.username}`}
+                  target="_blank"
+                  noreferrer="noreferrer"
+                  noopener="noopener"
+                >
+                  @{author.username}
+                </Link>
+              : author.email }
+              {i < conversation.fip_authors.length - 1 ? ", " : ""}
+            </React.Fragment>
+          )
+        })
       }
-    }
-  }
 
-  tree.children.forEach(visitNode)
+      <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 
-  return extractedParagraph
+      <div
+        onClick={(e) => {
+          // It's possible that there could be a tag inside the link,
+          // but we don't handle that case here
+          if (e.target.tagName === "A") {
+            e.stopPropagation()
+          }
+        }}
+      >
+        <SimpleSummary content={conversation.fip_content} />
+      </div>
+    </Box>
+  </>
 }
 
 export const FipEntry = ({
@@ -45,8 +71,7 @@ export const FipEntry = ({
 }: {
   conversation: FipVersion & {
     displayed_title: string
-    fip_authors: string[]
-    simple_summary: string
+    fip_authors: UserInfo[]
   }
   showAuthors: boolean
   showCategory: boolean
@@ -56,10 +81,13 @@ export const FipEntry = ({
   const [isOpen, setIsOpen] = useState(false)
 
   let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
-  if (conversation.fip_status === "wip") {
+  if (fipStatusKey === "wip") {
     fipStatusKey = "draft"
   } else if (!conversation.fip_status) {
     fipStatusKey = "unknown"
+  }
+  if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+    fipStatusKey = "closed"
   }
 
   const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
@@ -68,10 +96,10 @@ export const FipEntry = ({
     : fipStatusKey
 
   const fipBadges = []
-  const fipAttributes = []
   if (showType && conversation.fip_type) {
     fipBadges.push(
       <Badge
+        key="type"
         size="2"
         variant="outline"
         radius="full"
@@ -86,6 +114,7 @@ export const FipEntry = ({
   if (showCategory && conversation.fip_category) {
     fipBadges.push(
       <Badge
+        key="category"
         size="2"
         variant="outline"
         radius="full"
@@ -97,20 +126,23 @@ export const FipEntry = ({
       </Badge>,
     )
   }
-  if (showCreationDate) {
-    fipAttributes.push(
-      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
-        <TbCalendar />
-        <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
-      </Flex>,
-    )
-  }
-  if (showAuthors) {
-    fipAttributes.push(
-      <Text sx={{ whiteSpace: "nowrap" }}>
-        {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
-      </Text>,
-    )
+
+  let fileUrl = null
+  if (conversation.github_pr === null) {
+    // file link
+    const updatedFiles = (conversation.fip_files_updated || "").split("\n")
+    if (updatedFiles.length > 0) {
+      // strip leading and trailing slashes and join the rest
+      const updatedFile = updatedFiles[0].split("/").filter((x) => x !== "").join("/")
+      fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${updatedFile}`
+    }
+
+    const createdFiles = (conversation.fip_files_created || "").split("\n")
+    if (createdFiles.length > 0) {
+      // strip leading and trailing slashes and join the rest
+      const createdFile = createdFiles[0].split("/").filter((x) => x !== "").join("/")
+      fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${createdFile}`
+    }
   }
 
   return (
@@ -158,6 +190,29 @@ export const FipEntry = ({
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
           </Badge>
+          {fileUrl && (
+            <Link
+              className="link"
+              to={fileUrl}
+              target="_blank"
+              noreferrer="noreferrer"
+              noopener="noopener"
+              onClick={(e) => e.stopPropagation()}
+              sx={{
+                display: "block",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                width: "calc(100% - 20px)",
+              }}
+              style={{
+                fontSize: "90%",
+                fontWeight: "500",
+              }}
+            >
+              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+            </Link>
+          )}
           {conversation.github_pr && (
             <Link
               className="link"
@@ -178,83 +233,53 @@ export const FipEntry = ({
                 fontWeight: "500",
               }}
             >
-              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+              PR <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
             </Link>
           )}
         </Flex>
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "95%" }}>
           {fipBadges}
-          {fipAttributes.map((attr, i) => (
-            <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {i >= 0 && (
-                <Text
-                  style={{
-                    marginLeft: "2px",
-                    marginRight: "9px",
-                    top: "-1px",
-                    position: "relative",
-                    opacity: 0.5,
-                  }}
-                >
-                  |
-                </Text>
-              )}
-              {attr}
-            </Text>
-          ))}
-          <Box sx={{ flexGrow: "1" }}></Box>
-        </Flex>
-        {isOpen && (
-          <>
-            <Box></Box>
-            {/* display the simple summary if possible otherwise display the whole fip description */}
-            <Box sx={{ mb: "6px" }}>
-              <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
-              {conversation.fip_authors.map((author, i) => {
-                const matches = author.match(/.*@(\w+)/)
-                if (!matches) return author
-                const username = matches[1]
-                return (
-                  <React.Fragment key={author}>
-                    <Link
-                      className="link"
-                      onClick={(e) => e.stopPropagation()}
-                      to={`https://github.com/${username}`}
-                      target="_blank"
-                      noreferrer="noreferrer"
-                      noopener="noopener"
-                    >
-                      {author}
-                    </Link>
-                    {i < conversation.fip_authors.length - 1 ? ", " : ""}
-                  </React.Fragment>
-                )
-              })}
-
-              <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
-
-              <div
-                onClick={(e) => {
-                  // It's possible that there could be a tag inside the link,
-                  // but we don't handle that case here
-                  if (e.target.tagName === "A") {
-                    e.stopPropagation()
-                  }
+          {showCreationDate && (
+            <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
+              {fipBadges.length > 0 && <Text
+                style={{
+                  marginLeft: "2px",
+                  marginRight: "9px",
+                  top: "-1px",
+                  position: "relative",
+                  opacity: 0.5,
                 }}
               >
-                <ReactMarkdown
-                  skipHtml={true}
-                  remarkPlugins={[remarkGfm]}
-                  linkTarget="_blank"
-                  className="react-markdown"
-                >
-                  {conversation.simple_summary || conversation.fip_content}
-                </ReactMarkdown>
-              </div>
-            </Box>
-          </>
-        )}
+                |
+              </Text>}
+            <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+              <TbCalendar />
+              <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
+            </Flex>
+          </Text>
+          )}
+          {showAuthors && (
+            <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
+              {fipBadges.length > 0 || showCreationDate && <Text
+                style={{
+                  marginLeft: "2px",
+                  marginRight: "9px",
+                  top: "-1px",
+                  position: "relative",
+                  opacity: 0.5,
+                }}
+              >
+                |
+              </Text>}
+              <Text sx={{ whiteSpace: "nowrap" }}>
+                {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
+              </Text>
+            </Text>
+          )}
+          <Box sx={{ flexGrow: "1" }}></Box>
+        </Flex>
+        {isOpen && <FipEntryInner conversation={conversation} />}
       </Grid>
     </div>
   )

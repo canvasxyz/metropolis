@@ -1,4 +1,4 @@
-import { Checkbox, DropdownMenu } from "@radix-ui/themes"
+import { Box, Button, Checkbox, DropdownMenu, Flex } from "@radix-ui/themes"
 import React, { ReactNode, useRef } from "react"
 
 export const ClickableChecklistItem = ({
@@ -6,11 +6,15 @@ export const ClickableChecklistItem = ({
   checked,
   setChecked,
   children,
+  showOnly,
+  selectOnly,
 }: {
   color?: any
   checked: boolean
   setChecked: (value: boolean) => void
   children: ReactNode
+  showOnly?: boolean
+  selectOnly?: () => void
 }) => {
   const ref = useRef(null)
 
@@ -21,16 +25,30 @@ export const ClickableChecklistItem = ({
         ref.current.click()
       }}
     >
-      <Checkbox
-        color={color}
-        ref={ref}
-        checked={checked}
-        onCheckedChange={(c) => {
-          // @ts-expect-error assume that the value can never be 'indeterminate'
-          setChecked(c)
-        }}
-      />
-      {children}
+      <Flex gap="2" align="center" width="100%">
+        <Checkbox
+          color={color}
+          ref={ref}
+          checked={checked}
+          onCheckedChange={(c) => {
+            // @ts-expect-error assume that the value can never be 'indeterminate'
+            setChecked(c)
+          }}
+        />
+        {children}
+        {showOnly && <React.Fragment>
+          <Box flexGrow="1"></Box>
+          <Button
+            onClick={(e) => {
+              e.stopPropagation()
+              selectOnly()
+            }}
+            onMouseOver={(e) => e.stopPropagation()}
+            variant="outline" size="1">
+              Only
+          </Button>
+        </React.Fragment>}
+      </Flex>
     </DropdownMenu.Item>
   )
 }

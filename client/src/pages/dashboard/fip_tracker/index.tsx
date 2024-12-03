@@ -14,72 +14,91 @@ import useSWR from "swr"
 import { Box, Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
-import { extractParagraphByTitle, FipEntry } from "./fip_entry"
+import { FipEntry } from "./fip_entry"
 import { statusOptions } from "./status_options"
 import { useFipDisplayOptions } from "./useFipDisplayOptions"
 import { DatePicker, DateRange } from "./date_picker"
 import { FipVersion } from "../../../util/types"
-
-const splitAuthors = (authorList = "") => {
-  const result = authorList
-    ?.replace(
-      "<a list of the author's or authors' name(s) and/or username(s), or name(s) and email(s), e.g. (use with the parentheses or triangular brackets):",
-      "",
-    )
-    .replace(/"|,$/g, "")
-    .split(/, | and /)
-  if (result && result.length === 1) {
-    return result[0].split(/ @/).map((i) => {
-      return `${i.slice(1).indexOf("@") !== -1 ? "" : "@"}${i.replace(/^@/, "").trim()}`
-    })
-  }
-  return result
-}
+import { getAuthorKey, splitAuthors, UserInfo } from "./splitAuthors"
 
 function processFipVersions(data: FipVersion[]) {
   if (!data) {
     return {}
   }
 
-  const conversations: (FipVersion & {
-    simple_summary: string
-    fip_authors: string[]
-    displayed_title: string
-  })[] = []
-
   const allFipTypesSet = new Set<string | null>()
-  const allFipAuthorsSet = new Set<string>()
 
-  for (const conversation of data) {
-    // don't show fips that don't have a fip status
-    if (conversation.fip_status == null) {
-      continue
+  // map holding all fip authors
+  const allFipAuthors: Map<string, UserInfo> = new Map()
+
+  // don't show fips that don't have a fip status
+  const conversationsWithStatuses = data.filter((conversation) => conversation.fip_status !== null)
+
+  const conversations = conversationsWithStatuses.map((conversation) => {
+    // parse fip type
+    let fip_type = ""
+    const fip_categories = []
+
+    if(conversation.fip_type.indexOf("Core") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Core")
+    }
+    if(conversation.fip_type.indexOf("Networking") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Networking")
+    }
+    if(conversation.fip_type.indexOf("Interface") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Interface")
+    }
+    if(conversation.fip_type.indexOf("Informational") !== -1){
+      fip_type = "Technical"
+      fip_categories.push("Informational")
     }
 
-    allFipTypesSet.add(conversation.fip_type)
+    if(conversation.fip_type.indexOf("Technical") !== -1){
+      fip_type = "Technical"
+    }
+
+    if(conversation.fip_type.indexOf("Organizational") !== -1){
+      fip_type = "Organizational"
+    }
+
+    if(conversation.fip_type.indexOf("FRC") !== -1){
+      fip_type = "FRC"
+    }
+
+    if(conversation.fip_type.indexOf("Standards") !== -1){
+      fip_type = "Standards"
+    }
+
+    if(conversation.fip_type.indexOf("N/A") !== -1){
+      fip_type = "N/A"
+    }
+
+    allFipTypesSet.add(fip_type)
 
     const authors = splitAuthors(conversation.fip_author) || []
     for (const author of authors) {
-      allFipAuthorsSet.add(author)
+      allFipAuthors[getAuthorKey(author)] = author
     }
 
-    conversations.push({
+    return {
       ...conversation,
-      simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
       fip_authors: authors,
+      fip_type,
+      fip_category: fip_categories.join(", "),
       displayed_title: conversation.fip_title || conversation.github_pr.title,
-    })
-  }
+    }
+  })
 
   const allFipTypes = Array.from(allFipTypesSet)
-  allFipTypes.sort()
-  const allFipAuthors = Array.from(allFipAuthorsSet)
-  allFipAuthors.sort()
+  allFipTypes.sort((a, b) => a.localeCompare(b))
 
   return { conversations, allFipTypes, allFipAuthors }
 }
 
-export default () => {
+const FipTracker = () => {
   const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>({
     draft: true,
     "last-call": true,
@@ -89,6 +108,7 @@ export default () => {
     deferred: true,
     rejected: true,
     superseded: true,
+    closed: true,
   })
 
   const {
@@ -109,13 +129,6 @@ export default () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const searchParam = searchParams.get("search") || ""
-  const filterStatuses = Object.keys(selectedFipStatuses).filter(
-    (status) => selectedFipStatuses[status],
-  )
-  // if draft is selected, also request WIP
-  if (filterStatuses.indexOf("draft") !== -1) {
-    filterStatuses.push("WIP")
-  }
 
   const { data } = useSWR(
     `fips`,
@@ -130,6 +143,7 @@ export default () => {
 
   const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string, boolean>>({})
   const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string, boolean>>({})
+  const [unlabeledAuthorDeselected, setUnlabeledAuthorDeselected] = useState<boolean>(false)
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
@@ -153,25 +167,41 @@ export default () => {
       }
 
       // the conversation must have one of the selected fip authors
-      let hasMatchingFipAuthor = false
-      for (const fipAuthor of conversation.fip_authors) {
-        if (deselectedFipAuthors[fipAuthor] !== true) {
-          hasMatchingFipAuthor = true
-          break
+      if(conversation.fip_authors.length === 0) {
+        if(unlabeledAuthorDeselected) {
+          return false
+         }
+      } else {
+        let hasMatchingFipAuthor = false
+        for (const fipAuthor of conversation.fip_authors) {
+          const key = getAuthorKey(fipAuthor)
+          if(deselectedFipAuthors[key] !== true) {
+            hasMatchingFipAuthor = true
+            break
+          }
+        }
+        if(!hasMatchingFipAuthor) {
+          return false
         }
       }
-      if (!hasMatchingFipAuthor) {
-        return false
+
+      if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+        // conversation is closed
+        if (!selectedFipStatuses.closed) {
+          return false
+        }
+      } else if (conversation.fip_status) {
+        let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+        if (fipStatusKey === "wip") {
+          fipStatusKey = "draft"
+        }
+
+         if (!selectedFipStatuses[fipStatusKey]) {
+          return false
+        }
       }
 
       // the conversation's fip type must be one of the selected fip types
-      if (
-        conversation.fip_status &&
-        !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
-      ) {
-        return false
-      }
-
       if (conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
         return false
       }
@@ -192,7 +222,7 @@ export default () => {
       sx={{
         px: [3],
         py: [3],
-        pt: "15px",
+        pt: [4],
         flexDirection: "column",
         gap: [3],
       }}
@@ -224,7 +254,32 @@ export default () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {(allFipAuthors || []).map((fipAuthor) => (
+              <ClickableChecklistItem
+                color={"blue"}
+                checked={Object.values(deselectedFipAuthors).every((value) => value !== true) && !unlabeledAuthorDeselected}
+                setChecked={(value) => {
+                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, !value])))
+                  setUnlabeledAuthorDeselected(!value)
+                }}
+              >
+                All
+              </ClickableChecklistItem>
+              <ClickableChecklistItem
+                color={"blue"}
+                checked={!unlabeledAuthorDeselected}
+                setChecked={(value) => {
+                  setUnlabeledAuthorDeselected(!value)
+                }}
+                showOnly={true}
+                selectOnly={() => {
+                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, true])))
+                  setUnlabeledAuthorDeselected(false)
+                }}
+              >
+                Unlabeled
+              </ClickableChecklistItem>
+              <DropdownMenu.Separator />
+                {(Object.keys(allFipAuthors || {}).toSorted((a, b) => a.localeCompare(b))).map((fipAuthor) => (
                   <ClickableChecklistItem
                     key={fipAuthor}
                     color={"blue"}
@@ -232,8 +287,12 @@ export default () => {
                     setChecked={(value) => {
                       setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
                     }}
+                    showOnly={true}
+                    selectOnly={() => {
+                      setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, key !== fipAuthor])))
+                    }}
                   >
-                    {fipAuthor}
+                    {allFipAuthors[fipAuthor].username ? `@${allFipAuthors[fipAuthor].username}` : allFipAuthors[fipAuthor].email}
                   </ClickableChecklistItem>
                 ))}
               </DropdownMenu.SubContent>
@@ -252,6 +311,7 @@ export default () => {
                   "deferred",
                   "rejected",
                   "superseded",
+                  "closed",
                 ].map((fipStatus) => (
                   <ClickableChecklistItem
                     key={fipStatus}
@@ -369,3 +429,5 @@ export default () => {
     </Flex>
   )
 }
+
+export default FipTracker
