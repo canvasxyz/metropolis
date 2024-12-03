@@ -283,20 +283,19 @@ export const FipEntry = ({
           )}
           {showAuthors && (
             <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {fipBadges.length > 0 ||
-                (showCreationDate && (
-                  <Text
-                    style={{
-                      marginLeft: "2px",
-                      marginRight: "9px",
-                      top: "-1px",
-                      position: "relative",
-                      opacity: 0.5,
-                    }}
-                  >
-                    |
-                  </Text>
-                ))}
+              {(fipBadges.length > 0 || showCreationDate) && (
+                <Text
+                  style={{
+                    marginLeft: "2px",
+                    marginRight: "9px",
+                    top: "-1px",
+                    position: "relative",
+                    opacity: 0.5,
+                  }}
+                >
+                  |
+                </Text>
+              )}
               <Text sx={{ whiteSpace: "nowrap" }}>
                 {conversation.fip_authors.length} author
                 {conversation.fip_authors.length > 1 ? "s" : ""}
