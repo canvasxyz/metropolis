@@ -11,7 +11,7 @@ import {
 } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Box, Flex } from "theme-ui"
+import { Box, Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { FipEntry } from "./fip_entry"
@@ -222,7 +222,7 @@ const FipTracker = () => {
       sx={{
         px: [3],
         py: [3],
-        pt: "15px",
+        pt: [4],
         flexDirection: "column",
         gap: [3],
       }}
