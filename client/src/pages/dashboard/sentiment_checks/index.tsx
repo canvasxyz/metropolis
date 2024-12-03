@@ -133,26 +133,6 @@ export default () => {
           <DropdownMenu.Content>
             <DropdownMenu.Sub>
               <DropdownMenu.SubTrigger>
-                <TbUser /> Submitters
-              </DropdownMenu.SubTrigger>
-              <DropdownMenu.SubContent>
-                {/* {(allFipAuthors || [])
-                  .map((fipAuthor) => (
-                    <ClickableChecklistItem
-                      key={fipAuthor}
-                      color={"blue"}
-                      checked={deselectedFipAuthors[fipAuthor] !== true}
-                      setChecked={(value) => {
-                        setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
-                      }}
-                    >
-                      {fipAuthor}
-                    </ClickableChecklistItem>
-                  ))} */}
-              </DropdownMenu.SubContent>
-            </DropdownMenu.Sub>
-            <DropdownMenu.Sub>
-              <DropdownMenu.SubTrigger>
                 <TbRefresh /> Status
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
@@ -184,26 +164,6 @@ export default () => {
                 />
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
-            {/* <DropdownMenu.Sub>
-              <DropdownMenu.SubTrigger>
-                <TbLayoutGrid /> Type
-              </DropdownMenu.SubTrigger>
-              <DropdownMenu.SubContent>
-                {(allFipTypes || [])
-                  .map((fipType) => (
-                    <ClickableChecklistItem
-                      key={fipType}
-                      color={"blue"}
-                      checked={deselectedFipTypes[fipType] !== true}
-                      setChecked={(value) => {
-                        setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
-                      }}
-                    >
-                      {fipType}
-                    </ClickableChecklistItem>
-                  ))}
-              </DropdownMenu.SubContent>
-            </DropdownMenu.Sub> */}
           </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>
