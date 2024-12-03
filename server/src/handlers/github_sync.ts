@@ -161,7 +161,7 @@ async function getFipFromPR(
   );
 
   // fetch the branches from the remote
-  await execAsync(`git fetch ${remote}`, { cwd: repoDir });
+  await execAsync(`GIT_TERMINAL_PROMPT=0 git fetch ${remote}`, { cwd: repoDir });
 
   // check out the branch locally
   await execAsync(`git switch -c ${remote}-branch ${remote}/${pull.head.ref}`, {
