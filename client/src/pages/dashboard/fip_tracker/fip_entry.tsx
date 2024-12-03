@@ -17,7 +17,6 @@ const FipEntryInner = ({ conversation }: {
     displayed_title: string
     fip_authors: UserInfo[]
   }} ) => {
-  console.log(conversation)
   return <>
     <Box></Box>
     {/* display the simple summary if possible otherwise display the whole fip description */}
@@ -27,7 +26,6 @@ const FipEntryInner = ({ conversation }: {
         conversation.fip_authors.length === 0 ?
         conversation.fip_author :
         conversation.fip_authors.map((author, i) => {
-          console.log(author.username, author.email, author.name)
           return (
             <React.Fragment key={author.username || author.email || author.name}>
               {author.username ? <Link
