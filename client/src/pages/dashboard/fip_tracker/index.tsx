@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
@@ -39,40 +40,40 @@ function processFipVersions(data: FipVersion[]) {
     let fip_type = ""
     const fip_categories = []
 
-    if(conversation.fip_type.indexOf("Core") !== -1){
+    if (conversation.fip_type.indexOf("Core") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Core")
     }
-    if(conversation.fip_type.indexOf("Networking") !== -1){
+    if (conversation.fip_type.indexOf("Networking") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Networking")
     }
-    if(conversation.fip_type.indexOf("Interface") !== -1){
+    if (conversation.fip_type.indexOf("Interface") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Interface")
     }
-    if(conversation.fip_type.indexOf("Informational") !== -1){
+    if (conversation.fip_type.indexOf("Informational") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Informational")
     }
 
-    if(conversation.fip_type.indexOf("Technical") !== -1){
+    if (conversation.fip_type.indexOf("Technical") !== -1) {
       fip_type = "Technical"
     }
 
-    if(conversation.fip_type.indexOf("Organizational") !== -1){
+    if (conversation.fip_type.indexOf("Organizational") !== -1) {
       fip_type = "Organizational"
     }
 
-    if(conversation.fip_type.indexOf("FRC") !== -1){
+    if (conversation.fip_type.indexOf("FRC") !== -1) {
       fip_type = "FRC"
     }
 
-    if(conversation.fip_type.indexOf("Standards") !== -1){
+    if (conversation.fip_type.indexOf("Standards") !== -1) {
       fip_type = "Standards"
     }
 
-    if(conversation.fip_type.indexOf("N/A") !== -1){
+    if (conversation.fip_type.indexOf("N/A") !== -1) {
       fip_type = "N/A"
     }
 
@@ -147,11 +148,22 @@ const FipTracker = () => {
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
+  const getFipCreated = (c) => {
+    // Clean up some bad dates
+    if (!c.fip_created && c.fip_number === 4) {
+      return dayjs("2020-10-15").valueOf()
+    }
+    const parsed = dayjs(
+      c.fip_created?.replace(/<|>/g, "").replace("2022-0218", "2022-02-18"),
+    ).valueOf()
+    return isNaN(parsed) ? 0 : parsed
+  }
+
   let sortFunction
   if (sortBy === "asc") {
-    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
+    sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? 1 : -1)
   } else if (sortBy === "desc") {
-    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1)
+    sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? -1 : 1)
   } else {
     sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
   }
@@ -167,20 +179,20 @@ const FipTracker = () => {
       }
 
       // the conversation must have one of the selected fip authors
-      if(conversation.fip_authors.length === 0) {
-        if(unlabeledAuthorDeselected) {
+      if (conversation.fip_authors.length === 0) {
+        if (unlabeledAuthorDeselected) {
           return false
-         }
+        }
       } else {
         let hasMatchingFipAuthor = false
         for (const fipAuthor of conversation.fip_authors) {
           const key = getAuthorKey(fipAuthor)
-          if(deselectedFipAuthors[key] !== true) {
+          if (deselectedFipAuthors[key] !== true) {
             hasMatchingFipAuthor = true
             break
           }
         }
-        if(!hasMatchingFipAuthor) {
+        if (!hasMatchingFipAuthor) {
           return false
         }
       }
@@ -196,7 +208,7 @@ const FipTracker = () => {
           fipStatusKey = "draft"
         }
 
-         if (!selectedFipStatuses[fipStatusKey]) {
+        if (!selectedFipStatuses[fipStatusKey]) {
           return false
         }
       }
@@ -254,47 +266,66 @@ const FipTracker = () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-              <ClickableChecklistItem
-                color={"blue"}
-                checked={Object.values(deselectedFipAuthors).every((value) => value !== true) && !unlabeledAuthorDeselected}
-                setChecked={(value) => {
-                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, !value])))
-                  setUnlabeledAuthorDeselected(!value)
-                }}
-              >
-                All
-              </ClickableChecklistItem>
-              <ClickableChecklistItem
-                color={"blue"}
-                checked={!unlabeledAuthorDeselected}
-                setChecked={(value) => {
-                  setUnlabeledAuthorDeselected(!value)
-                }}
-                showOnly={true}
-                selectOnly={() => {
-                  setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, true])))
-                  setUnlabeledAuthorDeselected(false)
-                }}
-              >
-                Unlabeled
-              </ClickableChecklistItem>
-              <DropdownMenu.Separator />
-                {(Object.keys(allFipAuthors || {}).toSorted((a, b) => a.localeCompare(b))).map((fipAuthor) => (
-                  <ClickableChecklistItem
-                    key={fipAuthor}
-                    color={"blue"}
-                    checked={deselectedFipAuthors[fipAuthor] !== true}
-                    setChecked={(value) => {
-                      setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
-                    }}
-                    showOnly={true}
-                    selectOnly={() => {
-                      setDeselectedFipAuthors(() => Object.fromEntries(Object.keys(allFipAuthors || {}).map((key) => [key, key !== fipAuthor])))
-                    }}
-                  >
-                    {allFipAuthors[fipAuthor].username ? `@${allFipAuthors[fipAuthor].username}` : allFipAuthors[fipAuthor].email}
-                  </ClickableChecklistItem>
-                ))}
+                <ClickableChecklistItem
+                  color={"blue"}
+                  checked={
+                    Object.values(deselectedFipAuthors).every((value) => value !== true) &&
+                    !unlabeledAuthorDeselected
+                  }
+                  setChecked={(value) => {
+                    setDeselectedFipAuthors(() =>
+                      Object.fromEntries(
+                        Object.keys(allFipAuthors || {}).map((key) => [key, !value]),
+                      ),
+                    )
+                    setUnlabeledAuthorDeselected(!value)
+                  }}
+                >
+                  All
+                </ClickableChecklistItem>
+                <ClickableChecklistItem
+                  color={"blue"}
+                  checked={!unlabeledAuthorDeselected}
+                  setChecked={(value) => {
+                    setUnlabeledAuthorDeselected(!value)
+                  }}
+                  showOnly={true}
+                  selectOnly={() => {
+                    setDeselectedFipAuthors(() =>
+                      Object.fromEntries(
+                        Object.keys(allFipAuthors || {}).map((key) => [key, true]),
+                      ),
+                    )
+                    setUnlabeledAuthorDeselected(false)
+                  }}
+                >
+                  Unlabeled
+                </ClickableChecklistItem>
+                <DropdownMenu.Separator />
+                {Object.keys(allFipAuthors || {})
+                  .toSorted((a, b) => a.localeCompare(b))
+                  .map((fipAuthor) => (
+                    <ClickableChecklistItem
+                      key={fipAuthor}
+                      color={"blue"}
+                      checked={deselectedFipAuthors[fipAuthor] !== true}
+                      setChecked={(value) => {
+                        setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
+                      }}
+                      showOnly={true}
+                      selectOnly={() => {
+                        setDeselectedFipAuthors(() =>
+                          Object.fromEntries(
+                            Object.keys(allFipAuthors || {}).map((key) => [key, key !== fipAuthor]),
+                          ),
+                        )
+                      }}
+                    >
+                      {allFipAuthors[fipAuthor].username
+                        ? `@${allFipAuthors[fipAuthor].username}`
+                        : allFipAuthors[fipAuthor].email}
+                    </ClickableChecklistItem>
+                  ))}
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
             <DropdownMenu.Sub>

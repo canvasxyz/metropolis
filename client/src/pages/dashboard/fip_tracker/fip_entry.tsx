@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import React, { useState } from "react"
 import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
@@ -9,57 +10,63 @@ import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
 import SimpleSummary from "./simple_summary"
 
-const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || 'filecoin-project'
-const FIP_REPO_NAME = process.env.FIP_REPO_NAME || 'FIPs'
+const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || "filecoin-project"
+const FIP_REPO_NAME = process.env.FIP_REPO_NAME || "FIPs"
 
-const FipEntryInner = ({ conversation }: {
+const FipEntryInner = ({
+  conversation,
+}: {
   conversation: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
-  }} ) => {
-  return <>
-    <Box></Box>
-    {/* display the simple summary if possible otherwise display the whole fip description */}
-    <Box sx={{ mb: "6px" }}>
-      <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
-      {
-        conversation.fip_authors.length === 0 ?
-        conversation.fip_author :
-        conversation.fip_authors.map((author, i) => {
-          return (
-            <React.Fragment key={author.username || author.email || author.name}>
-              {author.username ? <Link
-                  className="link"
-                  onClick={(e) => e.stopPropagation()}
-                  to={`https://github.com/${author.username}`}
-                  target="_blank"
-                  noreferrer="noreferrer"
-                  noopener="noopener"
-                >
-                  @{author.username}
-                </Link>
-              : author.email }
-              {i < conversation.fip_authors.length - 1 ? ", " : ""}
-            </React.Fragment>
-          )
-        })
-      }
+  }
+}) => {
+  return (
+    <>
+      <Box></Box>
+      {/* display the simple summary if possible otherwise display the whole fip description */}
+      <Box sx={{ mb: "6px" }}>
+        <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
+        {conversation.fip_authors.length === 0
+          ? conversation.fip_author
+          : conversation.fip_authors.map((author, i) => {
+              return (
+                <React.Fragment key={author.username || author.email || author.name}>
+                  {author.username ? (
+                    <Link
+                      className="link"
+                      onClick={(e) => e.stopPropagation()}
+                      to={`https://github.com/${author.username}`}
+                      target="_blank"
+                      noreferrer="noreferrer"
+                      noopener="noopener"
+                    >
+                      @{author.username}
+                    </Link>
+                  ) : (
+                    author.email
+                  )}
+                  {i < conversation.fip_authors.length - 1 ? ", " : ""}
+                </React.Fragment>
+              )
+            })}
 
-      <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
+        <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
 
-      <div
-        onClick={(e) => {
-          // It's possible that there could be a tag inside the link,
-          // but we don't handle that case here
-          if (e.target.tagName === "A") {
-            e.stopPropagation()
-          }
-        }}
-      >
-        <SimpleSummary content={conversation.fip_content} />
-      </div>
-    </Box>
-  </>
+        <div
+          onClick={(e) => {
+            // It's possible that there could be a tag inside the link,
+            // but we don't handle that case here
+            if (e.target.tagName === "A") {
+              e.stopPropagation()
+            }
+          }}
+        >
+          <SimpleSummary content={conversation.fip_content} />
+        </div>
+      </Box>
+    </>
+  )
 }
 
 export const FipEntry = ({
@@ -133,14 +140,20 @@ export const FipEntry = ({
     const updatedFiles = (conversation.fip_files_updated || "").split("\n")
     if (updatedFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
-      const updatedFile = updatedFiles[0].split("/").filter((x) => x !== "").join("/")
+      const updatedFile = updatedFiles[0]
+        .split("/")
+        .filter((x) => x !== "")
+        .join("/")
       fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${updatedFile}`
     }
 
     const createdFiles = (conversation.fip_files_created || "").split("\n")
     if (createdFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
-      const createdFile = createdFiles[0].split("/").filter((x) => x !== "").join("/")
+      const createdFile = createdFiles[0]
+        .split("/")
+        .filter((x) => x !== "")
+        .join("/")
       fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${createdFile}`
     }
   }
@@ -242,38 +255,51 @@ export const FipEntry = ({
           {fipBadges}
           {showCreationDate && (
             <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {fipBadges.length > 0 && <Text
-                style={{
-                  marginLeft: "2px",
-                  marginRight: "9px",
-                  top: "-1px",
-                  position: "relative",
-                  opacity: 0.5,
+              {fipBadges.length > 0 && (
+                <Text
+                  style={{
+                    marginLeft: "2px",
+                    marginRight: "9px",
+                    top: "-1px",
+                    position: "relative",
+                    opacity: 0.5,
+                  }}
+                >
+                  |
+                </Text>
+              )}
+              <Flex
+                sx={{
+                  display: "inline-block",
+                  alignItems: "center",
+                  gap: [1],
+                  whiteSpace: "nowrap",
                 }}
               >
-                |
-              </Text>}
-            <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
-              <TbCalendar />
-              <Text> {new Date(Date.parse(conversation.fip_created)).toLocaleDateString()}</Text>
-            </Flex>
-          </Text>
+                <TbCalendar />
+                <Text> {dayjs(conversation.fip_created).format("YYYY-MM-DD")}</Text>
+              </Flex>
+            </Text>
           )}
           {showAuthors && (
             <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {fipBadges.length > 0 || showCreationDate && <Text
-                style={{
-                  marginLeft: "2px",
-                  marginRight: "9px",
-                  top: "-1px",
-                  position: "relative",
-                  opacity: 0.5,
-                }}
-              >
-                |
-              </Text>}
+              {fipBadges.length > 0 ||
+                (showCreationDate && (
+                  <Text
+                    style={{
+                      marginLeft: "2px",
+                      marginRight: "9px",
+                      top: "-1px",
+                      position: "relative",
+                      opacity: 0.5,
+                    }}
+                  >
+                    |
+                  </Text>
+                ))}
               <Text sx={{ whiteSpace: "nowrap" }}>
-                {conversation.fip_authors.length} author{conversation.fip_authors.length > 1 ? "s" : ""}
+                {conversation.fip_authors.length} author
+                {conversation.fip_authors.length > 1 ? "s" : ""}
               </Text>
             </Text>
           )}

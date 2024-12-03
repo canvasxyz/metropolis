@@ -63,6 +63,7 @@
     "d3-scale": "~3.2.3",
     "d3-scale-chromatic": "~1.1.1",
     "d3-voronoi": "^1.1.4",
+    "dayjs": "^1.11.13",
     "hull.js": "~0.2.11",
     "jquery": "~2.1.4",
     "lodash": "~4.17.21",
