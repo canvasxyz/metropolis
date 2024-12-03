@@ -27,8 +27,10 @@ export const ListingSelector = ({
             gap: "8px",
             cursor: "pointer",
             userSelect: "none",
-            ...(isActive ? { bg: "#D5EFFF", color: "#006BCA" } : { color: "#60646C" }),
-            // TODO: Add hover effect
+            ...(isActive
+              ? { bg: "#D5EFFF", color: "#006BCA" }
+              : { color: "#60646C", ":hover": { bg: "#f2f0e9" } }),
+            fontSize: "94%",
           }}
         >
           {iconComponent}

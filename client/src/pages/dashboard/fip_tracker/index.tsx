@@ -67,8 +67,7 @@ function processFipVersions(data: FipVersion[]) {
       ...conversation,
       simple_summary: extractParagraphByTitle(conversation.fip_content, "Simple Summary"),
       fip_authors: authors,
-      displayed_title:
-        conversation.fip_title || conversation.github_pr.title,
+      displayed_title: conversation.fip_title || conversation.github_pr.title,
     })
   }
 
@@ -127,76 +126,77 @@ export default () => {
     },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
-  const {conversations, allFipTypes, allFipAuthors} = data || {}
+  const { conversations, allFipTypes, allFipAuthors } = data || {}
 
-  const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string,boolean>>({})
-  const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string,boolean>>({})
+  const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string, boolean>>({})
+  const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string, boolean>>({})
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
-  let sortFunction;
+  let sortFunction
   if (sortBy === "asc") {
     sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
-  } else if(sortBy === "desc"){
+  } else if (sortBy === "desc") {
     sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1)
   } else {
     sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
   }
 
-  const displayedFips = (conversations || []).filter((conversation) => {
-    // the conversation's displayed title must include the search string, if it is given
-    if (
-      searchParam &&
-      !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
-    ) {
-      return false
-    }
-
-    // the conversation must have one of the selected fip authors
-    let hasMatchingFipAuthor = false
-    for (const fipAuthor of conversation.fip_authors) {
-      if (deselectedFipAuthors[fipAuthor] !== true) {
-        hasMatchingFipAuthor = true
-        break
-      }
-    }
-    if (!hasMatchingFipAuthor) {
-      return false
-    }
-
-    // the conversation's fip type must be one of the selected fip types
-    if (
-      conversation.fip_status &&
-      !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
-    ) {
-      return false
-    }
-
-    if(conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
-      return false
-    }
-
-    if (rangeValue.start && rangeValue.end) {
-      const conversationDate = new Date(Date.parse(conversation.fip_created))
-      if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
+  const displayedFips = (conversations || [])
+    .filter((conversation) => {
+      // the conversation's displayed title must include the search string, if it is given
+      if (
+        searchParam &&
+        !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
+      ) {
         return false
       }
-    }
 
-    return true
-  }).toSorted(sortFunction)
+      // the conversation must have one of the selected fip authors
+      let hasMatchingFipAuthor = false
+      for (const fipAuthor of conversation.fip_authors) {
+        if (deselectedFipAuthors[fipAuthor] !== true) {
+          hasMatchingFipAuthor = true
+          break
+        }
+      }
+      if (!hasMatchingFipAuthor) {
+        return false
+      }
+
+      // the conversation's fip type must be one of the selected fip types
+      if (
+        conversation.fip_status &&
+        !selectedFipStatuses[conversation.fip_status.toLowerCase().replace(" ", "-")]
+      ) {
+        return false
+      }
+
+      if (conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
+        return false
+      }
+
+      if (rangeValue.start && rangeValue.end) {
+        const conversationDate = new Date(Date.parse(conversation.fip_created))
+        if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
+          return false
+        }
+      }
+
+      return true
+    })
+    .toSorted(sortFunction)
 
   return (
     <Flex
       sx={{
         px: [3],
         py: [3],
-        pt: [4],
+        pt: "15px",
         flexDirection: "column",
         gap: [3],
       }}
     >
-      <Text sx={{ fontWeight: 600, fontSize: [2] }}>FIP Tracker</Text>
       <Flex sx={{ gap: [2], width: "100%" }}>
         <Box sx={{ flexGrow: "1", maxWidth: "400px" }}>
           <TextField.Root
@@ -223,19 +223,18 @@ export default () => {
                 <TbUser /> Authors
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {(allFipAuthors || [])
-                  .map((fipAuthor) => (
-                    <ClickableChecklistItem
-                      key={fipAuthor}
-                      color={"blue"}
-                      checked={deselectedFipAuthors[fipAuthor] !== true}
-                      setChecked={(value) => {
-                        setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
-                      }}
-                    >
-                      {fipAuthor}
-                    </ClickableChecklistItem>
-                  ))}
+                {(allFipAuthors || []).map((fipAuthor) => (
+                  <ClickableChecklistItem
+                    key={fipAuthor}
+                    color={"blue"}
+                    checked={deselectedFipAuthors[fipAuthor] !== true}
+                    setChecked={(value) => {
+                      setDeselectedFipAuthors((prev) => ({ ...prev, [fipAuthor]: !value }))
+                    }}
+                  >
+                    {fipAuthor}
+                  </ClickableChecklistItem>
+                ))}
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
             <DropdownMenu.Sub>
@@ -282,19 +281,18 @@ export default () => {
                 <TbLayoutGrid /> Type
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {(allFipTypes || [])
-                  .map((fipType) => (
-                    <ClickableChecklistItem
-                      key={fipType}
-                      color={"blue"}
-                      checked={deselectedFipTypes[fipType] !== true}
-                      setChecked={(value) => {
-                        setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
-                      }}
-                    >
-                      {fipType}
-                    </ClickableChecklistItem>
-                  ))}
+                {(allFipTypes || []).map((fipType) => (
+                  <ClickableChecklistItem
+                    key={fipType}
+                    color={"blue"}
+                    checked={deselectedFipTypes[fipType] !== true}
+                    setChecked={(value) => {
+                      setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
+                    }}
+                  >
+                    {fipType}
+                  </ClickableChecklistItem>
+                ))}
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
           </DropdownMenu.Content>
@@ -355,7 +353,7 @@ export default () => {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
-      <Flex sx={{ flexDirection: "column", gap: [3] }}>
+      <Flex sx={{ flexDirection: "column", gap: "12px" }}>
         {displayedFips.map((conversation) => (
           <FipEntry
             key={conversation.id}
