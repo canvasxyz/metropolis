@@ -71,11 +71,12 @@ export const LandingPage = () => {
   const conversations = data || []
 
   return (
-    <Container size="3">
+    <Container size="3" mt="8">
       <Flex
         direction="column"
         align="center"
         justify="center"
+        pt="4"
       >
         <Image
           src="/filecoin.png"
