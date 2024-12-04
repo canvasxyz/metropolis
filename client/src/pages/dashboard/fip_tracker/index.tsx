@@ -374,6 +374,14 @@ const FipTracker = () => {
                     setChecked={(value) => {
                       setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
                     }}
+                    showOnly={true}
+                      selectOnly={() => {
+                        setDeselectedFipTypes(() =>
+                          Object.fromEntries(
+                            allFipTypes.map((key) => [key, key !== fipType]),
+                          ),
+                        )
+                      }}
                   >
                     {fipType}
                   </ClickableChecklistItem>
