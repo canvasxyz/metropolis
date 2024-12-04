@@ -50,46 +50,28 @@ type SimpleSummaryProps = {
 
 const SimpleSummary = ({ content }: SimpleSummaryProps) => {
 
-  const [hasSimpleSummary, simpleSummaryText] = useMemo(() => {
-    const extractedData = extractParagraphByTitle(content, "Simple Summary")
-    if(extractedData)  {
-      return [true, extractedData]
-    } else {
-      return [false, content]
+  const extractedData = useMemo(() => {
+    const simpleSummaryContent = extractParagraphByTitle(content, "Simple Summary")
+    if (simpleSummaryContent)  {
+      return { title: "Simple Summary", content: simpleSummaryContent }
+    }
+
+    const summaryContent = extractParagraphByTitle(content, "Summary")
+    if (summaryContent)  {
+      return { title: "Summary", content: summaryContent }
     }
   }, [content])
 
-  const [hasSummary, summaryText] = useMemo(() => {
-    const extractedData = extractParagraphByTitle(content, "Summary")
-    if(extractedData)  {
-      return [true, extractedData]
-    } else {
-      return [false, content]
-    }
-  }, [content])
-
-  if (hasSimpleSummary) {
+  if (extractedData) {
     return <React.Fragment>
-      <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
+      <h3 style={{ margin: "15px 0 10px" }}>{extractedData.title}</h3>
       <ReactMarkdown
         skipHtml={true}
         remarkPlugins={[remarkGfm]}
         linkTarget="_blank"
         className="react-markdown"
       >
-        {simpleSummaryText}
-      </ReactMarkdown>
-    </React.Fragment>
-  } else if (hasSummary) {
-    return <React.Fragment>
-      <h3 style={{ margin: "15px 0 10px" }}>Summary</h3>
-      <ReactMarkdown
-        skipHtml={true}
-        remarkPlugins={[remarkGfm]}
-        linkTarget="_blank"
-        className="react-markdown"
-      >
-        {summaryText}
+        {extractedData.content}
       </ReactMarkdown>
     </React.Fragment>
   } else {
