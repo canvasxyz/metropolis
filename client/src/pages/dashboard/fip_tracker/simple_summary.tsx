@@ -8,25 +8,25 @@ import { unified } from "unified"
 export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
 
-  let inDesiredSection = false
-  let extractedParagraph: string | null = null
+  let titleDepth: number | null = null
+  let foundHeading = false
+  const extractedNodes: typeof tree.children = []
 
-  function visitNode(node) {
+  for(const node of tree.children) {
+    // is "value" the right property to check for the title?
     if (node.type === "heading" && node.children[0].value === title) {
-      inDesiredSection = true
-    } else if (inDesiredSection) {
-      if (node.type === "paragraph" || node.type === "list") {
-        extractedParagraph = remark().stringify(node)
-        inDesiredSection = false // Stop after finding the first paragraph
-      } else if (node.type === "heading" && node.depth <= 2) {
-        inDesiredSection = false // Stop if another heading of depth 1 or 2 is found
+      titleDepth = node.depth
+      foundHeading = true
+    } else if (foundHeading) {
+      if (node.type === "heading" && node.depth <= titleDepth) {
+        // Stop if an equally or more important heading is found
+        break
       }
+      extractedNodes.push(node)
     }
   }
 
-  tree.children.forEach(visitNode)
-
-  return extractedParagraph
+  return extractedNodes.map(node => remark().stringify(node)).join("\n")
 }
 
 type SimpleSummaryProps = {
