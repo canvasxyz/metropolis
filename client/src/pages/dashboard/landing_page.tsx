@@ -3,7 +3,7 @@ import React from "react"
 import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { useHistory } from "react-router-dom"
-import { Box, Flex, Text } from "theme-ui"
+import { Box, Flex, Image, Text } from "theme-ui"
 
 import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
@@ -70,10 +70,28 @@ export const LandingPage = () => {
 
   return (
     <Box sx={{ maxWidth: [null, "540px"], px: [3], py: [3], pt: [8], margin: "0 auto" }}>
-      <Box>
-        Welcome to Fil Poll, a nonbinding sentiment check tool for the Filecoin community. You
-        can:
-      </Box>
+      <Flex sx={{
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+
+      }}>
+        <Image
+          src="/filecoin.png"
+          width="80px"
+          height="80px"
+          sx={{paddingBottom: 3}}
+        />
+        <Text sx={{
+          fontSize: 4,
+          fontWeight: "bold",
+          paddingBottom: 3,
+
+        }}>Welcome to Fil Poll</Text>
+        <Text sx={{ }}>
+          A nonbinding sentiment check tool for the Filecoin community.
+        </Text>
+      </Flex>
       {/* FIPs */}
       <Flex sx={{ pt: [3], mt: [3] }}>
         <Box sx={{ flex: "0 0 25px" }}>
