@@ -64,7 +64,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
   )
 }
 
-export const Placeholder = () => {
+export const LandingPage = () => {
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
