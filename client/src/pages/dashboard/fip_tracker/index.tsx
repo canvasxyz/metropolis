@@ -100,17 +100,12 @@ function processFipVersions(data: FipVersion[]) {
 }
 
 const FipTracker = () => {
-  const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>({
-    draft: true,
-    "last-call": true,
-    accepted: true,
-    final: true,
-    active: true,
-    deferred: true,
-    rejected: true,
-    superseded: true,
-    closed: true,
-  })
+  const allFipStatuses = Object.keys(statusOptions)
+  const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>(
+    Object.fromEntries(
+      allFipStatuses.map((status) => [status, true])
+    )
+  )
 
   const {
     showAuthors,
@@ -333,23 +328,21 @@ const FipTracker = () => {
                 <TbRefresh /> Status
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {[
-                  "draft",
-                  "last-call",
-                  "accepted",
-                  "final",
-                  "active",
-                  "deferred",
-                  "rejected",
-                  "superseded",
-                  "closed",
-                ].map((fipStatus) => (
+                {allFipStatuses.map((fipStatus) => (
                   <ClickableChecklistItem
                     key={fipStatus}
                     color={statusOptions[fipStatus].color}
                     checked={selectedFipStatuses[fipStatus]}
                     setChecked={(value) => {
                       setSelectedFipStatuses((prev) => ({ ...prev, [fipStatus]: value }))
+                    }}
+                    showOnly={true}
+                    selectOnly={() => {
+                      setSelectedFipStatuses(() =>
+                        Object.fromEntries(
+                          allFipStatuses.map((key) => [key, key === fipStatus]),
+                        ),
+                      )
                     }}
                   >
                     {statusOptions[fipStatus].label}
