@@ -50,9 +50,6 @@ const FipEntryInner = ({
                 </React.Fragment>
               )
             })}
-
-        <h3 style={{ margin: "15px 0 10px" }}>Simple Summary</h3>
-
         <div
           onClick={(e) => {
             // It's possible that there could be a tag inside the link,
