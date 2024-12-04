@@ -24,10 +24,13 @@ const conversationStatusOptions = {
 }
 
 export default () => {
-  const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<{open: boolean; closed: boolean}>({
-    open: true,
-    closed: true
-  })
+  const allStatuses = [
+    "open",
+    "closed",
+  ]
+  const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<Record<string, boolean>>(
+    Object.fromEntries(allStatuses.map((status) => [status, true]))
+  )
 
   const {
     showAuthors,
@@ -136,10 +139,7 @@ export default () => {
                 <TbRefresh /> Status
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-                {[
-                  "open",
-                  "closed",
-                ].map((status) => (
+                {allStatuses.map((status) => (
                   <ClickableChecklistItem
                     key={status}
                     color={conversationStatusOptions[status].color}
@@ -147,6 +147,14 @@ export default () => {
                     setChecked={(value) => {
                       setSelectedConversationStatuses((prev) => ({ ...prev, [status]: value }))
                     }}
+                    showOnly={true}
+                      selectOnly={() => {
+                        setSelectedConversationStatuses(() =>
+                          Object.fromEntries(
+                            allStatuses.map((key) => [key, key === status]),
+                          ),
+                        )
+                      }}
                   >
                     {conversationStatusOptions[status].label}
                   </ClickableChecklistItem>
