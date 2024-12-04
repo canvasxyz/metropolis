@@ -15,7 +15,6 @@ export const TopRightFloating = ({children}: {children: React.ReactNode}) => {
   </Box>
 }
 
-
 export const DashboardUserButton = () => {
   const { loading, user, isLoggedIn } = useAppSelector((state: RootState) => state.user)
   const hist = useHistory()
@@ -30,6 +29,7 @@ export const DashboardUserButton = () => {
         ? <Button
             color="gold"
             variant="surface"
+            radius="large"
             onClick={() => hist.push(`/account`)}
           >
             <Text sx={{ display: "inline-block" }}>
@@ -37,11 +37,12 @@ export const DashboardUserButton = () => {
             </Text>
           </Button>
         : <Button
-            // TODO: what is the idiomatic radix UI way to make this black?
             color="gray"
             variant="solid"
+            radius="large"
+            highContrast
             onClick={() => {
-                document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
+              document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
             }}
           >
             Sign in with Github
