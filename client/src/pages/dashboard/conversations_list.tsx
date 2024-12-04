@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Text, Link } from "theme-ui"
-import { Link as RouterLink } from "react-router-dom"
+import { Button, Box, Link } from "theme-ui"
 import { TbExternalLink, TbFocus } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 
@@ -244,10 +243,6 @@ const ConversationsList = ({
           borderTop: "1px solid lighterGray",
         }}
       >
-        <RouterLink to="/about">
-          <Text variant="links.a">About</Text>
-        </RouterLink>{" "}
-        &middot;{" "}
         <Link
           variant="links.a"
           as="a"

@@ -2,7 +2,8 @@ import React from "react"
 
 import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
-import { useHistory } from "react-router-dom"
+import { Link as RouterLink, useHistory } from "react-router-dom"
+import { Card, Container, Flex, Grid, Link, Separator } from "@radix-ui/themes"
 import { Box, Image, Text } from "theme-ui"
 
 import { useAppSelector } from "../../hooks"
@@ -10,7 +11,6 @@ import { ConversationSummary } from "../../reducers/conversations_summary"
 import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { getIconForConversation } from "./conversation_list_item"
-import { Card, Container, Flex, Grid, Separator } from "@radix-ui/themes"
 
 const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
@@ -71,84 +71,94 @@ export const LandingPage = () => {
   const conversations = data || []
 
   return (
-    <Container size="3" mt="8">
-      <Flex
-        direction="column"
-        align="center"
-        justify="center"
-        pt="4"
-      >
-        <Image
-          src="/filecoin.png"
-          width="80px"
-          height="80px"
-          sx={{paddingBottom: 3}}
-        />
-        <Text sx={{
-          fontSize: 4,
-          fontWeight: "bold",
-          paddingBottom: 3,
+    <Box>
+      <Container size="3" mt="4">
+        <Flex
+          direction="column"
+          align="center"
+          justify="center"
+          pt="8"
+        >
+          <Image
+            src="/filecoin.png"
+            width="80px"
+            height="80px"
+            sx={{paddingBottom: 3}}
+          />
+          <Text sx={{
+            fontSize: 4,
+            fontWeight: "bold",
+            paddingBottom: 3,
 
-        }}>Welcome to Fil Poll</Text>
-        <Text sx={{ }}>
-          A nonbinding sentiment check tool for the Filecoin community.
-        </Text>
+          }}>Welcome to Fil Poll</Text>
+          <Text sx={{ }}>
+            A nonbinding sentiment check tool for the Filecoin community.
+          </Text>
+        </Flex>
+        <Grid columns="2" gap="4" py="6">
+          {/* discussions */}
+          <Card>
+            <Flex direction="column" gap="3" mx="2" mt="3">
+              <Flex>
+                <Box sx={{ flex: "0 0 25px" }}>
+                  <BiSolidBarChartAlt2 color="#0090ff" style={{ marginRight: "6px" }} />
+                </Box>
+                <Box>
+                  <Text sx={{ fontWeight: 700 }}>
+                    Initiate discussions, collect feedback, and respond to polls
+                  </Text>{" "}
+                  on open-ended thoughts or ideas.
+                </Box>
+              </Flex>
+              <Separator size="4"/>
+
+                The following discussion polls have been active recently:
+
+              <ConversationsPreview
+                conversations={conversations
+                  .filter(
+                    (c) =>
+                      !c.is_archived &&
+                      !c.is_hidden &&
+                      !c.fip_version?.github_pr?.title &&
+                      c.comment_count >= MIN_SEED_RESPONSES,
+                  )
+                  .slice(0, 5)}
+              />
+            </Flex>
+          </Card>
+          {/* FIPs */}
+          <Card>
+            <Flex direction="column" gap="3" mx="2" mt="3">
+              <Flex>
+                <Box sx={{ flex: "0 0 25px" }}>
+                  <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
+                </Box>
+                <Box>
+                  <Text sx={{ fontWeight: 700 }}>Signal your position</Text> on FIPs through sentiment
+                  checks. <br />
+
+                </Box>
+              </Flex>
+              <Separator size="4"/>
+              The following FIPs are currently open for sentiment checks:
+              <ConversationsPreview
+                conversations={conversations
+                  .filter((c) => !c.is_archived && !c.is_hidden && c.fip_version?.github_pr?.title && c.fip_version?.fip_files_created)
+                  .slice(0, 5)}
+              />
+            </Flex>
+          </Card>
+        </Grid>
+      </Container>
+      {/* footer */}
+      <Flex p="4" direction="row">
+        <RouterLink to="/about">
+          <Link weight="bold">About Fil Poll</Link>
+        </RouterLink>
+        <Box sx={{ flex: "1 1 auto" }} />
+        Fil Poll &copy; 2024
       </Flex>
-      <Grid columns="2" gap="4" pt="6">
-        {/* discussions */}
-        <Card>
-          <Flex direction="column" gap="3" mx="2" mt="3">
-            <Flex>
-              <Box sx={{ flex: "0 0 25px" }}>
-                <BiSolidBarChartAlt2 color="#0090ff" style={{ marginRight: "6px" }} />
-              </Box>
-              <Box>
-                <Text sx={{ fontWeight: 700 }}>
-                  Initiate discussions, collect feedback, and respond to polls
-                </Text>{" "}
-                on open-ended thoughts or ideas.
-              </Box>
-            </Flex>
-            <Separator size="4"/>
-
-              The following discussion polls have been active recently:
-
-            <ConversationsPreview
-              conversations={conversations
-                .filter(
-                  (c) =>
-                    !c.is_archived &&
-                    !c.is_hidden &&
-                    !c.fip_version?.github_pr?.title &&
-                    c.comment_count >= MIN_SEED_RESPONSES,
-                )
-                .slice(0, 5)}
-            />
-          </Flex>
-        </Card>
-        {/* FIPs */}
-        <Card>
-          <Flex direction="column" gap="3" mx="2" mt="3">
-            <Flex>
-              <Box sx={{ flex: "0 0 25px" }}>
-                <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
-              </Box>
-              <Box>
-                <Text sx={{ fontWeight: 700 }}>Signal your position</Text> on FIPs through sentiment
-                checks. <br />
-
-              </Box>
-            </Flex>
-            <Separator size="4"/>
-            The following FIPs are currently open for sentiment checks:
-            <ConversationsPreview
-              conversations={conversations
-                .filter((c) => !c.is_archived && !c.is_hidden && c.fip_version?.github_pr?.title && c.fip_version?.fip_files_created)
-                .slice(0, 5)}
-            />
-          </Flex>
-        </Card>
-      </Grid>
-    </Container>
+    </Box>
   )
 }
