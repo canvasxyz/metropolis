@@ -1,4 +1,4 @@
-import { Box, Button, Checkbox, DropdownMenu, Flex } from "@radix-ui/themes"
+import { Link, Box, Button, Checkbox, DropdownMenu, Flex } from "@radix-ui/themes"
 import React, { ReactNode, useRef } from "react"
 
 export const ClickableChecklistItem = ({
@@ -24,6 +24,7 @@ export const ClickableChecklistItem = ({
         e.preventDefault()
         ref.current.click()
       }}
+      className="contains-links-hover-white"
     >
       <Flex gap="2" align="center" width="100%">
         <Checkbox
@@ -36,18 +37,18 @@ export const ClickableChecklistItem = ({
           }}
         />
         {children}
-        {showOnly && <React.Fragment>
-          <Box flexGrow="1"></Box>
-          <Button
+        <Box flexGrow="1"></Box>
+        {showOnly && (
+          <Link
+            className="link"
             onClick={(e) => {
               e.stopPropagation()
               selectOnly()
             }}
-            onMouseOver={(e) => e.stopPropagation()}
-            variant="outline" size="1">
-              Only
-          </Button>
-        </React.Fragment>}
+          >
+            Only
+          </Link>
+        )}
       </Flex>
     </DropdownMenu.Item>
   )
