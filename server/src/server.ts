@@ -7964,7 +7964,8 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
   LEFT JOIN comment_counts ON conversations.zid = comment_counts.zid
   LEFT JOIN sentiment_counts ON conversations.zid = sentiment_counts.zid
   LEFT JOIN conversation_view_counts ON conversations.zid = conversation_view_counts.zid
-  JOIN zinvites ON conversations.zid = zinvites.zid;
+  JOIN zinvites ON conversations.zid = zinvites.zid
+  ORDER BY conversations.created DESC;
   `
 
   const conversations = await queryP_readOnly(query, [])
