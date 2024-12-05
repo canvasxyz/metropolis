@@ -29,13 +29,15 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
             key={c.created}
             onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
           >
-            <Flex>
-              <Box pr="13px" pt="1px">
-                {fipVersion?.github_pr?.title ? (
-                  getIconForConversation(c)
-                ) : (
-                  <BiSolidBarChartAlt2 color="#0090ff" />
-                )}
+            <Flex gap="3">
+              <Box>
+                <Text size="2">
+                  {fipVersion?.github_pr?.title ? (
+                    getIconForConversation(c)
+                  ) : (
+                    <BiSolidBarChartAlt2 color="#0090ff" />
+                  )}
+                </Text>
               </Box>
               <Box>
                 <Box>
@@ -87,9 +89,13 @@ export const LandingPage = () => {
         <Grid columns="2" gap="4" py="6">
           {/* discussions */}
           <Card>
-            <Flex direction="column" gap="3" mx="2" mt="3">
-              <Flex>
-                <BiSolidBarChartAlt2 color="#0090ff" style={{ marginRight: "6px" }} />
+            <Flex direction="column" gap="4" mx="2" mt="3">
+              <Flex gap="3">
+                <Box>
+                  <Text size="2">
+                    <BiSolidBarChartAlt2 color="#0090ff" />
+                  </Text>
+                </Box>
                 <Box>
                   <Text weight="bold">
                     Initiate discussions, collect feedback, and respond to polls
@@ -116,9 +122,13 @@ export const LandingPage = () => {
           </Card>
           {/* FIPs */}
           <Card>
-            <Flex direction="column" gap="3" mx="2" mt="3">
-              <Flex>
-                <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
+            <Flex direction="column" gap="4" mx="2" mt="3">
+              <Flex gap="3">
+                <Box>
+                  <Text size="2">
+                    <TbGitPullRequest color="#3fba50" />
+                  </Text>
+                </Box>
                 <Box>
                   <Text weight="bold">Signal your position</Text> on FIPs through sentiment
                   checks. <br />
