@@ -3,8 +3,7 @@ import React from "react"
 import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Card, Container, Flex, Grid, Link, Separator } from "@radix-ui/themes"
-import { Box, Image, Text } from "theme-ui"
+import { Box, Card, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
 
 import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
@@ -18,7 +17,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
   return (
     <Flex direction="column" gap="3">
       {conversations.length === 0 && (
-        <Box sx={{ fontWeight: 500, mt: [3], mb: [3], opacity: 0.5 }}>None found</Box>
+        <Box mt="3" mb="3"><Text weight="bold">None found</Text></Box>
       )}
       {conversations.map((c) => {
         const date = new Date(c.fip_version?.fip_created || +c.created)
@@ -42,7 +41,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
               }}
               onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
             >
-              <Box sx={{ pr: "13px", pt: "1px" }}>
+              <Box pr="13px" pt="1px">
                 {c.fip_version?.github_pr?.title ? (
                   getIconForConversation(c)
                 ) : (
@@ -54,8 +53,10 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                   {c.fip_version?.github_pr?.title && <Text sx={{ fontWeight: 600 }}>FIP: </Text>}
                   {c.fip_version?.fip_title || c.fip_version?.github_pr?.title || c.topic}
                 </Box>
-                <Box sx={{ opacity: 0.6, fontSize: "0.94em", mt: "3px", fontWeight: 400 }}>
-                  Created {timeAgo}
+                <Box mt="3px">
+                  <Text size="2">
+                    Created {timeAgo}
+                  </Text>
                 </Box>
               </Box>
             </Flex>
@@ -79,18 +80,14 @@ export const LandingPage = () => {
           justify="center"
           pt="8"
         >
-          <Image
+          <img
             src="/filecoin.png"
             width="80px"
             height="80px"
-            sx={{paddingBottom: 3}}
           />
-          <Text sx={{
-            fontSize: 4,
-            fontWeight: "bold",
-            paddingBottom: 3,
-
-          }}>Welcome to Fil Poll</Text>
+          <Box pb="3" pt="3">
+            <Text size="6" weight="bold" >Welcome to Fil Poll</Text>
+          </Box>
           <Text sx={{ }}>
             A nonbinding sentiment check tool for the Filecoin community.
           </Text>
@@ -154,9 +151,9 @@ export const LandingPage = () => {
       {/* footer */}
       <Flex p="4" direction="row">
         <RouterLink to="/about">
-          <Link weight="bold">About Fil Poll</Link>
+          <Text weight="bold">About Fil Poll</Text>
         </RouterLink>
-        <Box sx={{ flex: "1 1 auto" }} />
+        <Box flexGrow="1"/>
         Fil Poll &copy; 2024
       </Flex>
     </Box>
