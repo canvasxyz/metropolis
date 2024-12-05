@@ -37,6 +37,7 @@ const ConversationsList = ({
         <Button
           className="left-group-button"
           variant="outline"
+          size="3"
           color={selectedView === "all" ? "blue" : "gray"}
           onClick={() => setSelectedView("all")}
           style={{borderRadius: "8px 0 0 8px"}}
@@ -56,6 +57,7 @@ const ConversationsList = ({
         <Button
           className="center-group-button"
           variant="outline"
+          size="3"
           color={selectedView === "fips" ? "blue" : "gray"}
           onClick={() => setSelectedView("fips")}
           style={{borderRadius: "0 0 0 0"}}
@@ -75,6 +77,7 @@ const ConversationsList = ({
         <Button
           className="right-group-button"
           variant="outline"
+          size="3"
           color={selectedView === "polls" ? "blue" : "gray"}
           onClick={() => setSelectedView("polls")}
           style={{borderRadius: "0 8px 8px 0"}}
