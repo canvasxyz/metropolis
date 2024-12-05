@@ -11,7 +11,7 @@ import { User } from "../../util/types"
 import { CreateConversationModal } from "../CreateConversationModal"
 import { DashboardUserButton } from "./user_button"
 import ConversationsList from "./conversations_list"
-import { Placeholder } from "./placeholder"
+import { LandingPage } from "./landing_page"
 import { DashboardConversation } from "./conversation"
 const SentimentChecks = React.lazy(() => import("./sentiment_checks"))
 const FipTracker = React.lazy(() => import("./fip_tracker/index.js"))
@@ -140,7 +140,7 @@ const Dashboard = ({ user }: DashboardProps) => {
           </Box>
           <DashboardUserButton />
           <CompatRoutes>
-            <CompatRoute path="/" element={<Placeholder />} />
+            <CompatRoute path="/" element={<LandingPage />} />
             <CompatRoute path="/sentiment_checks" element={
               <Suspense>
                 {" "}

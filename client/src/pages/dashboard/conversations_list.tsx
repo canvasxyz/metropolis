@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Text, Link } from "theme-ui"
-import { Link as RouterLink } from "react-router-dom"
+import { Button, Box, Link } from "theme-ui"
 import { TbExternalLink, TbFocus } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 
@@ -209,30 +208,26 @@ const ConversationsList = ({
           </Link>
         </Box>
       )}
-      <Button
-        variant={user ? "buttons.primary" : "buttons.black"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          position: "absolute",
-          bottom: "40px",
-          right: "11px",
-          fontSize: "0.94em",
-          width: "calc(100% - 32px)",
-          fontWeight: 500,
-        }}
-        onClick={() => {
-          if (user) {
-            setCreateConversationModalIsOpen(true)
-          } else {
-            document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
-          }
-        }}
-      >
-        {user ? <BiSolidBarChartAlt2 /> : null} {user ? "Create a poll" : "Sign in with Github"}
-      </Button>
+      {user && (
+        <Button
+          variant="buttons.primary"
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            position: "absolute",
+            bottom: "40px",
+            right: "11px",
+            fontSize: "0.94em",
+            width: "calc(100% - 32px)",
+            fontWeight: 500,
+          }}
+          onClick={() => setCreateConversationModalIsOpen(true)}
+        >
+          <BiSolidBarChartAlt2 />Create a poll
+        </Button>
+      )}
       <Box
         sx={{
           textAlign: "center",
@@ -244,10 +239,6 @@ const ConversationsList = ({
           borderTop: "1px solid lighterGray",
         }}
       >
-        <RouterLink to="/about">
-          <Text variant="links.a">About</Text>
-        </RouterLink>{" "}
-        &middot;{" "}
         <Link
           variant="links.a"
           as="a"
