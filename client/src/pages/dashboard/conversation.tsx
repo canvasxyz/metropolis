@@ -224,9 +224,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 vote on. This poll will be hidden from other viewers until then.
               </Box>
             )}
-          {!zid_metadata.fip_version && !zid_metadata.is_archived && (
-            <ReportAndSurveyInfo conversation_info={zid_metadata} />
-          )}
+          {!zid_metadata.fip_version && <ReportAndSurveyInfo conversation_info={zid_metadata} />}
           {zid_metadata.fip_version && (
             <Box sx={dashboardBox}>
               <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
