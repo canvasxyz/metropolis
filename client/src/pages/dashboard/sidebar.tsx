@@ -127,7 +127,7 @@ const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
       label="Sentiment Checks"
     />
     <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
-    <ConversationsList />
+    <ConversationsList selectedView="all" />
     <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
   </Box>
 }

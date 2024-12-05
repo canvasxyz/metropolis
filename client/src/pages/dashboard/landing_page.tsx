@@ -4,10 +4,9 @@ import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Box, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
+import useSWR from "swr"
 
-import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
-import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { getIconForConversation } from "./conversation_list_item"
 
@@ -96,7 +95,14 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
 }
 
 export const LandingPage = () => {
-  const { data } = useAppSelector((state: RootState) => state.conversations_summary)
+  const { data } = useSWR(
+    `conversations_summary`,
+    async () => {
+      const response = await fetch(`/api/v3/conversations_summary`)
+      return (await response.json()) as ConversationSummary[]
+    },
+    { keepPreviousData: true, focusThrottleInterval: 500 },
+  )
   const conversations = data || []
 
   return (
