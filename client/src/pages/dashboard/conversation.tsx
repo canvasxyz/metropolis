@@ -104,11 +104,13 @@ export const DashboardConversation = ({ user }: { user }) => {
     }
   }, [zidMetadataError])
 
-  if(Object.keys(zid_metadata).length === 0) {
+  if (Object.keys(zid_metadata).length === 0) {
     return <Box>Loading...</Box>
   }
 
-  const displayTitle = zid_metadata.fip_version ? zid_metadata.fip_version.fip_title : zid_metadata.topic
+  const displayTitle = zid_metadata.fip_version
+    ? zid_metadata.fip_version.fip_title
+    : zid_metadata.topic
 
   return (
     <Box>
@@ -142,7 +144,9 @@ export const DashboardConversation = ({ user }: { user }) => {
               </Link>
               <Text> &middot; </Text>
               {(() => {
-                const date = new Date(zid_metadata.fip_version?.fip_created || +zid_metadata.created)
+                const date = new Date(
+                  zid_metadata.fip_version?.fip_created || +zid_metadata.created,
+                )
                 return date.toLocaleDateString("en-us", {
                   year: "numeric",
                   month: "short",
@@ -200,7 +204,9 @@ export const DashboardConversation = ({ user }: { user }) => {
               />
             </Box>
           )}
-          {!zid_metadata.is_archived && zid_metadata?.comment_count < MIN_SEED_RESPONSES && (
+          {!zid_metadata.fip_version &&
+            !zid_metadata.is_archived &&
+            zid_metadata?.comment_count < MIN_SEED_RESPONSES && (
               <Box
                 sx={{
                   ...surveyBox,
@@ -218,8 +224,10 @@ export const DashboardConversation = ({ user }: { user }) => {
                 vote on. This poll will be hidden from other viewers until then.
               </Box>
             )}
-          {!zid_metadata.is_archived && <ReportAndSurveyInfo conversation_info={zid_metadata} /> }
-          {
+          {!zid_metadata.fip_version && !zid_metadata.is_archived && (
+            <ReportAndSurveyInfo conversation_info={zid_metadata} />
+          )}
+          {zid_metadata.fip_version && (
             <Box sx={dashboardBox}>
               <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
               {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
@@ -229,7 +237,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 <SentimentCheckComments conversationId={zid_metadata.conversation_id} />
               </Box>
             </Box>
-          }
+          )}
         </Box>
       </Box>
     </Box>
