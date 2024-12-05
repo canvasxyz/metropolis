@@ -208,30 +208,26 @@ const ConversationsList = ({
           </Link>
         </Box>
       )}
-      <Button
-        variant={user ? "buttons.primary" : "buttons.black"}
-        sx={{
-          px: [2],
-          py: [1],
-          mr: [1],
-          mb: [1],
-          position: "absolute",
-          bottom: "40px",
-          right: "11px",
-          fontSize: "0.94em",
-          width: "calc(100% - 32px)",
-          fontWeight: 500,
-        }}
-        onClick={() => {
-          if (user) {
-            setCreateConversationModalIsOpen(true)
-          } else {
-            document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`
-          }
-        }}
-      >
-        {user ? <BiSolidBarChartAlt2 /> : null} {user ? "Create a poll" : "Sign in with Github"}
-      </Button>
+      {user && (
+        <Button
+          variant="buttons.primary"
+          sx={{
+            px: [2],
+            py: [1],
+            mr: [1],
+            mb: [1],
+            position: "absolute",
+            bottom: "40px",
+            right: "11px",
+            fontSize: "0.94em",
+            width: "calc(100% - 32px)",
+            fontWeight: 500,
+          }}
+          onClick={() => setCreateConversationModalIsOpen(true)}
+        >
+          <BiSolidBarChartAlt2 />Create a poll
+        </Button>
+      )}
       <Box
         sx={{
           textAlign: "center",
