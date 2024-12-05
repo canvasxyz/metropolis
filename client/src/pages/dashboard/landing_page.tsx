@@ -104,7 +104,9 @@ export const LandingPage = () => {
                 </Box>
               </Flex>
               <Separator size="4"/>
-              The following discussion polls have been active recently:
+              <Text size="2">
+                The following discussion polls have been active recently:
+              </Text>
               <ConversationsPreview
                 conversations={conversations
                   .filter(
@@ -133,7 +135,9 @@ export const LandingPage = () => {
                 </Box>
               </Flex>
               <Separator size="4"/>
-              The following FIPs are currently open for sentiment checks:
+              <Text size="2">
+                The following FIPs are currently open for sentiment checks:
+              </Text>
               <ConversationsPreview
                 conversations={conversations
                   .filter((c) => !c.is_archived && !c.is_hidden && c.fip_version?.github_pr?.title && c.fip_version?.fip_files_created)
