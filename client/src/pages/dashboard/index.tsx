@@ -44,11 +44,15 @@ const Dashboard = ({ user }: DashboardProps) => {
           <DashboardUserButton />
           <CompatRoutes>
             <CompatRoute path="/" element={<LandingPage />} />
-            <CompatRoute path="/sentiment_checks" element={
-              <Suspense>
-                {" "}
-                <SentimentChecks />
-              </Suspense>} />
+            <CompatRoute
+              path="/sentiment_checks"
+              element={
+                <Suspense>
+                  {" "}
+                  <SentimentChecks />
+                </Suspense>
+              }
+            />
             <CompatRoute
               path="/fip_tracker"
               element={

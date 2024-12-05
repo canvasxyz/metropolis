@@ -1,5 +1,9 @@
-import React from "react"
 import useSWR from "swr"
+import React, { useState, useEffect } from "react"
+import { useLocalStorage } from "usehooks-ts"
+import { Button, Box, Link } from "theme-ui"
+import { TbExternalLink, TbFocus } from "react-icons/tb"
+import { BiSolidBarChartAlt2 } from "react-icons/bi"
 
 import ConversationListItem from "./conversation_list_item"
 import { ConversationSummary } from "../../reducers/conversations_summary"
@@ -7,10 +11,10 @@ import { Badge, Box, Button, Flex } from "@radix-ui/themes"
 
 const ConversationsList = ({
   selectedView,
-  setSelectedView
+  setSelectedView,
 }: {
-  selectedView: "all" | "fips" | "polls";
-  setSelectedView: (view: "all" | "fips" | "polls") => void;
+  selectedView: "all" | "fips" | "polls"
+  setSelectedView: (view: "all" | "fips" | "polls") => void
 }) => {
   const { data } = useSWR(
     `conversations_summary`,
@@ -27,7 +31,8 @@ const ConversationsList = ({
   const fips = conversations.filter((conversation) => conversation.fip_version)
   const polls = conversations.filter((conversation) => conversation.fip_version === null)
 
-  const filteredConversations = selectedView === "all" ? allConversations : selectedView === "fips" ? fips : polls
+  const filteredConversations =
+    selectedView === "all" ? allConversations : selectedView === "fips" ? fips : polls
 
   const conversationsToDisplay = filteredConversations.slice(0, 5)
 
@@ -40,7 +45,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "all" ? "blue" : "gray"}
           onClick={() => setSelectedView("all")}
-          style={{borderRadius: "8px 0 0 8px"}}
+          style={{ borderRadius: "8px 0 0 8px" }}
         >
           All
           <Badge
@@ -60,7 +65,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "fips" ? "blue" : "gray"}
           onClick={() => setSelectedView("fips")}
-          style={{borderRadius: "0 0 0 0"}}
+          style={{ borderRadius: "0 0 0 0" }}
         >
           FIPs
           <Badge
@@ -80,7 +85,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "polls" ? "blue" : "gray"}
           onClick={() => setSelectedView("polls")}
-          style={{borderRadius: "0 8px 8px 0"}}
+          style={{ borderRadius: "0 8px 8px 0" }}
         >
           Polls
           <Badge
