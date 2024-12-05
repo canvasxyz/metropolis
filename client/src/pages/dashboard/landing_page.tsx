@@ -49,8 +49,8 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                   c.topic
                 }
                 </Box>
-                <Box mt="3px">
-                  <Text size="2">
+                <Box>
+                  <Text size="2" color="gray">
                     Created {timeAgo}
                   </Text>
                 </Box>
