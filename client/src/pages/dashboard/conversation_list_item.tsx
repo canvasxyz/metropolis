@@ -3,14 +3,26 @@ import { ConversationSummary } from "../../reducers/conversations_summary"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { NavLink } from "react-router-dom-v5-compat"
 import { Box, Flex, Text } from "theme-ui"
-import { TbExclamationCircle, TbGitMerge, TbGitPullRequest, TbGitPullRequestClosed, TbGitPullRequestDraft } from "react-icons/tb"
+import {
+  TbExclamationCircle,
+  TbGitMerge,
+  TbGitPullRequest,
+  TbGitPullRequestClosed,
+  TbGitPullRequestDraft,
+} from "react-icons/tb"
 
 import { useViewCount } from "../../reducers/view_counts"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import ConversationListItemMenu from "./conversation_list_item_menu"
 import { useAppSelector } from "../../hooks"
 
-const ViewCount = ({ initialViewCount, conversation }: {initialViewCount: number; conversation: ConversationSummary}) => {
+const ViewCount = ({
+  initialViewCount,
+  conversation,
+}: {
+  initialViewCount: number
+  conversation: ConversationSummary
+}) => {
   const viewCount = useViewCount(conversation.conversation_id)
   return <Text>{Math.max(viewCount, initialViewCount)}</Text>
 }
@@ -45,25 +57,27 @@ type ConversationListItemProps = {
   initialViewCount: number
 }
 
-const ConversationListItem = ({
-  conversation,
-  initialViewCount,
-}: ConversationListItemProps) => {
+const ConversationListItem = ({ conversation, initialViewCount }: ConversationListItemProps) => {
   const { user } = useAppSelector((state) => state.user)
-  const date = new Date(conversation.fip_version ? conversation.fip_version.fip_created : +conversation.created)
+  const date = new Date(
+    conversation.fip_version ? conversation.fip_version.fip_created : +conversation.created,
+  )
   const timeAgo = formatTimeAgo(+date, true)
 
-  const shouldHideDiscussion = !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES
+  const shouldHideDiscussion =
+    !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES
 
   // TODO: should we show the conversation if the FIP is empty?
   // const emptyFIP = conversation.fip_version !== null && conversation.fip_version.fip_files_created
 
-  const displayTitle = conversation.fip_version ? conversation.fip_version.fip_title : conversation.topic
+  const displayTitle = conversation.fip_version
+    ? conversation.fip_version.fip_title
+    : conversation.topic
 
   if (shouldHideDiscussion && conversation.owner !== user?.uid) return
 
   return (
-    <NavLink to={`/dashboard/c/${conversation.conversation_id}`} >
+    <NavLink to={`/dashboard/c/${conversation.conversation_id}`}>
       {({ isActive }) => (
         <Box
           sx={{
@@ -94,12 +108,10 @@ const ConversationListItem = ({
               {getIconForConversation(conversation)}
             </Box>
             <Box sx={{ fontWeight: 500, flex: 1 }}>
-              {displayTitle || (
-                <Text sx={{ color: "#84817D" }}>Untitled</Text>
-              )}
+              {displayTitle || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
               <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
                 <Text sx={{ flex: 1 }}>
-                  Created {timeAgo} ago &middot;{" "}
+                  {timeAgo} {timeAgo === "Just now" ? "" : "ago "}&middot;{" "}
                   <ViewCount initialViewCount={initialViewCount} conversation={conversation} />{" "}
                   views
                 </Text>
