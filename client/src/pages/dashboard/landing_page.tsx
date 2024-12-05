@@ -22,27 +22,16 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
       {conversations.map((c) => {
         const date = new Date(c.fip_version?.fip_created || +c.created)
         const timeAgo = formatTimeAgo(+date)
+        const fipVersion = c.fip_version
 
         return (
-          <Card key={c.created}>
-            <Flex
-              sx={{
-                bg: "bgWhite",
-                border: "1px solid #e2ddd599",
-                borderRadius: "8px",
-                px: [3],
-                py: "12px",
-                mb: [2],
-                lineHeight: 1.3,
-                cursor: "pointer",
-                "&:hover": {
-                  border: "1px solid #e2ddd5",
-                },
-              }}
-              onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
-            >
+          <Card
+            key={c.created}
+            onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
+          >
+            <Flex>
               <Box pr="13px" pt="1px">
-                {c.fip_version?.github_pr?.title ? (
+                {fipVersion?.github_pr?.title ? (
                   getIconForConversation(c)
                 ) : (
                   <BiSolidBarChartAlt2 color="#0090ff" />
@@ -50,8 +39,13 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
               </Box>
               <Box>
                 <Box>
-                  {c.fip_version?.github_pr?.title && <Text sx={{ fontWeight: 600 }}>FIP: </Text>}
-                  {c.fip_version?.fip_title || c.fip_version?.github_pr?.title || c.topic}
+                {fipVersion ?
+                  <React.Fragment>
+                    <Text weight="bold">FIP{fipVersion.fip_number ? String(fipVersion.fip_number).padStart(4, "0") : ""}: </Text>
+                    {fipVersion.fip_title || fipVersion.github_pr?.title}
+                  </React.Fragment> :
+                  c.topic
+                }
                 </Box>
                 <Box mt="3px">
                   <Text size="2">
@@ -88,20 +82,16 @@ export const LandingPage = () => {
           <Box pb="3" pt="3">
             <Text size="6" weight="bold" >Welcome to Fil Poll</Text>
           </Box>
-          <Text sx={{ }}>
-            A nonbinding sentiment check tool for the Filecoin community.
-          </Text>
+          A nonbinding sentiment check tool for the Filecoin community.
         </Flex>
         <Grid columns="2" gap="4" py="6">
           {/* discussions */}
           <Card>
             <Flex direction="column" gap="3" mx="2" mt="3">
               <Flex>
-                <Box sx={{ flex: "0 0 25px" }}>
-                  <BiSolidBarChartAlt2 color="#0090ff" style={{ marginRight: "6px" }} />
-                </Box>
+                <BiSolidBarChartAlt2 color="#0090ff" style={{ marginRight: "6px" }} />
                 <Box>
-                  <Text sx={{ fontWeight: 700 }}>
+                  <Text weight="bold">
                     Initiate discussions, collect feedback, and respond to polls
                   </Text>{" "}
                   on open-ended thoughts or ideas.
@@ -128,11 +118,9 @@ export const LandingPage = () => {
           <Card>
             <Flex direction="column" gap="3" mx="2" mt="3">
               <Flex>
-                <Box sx={{ flex: "0 0 25px" }}>
-                  <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
-                </Box>
+                <TbGitPullRequest color="#3fba50" style={{ marginRight: "6px" }} />
                 <Box>
-                  <Text sx={{ fontWeight: 700 }}>Signal your position</Text> on FIPs through sentiment
+                  <Text weight="bold">Signal your position</Text> on FIPs through sentiment
                   checks. <br />
 
                 </Box>
