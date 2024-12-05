@@ -3,13 +3,45 @@ import React from "react"
 import { TbGitPullRequest } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Link as RouterLink, useHistory } from "react-router-dom"
-import { Box, Card, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
+import { Box, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
 
 import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { getIconForConversation } from "./conversation_list_item"
+
+const SectionCard = ({ children }: { children: React.ReactNode }) =>
+  <div
+    style={{
+      borderColor: "#E8E8EB",
+      borderRadius: "16px",
+      borderStyle: "solid",
+      borderWidth: "1px",
+      padding: "6px",
+      background: "#fff",
+      fontSize: "95%",
+    }}
+  >
+    {children}
+  </div>
+
+const ConversationCard = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) =>
+  <div
+    style={{
+      borderColor: "#E8E8EB",
+      borderRadius: "8px",
+      borderStyle: "solid",
+      borderWidth: "1px",
+      padding: "6px",
+      background: "#fff",
+      fontSize: "95%",
+    }}
+    onClick={onClick}
+  >
+    {children}
+  </div>
+
 
 const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
@@ -25,7 +57,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
         const fipVersion = c.fip_version
 
         return (
-          <Card
+          <ConversationCard
             key={c.created}
             onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
           >
@@ -56,7 +88,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                 </Box>
               </Box>
             </Flex>
-          </Card>
+          </ConversationCard>
         )
       })}
     </Flex>
@@ -88,7 +120,7 @@ export const LandingPage = () => {
         </Flex>
         <Grid columns={{initial: "1", md: "2"}} gap="4" py="6">
           {/* discussions */}
-          <Card>
+          <SectionCard>
             <Flex direction="column" gap="4" mx="2" mt="3">
               <Flex gap="3">
                 <Box>
@@ -119,9 +151,9 @@ export const LandingPage = () => {
                   .slice(0, 5)}
               />
             </Flex>
-          </Card>
+          </SectionCard>
           {/* FIPs */}
-          <Card>
+          <SectionCard>
             <Flex direction="column" gap="4" mx="2" mt="3">
               <Flex gap="3">
                 <Box>
@@ -144,7 +176,7 @@ export const LandingPage = () => {
                   .slice(0, 5)}
               />
             </Flex>
-          </Card>
+          </SectionCard>
         </Grid>
       </Container>
       {/* footer */}
