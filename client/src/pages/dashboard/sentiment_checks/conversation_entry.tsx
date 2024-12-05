@@ -6,6 +6,8 @@ import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import ReportAndSurveyInfo from "../report_and_survey_info"
 import { SentimentCheckComments } from "../sentiment_check_comments"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 const dashboardBox = {
   bg: "bgWhite",
@@ -101,6 +103,17 @@ export const ConversationEntry = ({
         </Flex>
         { isOpen &&
           <>
+            <Box></Box>
+            <Box>
+              <ReactMarkdown
+                skipHtml={true}
+                remarkPlugins={[remarkGfm]}
+                linkTarget="_blank"
+                className="react-markdown"
+              >
+                {conversation.description}
+              </ReactMarkdown>
+            </Box>
             <Box></Box>
             <ReportAndSurveyInfo conversation_info={conversation}/>
             <Box></Box>
