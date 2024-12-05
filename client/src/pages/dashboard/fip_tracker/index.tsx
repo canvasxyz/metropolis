@@ -229,7 +229,7 @@ const FipTracker = () => {
       sx={{
         px: [3],
         py: [3],
-        pt: [4],
+        pt: [7],
         flexDirection: "column",
         gap: [3],
       }}

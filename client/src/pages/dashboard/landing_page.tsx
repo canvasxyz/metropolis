@@ -5,13 +5,14 @@ import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Box, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
 
+import useSWR from "swr"
 import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { getIconForConversation } from "./conversation_list_item"
 
-const SectionCard = ({ children }: { children: React.ReactNode }) =>
+const SectionCard = ({ children }: { children: React.ReactNode }) => (
   <div
     style={{
       borderColor: "#E8E8EB",
@@ -25,8 +26,15 @@ const SectionCard = ({ children }: { children: React.ReactNode }) =>
   >
     {children}
   </div>
+)
 
-const ConversationCard = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) =>
+const ConversationCard = ({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode
+  onClick: () => void
+}) => (
   <div
     style={{
       borderColor: "#E8E8EB",
@@ -41,7 +49,7 @@ const ConversationCard = ({ children, onClick }: { children: React.ReactNode; on
   >
     {children}
   </div>
-
+)
 
 const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
   const hist = useHistory()
@@ -49,7 +57,9 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
   return (
     <Flex direction="column" gap="3">
       {conversations.length === 0 && (
-        <Box mt="3" mb="3"><Text weight="bold">None found</Text></Box>
+        <Box mt="3" mb="3">
+          <Text weight="bold">None found</Text>
+        </Box>
       )}
       {conversations.map((c) => {
         const date = new Date(c.fip_version?.fip_created || +c.created)
@@ -73,13 +83,20 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
               </Box>
               <Box>
                 <Box>
-                {fipVersion ?
-                  <React.Fragment>
-                    <Text weight="bold">FIP{fipVersion.fip_number ? String(fipVersion.fip_number).padStart(4, "0") : ""}: </Text>
-                    {fipVersion.fip_title || fipVersion.github_pr?.title}
-                  </React.Fragment> :
-                  c.topic
-                }
+                  {fipVersion ? (
+                    <React.Fragment>
+                      <Text weight="bold">
+                        FIP
+                        {fipVersion.fip_number
+                          ? String(fipVersion.fip_number).padStart(4, "0")
+                          : ""}
+                        :{" "}
+                      </Text>
+                      {fipVersion.fip_title || fipVersion.github_pr?.title}
+                    </React.Fragment>
+                  ) : (
+                    c.topic
+                  )}
                 </Box>
                 <Box>
                   <Text size="2" color="gray">
@@ -96,29 +113,29 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
 }
 
 export const LandingPage = () => {
-  const { data } = useAppSelector((state: RootState) => state.conversations_summary)
+  const { data } = useSWR(
+    `conversations_summary`,
+    async () => {
+      const response = await fetch(`/api/v3/conversations_summary`)
+      return (await response.json()) as ConversationSummary[]
+    },
+    { keepPreviousData: true, focusThrottleInterval: 500 },
+  )
   const conversations = data || []
 
   return (
     <Box>
       <Container size="3" mt="4" px="3">
-        <Flex
-          direction="column"
-          align="center"
-          justify="center"
-          pt="8"
-        >
-          <img
-            src="/filecoin.png"
-            width="80px"
-            height="80px"
-          />
+        <Flex direction="column" align="center" justify="center" pt="8">
+          <img src="/filecoin.png" width="80px" height="80px" />
           <Box pb="3" pt="3">
-            <Text size="6" weight="bold" >Welcome to Fil Poll</Text>
+            <Text size="6" weight="bold">
+              Welcome to Fil Poll
+            </Text>
           </Box>
           A nonbinding sentiment check tool for the Filecoin community.
         </Flex>
-        <Grid columns={{initial: "1", md: "2"}} gap="4" py="6">
+        <Grid columns={{ initial: "1", md: "2" }} gap="4" py="6">
           {/* discussions */}
           <SectionCard>
             <Flex direction="column" gap="4" mx="2" mt="3">
@@ -135,10 +152,8 @@ export const LandingPage = () => {
                   on open-ended thoughts or ideas.
                 </Box>
               </Flex>
-              <Separator size="4"/>
-              <Text size="2">
-                The following discussion polls have been active recently:
-              </Text>
+              <Separator size="4" />
+              <Text size="2">The following discussion polls have been active recently:</Text>
               <ConversationsPreview
                 conversations={conversations
                   .filter(
@@ -162,17 +177,20 @@ export const LandingPage = () => {
                   </Text>
                 </Box>
                 <Box>
-                  <Text weight="bold">Signal your position</Text> on FIPs through sentiment
-                  checks.
+                  <Text weight="bold">Signal your position</Text> on FIPs through sentiment checks.
                 </Box>
               </Flex>
-              <Separator size="4"/>
-              <Text size="2">
-                The following FIPs are currently open for sentiment checks:
-              </Text>
+              <Separator size="4" />
+              <Text size="2">The following FIPs are currently open for sentiment checks:</Text>
               <ConversationsPreview
                 conversations={conversations
-                  .filter((c) => !c.is_archived && !c.is_hidden && c.fip_version?.github_pr?.title && c.fip_version?.fip_files_created)
+                  .filter(
+                    (c) =>
+                      !c.is_archived &&
+                      !c.is_hidden &&
+                      c.fip_version?.github_pr?.title &&
+                      c.fip_version?.fip_files_created,
+                  )
                   .slice(0, 5)}
               />
             </Flex>
@@ -184,7 +202,7 @@ export const LandingPage = () => {
         <RouterLink to="/about">
           <Text weight="bold">About Fil Poll</Text>
         </RouterLink>
-        <Box flexGrow="1"/>
+        <Box flexGrow="1" />
         Fil Poll &copy; 2024
       </Flex>
     </Box>
