@@ -87,11 +87,9 @@ export default () => {
 
   let sortFunction
   if (sortBy === "asc") {
-    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
-  } else if (sortBy === "desc") {
     sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? -1 : 1)
   } else {
-    sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
+    sortFunction = (c1, c2) => (c1.fip_created > c2.fip_created ? 1 : -1)
   }
 
   const displayedConversations = (conversations || [])
