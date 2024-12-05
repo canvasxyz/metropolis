@@ -8,7 +8,8 @@ import ConversationsList from "./conversations_list"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { ListingSelector } from "./listing_selector"
 import { TbFocus } from "react-icons/tb"
-import { Box, Flex, Link, Text } from "@radix-ui/themes"
+import { Box, Button, Flex, Link, Text } from "@radix-ui/themes"
+import { useNavigate } from "react-router-dom-v5-compat"
 
 const LogoBlock = () => {
   return (
@@ -37,6 +38,30 @@ const LastSync = ({ lastSync, syncInProgress, syncPRs }: { lastSync: number; syn
     <Link href="#" onClick={() => syncPRs()}>
       {syncInProgress ? <Spinner size={26} /> : `Sync now`}
     </Link>
+  </Flex>
+}
+
+const ViewAllButton = ({ selectedView }: { selectedView: "all" | "fips" | "polls" }) => {
+  const navigate = useNavigate()
+
+  if(selectedView === "all") return null
+
+  return <Flex justify="center" align="center" p="3">
+    <Button
+      size="3"
+      style={{width: "100%"}}
+      color="gray"
+      variant="soft"
+      onClick={() => {
+        if(selectedView === "fips") {
+          navigate("/dashboard/fip_tracker")
+        } else {
+          navigate("/dashboard/sentiment_checks")
+        }
+      }
+    }>
+      View all
+    </Button>
   </Flex>
 }
 
@@ -112,6 +137,7 @@ const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
         <Text size="1">Recently Active ▾</Text>
       </Box>
       <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />
+      <ViewAllButton selectedView={selectedView} />
       <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
     </div>
   </Box>
