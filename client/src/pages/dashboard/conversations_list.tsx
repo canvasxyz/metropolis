@@ -32,7 +32,7 @@ const ConversationsList = ({
   const conversationsToDisplay = filteredConversations.slice(0, 5)
 
   return (
-    <Box flexGrow="1">
+    <React.Fragment>
       <Flex justify="center">
         <Button
           className="left-group-button"
@@ -95,15 +95,16 @@ const ConversationsList = ({
           </Badge>
         </Button>
       </Flex>
-
-      {conversationsToDisplay.map((conversation) => (
-        <ConversationListItem
-          conversation={conversation}
-          key={conversation.conversation_id}
-          initialViewCount={conversation.view_count}
-        />
-      ))}
-    </Box>
+      <Flex direction="column" overflowY="scroll" flexGrow="1">
+        {conversationsToDisplay.map((conversation) => (
+          <ConversationListItem
+            conversation={conversation}
+            key={conversation.conversation_id}
+            initialViewCount={conversation.view_count}
+          />
+        ))}
+      </Flex>
+    </React.Fragment>
   )
 }
 
