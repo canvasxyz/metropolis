@@ -5,6 +5,7 @@ import { Button, Box, Link } from "theme-ui"
 import { TbExternalLink, TbFocus } from "react-icons/tb"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 
+import { MIN_SEED_RESPONSES } from "../../util/misc"
 import ConversationListItem from "./conversation_list_item"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { Badge, Box, Button, Flex } from "@radix-ui/themes"
@@ -27,9 +28,13 @@ const ConversationsList = ({
 
   const conversations = data || []
 
-  const allConversations = conversations
-  const fips = conversations.filter((conversation) => conversation.fip_version)
-  const polls = conversations.filter((conversation) => conversation.fip_version === null)
+  const allConversations = conversations.filter(
+    (c) => c.fip_version || c.comment_count >= MIN_SEED_RESPONSES,
+  )
+  const fips = conversations.filter((c) => c.fip_version)
+  const polls = conversations.filter(
+    (c) => c.fip_version === null && c.comment_count >= MIN_SEED_RESPONSES,
+  )
 
   const filteredConversations =
     selectedView === "all" ? allConversations : selectedView === "fips" ? fips : polls
