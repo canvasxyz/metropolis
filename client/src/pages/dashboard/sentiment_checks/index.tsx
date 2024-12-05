@@ -1,4 +1,4 @@
-import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
+import { Button as RadixButton, DropdownMenu, TextField, Select, Button, Box } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
@@ -6,21 +6,32 @@ import {
   TbCalendar,
   TbRefresh,
   TbSearch,
-  TbUser,
 } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Box, Flex, Text } from "theme-ui"
+import { Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
 import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry } from "./conversation_entry"
+import { useAppSelector } from "../../../hooks"
+import { CreateConversationModal } from "../../CreateConversationModal"
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
   closed: { label: "Closed", color: "gray" },
+}
+
+export const TopLeftFloating = ({children}: {children: React.ReactNode}) => {
+  return <Box
+    position="absolute"
+    top="3"
+    left="3"
+    >
+    {children}
+  </Box>
 }
 
 export default () => {
@@ -31,6 +42,8 @@ export default () => {
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<Record<string, boolean>>(
     Object.fromEntries(allStatuses.map((status) => [status, true]))
   )
+  const { user } = useAppSelector((state) => state.user)
+  const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const {
     showAuthors,
@@ -52,7 +65,7 @@ export default () => {
   const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
-    `conversations_summary`,
+    `conversations_summary_sentiment_checks`,
     async () => {
       const response = await fetch(`/api/v3/conversations_summary`)
       // process the fip_version part if it exists
@@ -103,18 +116,34 @@ export default () => {
   }).toSorted(sortFunction)
 
   return (
+    <Box>
+      {user &&
+        <TopLeftFloating>
+          <Button
+              color="gray"
+
+              radius="large"
+              highContrast
+              onClick={() => setCreateConversationModalIsOpen(true)}
+            >
+              <Text sx={{ display: "inline-block" }}>
+                Create a poll
+              </Text>
+            </Button>
+        </TopLeftFloating>
+      }
     <Flex
       sx={{
         px: [3],
         py: [3],
-        pt: [4],
+        pt: [7],
         flexDirection: "column",
         gap: [3],
       }}
     >
       <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
       <Flex sx={{ gap: [2], width: "100%" }}>
-        <Box sx={{ flexGrow: "1", maxWidth: "400px" }}>
+        <Box flexGrow="1" maxWidth="400px" >
           <TextField.Root
             placeholder="Search..."
             value={(searchParams as any).get("search") || ""}
@@ -125,7 +154,7 @@ export default () => {
             </TextField.Slot>
           </TextField.Root>
         </Box>
-        <Box sx={{ flexGrow: "1" }}></Box>
+        <Box flexGrow="1" ></Box>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <RadixButton variant="surface">
@@ -221,7 +250,7 @@ export default () => {
               <RadixButton color="gray" variant="ghost" onClick={resetDisplayOptions}>
                 Reset
               </RadixButton>
-              <Box sx={{ flexGrow: "1" }}></Box>
+              <Box flexGrow="1" ></Box>
               <RadixButton variant="ghost" onClick={saveDisplayOptions}>
                 Save as default
               </RadixButton>
@@ -239,5 +268,9 @@ export default () => {
         ))}
       </Flex>
     </Flex>
+    <CreateConversationModal
+        isOpen={createConversationModalIsOpen}
+        setIsOpen={setCreateConversationModalIsOpen} />
+    </Box>
   )
 }
