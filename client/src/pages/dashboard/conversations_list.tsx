@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { Box } from "theme-ui"
 
 import { MIN_SEED_RESPONSES } from "../../util/misc"
-import api from "../../util/api"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
 import {
@@ -21,13 +20,7 @@ type ConversationListSelection =
   | "archived"
   | "hidden"
 
-const ConversationsList = ({
-  syncPRs,
-  syncInProgress,
-}: {
-  syncPRs: () => void
-  syncInProgress: boolean
-}) => {
+const ConversationsList = () => {
   const dispatch = useAppDispatch()
   const { user } = useAppSelector((state) => state.user)
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
