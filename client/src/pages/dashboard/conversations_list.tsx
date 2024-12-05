@@ -228,37 +228,6 @@ const ConversationsList = ({
           <BiSolidBarChartAlt2 />Create a poll
         </Button>
       )}
-      <Box
-        sx={{
-          textAlign: "center",
-          position: "absolute",
-          bottom: "12px",
-          width: "100%",
-          fontSize: "0.88em",
-          fontWeight: "600",
-          borderTop: "1px solid lighterGray",
-        }}
-      >
-        <Link
-          variant="links.a"
-          as="a"
-          target="_blank"
-          rel="noreferrer"
-          href={`https://github.com/${process.env.FIP_REPO_OWNER || "filecoin-project"}/${process.env.FIP_REPO_NAME || "FIPs"}`}
-        >
-          FIPs <TbExternalLink style={{ position: "relative", top: 1, left: -1 }} />
-        </Link>{" "}
-        &middot;{" "}
-        <Link
-          variant="links.a"
-          as="a"
-          target="_blank"
-          rel="noreferrer"
-          href="https://github.com/canvasxyz/metropolis/issues/new/choose"
-        >
-          Bugs & Feedback <TbExternalLink style={{ position: "relative", top: 1, left: -1 }} />
-        </Link>
-      </Box>
     </React.Fragment>
   )
 }
