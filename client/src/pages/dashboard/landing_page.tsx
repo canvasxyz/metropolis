@@ -18,7 +18,7 @@ const SectionCard = ({ children }: { children: React.ReactNode }) =>
       borderRadius: "16px",
       borderStyle: "solid",
       borderWidth: "1px",
-      padding: "6px 6px 12px 6px",
+      padding: "6px 12px 18px 12px",
       background: "#fff",
       fontSize: "95%",
     }}
@@ -33,7 +33,7 @@ const ConversationCard = ({ children, onClick }: { children: React.ReactNode; on
       borderRadius: "8px",
       borderStyle: "solid",
       borderWidth: "1px",
-      padding: "6px",
+      padding: "8px",
       background: "#fff",
       fontSize: "95%",
     }}
