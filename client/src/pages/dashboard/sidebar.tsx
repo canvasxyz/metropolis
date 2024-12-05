@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { HTMLAttributes, useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
 import { formatTimeAgo } from "../../util/misc"
@@ -108,11 +108,33 @@ const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
         label="Sentiment Checks"
       />
       <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
-      {/* <Flex>
-        <Button onClick={() => setSelectedView("all")}>All</Button>
-        <Button onClick={() => setSelectedView("fips")}>FIPs</Button>
-        <Button onClick={() => setSelectedView("polls")}>Polls</Button>
-      </Flex> */}
+      <Flex justify="center">
+        <Button
+          className="left-group-button"
+          variant="outline"
+          color={selectedView === "all" ? "blue" : "gray"}
+          onClick={() => setSelectedView("all")}
+          style={{borderRadius: "8px 0 0 8px"}}
+        >All</Button>
+        <Button
+          className="center-group-button"
+          variant="outline"
+          color={selectedView === "fips" ? "blue" : "gray"}
+          onClick={() => setSelectedView("fips")}
+          style={{borderRadius: "0 0 0 0"}}
+        >FIPs</Button>
+        <Button
+          className="right-group-button"
+          variant="outline"
+          color={selectedView === "polls" ? "blue" : "gray"}
+          onClick={() => setSelectedView("polls")}
+          style={{borderRadius: "0 8px 8px 0"}}
+        >Polls</Button>
+
+        {/* <GroupButton orientation="left" onClick={() => setSelectedView("all")}>All</GroupButton>
+        <GroupButton orientation="center" onClick={() => setSelectedView("fips")}>FIPs</GroupButton>
+        <GroupButton orientation="right" onClick={() => setSelectedView("polls")}>Polls</GroupButton> */}
+      </Flex>
       <ConversationsList selectedView={selectedView} />
       <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
     </div>
