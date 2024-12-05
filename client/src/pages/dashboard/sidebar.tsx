@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react"
-import { Link as RouterLink } from "react-router-dom"
 import { toast } from "react-hot-toast"
 
 import { formatTimeAgo } from "../../util/misc"
@@ -8,25 +7,21 @@ import api from "../../util/api"
 import ConversationsList from "./conversations_list"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { ListingSelector } from "./listing_selector"
-import { Box, Flex, Text, Link } from "theme-ui"
 import { TbFocus } from "react-icons/tb"
+import { Box, Button, Flex, Link, Text } from "@radix-ui/themes"
 
 const LogoBlock = () => {
   return (
-    <Flex sx={{gap: 2}}>
+    <Flex gap="2">
       <img
         src="/filecoin.png"
         width="25"
         height="25"
       />
       <Text
-        variant="links.text"
-        sx={{
-          color: "text",
-          "&:hover": { color: "text" },
-          fontWeight: 700,
-
-        }}
+        color="gray"
+        weight="bold"
+        highContrast
       >
         Fil Poll
       </Text>
@@ -35,31 +30,20 @@ const LogoBlock = () => {
 }
 
 const LastSync = ({ lastSync, syncInProgress, syncPRs }: { lastSync: number; syncInProgress: boolean; syncPRs: () => void }) => {
-  return <Box
-    sx={{
-      position: "absolute",
-      bottom: "0px",
-      pb: "86px",
-      pt: "20px",
-      fontSize: "0.88em",
-      textAlign: "center",
-      width: "100%",
-      color: "#83817d",
-      background:
-        "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
-    }}
-  >
+  return <Flex justify="center" align="center" pb="3">
+    <Text>
     Last sync: {isNaN(lastSync) ? "n/a" : formatTimeAgo(lastSync)} &nbsp;
-    <Link variant="links.a" onClick={() => syncPRs()}>
+    </Text>
+    <Link href="#" onClick={() => syncPRs()}>
       {syncInProgress ? <Spinner size={26} /> : `Sync now`}
     </Link>
-  </Box>
+  </Flex>
 }
-
 
 const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
   const [syncInProgress, setSyncInProgress] = useState(false)
   const [lastSync, setLastSync] = useState<number>()
+  const [selectedView, setSelectedView] = useState<"all" | "fips" | "polls">("all")
 
   useEffect(() => {
     api.get("/api/v3/github_syncs", {}).then((result) => {
@@ -94,41 +78,44 @@ const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
   }
 
   return <Box
-    sx={{
-      display: mobileMenuOpen ? null : ["none", "block"],
-      width: ["100%", "40%", null, "340px"],
-      borderRight: "1px solid #e2ddd5",
-      bg: "#FFFFFF",
-      maxHeight: "100vh",
-      overflow: "hidden",
-      position: "relative",
-    }}
+    display={mobileMenuOpen ? "block" : { initial: "none", sm: "block" }}
+    width={{ initial: "100%", sm: "40%", md: "340px" }}
+    maxHeight="100vh"
+    overflow="hidden"
+    position="relative"
   >
-    <Flex
-      sx={{
-        width: "100%",
-        borderBottom: "1px solid #e2ddd5",
-        pt: "7px",
-        pb: "14px",
-        px: "18px",
-        alignItems: "center",
-        whiteSpace: "nowrap",
-      }}
-    >
-      <Box sx={{ flexGrow: "1" }}>
-        <RouterLink to="/dashboard">
+    <div style={{
+      height: "100%",
+      width: "100%",
+      borderRight: "1px solid #e2ddd5",
+      flexDirection: "column",
+      display: "flex",
+    }}>
+      <Flex
+        width="100%"
+        pt="14px"
+        pb="14px"
+        px="18px"
+        align="center"
+      >
+        <Link href="/dashboard">
           <LogoBlock />
-        </RouterLink>
-      </Box>
-    </Flex>
-    <ListingSelector
-      to="/dashboard/sentiment_checks"
-      iconType={BiSolidBarChartAlt2}
-      label="Sentiment Checks"
-    />
-    <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
-    <ConversationsList selectedView="all" />
-    <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
+        </Link>
+      </Flex>
+      <ListingSelector
+        to="/dashboard/sentiment_checks"
+        iconType={BiSolidBarChartAlt2}
+        label="Sentiment Checks"
+      />
+      <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
+      {/* <Flex>
+        <Button onClick={() => setSelectedView("all")}>All</Button>
+        <Button onClick={() => setSelectedView("fips")}>FIPs</Button>
+        <Button onClick={() => setSelectedView("polls")}>Polls</Button>
+      </Flex> */}
+      <ConversationsList selectedView={selectedView} />
+      <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
+    </div>
   </Box>
 }
 

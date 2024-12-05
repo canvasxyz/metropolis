@@ -1,9 +1,9 @@
 import React from "react"
-import { Box } from "theme-ui"
 import useSWR from "swr"
 
 import ConversationListItem from "./conversation_list_item"
 import { ConversationSummary } from "../../reducers/conversations_summary"
+import { Box } from "@radix-ui/themes"
 
 const ConversationsList = ({ selectedView }: {selectedView: "all" | "fips" | "polls"}) => {
   const { data } = useSWR(
@@ -29,17 +29,15 @@ const ConversationsList = ({ selectedView }: {selectedView: "all" | "fips" | "po
   const conversationsToDisplay = filteredConversations.slice(0, 5)
 
   return (
-    <React.Fragment>
-      <Box sx={{ height: "calc(100vh - 150px)", overflow: "scroll", pb: "100px" }}>
-        {conversationsToDisplay.map((conversation) => (
-          <ConversationListItem
-            conversation={conversation}
-            key={conversation.conversation_id}
-            initialViewCount={conversation.view_count}
-          />
-        ))}
-      </Box>
-    </React.Fragment>
+    <Box flexGrow="1">
+      {conversationsToDisplay.map((conversation) => (
+        <ConversationListItem
+          conversation={conversation}
+          key={conversation.conversation_id}
+          initialViewCount={conversation.view_count}
+        />
+      ))}
+    </Box>
   )
 }
 
