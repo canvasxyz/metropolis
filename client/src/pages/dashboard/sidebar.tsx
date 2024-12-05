@@ -1,4 +1,4 @@
-import React, { HTMLAttributes, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { toast } from "react-hot-toast"
 
 import { formatTimeAgo } from "../../util/misc"
@@ -8,7 +8,7 @@ import ConversationsList from "./conversations_list"
 import { BiSolidBarChartAlt2 } from "react-icons/bi"
 import { ListingSelector } from "./listing_selector"
 import { TbFocus } from "react-icons/tb"
-import { Box, Button, Flex, Link, Text } from "@radix-ui/themes"
+import { Box, Flex, Link, Text } from "@radix-ui/themes"
 
 const LogoBlock = () => {
   return (
@@ -108,34 +108,7 @@ const Sidebar = ({mobileMenuOpen}: {mobileMenuOpen: boolean}) => {
         label="Sentiment Checks"
       />
       <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
-      <Flex justify="center">
-        <Button
-          className="left-group-button"
-          variant="outline"
-          color={selectedView === "all" ? "blue" : "gray"}
-          onClick={() => setSelectedView("all")}
-          style={{borderRadius: "8px 0 0 8px"}}
-        >All</Button>
-        <Button
-          className="center-group-button"
-          variant="outline"
-          color={selectedView === "fips" ? "blue" : "gray"}
-          onClick={() => setSelectedView("fips")}
-          style={{borderRadius: "0 0 0 0"}}
-        >FIPs</Button>
-        <Button
-          className="right-group-button"
-          variant="outline"
-          color={selectedView === "polls" ? "blue" : "gray"}
-          onClick={() => setSelectedView("polls")}
-          style={{borderRadius: "0 8px 8px 0"}}
-        >Polls</Button>
-
-        {/* <GroupButton orientation="left" onClick={() => setSelectedView("all")}>All</GroupButton>
-        <GroupButton orientation="center" onClick={() => setSelectedView("fips")}>FIPs</GroupButton>
-        <GroupButton orientation="right" onClick={() => setSelectedView("polls")}>Polls</GroupButton> */}
-      </Flex>
-      <ConversationsList selectedView={selectedView} />
+      <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />
       <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
     </div>
   </Box>
