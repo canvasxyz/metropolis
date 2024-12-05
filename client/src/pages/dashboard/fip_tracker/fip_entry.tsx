@@ -54,6 +54,7 @@ const FipEntryInner = ({
           onClick={(e) => {
             // It's possible that there could be a tag inside the link,
             // but we don't handle that case here
+            // @ts-expect-error - TS doesn't know about tagName
             if (e.target.tagName === "A") {
               e.stopPropagation()
             }
