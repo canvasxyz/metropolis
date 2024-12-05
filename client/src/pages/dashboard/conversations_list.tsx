@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Link } from "theme-ui"
-import { TbExternalLink, TbFocus } from "react-icons/tb"
-import { BiSolidBarChartAlt2 } from "react-icons/bi"
+import { Box, Link } from "theme-ui"
 
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import api from "../../util/api"
@@ -14,7 +12,6 @@ import {
   populateConversationsSummary,
 } from "../../reducers/conversations_summary"
 import { ListSelector } from "./list_selector"
-import { ListingSelector } from "./listing_selector"
 import ConversationListItem from "./conversation_list_item"
 
 type ConversationListSelection =
@@ -26,16 +23,13 @@ type ConversationListSelection =
   | "hidden"
 
 const ConversationsList = ({
-  user,
-  setCreateConversationModalIsOpen,
   syncPRs,
   syncInProgress,
 }: {
-  user
-  setCreateConversationModalIsOpen: (arg0: boolean) => void
   syncPRs: () => void
   syncInProgress: boolean
 }) => {
+  const { user } = useAppSelector((state) => state.user)
   const dispatch = useAppDispatch()
   const [lastSync, setLastSync] = useState<number>()
 
@@ -124,12 +118,7 @@ const ConversationsList = ({
 
   return (
     <React.Fragment>
-      <ListingSelector
-        to="/dashboard/sentiment_checks"
-        iconType={BiSolidBarChartAlt2}
-        label="Sentiment Checks"
-      />
-      <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
+
 
       <ListSelector<ConversationListSelection>
         selectedEntryId={selectedConversations}
@@ -207,26 +196,6 @@ const ConversationsList = ({
             {syncInProgress ? <Spinner size={26} /> : `Sync now`}
           </Link>
         </Box>
-      )}
-      {user && (
-        <Button
-          variant="buttons.primary"
-          sx={{
-            px: [2],
-            py: [1],
-            mr: [1],
-            mb: [1],
-            position: "absolute",
-            bottom: "40px",
-            right: "11px",
-            fontSize: "0.94em",
-            width: "calc(100% - 32px)",
-            fontWeight: 500,
-          }}
-          onClick={() => setCreateConversationModalIsOpen(true)}
-        >
-          <BiSolidBarChartAlt2 />Create a poll
-        </Button>
       )}
     </React.Fragment>
   )
