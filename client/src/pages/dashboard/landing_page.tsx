@@ -18,7 +18,7 @@ const SectionCard = ({ children }: { children: React.ReactNode }) =>
       borderRadius: "16px",
       borderStyle: "solid",
       borderWidth: "1px",
-      padding: "6px",
+      padding: "6px 6px 12px 6px",
       background: "#fff",
       fontSize: "95%",
     }}
