@@ -69,7 +69,7 @@ export const LandingPage = () => {
 
   return (
     <Box>
-      <Container size="3" mt="4">
+      <Container size="3" mt="4" px="3">
         <Flex
           direction="column"
           align="center"
@@ -86,7 +86,7 @@ export const LandingPage = () => {
           </Box>
           A nonbinding sentiment check tool for the Filecoin community.
         </Flex>
-        <Grid columns="2" gap="4" py="6">
+        <Grid columns={{initial: "1", md: "2"}} gap="4" py="6">
           {/* discussions */}
           <Card>
             <Flex direction="column" gap="4" mx="2" mt="3">
@@ -104,9 +104,7 @@ export const LandingPage = () => {
                 </Box>
               </Flex>
               <Separator size="4"/>
-
-                The following discussion polls have been active recently:
-
+              The following discussion polls have been active recently:
               <ConversationsPreview
                 conversations={conversations
                   .filter(
@@ -131,8 +129,7 @@ export const LandingPage = () => {
                 </Box>
                 <Box>
                   <Text weight="bold">Signal your position</Text> on FIPs through sentiment
-                  checks. <br />
-
+                  checks.
                 </Box>
               </Flex>
               <Separator size="4"/>
