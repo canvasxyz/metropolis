@@ -38,14 +38,14 @@ const ConversationsList = ({
 
   return (
     <React.Fragment>
-      <Flex justify="center">
+      <Flex justify="center" pt="0px" pb="8px" mx="16px">
         <Button
           className="left-group-button"
           variant="outline"
           size="3"
           color={selectedView === "all" ? "blue" : "gray"}
           onClick={() => setSelectedView("all")}
-          style={{ borderRadius: "8px 0 0 8px" }}
+          style={{ flex: "1", borderRadius: "8px 0 0 8px", position: "relative", left: "1px" }}
         >
           All
           <Badge
@@ -65,7 +65,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "fips" ? "blue" : "gray"}
           onClick={() => setSelectedView("fips")}
-          style={{ borderRadius: "0 0 0 0" }}
+          style={{ flex: "1", borderRadius: "0 0 0 0", borderLeft: 0 }}
         >
           FIPs
           <Badge
@@ -85,7 +85,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "polls" ? "blue" : "gray"}
           onClick={() => setSelectedView("polls")}
-          style={{ borderRadius: "0 8px 8px 0" }}
+          style={{ flex: "1", borderRadius: "0 8px 8px 0", position: "relative", left: "-1px" }}
         >
           Polls
           <Badge

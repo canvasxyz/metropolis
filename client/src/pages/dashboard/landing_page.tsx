@@ -58,7 +58,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
     <Flex direction="column" gap="3">
       {conversations.length === 0 && (
         <Box mt="3" mb="3">
-          <Text weight="bold">None found</Text>
+          <Text color="gray">None found</Text>
         </Box>
       )}
       {conversations.map((c) => {
@@ -71,8 +71,8 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
             key={c.created}
             onClick={() => hist.push(`/dashboard/c/${c.conversation_id}`)}
           >
-            <Flex gap="3">
-              <Box>
+            <Flex gap="2" py="2px" style={{ cursor: "pointer" }}>
+              <Box mx="6px">
                 <Text size="2">
                   {fipVersion?.github_pr?.title ? (
                     getIconForConversation(c)
@@ -81,11 +81,11 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                   )}
                 </Text>
               </Box>
-              <Box>
+              <Box style={{ lineHeight: "1.35" }}>
                 <Box>
                   {fipVersion ? (
-                    <React.Fragment>
-                      <Text weight="bold">
+                    <Text style={{ lineHeight: "1.35" }}>
+                      <Text weight="bold" style={{ lineHeight: "1.35" }}>
                         FIP
                         {fipVersion.fip_number
                           ? String(fipVersion.fip_number).padStart(4, "0")
@@ -93,13 +93,13 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                         :{" "}
                       </Text>
                       {fipVersion.fip_title || fipVersion.github_pr?.title}
-                    </React.Fragment>
+                    </Text>
                   ) : (
                     c.topic
                   )}
                 </Box>
-                <Box>
-                  <Text size="2" color="gray">
+                <Box mt="3px">
+                  <Text size="2" style={{ color: "#888" }}>
                     Created {timeAgo}
                   </Text>
                 </Box>
@@ -126,16 +126,16 @@ export const LandingPage = () => {
   return (
     <Box>
       <Container size="3" mt="4" px="3">
-        <Flex direction="column" align="center" justify="center" pt="8">
-          <img src="/filecoin.png" width="80px" height="80px" />
-          <Box pb="3" pt="3">
+        <Flex direction="column" align="center" justify="center" pt="16px">
+          <img src="/filecoin.png" width="54px" height="54px" />
+          <Box pb="10px" pt="16px">
             <Text size="6" weight="bold">
               Welcome to Fil Poll
             </Text>
           </Box>
-          A nonbinding sentiment check tool for the Filecoin community.
+          A nonbinding sentiment check tool for the Filecoin community
         </Flex>
-        <Grid columns={{ initial: "1", md: "2" }} gap="4" py="6">
+        <Grid columns={{ initial: "1", md: "2" }} gap="3" py="26px" mx="2">
           {/* discussions */}
           <SectionCard>
             <Flex direction="column" gap="4" mx="2" mt="3">
@@ -145,15 +145,17 @@ export const LandingPage = () => {
                     <BiSolidBarChartAlt2 color="#0090ff" />
                   </Text>
                 </Box>
-                <Box>
-                  <Text weight="bold">
+                <Box style={{ "line-height": "1.35" }}>
+                  <Text weight="bold" style={{ "line-height": "1.35" }}>
                     Initiate discussions, collect feedback, and respond to polls
                   </Text>{" "}
                   on open-ended thoughts or ideas.
                 </Box>
               </Flex>
               <Separator size="4" />
-              <Text size="2">The following discussion polls have been active recently:</Text>
+              <Text style={{ "line-height": "1.35" }}>
+                The following discussion polls have been active recently:
+              </Text>
               <ConversationsPreview
                 conversations={conversations
                   .filter(
@@ -176,12 +178,17 @@ export const LandingPage = () => {
                     <TbGitPullRequest color="#3fba50" />
                   </Text>
                 </Box>
-                <Box>
-                  <Text weight="bold">Signal your position</Text> on FIPs through sentiment checks.
+                <Box style={{ "line-height": "1.35" }}>
+                  <Text weight="bold" style={{ "line-height": "1.35" }}>
+                    Signal your position
+                  </Text>{" "}
+                  on FIPs through sentiment checks.
                 </Box>
               </Flex>
               <Separator size="4" />
-              <Text size="2">The following FIPs are currently open for sentiment checks:</Text>
+              <Text style={{ "line-height": "1.35" }}>
+                The following FIPs are currently open for sentiment checks:
+              </Text>
               <ConversationsPreview
                 conversations={conversations
                   .filter(
@@ -198,12 +205,12 @@ export const LandingPage = () => {
         </Grid>
       </Container>
       {/* footer */}
-      <Flex p="4" direction="row">
+      <Flex p="4" px="5" direction="row" style={{ fontSize: "0.91em" }}>
         <RouterLink to="/about">
           <Text weight="bold">About Fil Poll</Text>
         </RouterLink>
         <Box flexGrow="1" />
-        Fil Poll &copy; 2024
+        <Text color="gray">Fil Poll &copy; 2024</Text>
       </Flex>
     </Box>
   )

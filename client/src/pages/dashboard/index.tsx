@@ -29,7 +29,7 @@ const Dashboard = ({ user }: DashboardProps) => {
   }, [location])
 
   return (
-    <Box sx={{ height: "100vh" }}>
+    <Box sx={{ height: "calc(100vh - 1px)" }}>
       <Flex sx={{ display: "flex", height: "100%" }}>
         <Sidebar mobileMenuOpen={mobileMenuOpen} />
         <Box

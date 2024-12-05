@@ -13,14 +13,13 @@ export const ListingSelector = ({
   label: string
   to: string
 }) => {
-  const iconComponent = iconType({ size: "1.5em", style: { position: "relative", top: 0 } })
-
   return (
     <NavLink to={to}>
       {({ isActive }) => (
         <Flex
           sx={{
-            m: 2,
+            mx: 2,
+            my: "2px",
             p: 2,
             borderRadius: "8px",
             alignItems: "center",
@@ -33,7 +32,10 @@ export const ListingSelector = ({
             fontSize: "94%",
           }}
         >
-          {iconComponent}
+          {iconType({
+            size: "1.5em",
+            style: { position: "relative", top: 0, marginLeft: "3px", opacity: isActive ? 1 : 0.8 },
+          })}
           <Text sx={isActive ? { fontWeight: 600 } : {}}>{label}</Text>
         </Flex>
       )}

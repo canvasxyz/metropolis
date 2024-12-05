@@ -25,7 +25,7 @@ const CreateConversationInner = () => {
     <Box>
       <Flex>
         <Heading as="h2" sx={{ flex: 1, position: "relative", top: "4px" }}>
-          Create a community poll
+          Create a sentiment check
         </Heading>
       </Flex>
 
@@ -73,7 +73,7 @@ Try to be objective in the description. You can add specific opinions as respons
               dispatch(handleCreateConversationSubmit(title, description, true))
             }}
           >
-            Create discussion
+            Create poll
           </Button>
         </Box>
         {error && <Box sx={{ color: "mediumRedActive", fontWeight: 500, mt: [3] }}>{error}</Box>}
