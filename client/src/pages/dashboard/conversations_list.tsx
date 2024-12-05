@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react"
 import { useLocalStorage } from "usehooks-ts"
-import { Box, Link } from "theme-ui"
+import { Box } from "theme-ui"
 
-import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
+import { MIN_SEED_RESPONSES } from "../../util/misc"
 import api from "../../util/api"
-import Spinner from "../../components/spinner"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { RootState } from "../../store"
 import {
@@ -29,18 +28,8 @@ const ConversationsList = ({
   syncPRs: () => void
   syncInProgress: boolean
 }) => {
-  const { user } = useAppSelector((state) => state.user)
   const dispatch = useAppDispatch()
-  const [lastSync, setLastSync] = useState<number>()
-
-  useEffect(() => {
-    api.get("/api/v3/github_syncs", {}).then((result) => {
-      if (!result.success) return
-      const lastSync = Date.parse(result.latest.ts)
-      setLastSync(lastSync)
-    })
-  }, [])
-
+  const { user } = useAppSelector((state) => state.user)
   const { data } = useAppSelector((state: RootState) => state.conversations_summary)
   const conversations = data || []
 
@@ -176,27 +165,6 @@ const ConversationsList = ({
           />
         ))}
       </Box>
-      {(selectedConversations === "all-fip" || selectedConversations === "open-fip") && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: "0px",
-            pb: "86px",
-            pt: "20px",
-            fontSize: "0.88em",
-            textAlign: "center",
-            width: "100%",
-            color: "#83817d",
-            background:
-              "linear-gradient(0deg, #faf9f6 0%, #faf9f6 66%, #faf9f699 88%, transparent)",
-          }}
-        >
-          Last sync: {isNaN(lastSync) ? "n/a" : formatTimeAgo(lastSync)} &nbsp;
-          <Link variant="links.a" onClick={() => syncPRs()}>
-            {syncInProgress ? <Spinner size={26} /> : `Sync now`}
-          </Link>
-        </Box>
-      )}
     </React.Fragment>
   )
 }
