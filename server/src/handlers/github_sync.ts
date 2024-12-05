@@ -46,6 +46,8 @@ type FIPFrontmatterData = {
 type PullRequest =
   Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
 
+const extra = "GIT_EXEC_PATH=/app/.apt/usr/lib/git-core";
+
 const DISCUSSION_REGEX = new RegExp(
   `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/discussions/(\\d+)`,
 );
@@ -156,25 +158,30 @@ async function getFipFromPR(
 
   // add remote
   await execAsync(
-    `git remote add ${remote} https://github.com/${owner}/${repo}`,
+    `${extra} git remote add ${remote} https://github.com/${owner}/${repo}`,
     { cwd: repoDir },
   );
 
   // fetch the branches from the remote
-  await execAsync(`GIT_TERMINAL_PROMPT=0 git fetch ${remote}`, { cwd: repoDir });
-
-  // check out the branch locally
-  await execAsync(`git switch -c ${remote}-branch ${remote}/${pull.head.ref}`, {
+  await execAsync(`${extra} GIT_TERMINAL_PROMPT=0 git fetch ${remote}`, {
     cwd: repoDir,
   });
 
+  // check out the branch locally
+  await execAsync(
+    `${extra} git switch -c ${remote}-branch ${remote}/${pull.head.ref}`,
+    {
+      cwd: repoDir,
+    },
+  );
+
   // get updated filenames against the mergebase, unless the FIP PR isn't against master
   const { stdout: mergeBase } = await execAsync(
-    `git merge-base ${mainBranchName} ${remote}/${pull.head.ref}`,
+    `${extra} git merge-base ${mainBranchName} ${remote}/${pull.head.ref}`,
     { cwd: repoDir },
   );
   const { stdout: updatedFilenamesText } = await execAsync(
-    `git diff --name-status ${
+    `${extra} git diff --name-status ${
       pull.base.ref === mainBranchName ? mergeBase : pull.base.ref
     }`,
     { cwd: repoDir },
@@ -225,7 +232,7 @@ async function getFipFromPR(
     // try to extract frontmatter
     const contentParts = content.split("---");
     const frontmatterSource = contentParts[1];
-    const description = contentParts.slice(2).join("---")
+    const description = contentParts.slice(2).join("---");
 
     let frontmatterData;
     try {
@@ -358,7 +365,7 @@ export async function do_github_sync() {
 
   // clone the repo
   child_process.execSync(
-    `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
+    `${extra} git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
     { cwd: workingDir },
   );
 
@@ -389,7 +396,7 @@ export async function do_github_sync() {
     repoCollaboratorIds = new Set(response);
   }
 
-  const userIds: Record<string, number> = {}
+  const userIds: Record<string, number> = {};
 
   let fipsUpdated = 0;
   let fipsCreated = 0;
@@ -400,7 +407,7 @@ export async function do_github_sync() {
     }
 
     // if github sync is disabled for this pr, skip
-    if(!await isGitHubSyncEnabledforPr(pull.number)) {
+    if (!(await isGitHubSyncEnabledforPr(pull.number))) {
       console.log(
         `[${pull.head?.label}] github sync is disabled for PR #${pull.number}, skipping`,
       );
@@ -409,9 +416,13 @@ export async function do_github_sync() {
 
     // try to get the existing github pr from the database
     // this is used to detect whether github PRs have changed state
-    const existingGitHubPr = await getGitHubPr(pull.number)
+    const existingGitHubPr = await getGitHubPr(pull.number);
 
-    if(existingGitHubPr && existingGitHubPr.closed_at && pull.state === "closed") {
+    if (
+      existingGitHubPr &&
+      existingGitHubPr.closed_at &&
+      pull.state === "closed"
+    ) {
       console.log(
         `[${pull.head?.label}] PR #${pull.number} is already closed, skipping`,
       );
@@ -451,7 +462,7 @@ export async function do_github_sync() {
     const fipVersionId = await upsertFipVersion(fipFields);
 
     // update or insert conversation
-    if(userIds[pull.user.login] === undefined) {
+    if (userIds[pull.user.login] === undefined) {
       // We have to do a separate request to get the email address from the user's profile
       // because this information is not returned by the pulls endpoint
       const {
@@ -472,17 +483,17 @@ export async function do_github_sync() {
       userIds[pull.user.login] = uid;
     }
 
-    const {zid, isNew} = await upsertConversation({
+    const { zid, isNew } = await upsertConversation({
       owner: userIds[pull.user.login],
       is_active: pull.state == "open",
       is_archived: pull.state === "closed",
       fip_version_id: fipVersionId,
-      github_sync_enabled: true
-    })
+      github_sync_enabled: true,
+    });
 
     // TODO: we should only do this if it's a new conversation
-    if(isNew) {
-      await generateAndRegisterZinvite(zid, false)
+    if (isNew) {
+      await generateAndRegisterZinvite(zid, false);
     }
 
     // const welcomeMessage = getWelcomeMessage(
@@ -534,12 +545,11 @@ export async function do_github_sync() {
   };
 }
 
-
 function parseFipContent(content: string) {
   // try to extract frontmatter
   const contentParts = content.split("---");
   const frontmatterSource = contentParts[1];
-  const description = contentParts.slice(2).join("---")
+  const description = contentParts.slice(2).join("---");
 
   let frontmatterData;
   try {
@@ -573,7 +583,6 @@ function parseFipContent(content: string) {
   };
 }
 
-
 async function do_master_sync() {
   if (!process.env.FIP_REPO_OWNER) {
     throw Error("FIP_REPO_OWNER not set");
@@ -588,7 +597,7 @@ async function do_master_sync() {
 
   // clone the repo
   child_process.execSync(
-    `git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
+    `${extra} git clone https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}`,
     { cwd: workingDir },
   );
 
@@ -596,10 +605,10 @@ async function do_master_sync() {
 
   const fipFilenames = await getFipFilenames(repoDir);
 
-  const result = []
+  const result = [];
 
   // for each fip, extract the metadata and insert it into the database
-  for(const fipFileName of fipFilenames) {
+  for (const fipFileName of fipFilenames) {
     const content = await fsPromises.readFile(
       path.join(repoDir, fipFileName),
       "utf8",
@@ -607,9 +616,11 @@ async function do_master_sync() {
 
     const fipData = parseFipContent(content);
 
-    const fipFileNameParts = fipFileName.split("/")
-    const fipNameParts = fipFileNameParts[fipFileNameParts.length - 1].replace(".md", "").split("-")
-    const number = parseInt(fipNameParts[fipNameParts.length - 1], 10)
+    const fipFileNameParts = fipFileName.split("/");
+    const fipNameParts = fipFileNameParts[fipFileNameParts.length - 1]
+      .replace(".md", "")
+      .split("-");
+    const number = parseInt(fipNameParts[fipNameParts.length - 1], 10);
 
     await upsertFipVersion({
       fip_number: number,
@@ -624,12 +635,12 @@ async function do_master_sync() {
       fip_status: fipData.status || null,
       fip_title: fipData.title || null,
       fip_type: fipData.type || null,
-    })
+    });
 
-    result.push({...fipData, number})
+    result.push({ ...fipData, number });
   }
 
-  return result
+  return result;
 }
 
 export async function handle_POST_github_sync(req: Request, res: Response) {
