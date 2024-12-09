@@ -328,6 +328,18 @@ const FipTracker = () => {
                 <TbRefresh /> Status
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
+              <ClickableChecklistItem
+                  color={"blue"}
+                  checked={Object.values(selectedFipStatuses).every((value) => value === true)}
+                  setChecked={(value) => {
+                    setSelectedFipStatuses(() =>
+                      Object.fromEntries(allFipStatuses.map((key) => [key, value]),),
+                    )
+                  }}
+                >
+                  All
+                </ClickableChecklistItem>
+                <DropdownMenu.Separator />
                 {allFipStatuses.map((fipStatus) => (
                   <ClickableChecklistItem
                     key={fipStatus}
