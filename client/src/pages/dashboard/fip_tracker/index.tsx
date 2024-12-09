@@ -378,6 +378,18 @@ const FipTracker = () => {
                 <TbLayoutGrid /> Type
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
+                <ClickableChecklistItem
+                  color={"blue"}
+                  checked={Object.values(deselectedFipTypes).every((value) => value !== true)}
+                  setChecked={(value) => {
+                    setDeselectedFipTypes(() =>
+                      Object.fromEntries(allFipTypes.map((key) => [key, !value]),),
+                    )
+                  }}
+                >
+                  All
+                </ClickableChecklistItem>
+                <DropdownMenu.Separator />
                 {(allFipTypes || []).map((fipType) => (
                   <ClickableChecklistItem
                     key={fipType}
