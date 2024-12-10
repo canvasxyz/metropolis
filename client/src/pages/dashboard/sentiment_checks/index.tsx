@@ -26,14 +26,6 @@ const conversationStatusOptions = {
   closed: { label: "Closed", color: "gray" },
 }
 
-export const TopRightFloating = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Box position="absolute" top="54px" right="16px">
-      {children}
-    </Box>
-  )
-}
-
 export default () => {
   const allStatuses = ["open", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
@@ -118,18 +110,6 @@ export default () => {
 
   return (
     <Box>
-      {user && (
-        <TopRightFloating>
-          <Button
-            variant="surface"
-            radius="large"
-            onClick={() => setCreateConversationModalIsOpen(true)}
-            style={{ cursor: "pointer" }}
-          >
-            <Text sx={{ display: "inline-block" }}>Create a poll</Text>
-          </Button>
-        </TopRightFloating>
-      )}
       <Flex
         sx={{
           px: [3],
@@ -139,7 +119,18 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
+        <Flex flexDirection="row">
+          <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
+          <Box flexGrow="1"></Box>
+          <Button
+              variant="surface"
+              radius="large"
+              onClick={() => setCreateConversationModalIsOpen(true)}
+              style={{ cursor: "pointer" }}
+            >
+              <Text sx={{ display: "inline-block" }}>Create a poll</Text>
+            </Button>
+        </Flex>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
