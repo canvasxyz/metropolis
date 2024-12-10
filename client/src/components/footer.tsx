@@ -7,25 +7,27 @@ const Footer = ({ inSurvey }: { inSurvey: boolean }) => {
     <Flex
       align="center"
       px="4"
+      gap="3"
+      justify="center"
     >
       {!inSurvey && (
         <Text as="span" sx={{ mr: 3 }}>
           &copy; {new Date().getFullYear()} Authors
         </Text>
       )}
-      <Link sx={{ variant: "styles.a", mr: 3 }} to="/tos">
+      <Link to="/tos">
         Terms
       </Link>{" "}
-      <Link sx={{ variant: "styles.a", mr: 3, pr: "1px" }} to="/privacy">
+      <Link to="/privacy">
         Privacy
       </Link>
       {inSurvey && (
-        <Link sx={{ variant: "styles.a", mr: 3 }} to="/">
+        <Link to="/">
           About
         </Link>
       )}
       {!inSurvey && (
-        <Link sx={{ variant: "styles.a", mr: 3 }} to="/about">
+        <Link to="/about">
           About
         </Link>
       )}
