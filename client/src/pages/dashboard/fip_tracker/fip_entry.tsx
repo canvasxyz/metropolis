@@ -2,9 +2,8 @@ import dayjs from "dayjs"
 import React, { useState } from "react"
 import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
-import { Box, Flex, Grid } from "theme-ui"
 
-import { Badge, Text } from "@radix-ui/themes"
+import { Badge, Box, Flex, Grid, Text } from "@radix-ui/themes"
 import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
@@ -25,7 +24,7 @@ const FipEntryInner = ({
     <>
       <Box></Box>
       {/* display the simple summary if possible otherwise display the whole fip description */}
-      <Box sx={{ mb: "6px" }}>
+      <Box mb="6px">
         <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
         {conversation.fip_authors.length === 0
           ? conversation.fip_author
@@ -172,19 +171,25 @@ export const FipEntry = ({
       onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
-        sx={{
-          margin: "10px",
-          gridTemplateColumns: "20px 1fr",
-          gridRow: "auto auto",
-          gridColumnGap: "10px",
-          gridRowGap: "10px",
-          paddingRight: "10px",
-        }}
+        m="10px"
+        columns="20px 1fr"
+        rows="auto auto"
+        gapY="10px"
+        gapX="10px"
+        pr="10px"
       >
-        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
+        <Flex
+          direction="row"
+          gap="4"
+          align="center"
+        >
           {isOpen ? <TbChevronDown /> : <TbChevronRight />}
         </Flex>
-        <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
+        <Flex
+          direction="row"
+          gap="3"
+          align="center"
+        >
           <Text
             style={{
               fontWeight: "bold",
@@ -195,9 +200,11 @@ export const FipEntry = ({
           >
             {conversation.fip_number ? String(conversation.fip_number).padStart(4, "0") : "Draft"}
           </Text>
+          <Box flexGrow="1">
           <Text style={{ flex: 1, lineHeight: 1.3, fontWeight: 500 }}>
-            {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
+            {conversation.displayed_title || <Text color="gray">Untitled</Text>}
           </Text>
+          </Box>
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
           </Badge>
@@ -209,19 +216,16 @@ export const FipEntry = ({
               noreferrer="noreferrer"
               noopener="noopener"
               onClick={(e) => e.stopPropagation()}
-              sx={{
+              style={{
                 display: "block",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
-                width: "calc(100% - 20px)",
-              }}
-              style={{
                 fontSize: "90%",
                 fontWeight: "500",
               }}
             >
-              GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+              GitHub <TbArrowUpRight style={{ position: "relative", top: "2px" }} />
             </Link>
           )}
           {conversation.github_pr && (
@@ -232,24 +236,26 @@ export const FipEntry = ({
               noreferrer="noreferrer"
               noopener="noopener"
               onClick={(e) => e.stopPropagation()}
-              sx={{
+              style={{
                 display: "block",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
-                width: "calc(100% - 20px)",
-              }}
-              style={{
                 fontSize: "90%",
                 fontWeight: "500",
               }}
             >
-              PR <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
+              PR <TbArrowUpRight style={{ position: "relative", top: "2px" }} />
             </Link>
           )}
         </Flex>
         <Box></Box>
-        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "95%" }}>
+        <Flex
+          direction="row"
+          gap="2"
+          align="center"
+          style={{  fontSize: "95%" }}
+        >
           {fipBadges}
           {showCreationDate && (
             <Text style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
@@ -267,10 +273,10 @@ export const FipEntry = ({
                 </Text>
               )}
               <Flex
-                sx={{
+                align="center"
+                gap="1"
+                style={{
                   display: "inline-block",
-                  alignItems: "center",
-                  gap: [1],
                   whiteSpace: "nowrap",
                 }}
               >
@@ -294,13 +300,13 @@ export const FipEntry = ({
                   |
                 </Text>
               )}
-              <Text sx={{ whiteSpace: "nowrap" }}>
+              <Text wrap="nowrap">
                 {conversation.fip_authors.length} author
                 {conversation.fip_authors.length > 1 ? "s" : ""}
               </Text>
             </Text>
           )}
-          <Box sx={{ flexGrow: "1" }}></Box>
+          <Box flexGrow="1"></Box>
         </Flex>
         {isOpen && <FipEntryInner conversation={conversation} />}
       </Grid>
