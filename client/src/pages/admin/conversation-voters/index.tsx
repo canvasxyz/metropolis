@@ -1,8 +1,6 @@
-/** @jsx jsx */
-
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { Heading, Box, jsx } from "theme-ui"
+import { Heading, Box } from "@radix-ui/themes"
 import { UrlObject } from "url"
 import ComponentHelpers from "../../../util/component-helpers"
 import { formatTimeAgo } from "../../../util/misc"
@@ -35,18 +33,15 @@ class ConversationVoters extends React.Component<ConversationVotersPropTypes> {
       <Box>
         <Heading
           as="h3"
-          sx={{
-            fontSize: [3, null, 4],
-            lineHeight: "body",
-            mb: [3, null, 4],
-          }}
+          size={{initial: "3", md: "4"}}
+          mb={{initial: "3", md: "4"}}
         >
           Voters
         </Heading>
-        <Box sx={{ mb: [4] }}>{voterList?.length} voters</Box>
-        <Box sx={{ mb: [4] }}>
+        <Box mb="4">{voterList?.length} voters</Box>
+        <Box mb="4">
           {voterList?.map((voter, index) => (
-            <Box key={index} sx={{ mb: [2] }}>
+            <Box key={index} mb="2">
               <Box>{voter.hname || "Anonymous"}</Box>
               <Box>{voter.vote_count} votes</Box>
               <Box>First seen {formatTimeAgo(+voter.created)} </Box>
