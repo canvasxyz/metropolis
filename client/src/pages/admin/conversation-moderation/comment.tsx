@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { Flex, Box, Text, Button, Card } from "theme-ui"
+import { Flex, Box, Text, Button, Card } from "@radix-ui/themes"
 import { AppDispatch, RootState } from "../../../store"
 
 class Comment extends React.Component<
@@ -37,43 +37,41 @@ class Comment extends React.Component<
 
   render() {
     return (
-      <Card sx={{ mb: [3], width: "100%", maxWidth: "35em" }}>
-        <Box>
-          <Text sx={{ mb: [3] }}>{this.props.comment.txt}</Text>
+      <Card
+        mb="3"
+        style={{ width:"100%", maxWidth: "35em" }}
+      >
+        <Flex gap="1" direction="column">
+          <Text>{this.props.comment.txt}</Text>
           <Flex
-            sx={{
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "100%",
-            }}
+            align="center"
+            width="100%"
+            gap="1"
           >
-            <Box>
-              {this.props.acceptButton ? (
-                <Button sx={{ mr: [3] }} onClick={this.onAcceptClicked.bind(this)}>
-                  {this.props.acceptButtonText}
-                </Button>
-              ) : null}
-              {this.props.rejectButton ? (
-                <Button onClick={this.onRejectClicked.bind(this)}>
-                  {this.props.rejectButtonText}
-                </Button>
-              ) : null}
-            </Box>
-            <Flex sx={{ alignItems: "center" }}>
-              {this.props.isMetaCheckbox ? (
-                <label>
-                  <input
-                    type="checkbox"
-                    ref={(c) => (this.is_meta = c)}
-                    checked={this.props.comment.is_meta}
-                    onChange={this.onIsMetaClicked.bind(this)}
-                  />
-                  Mark as metadata
-                </label>
-              ) : null}
-            </Flex>
+            {this.props.acceptButton ? (
+              <Button onClick={this.onAcceptClicked.bind(this)}>
+                {this.props.acceptButtonText}
+              </Button>
+            ) : null}
+            {this.props.rejectButton ? (
+              <Button onClick={this.onRejectClicked.bind(this)}>
+                {this.props.rejectButtonText}
+              </Button>
+            ) : null}
+            <Box flexGrow="1" />
+            {this.props.isMetaCheckbox ? (
+              <label>
+                <input
+                  type="checkbox"
+                  ref={(c) => (this.is_meta = c)}
+                  checked={this.props.comment.is_meta}
+                  onChange={this.onIsMetaClicked.bind(this)}
+                />
+                Mark as metadata
+              </label>
+            ) : null}
           </Flex>
-        </Box>
+        </Flex>
       </Card>
     )
   }

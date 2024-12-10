@@ -1,5 +1,5 @@
 import React from "react"
-import { Flex, Box } from "@radix-ui/themes"
+import { Flex, Box, Link as RadixLink } from "@radix-ui/themes"
 
 import { Link } from "react-router-dom"
 
@@ -14,7 +14,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
       mb={{ initial: "5", md: "0" }}
       justify={inSurvey ? "center" : "between"}
     >
-      <Box
+      <Flex
         position="relative"
         mt="3px"
       >
@@ -36,42 +36,51 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
             />
           </Link>
         ) : (
-          <Link to="/">
-            <img
-              src="/foundation.png"
-              width="20"
-              style={{ position: "relative", top: 3, opacity: 0.81 }}
-            />
-          </Link>
+          <Flex gap="1" align="center">
+            <Link to="/">
+              <img
+                src="/foundation.png"
+                width="20"
+                style={{ position: "relative", top: 3, opacity: 0.81 }}
+              />
+            </Link>
+            <RadixLink size="3" weight="medium" asChild>
+              <Link to="/">
+                Fil Poll
+              </Link>
+            </RadixLink>
+          </Flex>
         )}
-        {!inSurvey && (
-          <Link to="/">
-            Fil Poll
-          </Link>
-        )}
-      </Box>
+
+      </Flex>
       {!inSurvey && (
         <Box mt="1">
           {isLoggedIn ? (
-            <React.Fragment>
-              <Link to={`/account`}>
-                Account
-              </Link>
-              <Link to="/signout">
-                Sign out
-              </Link>
-            </React.Fragment>
+            <Flex gap="2">
+              <RadixLink asChild>
+                <Link to={`/account`}>
+                  Account
+                </Link>
+              </RadixLink>
+              <RadixLink asChild>
+                <Link to="/signout">
+                  Sign out
+                </Link>
+              </RadixLink>
+            </Flex>
           ) : (
-            <React.Fragment>
+            <Flex gap="2">
               {/*
               <Link to="/about">
                 About
               </Link>
                */}
-              <Link to="/">
-                Back home
-              </Link>
-            </React.Fragment>
+              <RadixLink asChild>
+                <Link to="/">
+                  Back home
+                </Link>
+              </RadixLink>
+            </Flex>
           )}
         </Box>
       )}
