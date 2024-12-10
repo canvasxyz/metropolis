@@ -1,6 +1,8 @@
 import {
   Button as RadixButton,
   DropdownMenu,
+  Flex,
+  Text,
   TextField,
   Select,
   Button,
@@ -11,7 +13,6 @@ import { BiFilter } from "react-icons/bi"
 import { TbAdjustmentsHorizontal, TbCalendar, TbRefresh, TbSearch } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
@@ -111,16 +112,14 @@ export default () => {
   return (
     <Box>
       <Flex
-        sx={{
-          px: [3],
-          py: [3],
-          pt: [7],
-          flexDirection: "column",
-          gap: [3],
-        }}
+        px="3"
+        py="3"
+        pt="6"
+        direction="column"
+        gap="3"
       >
-        <Flex flexDirection="row">
-          <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
+        <Flex direction="row" align="center">
+          <Text weight="bold" size="4">Sentiment Checks</Text>
           <Box flexGrow="1"></Box>
           <Button
               variant="surface"
@@ -128,10 +127,10 @@ export default () => {
               onClick={() => setCreateConversationModalIsOpen(true)}
               style={{ cursor: "pointer" }}
             >
-              <Text sx={{ display: "inline-block" }}>Create a poll</Text>
+              Create a poll
             </Button>
         </Flex>
-        <Flex sx={{ gap: [2], width: "100%" }}>
+        <Flex gap="2" width="100%">
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
               placeholder="Search..."
@@ -245,7 +244,7 @@ export default () => {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>
-        <Flex sx={{ flexDirection: "column", gap: [3] }}>
+        <Flex direction="column" gap="3">
           {displayedConversations.map((conversation) => (
             <ConversationEntry
               key={conversation.conversation_id}
