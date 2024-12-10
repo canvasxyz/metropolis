@@ -1,22 +1,12 @@
 import React, { useState } from "react"
 import { TbCalendar, TbCaretDown, TbCaretRight } from "react-icons/tb"
-import { Box, Flex, Grid } from "theme-ui"
 
-import { Badge, Text } from "@radix-ui/themes"
+import { Badge, Box, Flex, Grid, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import ReportAndSurveyInfo from "../report_and_survey_info"
 import { SentimentCheckComments } from "../sentiment_check_comments"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-
-const dashboardBox = {
-  bg: "bgWhite",
-  py: "18px",
-  px: "22px",
-  // my: [3],
-  lineHeight: 1.35,
-  border: "1px solid #ddd",
-}
 
 export const ConversationEntry = ({
   conversation,
@@ -28,12 +18,13 @@ export const ConversationEntry = ({
   showCreationDate: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
-
-  const fipBadges = []
   const fipAttributes = []
   if (showCreationDate) {
     fipAttributes.push(
-      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+      <Flex
+        align="center"
+        gap="1"
+      >
         <TbCalendar />
         <Text> {new Date(conversation.created).toLocaleDateString()}</Text>
       </Flex>,
@@ -59,31 +50,44 @@ export const ConversationEntry = ({
       onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
-        sx={{
-          margin: "10px",
-          gridTemplateColumns: "20px 1fr",
-          gridRow: "auto auto",
-          gridColumnGap: "20px",
-          gridRowGap: "10px",
-        }}
+        m="10px"
+        columns="20px 1fr"
+        gridRow="auto auto"
+        gapY="10px"
+        gapX="10px"
       >
-        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
+        <Flex
+          direction="row"
+          gap="4"
+          align="center"
+        >
           {isOpen ? <TbCaretDown /> : <TbCaretRight />}
         </Flex>
-        <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
-          <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
-            {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
+        <Flex
+          direction="row"
+          gap="3"
+          align="center"
+         >
+          <Text
+            size="2"
+            style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}
+          >
+            {conversation.displayed_title || <Text color="gray">Untitled</Text>}
           </Text>
           <Badge size="2" color={color} variant="surface" radius="full">
             {statusLabel}
           </Badge>
         </Flex>
         <Box></Box>
-        <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
-          {fipBadges}
+        <Flex
+          direction="row"
+          gap="2"
+          align="center"
+          style={{ fontSize: "90%" }}
+        >
           {fipAttributes.map((attr, i) => (
-            <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {fipBadges.length > 0 || i > 0 && (
+            <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }} >
+              {i > 0 && (
                 <Text
                   style={{
                     marginLeft: "2px",
@@ -99,7 +103,7 @@ export const ConversationEntry = ({
               {attr}
             </Text>
           ))}
-          <Box sx={{ flexGrow: "1" }}></Box>
+          <Box flexGrow="1"></Box>
         </Flex>
         { isOpen &&
           <>
@@ -117,12 +121,25 @@ export const ConversationEntry = ({
             <Box></Box>
             <ReportAndSurveyInfo conversation_info={conversation}/>
             <Box></Box>
-            <Box sx={dashboardBox}>
-              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
+            <Box
+              py="18px"
+              px="22px"
+              // my: [3]
+              style={{
+                backgroundColor: "white",
+                border: "1px solid #ddd",
+                lineHeight: "1.35",
+              }}
+            >
+              <Box pb="1">
+                <Text weight="bold">
+                  Comments
+                </Text>
+              </Box>
               {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
                 Have more to say? You can leave a short comment here.
                 </Box> */}
-              <Box sx={{ mx: "-8px", pt: "8px" }}>
+              <Box mx="-8px" pt="8px">
                 <SentimentCheckComments conversationId={conversation.conversation_id} />
               </Box>
             </Box>
