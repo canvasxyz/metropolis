@@ -120,8 +120,11 @@ export default () => {
       >
         <Flex direction="row" align="center">
           <Text weight="bold" size="4">Sentiment Checks</Text>
-          <Box flexGrow="1"></Box>
-          <Button
+          <Box
+            position="absolute"
+            right="3"
+          >
+            <Button
               variant="surface"
               radius="large"
               onClick={() => setCreateConversationModalIsOpen(true)}
@@ -129,6 +132,7 @@ export default () => {
             >
               Create a poll
             </Button>
+          </Box>
         </Flex>
         <Flex gap="2" width="100%">
           <Box flexGrow="1" maxWidth="400px">
