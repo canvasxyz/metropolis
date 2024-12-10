@@ -1,8 +1,6 @@
-/** @jsx jsx */
-
-import { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
+import React, { useCallback, useState, useEffect, ComponentProps, Fragment } from "react"
 import { Link as RouterLink } from "react-router-dom"
-import { Heading, Box, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Text, Button, TextField, Link, TextArea } from "@radix-ui/themes"
 
 import { handleZidMetadataUpdate } from "../../actions"
 import NoPermission from "./no-permission"
@@ -14,40 +12,6 @@ import { useAppDispatch, useAppSelector } from "../../hooks"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME
-
-const Input = (props: ComponentProps<"input">) => (
-  <input
-    sx={{
-      fontFamily: "body",
-      fontSize: [2],
-      width: "100%",
-      maxWidth: "35em",
-      borderRadius: 2,
-      padding: [2],
-      border: "1px solid",
-      borderColor: "mediumGray",
-    }}
-    {...props}
-  />
-)
-
-const Textarea = (props: ComponentProps<"textarea">) => (
-  <textarea
-    sx={{
-      fontFamily: "body",
-      fontSize: [2],
-      width: "100%",
-      maxWidth: "35em",
-      height: "7em",
-      resize: "none",
-      padding: [2],
-      borderRadius: 2,
-      border: "1px solid",
-      borderColor: "mediumGray",
-    }}
-    {...props}
-  />
-)
 
 function updatePath(obj: any, path: string[], value: any) {
   if(path.length === 0) {
@@ -102,16 +66,13 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
     <Box>
       <Heading
         as="h3"
-        sx={{
-          fontSize: [3, null, 4],
-          lineHeight: "body",
-          mb: [3, null, 4],
-        }}
+        size={{ initial: "3", md: "4" }}
+        mb={{ initial: "3", md: "4" }}
       >
         Configure
       </Heading>
 
-      <Box sx={{ mb: [4] }}>{error ? <Text>Error Saving</Text> : null}</Box>
+      <Box mb="4">{error ? <Text>Error Saving</Text> : null}</Box>
 
       <CheckboxField
         checked={zid_metadata.is_active}
@@ -120,39 +81,39 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         subtitle="Uncheck to disable voting"
       />
 
-      <Box sx={{ my: [4] }}>
+      <Box my="4">
         <RouterLink to={"/dashboard/c/" + zid_metadata.conversation_id}>
-          <Button sx={{ ml: [2] }} variant="outlineSecondary">
+          <Button ml="2" variant="outline">
             Go to FIP dashboard
           </Button>
         </RouterLink>
         {!zid_metadata.fip_version && (
           <RouterLink to={"/c/" + zid_metadata.conversation_id}>
-            <Button sx={{ ml: [2] }} variant="outlineSecondary">
+            <Button ml="2" variant="outline">
               Go to survey
             </Button>
           </RouterLink>
         )}
         {reports && reports[0] && (
           <RouterLink to={`/r/${zid_metadata.conversation_id}/${(reports[0] as any).report_id}`}>
-            <Button sx={{ ml: [2] }} variant="outlineSecondary">
+            <Button ml="2" variant="outline">
               Go to report
             </Button>
           </RouterLink>
         )}
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Title</Text>
-        <Input
+      <Box mb="3">
+        <Text mb="2">Title</Text>
+        <TextField.Root
           onBlur={(e) => handleValueChange(["topic"], e.target.value)}
           defaultValue={zid_metadata.topic}
         />
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>Description</Text>
-        <Textarea
+      <Box mb="3">
+        <Text mb="2">Description</Text>
+        <TextArea
           data-test-id="description"
           onBlur={(e) => handleValueChange(["description"], e.target.value)}
           defaultValue={zid_metadata.description}
@@ -162,35 +123,33 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
 
       {zid_metadata.fip_version && (
         <Fragment>
-          <a
+          <Link
             href="#"
             onClick={(e) => {
               e.preventDefault()
               setShowFIPMetadata(!showFIPMetadata)
             }}
-          >
-            <Text variant="links.a" sx={{ mb: [2] }}>
+            >
+            <Text mb="2">
               {showFIPMetadata ? "Hide" : "Show"} FIP Metadata
             </Text>
-          </a>
+          </Link>
 
           <Box
-            sx={{
-              border: "1px solid #ddd",
-              px: [3],
-              py: [3],
-              display: showFIPMetadata ? "block" : "none",
-            }}
+            px="3"
+            py="3"
+            display={showFIPMetadata ? "block" : "none"}
+            style={{border: "1px solid #ddd"}}
           >
             {hasGithubPr && (
               <Fragment>
-                <Heading as="h3" sx={{ mt: 0, mb: 4 }}>
+                <Heading as="h3" mt="0" mb="4">
                   GitHub Synced Data
                 </Heading>
 
-                <Box sx={{ mb: [4], fontStyle: "italic" }}>
-                  The fields in this section are automatically synced from GitHub. To change them,
-                  please modify the source pull request, or disable syncing by unchecking the box below.
+                <Box mb="4">
+                  <em>The fields in this section are automatically synced from GitHub. To change them,
+                  please modify the source pull request, or disable syncing by unchecking the box below.</em>
                 </Box>
 
                 <CheckboxField
@@ -199,7 +158,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
                   label="Enable GitHub sync"
                   subtitle="Uncheck in order to disable syncing"
                 />
-                <Box sx={{ mb: [3] }}>
+                <Box mb="3">
                   PR{" "}
                   <a
                     href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.fip_version.github_pr.id}`}
@@ -208,80 +167,80 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
                   </a>
                 </Box>
 
-                <Box sx={{ mb: [3] }}>
+                <Box mb="3">
                   Branch <strong>{zid_metadata.fip_version.github_pr.branch_name}</strong> on{" "}
                   <strong>
                     {zid_metadata.fip_version.github_pr.repo_owner}/{zid_metadata.fip_version.github_pr.repo_name}
                   </strong>
                 </Box>
 
-                <Box sx={{ mb: [3] }}>
+                <Box mb="3">
                   Submitted by <strong>{zid_metadata.fip_version.github_pr.submitter}</strong>
                 </Box>
               </Fragment>
             )}
 
-            <Box sx={{ mb: [3] }}>
+            <Box mb="3">
               FIP number{" "}{zid_metadata.fip_version.fip_number ? zid_metadata.fip_version.fip_number : "-"}
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP title</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP title</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_title"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_title}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP author</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP author</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_author"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_author}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP discussions link</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP discussions link</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_discussions_to"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_discussions_to}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP status</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP status</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_status"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_status}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP type</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP type</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_type"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_type}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP category</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP category</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_category"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_category}
                 disabled={zid_metadata.github_sync_enabled}
               />
             </Box>
 
-            <Box sx={{ mb: [3] }}>
-              <Text sx={{ mb: [2] }}>FIP created</Text>
-              <Input
+            <Box mb="3">
+              <Text mb="2">FIP created</Text>
+              <TextField.Root
                 onBlur={(e) => handleValueChange(["fip_version", "fip_created"], e.target.value)}
                 defaultValue={zid_metadata.fip_version.fip_created}
                 disabled={zid_metadata.github_sync_enabled}
@@ -291,19 +250,19 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         </Fragment>
       )}
       {/*
-      <Heading as="h3" sx={{ mt: 5, mb: 4 }}>
+      <Heading as="h3" mt="5" mb="4">
         Post-Survey Redirect
       </Heading>
 
-      <Box sx={{ mb: [4], fontStyle: "italic" }}>
-        Once participants have reached the number of votes and submissions expected, they will be
-        directed to the post-survey page.
+      <Box mb="4">
+        <em>Once participants have reached the number of votes and submissions expected, they will be
+        directed to the post-survey page.</em>
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>
+      <Box mb="3">
+        <Text mb="2">
           Votes Expected
-          <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
+          <Text color="gray" ml="2">Optional</Text>
         </Text>
         <Input
           onBlur={(e) => handleIntegerValueChange("postsurvey_limit", e.target)}
@@ -311,10 +270,10 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>
+      <Box mb="3">
+        <Text mb="2">
           Statements Expected
-          <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
+          <Text color="gray" ml="2">Optional</Text>
         </Text>
         <Input
           onBlur={(e) => handleIntegerValueChange("postsurvey_submission", e.target)}
@@ -322,10 +281,10 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>
+      <Box mb="3">
+        <Text mb="2">
           Post-Survey Text
-          <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>Optional</Text>
+          <Text color="gray" ml="2">Optional</Text>
         </Text>
         <textarea
           placeholder="You’re all done! Thanks for contributing your input. You can expect to hear back from us after..."
@@ -347,8 +306,8 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
         />
       </Box>
 
-      <Box sx={{ mb: [3] }}>
-        <Text sx={{ mb: [2] }}>
+      <Box mb="3">
+        <Text mb="2">
           Post-Survey Link
           <Text sx={{ display: "inline", color: "lightGray", ml: [2] }}>
             Optional. Shown as a button after the survey
@@ -362,7 +321,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
       </Box>
        */}
 
-      <Heading as="h3" sx={{ mt: [6], mb: 4 }}>
+      <Heading as="h3"  mt="6" mb="4">
         Permissions
       </Heading>
 
