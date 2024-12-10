@@ -1,11 +1,9 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/** @jsx jsx */
-
 import React from "react"
 import PropTypes from "prop-types"
 import { populateAllCommentStores } from "../../actions"
-import { Box, Text, Button, jsx } from "theme-ui"
+import { Box, Text, Button, TextArea } from "@radix-ui/themes"
 import api from "../../util/api"
 import strings from "../../intl"
 import { AppDispatch } from "../../store"
@@ -55,21 +53,9 @@ class ModerateCommentsSeed extends React.Component<
 
   render() {
     return (
-      <Box sx={{ mb: [4] }}>
-        <Box sx={{ mb: [2] }}>
-          <textarea
-            sx={{
-              fontFamily: "body",
-              fontSize: [2],
-              width: "100%",
-              maxWidth: "35em",
-              height: "4em",
-              resize: "none",
-              padding: [2],
-              borderRadius: 2,
-              border: "1px solid",
-              borderColor: "mediumGray",
-            }}
+      <Box mb="4">
+        <Box mb="2">
+          <TextArea
             maxLength={400}
             data-test-id="seed_form"
             ref={(c) => (this.seed_form = c)}
@@ -77,10 +63,10 @@ class ModerateCommentsSeed extends React.Component<
           />
         </Box>
         <Box>
-          <Button variant="primary" onClick={this.handleSubmitSeed.bind(this)}>
+          <Button onClick={this.handleSubmitSeed.bind(this)}>
             {this.state.success ? "Success!" : this.state.loading ? "Saving..." : "Submit"}
           </Button>
-          {this.state.error ? <Text sx={{ mt: [2], color: "red" }}>{this.state.error}</Text> : null}
+          {this.state.error ? <Text mt="2" color="red">{this.state.error}</Text> : null}
         </Box>
       </Box>
     )
