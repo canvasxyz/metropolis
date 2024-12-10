@@ -1,28 +1,22 @@
-/** @jsx jsx */
 import React from "react"
-import { Flex, Box, jsx } from "theme-ui"
+import { Flex, Box } from "@radix-ui/themes"
 
 import { Link } from "react-router-dom"
 
 const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
   return (
     <Flex
-      sx={{
-        margin: `0 auto`,
-        width: "100%",
-        pt: [3, 5],
-        pb: [3, 5],
-        px: [4, 5],
-        mb: [5, 0],
-        borderBottom: ["1px solid lightGray", "none"],
-        justifyContent: inSurvey ? "center" : "space-between",
-      }}
+      m="0 auto"
+      width="100%"
+      pt={{ initial: "3", md: "5" }}
+      pb={{ initial: "3", md: "5" }}
+      px={{ initial: "4", md: "5" }}
+      mb={{ initial: "5", md: "0" }}
+      justify={inSurvey ? "center" : "between"}
     >
       <Box
-        sx={{
-          position: "relative",
-          marginTop: "3px",
-        }}
+        position="relative"
+        mt="3px"
       >
         {inSurvey ? (
           <Link
@@ -51,36 +45,42 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
           </Link>
         )}
         {!inSurvey && (
-          <Link sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }} to="/">
+          <Link to="/">
             Fil Poll
           </Link>
         )}
       </Box>
       {!inSurvey && (
-        <Box sx={{ mt: [1] }}>
+        <Box mt="1">
           {isLoggedIn ? (
             <React.Fragment>
-              <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>
+              <Link to={`/account`}>
                 Account
               </Link>
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/signout">
+              <Link to="/signout">
                 Sign out
               </Link>
             </React.Fragment>
           ) : (
             <React.Fragment>
               {/*
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/about">
+              <Link to="/about">
                 About
               </Link>
                */}
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/">
+              <Link to="/">
                 Back home
               </Link>
             </React.Fragment>
           )}
         </Box>
       )}
+      {/* only display lower border on small screens */}
+      <Box
+        display={{ initial: "block", sm: "none" }}
+        style={{
+          borderBottom: "1px solid lightGray",
+        }}></Box>
     </Flex>
   )
 }
