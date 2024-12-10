@@ -1,15 +1,12 @@
-/** @jsx jsx */
 import React from "react"
 import { Link } from "react-router-dom"
-import { Box, Text, jsx } from "theme-ui"
+import { Flex, Text } from "@radix-ui/themes"
 
 const Footer = ({ inSurvey }: { inSurvey: boolean }) => {
   return (
-    <Box
-      sx={{
-        textAlign: inSurvey ? "center" : undefined,
-        px: [4, 5],
-      }}
+    <Flex
+      align="center"
+      px="4"
     >
       {!inSurvey && (
         <Text as="span" sx={{ mr: 3 }}>
@@ -32,7 +29,7 @@ const Footer = ({ inSurvey }: { inSurvey: boolean }) => {
           About
         </Link>
       )}
-    </Box>
+    </Flex>
   )
 }
 

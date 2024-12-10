@@ -1,5 +1,3 @@
-/** @jsx jsx */
-
 import "./types.d.ts"
 
 import React from "react"
@@ -10,7 +8,6 @@ import { populateUserStore } from "./actions"
 import { Toaster } from "react-hot-toast"
 import { Switch, Route, Redirect } from "react-router-dom"
 import { Route as CompatRoute, Routes as CompatRoutes, Navigate } from "react-router-dom-v5-compat"
-import { Box, jsx } from "theme-ui"
 
 import Header from "./components/header"
 import Footer from "./components/footer"
@@ -39,6 +36,7 @@ import SurveyWithLoader from "./pages/survey/survey_with_loader"
 /* report */
 import Report from "./pages/report"
 import { AppDispatch, RootState } from "./store"
+import { Box } from "@radix-ui/themes"
 
 const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
   if (isLoading) {
@@ -144,11 +142,9 @@ class App extends React.Component<
         </Switch>
         <Box>
           <Box
-            sx={{
-              margin: `0 auto`,
-              maxWidth: inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em",
-              pb: inDashboard ? [0] : [4],
-            }}
+            m="0"
+            maxWidth={inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em"}
+            pb={inDashboard ? "0" : "4"}
           >
             {document.location.pathname !== "/about" &&
               document.location.pathname !== "/" &&
@@ -156,12 +152,10 @@ class App extends React.Component<
                 <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
               )}
             <Box
-              sx={{
-                pt: "1px", // prevent margins from spilling over
-                pb: inDashboard ? 0 : "1em",
-                px: inDashboard ? 0 : [4, 5],
-                minHeight: "calc(100vh - 9em - 8px)",
-              }}
+              pt="1px" // prevent margins from spilling over
+              pb={inDashboard ? "0" : "1em"}
+              px={inDashboard ? "0" : "4"} // TODO: responsive padding [4, 5]
+              minHeight="calc(100vh - 9em - 8px)"
             >
               {/* routes defined with react-router-dom-v5-compat */}
               {/* these use the newer react router dom v6 APIs */}
@@ -238,16 +232,16 @@ class App extends React.Component<
               )}
           </Box>
           <Box
-            sx={{
-              position: "fixed",
-              width: "100%",
-              bottom: 0,
-              height: "150px",
+            position="fixed"
+            width="100%"
+            bottom="0"
+            height="150px"
+            style={{
               opacity: 0.15,
               transform: "scaleY(-1)",
-              zIndex: -1,
               backgroundImage:
                 "linear-gradient(180deg, #CEC3AB 0%, #D4CAB4 8%, #D9D0BC 15%, #DED6C3 23%, #E3DBCA 29%, #E7E0D0 36%, #EBE4D5 42%, #EEE8DA 48%, #F1EBDE 54%, #F4EEE2 61%, #F6F1E5 68%, #F8F2E7 75%, #F9F4E9 83%, #FAF5EA 91%, #FAF5EA 100%);",
+              zIndex: "-1"
             }}
           ></Box>
         </Box>
