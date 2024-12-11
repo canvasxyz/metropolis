@@ -1,9 +1,7 @@
-/** @jsx jsx */
-
 import React, { Suspense, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { Route as CompatRoute, Routes as CompatRoutes } from "react-router-dom-v5-compat"
-import { Box, Flex, jsx } from "theme-ui"
+import { Box, Flex } from "@radix-ui/themes"
 
 import { User } from "../../util/types"
 import { DashboardUserButton } from "./user_button"
@@ -29,16 +27,15 @@ const Dashboard = ({ user }: DashboardProps) => {
   }, [location])
 
   return (
-    <Box sx={{ height: "calc(100vh - 1px)" }}>
-      <Flex sx={{ display: "flex", height: "100%" }}>
+    <Box height="calc(100vh - 1px)">
+      <Flex height="100%">
         <Sidebar mobileMenuOpen={mobileMenuOpen} />
         <Box
-          sx={{
-            display: [mobileMenuOpen ? "none" : "block", "block"],
-            overflowY: "scroll",
-            flex: 1,
-            position: "relative",
-            bg: "#F9F9FB",
+          flexGrow="1"
+          overflowY="scroll"
+          position="relative"
+          style={{
+            backgroundColor: "#F9F9FB",
           }}
         >
           <DashboardUserButton />
