@@ -1,8 +1,8 @@
-import React from "react"
+import React, { useState } from "react"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { NavLink } from "react-router-dom-v5-compat"
-import { Box, Flex, Text } from "theme-ui"
+import { Box, Button, Flex, Text } from "@radix-ui/themes"
 import {
   TbExclamationCircle,
   TbGitMerge,
@@ -58,6 +58,7 @@ type ConversationListItemProps = {
 }
 
 const ConversationListItem = ({ conversation, initialViewCount }: ConversationListItemProps) => {
+  const [isHovered, setIsHovered] = useState(false)
   const { user } = useAppSelector((state) => state.user)
   const date = new Date(
     conversation.fip_version ? conversation.fip_version.fip_created : +conversation.created,
@@ -79,43 +80,43 @@ const ConversationListItem = ({ conversation, initialViewCount }: ConversationLi
   return (
     <NavLink to={`/dashboard/c/${conversation.conversation_id}`}>
       {({ isActive }) => (
-        <Box
-          sx={{
-            position: "relative",
-            // opacity: emptyFIP ? 0.7 : null,
-            // pointerEvents: emptyFIP ? "none" : null,
-            padding: "12px 16px",
+        <Box p="2"
+          width="100%"
+          position="relative"
+          py="12px"
+          px="16px"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          style={{
+            justifyContent: "start",
             cursor: "pointer",
             userSelect: "none",
-            fontSize: "15px",
-            lineHeight: 1.2,
-            color: "black",
-            bg: isActive ? "bgGray" : "inherit",
-            "&:hover": {
-              bg: isActive ? "bgGray" : "bgGrayLight",
-            },
+            backgroundColor: isActive ? "#ECE8DE" : isHovered ? "#F2F0EA" : "transparent",
           }}
           key={conversation.conversation_id}
-        >
+          >
           {shouldHideDiscussion && (
-            <Box sx={{ fontSize: "0.8em", color: "#eb4b4c", ml: "1px", mb: "2px" }}>
+            <Box ml="1px" mb="2px" style={{ fontSize: "0.8em", color: "#eb4b4c" }}>
               <TbExclamationCircle color="#eb4b4c" />
               &nbsp; Needs Example Responses
             </Box>
           )}
           <Flex>
-            <Box sx={{ color: "#84817D", fontSize: "90%", pr: "6px" }}>
+            <Box pr="6px" style={{ color: "#84817D", fontSize: "90%" }}>
               {getIconForConversation(conversation)}
             </Box>
-            <Box sx={{ fontWeight: 500, flex: 1 }}>
-              {displayTitle || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
-              <Flex sx={{ opacity: 0.6, fontSize: "0.8em", mt: "3px", fontWeight: 400 }}>
-                <Text sx={{ flex: 1 }}>
+            <Box>
+              <Text weight="medium" color="gray" highContrast>
+                {displayTitle || <Text color="gray">Untitled</Text>}
+              </Text>
+              <Box>
+                <Text color="gray" size="1">
                   {timeAgo} {timeAgo === "Just now" ? "" : "ago "}&middot;{" "}
                   <ViewCount initialViewCount={initialViewCount} conversation={conversation} />{" "}
                   views
                 </Text>
-              </Flex>
+              </Box>
+
             </Box>
           </Flex>
           {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
