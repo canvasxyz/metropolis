@@ -17,28 +17,6 @@ import { handleSubmitNewComment } from "../../actions"
 
 type SurveyState = "loading" | "voting" | "postsurvey"
 
-export const surveyHeading = {
-  fontSize: [4],
-  lineHeight: "1.35",
-  mt: [1, 5],
-  mb: [5],
-}
-
-export const surveyHeadingMini = {
-  fontSize: [3],
-  lineHeight: "1.35",
-  mt: 0,
-  mb: "0.5em",
-}
-
-export const surveyBox = {
-  padding: "26px 32px 24px",
-  border: "1px solid",
-  borderColor: "lighterGray",
-  bg: "bgOffWhite",
-  borderRadius: "8px",
-}
-
 // reorder the next comments according to the backend api
 const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id, withoutTid) => {
   api
