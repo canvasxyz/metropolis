@@ -1,7 +1,5 @@
-/** @jsx jsx */
-
 import React, { useState } from "react"
-import { Button, Box, Text, Flex, jsx } from "theme-ui"
+import { Button, Box, Text, Flex, Grid } from "@radix-ui/themes"
 import {
   TbCheck,
   TbChevronDown,
@@ -81,34 +79,36 @@ export const SentimentCheck = ({
 
   return (
     <Box>
-      <Flex sx={{ gap: [2] }}>
-        <Box sx={{ flex: 1, textAlign: "center", mt: "6px" }}>
+      <Grid columns="2" gap="2">
+        <Box mt="6px" flexGrow="1">
           <Button
-            variant="vote"
-            sx={{
+            color="gold"
+            variant="soft"
+            style={{
+              height: "36px",
               width: "100%",
               fontSize: "0.98em",
               fontWeight: 500,
-              mr: "8px",
-              mb: "4px",
-              height: "36px",
               opacity: !user?.uid ? "0.5" : 1,
               pointerEvents: !user?.uid ? "none" : undefined,
               ...likedStyles,
             }}
             onClick={voteLike}
           >
-            <TbMoodSmileBeam
-              style={{ width: 18, color: "#2fcc71", position: "relative", top: 2 }}
-            />{" "}
-            {!user?.uid ? (
-              <Text>Login required</Text>
-            ) : (
-              <Text>Positive {isLiked && <TbCheck />}</Text>
-            )}
+            <Flex direction="row" align="center" gap="2">
+              <TbMoodSmileBeam
+                style={{ width: 18, color: "#2fcc71", position: "relative", top: 0 }}
+              />{" "}
+              {!user?.uid ? (
+                <Text>Login required</Text>
+              ) : (
+                <Text>Positive {isLiked && <TbCheck />}</Text>
+              )}
+            </Flex>
           </Button>
-          <Box
-            sx={{ fontSize: "0.94em", mt: [1] }}
+          <Flex
+            justify="center"
+            mt="1"
             onClick={() => {
               setShowLikedUsers(!showLikedUsers)
             }}
@@ -116,49 +116,50 @@ export const SentimentCheck = ({
             {liked.length} positive
             {user && (user.isRepoCollaborator || user.isAdmin) && (
               <Box
-                sx={{
-                  display: "inline",
-                  position: "relative",
-                  ml: "2px",
-                  top: "2px",
-                }}
+                display="inline"
+                position="relative"
+                ml="2px"
+                top="2px"
               >
                 {showLikedUsers ? <TbChevronUp /> : <TbChevronDown />}
               </Box>
             )}
-          </Box>
+          </Flex>
           {user && (user.isRepoCollaborator || user.isAdmin) && showLikedUsers && (
-            <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+            <Box mt="1">
               {liked.map((u: string) => (
                 <Box key={u}>{u}</Box>
               ))}
             </Box>
           )}
         </Box>
-        <Box sx={{ flex: 1, textAlign: "center", mt: "6px" }}>
+        <Box mt="6px" flexGrow="1">
           <Button
-            variant="vote"
-            sx={{
+            color="gold"
+            variant="soft"
+            style={{
+              height: "36px",
               width: "100%",
               fontSize: "0.98em",
               fontWeight: 500,
-              mb: "4px",
-              height: "36px",
               opacity: !user?.uid ? "0.5" : 1,
               pointerEvents: !user?.uid ? "none" : undefined,
               ...dislikedStyles,
             }}
             onClick={voteDislike}
           >
-            <TbMoodSad style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
-            {!user?.uid ? (
-              <Text>Login required</Text>
-            ) : (
-              <Text>Negative {isDisliked && <TbCheck />}</Text>
-            )}
+            <Flex direction="row" align="center" gap="2">
+              <TbMoodSad style={{ width: 18, color: "#e74b3c", position: "relative", top: 0 }} />{" "}
+              {!user?.uid ? (
+                <Text>Login required</Text>
+              ) : (
+                <Text>Negative {isDisliked && <TbCheck />}</Text>
+              )}
+            </Flex>
           </Button>
-          <Box
-            sx={{ fontSize: "0.94em", mt: [1] }}
+          <Flex
+            mt="1"
+            justify="center"
             onClick={() => {
               setShowDislikedUsers(!showDislikedUsers)
             }}
@@ -166,31 +167,30 @@ export const SentimentCheck = ({
             {disliked.length} negative
             {user && (user.isRepoCollaborator || user.isAdmin) && (
               <Box
-                sx={{
-                  display: "inline",
-                  position: "relative",
-                  ml: "2px",
-                  top: "2px",
-                }}
+                display="inline"
+                position="relative"
+                ml="2px"
+                top="2px"
               >
                 {showDislikedUsers ? <TbChevronUp /> : <TbChevronDown />}
               </Box>
             )}
-          </Box>
+          </Flex>
           {user && (user.isRepoCollaborator || user.isAdmin) && showDislikedUsers && (
-            <Box sx={{ fontSize: "0.9em", mt: [1] }}>
+            <Box mt="1">
               {disliked.map((u: string) => (
                 <Box key={u}>{u}</Box>
               ))}
             </Box>
           )}
         </Box>
-      </Flex>
+      </Grid>
       {!user && (
-        <Box sx={{ mt: "18px" }}>
+        <Box mt="18px">
           <Button
-            variant="buttons.outlineSecondary"
-            sx={{ py: "6px", fontWeight: 500, width: "100%" }}
+            color="gold"
+            style={{ width: "100%" }}
+            variant="outline"
             onClick={() =>
               (document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`)
             }
