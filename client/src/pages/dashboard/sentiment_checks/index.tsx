@@ -166,6 +166,18 @@ export default () => {
                   <TbRefresh /> Status
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent>
+                <ClickableChecklistItem
+                  color={"blue"}
+                  checked={Object.values(selectedConversationStatuses).every((value) => value === true)}
+                  setChecked={(value) => {
+                    setSelectedConversationStatuses(() =>
+                      Object.fromEntries(allStatuses.map((key) => [key, value]),),
+                    )
+                  }}
+                >
+                  All
+                </ClickableChecklistItem>
+                <DropdownMenu.Separator />
                   {allStatuses.map((status) => (
                     <ClickableChecklistItem
                       key={status}
