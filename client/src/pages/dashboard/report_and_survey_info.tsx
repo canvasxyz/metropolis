@@ -112,7 +112,7 @@ const ReportAndSurveyInfo = ({
                 style={{
                   border: "1px solid",
                   borderColor: "lighterGray",
-                  backgroundColor: "bgOffWhite",
+                  backgroundColor: "#faf9f6",
                   borderRadius: "8px",
                 }}>
                 No responses for this{" "}
