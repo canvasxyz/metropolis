@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react"
 import { Link, Box, Text, Button, Flex } from "@radix-ui/themes"
-import Survey, { surveyBox } from "../survey"
+import Survey from "../survey"
 import api from "../../util/api"
 import { FipVersion } from "../../util/types"
 import { ReportComment, ReportCommentRow } from "./report_comment"

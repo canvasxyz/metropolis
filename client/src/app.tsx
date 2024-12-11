@@ -142,7 +142,7 @@ class App extends React.Component<
         </Switch>
         <Box>
           <Box
-            m="0"
+            m="auto"
             maxWidth={inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em"}
             pb={inDashboard ? "0" : "4"}
           >
