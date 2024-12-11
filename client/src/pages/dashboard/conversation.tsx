@@ -1,16 +1,13 @@
-/** @jsx jsx */
-
 import React, { useEffect, useState } from "react"
 import { usePopper } from "react-popper"
 import { toast } from "react-hot-toast"
-import { Heading, Link, Box, Text, jsx } from "theme-ui"
+import { Heading, Link, Box, Flex, Text } from "@radix-ui/themes"
 import { Link as RouterLink, useHistory } from "react-router-dom"
 import { useParams } from "react-router-dom-v5-compat"
 import { TbExclamationCircle, TbInfoCircle } from "react-icons/tb"
 
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
-import { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
 import { SentimentCheck } from "./sentiment_check"
 import { SentimentCheckComments } from "./sentiment_check_comments"
@@ -18,15 +15,6 @@ import { Frontmatter, Collapsible } from "./front_matter"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
 import { MIN_SEED_RESPONSES } from "../../util/misc"
 import ReportAndSurveyInfo from "./report_and_survey_info"
-
-const dashboardBox = {
-  bg: "bgWhite",
-  py: "18px",
-  px: "22px",
-  my: [3],
-  lineHeight: 1.35,
-  border: "1px solid #ddd",
-}
 
 const SentimentTooltip = () => {
   const [referenceElement, setReferenceElement] = useState(null)
@@ -49,7 +37,7 @@ const SentimentTooltip = () => {
     <Box>
       <Box
         ref={setReferenceElement}
-        sx={{ ml: "6px" }}
+        ml="6px"
         onMouseEnter={() => setVisible(true)}
         onMouseLeave={() => setVisible(false)}
       >
@@ -114,28 +102,24 @@ export const DashboardConversation = ({ user }: { user }) => {
 
   return (
     <Box>
-      <Box sx={{ mt: [6, "none"], width: "100%" }}>
-        <Box
-          sx={{
-            flexDirection: "column",
-            gap: [2],
-            margin: "0 auto",
-            pt: [5],
-            pb: [2],
-            mt: [3],
-            px: [3, 5],
-            maxWidth: "760px",
-          }}
+      <Box mt={{initial: "6", sm: "none"}} width="100%">
+        <Flex
+          direction="column"
+          gap="2"
+          m="0 auto"
+          pt="5"
+          pb="5"
+          mt="3"
+          px={{initial: "3", sm: "5"}}
+          maxWidth="760px"
         >
-          <Heading as="h2" sx={{ mb: [2] }}>
+          <Heading as="h2" mb="2">
             {displayTitle}
           </Heading>
           {zid_metadata.fip_version?.github_pr?.submitter && (
             <Box>
               Created by{" "}
               <Link
-                variant="links.a"
-                as="a"
                 target="_blank"
                 rel="noreferrer"
                 href={`https://github.com/${zid_metadata.fip_version.github_pr.submitter}`}
@@ -159,23 +143,31 @@ export const DashboardConversation = ({ user }: { user }) => {
               {zid_metadata.fip_version.github_pr.submitter === user?.githubUsername && (
                 <Text>
                   <Text> &middot; </Text>
-                  <RouterLink
-                    sx={{ fontWeight: 600, "&:hover": { textDecoration: "underline" } }}
-                    to={`/m/${zid_metadata?.conversation_id}`}
-                  >
-                    Edit
-                  </RouterLink>
+                  <Link asChild>
+                    <RouterLink to={`/m/${zid_metadata?.conversation_id}`}>
+                      Edit
+                    </RouterLink>
+                  </Link>
                 </Text>
               )}
             </Box>
           )}
           {zid_metadata.fip_version ? (
-            <Box sx={{ ...dashboardBox, px: "6px", pt: "10px", pb: "6px" }}>
+            <Box
+              py="10px"
+              px="6px"
+              my="3"
+              pb="6px"
+              style={{
+                backgroundColor: "white",
+                lineHeight: 1.35,
+                border: "1px solid #ddd"
+              }}>
               <Frontmatter zid_metadata={zid_metadata} />
             </Box>
           ) : (
             zid_metadata.description && (
-              <Box sx={{ pt: "18px" }}>
+              <Box pt="18px">
                 <Collapsible
                   title={displayTitle}
                   key={zid_metadata.conversation_id}
@@ -186,17 +178,22 @@ export const DashboardConversation = ({ user }: { user }) => {
             )
           )}
           {zid_metadata.fip_version && (
-            <Box sx={dashboardBox}>
-              <Box
-                sx={{
-                  display: "flex",
-                  fontWeight: 700,
-                  mb: [2],
-                }}
-              >
-                Sentiment Check
+            <Box
+              py="18px"
+              px="22px"
+              my="3"
+              style={{
+                backgroundColor: "white",
+                lineHeight: 1.35,
+                border: "1px solid #ddd"
+              }}
+            >
+              <Flex mb="2" align="center">
+                <Text weight="bold">
+                  Sentiment Check
+                </Text>
                 <SentimentTooltip />
-              </Box>
+              </Flex>
               <SentimentCheck
                 user={user}
                 zid_metadata={zid_metadata}
@@ -208,17 +205,21 @@ export const DashboardConversation = ({ user }: { user }) => {
             !zid_metadata.is_archived &&
             zid_metadata?.comment_count < MIN_SEED_RESPONSES && (
               <Box
-                sx={{
-                  ...surveyBox,
-                  p: "16px 18px",
-                  my: [3],
+                p="16px 18px"
+                my="3"
+                style={{
+                  border: "1px solid",
+                  borderColor: "lighterGray",
+                  borderRadius: "8px",
                   borderLeft: "4px solid #eb4b4c",
                   lineHeight: 1.325,
-                  bg: "bgWhite",
+                  backgroundColor: "bgWhite",
                 }}
               >
-                <Box sx={{ fontWeight: 600, mb: [1] }}>
-                  <TbExclamationCircle /> Example Responses Required
+                <Box mb="1">
+                  <Text weight="bold">
+                    <TbExclamationCircle /> Example Responses Required
+                  </Text>
                 </Box>
                 You should fill in at least {MIN_SEED_RESPONSES} example responses for readers to
                 vote on. This poll will be hidden from other viewers until then.
@@ -226,17 +227,29 @@ export const DashboardConversation = ({ user }: { user }) => {
             )}
           {!zid_metadata.fip_version && <ReportAndSurveyInfo conversation_info={zid_metadata} />}
           {zid_metadata.fip_version && (
-            <Box sx={dashboardBox}>
-              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
+            <Box
+              py="18px"
+              px="22px"
+              my="3"
+              style={{
+                backgroundColor: "bgWhite",
+                lineHeight: 1.35,
+                border: "1px solid #ddd",
+              }}>
+              <Box pb="1">
+                <Text weight="bold">
+                  Comments
+                </Text>
+              </Box>
               {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
                 Have more to say? You can leave a short comment here.
                 </Box> */}
-              <Box sx={{ mx: "-8px", pt: "8px" }}>
+              <Box mx="-8px" pt="8px">
                 <SentimentCheckComments conversationId={zid_metadata.conversation_id} />
               </Box>
             </Box>
           )}
-        </Box>
+        </Flex>
       </Box>
     </Box>
   )
