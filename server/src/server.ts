@@ -54,7 +54,6 @@ import {
 import {
   createDummyUser,
   getPidPromise,
-  getUserInfoForUid,
   getUserInfoForUid2,
   getUser,
   getXidStuff,
