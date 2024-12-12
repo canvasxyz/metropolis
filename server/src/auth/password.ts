@@ -4,23 +4,6 @@ import _ from "underscore"
 
 import pg from "../db/pg-query"
 
-function generateHashedPassword(
-  password: any,
-  callback: (arg0: string | null, arg1?: string) => void,
-) {
-  bcrypt.genSalt(12, function (errSalt: any, salt: any) {
-    if (errSalt) {
-      return callback("polis_err_salt")
-    }
-    bcrypt.hash(password, salt, function (errHash: any, hashedPassword: any) {
-      if (errHash) {
-        return callback("polis_err_hash")
-      }
-      callback(null, hashedPassword)
-    })
-  })
-}
-
 function checkPassword(uid: any, password: any) {
   return pg
     .queryP_readOnly_wRetryIfEmpty(
@@ -113,10 +96,9 @@ function generateTokenP(len: any, pseudoRandomOk: any) {
   })
 }
 
-export { generateHashedPassword, checkPassword, generateToken, generateTokenP }
+export { checkPassword, generateToken, generateTokenP }
 
 export default {
-  generateHashedPassword,
   checkPassword,
   generateToken,
   generateTokenP,

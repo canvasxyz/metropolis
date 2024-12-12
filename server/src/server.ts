@@ -73,7 +73,6 @@ const devMode = Config.isDevMode
 const escapeLiteral = pg.Client.prototype.escapeLiteral
 
 // TODO: Maybe able to remove
-import { generateHashedPassword } from "./auth/password"
 import {
   COOKIES,
   COOKIES_TO_CLEAR,
@@ -101,8 +100,6 @@ import {
   startSession,
   endSession,
   setupPwReset,
-  getUidForPwResetToken,
-  clearPwResetToken,
 } from "./session"
 
 import {
@@ -2081,58 +2078,6 @@ function handle_GET_bid(
     )
     .catch(function (err: any) {
       fail(res, 500, "polis_err_get_bid_misc", err)
-    })
-}
-
-function handle_POST_auth_password(
-  req: { p: { pwresettoken: any; newPassword: any } },
-  res: {
-    status: (
-      arg0: number,
-    ) => {
-      (): any
-      new (): any
-      json: { (arg0: string): void; new (): any }
-    }
-  },
-) {
-  let pwresettoken = req.p.pwresettoken
-  let newPassword = req.p.newPassword
-
-  getUidForPwResetToken(pwresettoken)
-    .then((userParams: { uid: any }) => {
-      let uid = Number(userParams.uid)
-      generateHashedPassword(
-        newPassword,
-        function (err: any, hashedPassword: any) {
-          return queryP(
-            "insert into jianiuevyew (uid, pwhash) values " +
-              "($1, $2) on conflict (uid) " +
-              "do update set pwhash = excluded.pwhash;",
-            [uid, hashedPassword],
-          ).then(
-            () => {
-              res.status(200).json("Password reset successful.")
-              clearPwResetToken(pwresettoken, function (err: any) {
-                if (err) {
-                  logger.error("polis_err_auth_pwresettoken_clear_fail", err)
-                }
-              })
-            },
-            (err: any) => {
-              fail(res, 500, "Couldn't reset password.", err)
-            },
-          )
-        },
-      )
-    })
-    .catch((err) => {
-      fail(
-        res,
-        500,
-        "Password Reset failed. Couldn't find matching pwresettoken.",
-        err,
-      )
     })
 }
 
@@ -5116,21 +5061,6 @@ function isDuplicateKey(err: {
     err.sqlState === "23505" ||
     (err.messagePrimary && err.messagePrimary.includes("duplicate key value"))
   return isdup
-}
-
-function failWithRetryRequest(res: {
-  setHeader: (arg0: string, arg1: number) => void
-  writeHead: (
-    arg0: number,
-  ) => {
-    (): any
-    new (): any
-    send: { (arg0: number): void; new (): any }
-  }
-}) {
-  res.setHeader("Retry-After", 0)
-  logger.warn("failWithRetryRequest")
-  res.writeHead(500).send(57493875)
 }
 
 function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
@@ -9687,7 +9617,6 @@ export {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
   handle_POST_comments,
   handle_POST_contexts,

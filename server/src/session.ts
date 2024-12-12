@@ -139,42 +139,6 @@ async function setupPwReset(uid: any) {
   )
 }
 
-async function getUidForPwResetToken(pwresettoken: any) {
-  let results
-  try {
-    // TODO "and created > timestamp - x"
-    results = await pg.queryP(
-      "select uid from pwreset_tokens where token = ($1);",
-      [pwresettoken],
-    )
-  } catch (err) {
-    logger.error("pwresettoken_fetch_error", err)
-    throw new Error("pwresettoken_fetch_error")
-  }
-
-  if (results.length == 0) {
-    logger.error("token_expired_or_missing")
-    throw new Error("token_expired_or_missing")
-  }
-
-  let uid = results[0].uid
-  return { uid }
-}
-
-function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
-  pg.query(
-    "delete from pwreset_tokens where token = ($1);",
-    [pwresettoken],
-    function (errDelToken: any) {
-      if (errDelToken) {
-        cb(errDelToken)
-        return
-      }
-      cb(null)
-    },
-  )
-}
-
 export {
   encrypt,
   decrypt,
@@ -183,6 +147,4 @@ export {
   startSession,
   endSession,
   setupPwReset,
-  getUidForPwResetToken,
-  clearPwResetToken,
 }

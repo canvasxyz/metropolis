@@ -81,7 +81,6 @@ import {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
   handle_POST_comments,
   handle_POST_contexts,
@@ -147,8 +146,6 @@ import {
   getIntInRange,
   getNumberInRange,
   getOptionalStringLimitLength,
-  getPassword,
-  getPasswordWithCreatePasswordRules,
   getReportIdFetchRid,
   getStringLimitLength,
   getUrlLimitLength,
@@ -294,13 +291,6 @@ app.get(
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
   want("math_tick", getInt, assignToP, 0),
   handle_GET_bid as any,
-)
-
-app.post(
-  "/api/v3/auth/password",
-  need("pwresettoken", getOptionalStringLimitLength(1000), assignToP),
-  need("newPassword", getPasswordWithCreatePasswordRules, assignToP),
-  handle_POST_auth_password as any,
 )
 
 app.post(
