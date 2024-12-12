@@ -5,10 +5,8 @@ import * as types from "../actions"
 const signin = (
   state = {
     loading: false,
-    facebookLoading: false,
     signInSuccessful: false,
     error: null,
-    facebookError: null,
   },
   action,
 ) => {
@@ -17,7 +15,6 @@ const signin = (
       return Object.assign({}, state, {
         loading: false,
         pending: true,
-        facebookLoading: false,
         error: null,
       })
 
@@ -26,7 +23,6 @@ const signin = (
         loading: false,
         pending: false,
         signInSuccessful: false,
-        facebookLoading: false,
         error: null,
       })
     case "signin completed successfully":
@@ -34,28 +30,24 @@ const signin = (
         loading: false,
         pending: false,
         signInSuccessful: true,
-        facebookLoading: false,
         error: null,
       })
     case types.SIGNIN_ERROR:
       return Object.assign({}, state, {
         loading: false,
         pending: false,
-        facebookLoading: false,
         error: action.data,
       })
     case types.CREATEUSER_INITIATED:
       return Object.assign({}, state, {
         loading: false,
         pending: true,
-        facebookLoading: false,
         error: null,
       })
     case types.CREATEUSER_ERROR:
       return Object.assign({}, state, {
         loading: false,
         pending: false,
-        facebookLoading: false,
         error: action.data,
       })
 
