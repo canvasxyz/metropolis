@@ -13,27 +13,6 @@ const signin = (
   action,
 ) => {
   switch (action.type) {
-    case types.FACEBOOK_SIGNIN_INITIATED:
-      return Object.assign({}, state, {
-        loading: false,
-        facebookLoading: true,
-        error: null,
-        facebookError: null,
-      })
-    case types.FACEBOOK_SIGNIN_SUCCESSFUL:
-      return Object.assign({}, state, {
-        loading: false,
-        facebookLoading: false,
-        error: null,
-        facebookError: null,
-      })
-    case types.FACEBOOK_SIGNIN_FAILED:
-      return Object.assign({}, state, {
-        loading: false,
-        facebookLoading: false,
-        error: null,
-        facebookError: action.errorCode,
-      })
     case types.SIGNIN_INITIATED:
       return Object.assign({}, state, {
         loading: false,
