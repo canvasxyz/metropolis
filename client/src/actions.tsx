@@ -205,49 +205,6 @@ export const populateUserStore = () => {
   }
 }
 
-/* passwordResetInit */
-
-const passwordResetInitInitiated = () => {
-  return {
-    type: PWRESET_INIT_INITIATED,
-  }
-}
-
-const passwordResetInitSuccess = () => {
-  return {
-    type: PWRESET_INIT_SUCCESS,
-  }
-}
-
-const passwordResetInitError = (err) => {
-  return {
-    type: PWRESET_INIT_ERROR,
-    data: err,
-  }
-}
-
-const passwordResetInitPost = (attrs) => {
-  return api.post("/api/v3/auth/pwresettoken", attrs)
-}
-
-export const doPasswordResetInit = (attrs) => {
-  return (dispatch) => {
-    dispatch(passwordResetInitInitiated())
-    return passwordResetInitPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          window.location.assign("/pwresetinit/done")
-        }, 3000)
-
-        return dispatch(passwordResetInitSuccess())
-      },
-      (err) => dispatch(passwordResetInitError(err)),
-    )
-  }
-}
-
 /* passwordReset */
 
 const passwordResetInitiated = () => {

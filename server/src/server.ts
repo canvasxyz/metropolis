@@ -2083,74 +2083,6 @@ function handle_GET_bid(
 
 const getServerNameWithProtocol = Config.getServerNameWithProtocol
 
-async function handle_POST_auth_pwresettoken(
-  req: { p: { email: any } },
-  res: {
-    status: (
-      arg0: number,
-    ) => {
-      (): any
-      new (): any
-      json: { (arg0: string): void; new (): any }
-    }
-  },
-) {
-  let email = req.p.email
-
-  let server = getServerNameWithProtocol(req)
-
-  // let's clear the cookies here, in case something is borked.
-  clearCookies(req, res)
-
-  function finish() {
-    res.status(200).json("Password reset email sent, please check your email.")
-  }
-
-  let uid
-  try {
-    uid = await getUidByEmail(email)
-  } catch (err) {
-    sendPasswordResetEmailFailure(email, server)
-    finish()
-    return
-  }
-
-  const pwresettoken = await setupPwReset(uid)
-  try {
-    // TODO: make this async
-    await sendPasswordResetEmail(uid, pwresettoken, server)
-  } catch (err) {
-    fail(res, 500, "Error: Couldn't send password reset email.", err)
-    return
-  }
-
-  finish()
-}
-
-function sendPasswordResetEmailFailure(email: any, server: any) {
-  let body = `We were unable to find an account registered with the email address: ${email}
-
-You may have used another email address to create your account.
-
-If you need to create a new account, you can do that here ${server}/
-
-Feel free to reply to this email if you need help.`
-
-  return sendTextEmail(polisFromAddress, email, "Password Reset Failed", body)
-}
-
-function getUidByEmail(email: string) {
-  email = email.toLowerCase()
-  return queryP_readOnly("SELECT uid FROM users where LOWER(email) = ($1);", [
-    email,
-  ]).then(function (rows: string | any[]) {
-    if (!rows || !rows.length) {
-      throw new Error("polis_err_no_user_matching_email")
-    }
-    return rows[0].uid
-  })
-}
-
 function clearCookie(
   req: { [key: string]: any; headers?: { origin: string } },
   res: {
@@ -3076,37 +3008,6 @@ function emailBadProblemTime(message: string) {
 ${message}`
 
   return emailTeam("Polis Bad Problems!!!", body)
-}
-async function sendPasswordResetEmail(
-  uid?: any,
-  pwresettoken?: any,
-  serverName?: any,
-) {
-  const userInfo = (await getUserInfoForUid(uid)) as { hname: any; email: any }
-  if (!userInfo) {
-    throw new Error("missing user info")
-  }
-
-  let body = `Hi ${userInfo.hname},
-
-We have just received a password reset request for ${userInfo.email}
-
-To reset your password, visit this page:
-${serverName}/pwreset/${pwresettoken}
-
-"Thank you for using Metropolis!`
-
-  try {
-    await sendTextEmail(
-      polisFromAddress,
-      userInfo.email,
-      "Polis Password Reset",
-      body,
-    )
-  } catch (err) {
-    logger.error("polis_err_failed_to_email_password_reset_code", err)
-    throw err
-  }
 }
 
 // function sendTextEmailWithPostmark(sender, recipient, subject, text) {
@@ -9617,7 +9518,6 @@ export {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_pwresettoken,
   handle_POST_comments,
   handle_POST_contexts,
   handle_POST_conversation_close,
