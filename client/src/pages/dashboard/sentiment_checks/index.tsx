@@ -20,7 +20,8 @@ import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
-import { CreateConversationModal } from "../../CreateConversationModal"
+import { CreateConversationDialog } from "../../CreateConversationDialog"
+
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
@@ -33,7 +34,6 @@ export default () => {
     Record<string, boolean>
   >(Object.fromEntries(allStatuses.map((status) => [status, true])))
   const { user } = useAppSelector((state) => state.user)
-  const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const {
     showAuthors,
@@ -124,14 +124,7 @@ export default () => {
             position="absolute"
             right="3"
           >
-            <Button
-              variant="surface"
-              radius="large"
-              onClick={() => setCreateConversationModalIsOpen(true)}
-              style={{ cursor: "pointer" }}
-            >
-              Create a poll
-            </Button>
+            <CreateConversationDialog />
           </Box>
         </Flex>
         <Flex gap="2" width="100%">
@@ -258,10 +251,6 @@ export default () => {
           ))}
         </Flex>
       </Flex>
-      <CreateConversationModal
-        isOpen={createConversationModalIsOpen}
-        setIsOpen={setCreateConversationModalIsOpen}
-      />
     </Box>
   )
 }
