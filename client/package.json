@@ -87,7 +87,6 @@
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^3.0.1",
     "request": "~2.65.0",
-    "theme-ui": "^0.16.0",
     "usehooks-ts": "^2.9.1",
     "victory": "^36.9.1"
   }
