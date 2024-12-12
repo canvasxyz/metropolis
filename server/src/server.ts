@@ -7,7 +7,6 @@ import akismetLib from "akismet"
 import AWS from "aws-sdk"
 import badwords from "badwords/object"
 import async from "async"
-import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import responseTime from "response-time"
 import request from "request-promise" // includes Request, but adds promise methods
@@ -18,7 +17,7 @@ import _ from "underscore"
 import pg from "pg"
 
 import { addInRamMetric, meteredPromise } from "./utils/metered"
-import { generateAndRegisterZinvite, createUser } from "./auth/create-user"
+import { generateAndRegisterZinvite } from "./auth/create-user"
 import { generateToken, generateTokenP } from "./auth/password"
 import {
   query,
@@ -4695,10 +4694,6 @@ function handle_GET_conversationStats(
       fail(res, 500, "polis_err_conversationStats_misc", err)
     })
 }
-
-function handle_POST_auth_new(req: any, res: any) {
-  createUser(req, res)
-} // end /api/v3/auth/new
 
 function handle_POST_tutorial(
   req: { p: { uid?: any; step: any } },
@@ -9692,7 +9687,6 @@ export {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_new,
   handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
   handle_POST_comments,

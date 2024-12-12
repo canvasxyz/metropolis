@@ -38,18 +38,6 @@ const signin = (
         pending: false,
         error: action.data,
       })
-    case types.CREATEUSER_INITIATED:
-      return Object.assign({}, state, {
-        loading: false,
-        pending: true,
-        error: null,
-      })
-    case types.CREATEUSER_ERROR:
-      return Object.assign({}, state, {
-        loading: false,
-        pending: false,
-        error: action.data,
-      })
 
     default:
       return state

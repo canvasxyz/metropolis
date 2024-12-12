@@ -81,7 +81,6 @@ import {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_new,
   handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
   handle_POST_comments,
@@ -472,21 +471,6 @@ app.get(
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("until", getInt, assignToP),
   handle_GET_conversationStats as any,
-)
-
-app.post(
-  "/api/v3/auth/new",
-  want("anon", getBool, assignToP),
-  want("password", getPasswordWithCreatePasswordRules, assignToP),
-  want("password2", getPasswordWithCreatePasswordRules, assignToP),
-  want("email", getOptionalStringLimitLength(999), assignToP),
-  want("hname", getOptionalStringLimitLength(999), assignToP),
-  want("encodedParams", getOptionalStringLimitLength(9999), assignToP), // TODO_SECURITY we need to add an additional key param to ensure this is secure. we don't want anyone adding themselves to other people's site_id groups.
-  want("zinvite", getOptionalStringLimitLength(999), assignToP),
-  want("organization", getOptionalStringLimitLength(999), assignToP),
-  want("gatekeeperTosPrivacy", getBool, assignToP),
-  want("owner", getBool, assignToP, true),
-  handle_POST_auth_new,
 )
 
 app.post(
