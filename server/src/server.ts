@@ -2156,7 +2156,6 @@ function doCookieAuth(
       return
     })
 }
-
 async function handle_POST_auth_deregister(
   req: { p: { showPage?: any }; cookies: { [x: string]: any } },
   res: {
