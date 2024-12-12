@@ -11,7 +11,7 @@ const Footer = ({ inSurvey }: { inSurvey: boolean }) => {
       justify="center"
     >
       {!inSurvey && (
-        <Text as="span" sx={{ mr: 3 }}>
+        <Text as="span" mr="3">
           &copy; {new Date().getFullYear()} Authors
         </Text>
       )}
