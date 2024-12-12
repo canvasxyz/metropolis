@@ -1,7 +1,5 @@
-/** @jsx jsx */
-
 import React from "react"
-import { jsx, Box, Heading } from "theme-ui"
+import { Box, Heading } from "@radix-ui/themes"
 import { VictoryChart, VictoryArea } from "victory"
 import victoryTheme from "./victoryTheme"
 
@@ -13,14 +11,11 @@ class Commenters extends React.Component<{
     const { size, firstCommentTimes } = this.props
     if (firstCommentTimes.length <= 1) return null /* handle seed commenter */
     return (
-      <Box sx={{ mt: [5] }}>
+      <Box mt="5">
         <Heading
           as="h6"
-          sx={{
-            fontSize: [2, null, 3],
-            lineHeight: "body",
-            my: [2],
-          }}
+          size={{ initial: "2", md: "3"}}
+          my="2"
         >
           Commenters over time, by time of first comment
         </Heading>
