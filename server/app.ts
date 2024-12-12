@@ -81,7 +81,6 @@ import {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_login,
   handle_POST_auth_new,
   handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
@@ -403,13 +402,6 @@ app.post(
   need("type", getInt, assignToP),
   need("email", getEmail, assignToP),
   handle_POST_convSubscriptions as any,
-)
-
-app.post(
-  "/api/v3/auth/login",
-  need("password", getPassword, assignToP),
-  want("email", getEmail, assignToP),
-  handle_POST_auth_login as any,
 )
 
 app.post(

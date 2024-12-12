@@ -209,44 +209,6 @@ export const populateUserStore = () => {
   }
 }
 
-/* signin */
-
-const signinInitiated = () => {
-  return {
-    type: SIGNIN_INITIATED,
-  }
-}
-
-// SIGNIN_SUCCESSFUL Not needed since redirecting to clear password from memory
-
-const signinError = (err) => {
-  return {
-    type: SIGNIN_ERROR,
-    data: err,
-  }
-}
-
-const signinPost = (attrs) => {
-  return api.post("/api/v3/auth/login", attrs)
-}
-
-export const doSignin = (attrs) => {
-  return (dispatch) => {
-    dispatch(signinInitiated())
-    return signinPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          dispatch({ type: "signin completed successfully" })
-          window.location.assign("/conversations")
-        }, 3000)
-      },
-      (err) => dispatch(signinError(err)),
-    )
-  }
-}
-
 /* createUser */
 
 const createUserInitiated = () => {

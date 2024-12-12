@@ -3959,79 +3959,6 @@ function handle_POST_convSubscriptions(
   }
 }
 
-async function handle_POST_auth_login(
-  req: {
-    p: {
-      password: any
-      email: string
-    }
-  },
-  res: {
-    redirect: (arg0: any) => void
-    json: (arg0: { uid?: any; email: any; token: any }) => void
-  },
-) {
-  let password = req.p.password
-  let email = req.p.email || ""
-
-  email = email.toLowerCase()
-  if (!_.isString(password) || !password.length) {
-    fail(res, 403, "polis_err_login_need_password")
-    return
-  }
-
-  let docs
-  try {
-    docs = await queryP("SELECT * FROM users WHERE LOWER(email) = ($1);", [
-      email,
-    ])
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
-    return
-  }
-
-  const uid = docs[0].uid
-
-  let results
-  try {
-    results = await queryP("select pwhash from jianiuevyew where uid = ($1);", [
-      uid,
-    ])
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
-    return
-  }
-
-  if (!results || results.length === 0) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password")
-    return
-  }
-
-  let hashedPassword = results[0].pwhash
-  try {
-    await bcrypt.compare(password, hashedPassword)
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password")
-    return
-  }
-
-  const token = await startSession(uid)
-  const response_data = {
-    uid: uid,
-    email: email,
-    token: token,
-  }
-
-  try {
-    // @ts-ignore
-    await addCookies(req, res, token, uid)
-  } catch (err) {
-    fail(res, 500, "polis_err_adding_cookies", err)
-    return
-  }
-  res.json(response_data)
-} // /api/v3/auth/login
-
 function handle_POST_joinWithInvite(
   req: {
     p: {
@@ -9765,7 +9692,6 @@ export {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_login,
   handle_POST_auth_new,
   handle_POST_auth_password,
   handle_POST_auth_pwresettoken,
