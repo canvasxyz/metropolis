@@ -119,10 +119,15 @@ async function startSession(uid: any) {
   return token
 }
 
+async function endSession(sessionToken: any) {
+  await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken])
+}
+
 export {
   encrypt,
   decrypt,
   makeSessionToken,
   getUserInfoForSessionToken,
   startSession,
+  endSession,
 }

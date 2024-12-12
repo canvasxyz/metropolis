@@ -98,6 +98,7 @@ import {
   makeSessionToken,
   getUserInfoForSessionToken,
   startSession,
+  endSession,
 } from "./session"
 
 import {
