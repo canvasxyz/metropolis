@@ -14,7 +14,6 @@ import Footer from "./components/footer"
 
 /* public home page */
 import Home from "./pages/home"
-import About from "./pages/about"
 import Dashboard from "./pages/dashboard"
 
 /* landing pages */
@@ -167,7 +166,6 @@ class App extends React.Component<
                 ></CompatRoute>
               </CompatRoutes>
               <Route exact path="/about" render={() => <Home user={this.props.user} />} />
-              <Route exact path="/about2" render={() => <About />} />
               <Route
                 exact
                 path="/signin"
