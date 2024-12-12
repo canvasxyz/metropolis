@@ -1,7 +1,7 @@
 import React from "react"
 import PropTypes from "prop-types"
 import NumberCard from "./conversation-stats-number-card"
-import { Box } from "theme-ui"
+import { Box, Flex } from "@radix-ui/themes"
 
 class NumberCards extends React.Component<
   {
@@ -20,19 +20,19 @@ class NumberCards extends React.Component<
     const data = this.props.data
     // const averageVotes = data.voteTimes.length / data.firstVoteTimes.length
     return (
-      <Box sx={{ display: "flex" }}>
-        <Box sx={{ flex: 1 }}>
+      <Flex>
+        <Box>
           <NumberCard datum={data.firstVoteTimes.length} subheading="participants voted" />
           <NumberCard datum={data.voteTimes.length} subheading="votes were cast" />
         </Box>
-        <Box sx={{ flex: 1 }}>
+        <Box>
           <NumberCard
             datum={data.firstCommentTimes.length}
             subheading="participants wrote comments"
           />
           <NumberCard datum={data.commentTimes.length} subheading="comments submitted" />
         </Box>
-      </Box>
+      </Flex>
     )
   }
 }
