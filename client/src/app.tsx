@@ -23,12 +23,7 @@ import Dashboard from "./pages/dashboard"
 /* landing pages */
 import TOS from "./pages/landing/tos"
 import Privacy from "./pages/landing/privacy"
-import PasswordReset from "./pages/landing/password-reset"
-import PasswordResetInit from "./pages/landing/password-reset-init"
-import PasswordResetInitDone from "./pages/landing/password-reset-init-done"
-import SignIn from "./pages/landing/signin"
 import SignOut from "./pages/landing/signout"
-import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
 import CreateConversation from "./pages/create_conversation"
@@ -51,7 +46,7 @@ const PrivateRoute = ({ component: Component, isLoading, authed, ...rest }) => {
         authed === true ? (
           <Component {...props} />
         ) : (
-          <Redirect to={{ pathname: "/signin", state: { from: props.location } }} />
+          <Redirect to={{ pathname: "/", state: { from: props.location } }} />
         )
       }
     />
@@ -174,33 +169,10 @@ class App extends React.Component<
               </CompatRoutes>
               <Route exact path="/about" render={() => <Home user={this.props.user} />} />
               <Route exact path="/about2" render={() => <About />} />
-              <Route
-                exact
-                path="/signin"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
-              <Route
-                exact
-                path="/signin/*"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
-              <Route
-                exact
-                path="/signin/**/*"
-                render={() => <SignIn {...this.props} authed={this.isAuthed()} />}
-              />
               <Route exact path="/signout" component={SignOut} />
               <Route exact path="/signout/*" component={SignOut} />
               <Route exact path="/signout/**/*" component={SignOut} />
-              <Route exact path="/createuser" component={CreateUser} />
-              <Route exact path="/createuser/*" component={CreateUser} />
-              <Route exact path="/createuser/**/*" component={CreateUser} />
 
-              <Route exact path="/pwreset" component={PasswordReset} />
-              <Route path="/pwreset/*" component={PasswordReset} />
-              <Route exact path="/pwresetinit" component={PasswordResetInit} />
-
-              <Route exact path="/pwresetinit/done" component={PasswordResetInitDone} />
               <Route exact path="/tos" component={TOS} />
               <Route exact path="/privacy" component={Privacy} />
 

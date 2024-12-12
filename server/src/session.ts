@@ -119,32 +119,10 @@ async function startSession(uid: any) {
   return token
 }
 
-async function endSession(sessionToken: any) {
-  await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken])
-}
-
-async function setupPwReset(uid: any) {
-  function makePwResetToken() {
-    // These can probably be shortened at some point.
-    return crypto
-      .randomBytes(140)
-      .toString("base64")
-      .replace(/[^A-Za-z0-9]/g, "")
-      .substr(0, 100)
-  }
-  let token = makePwResetToken()
-  await pg.queryP(
-    "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
-  )
-}
-
 export {
   encrypt,
   decrypt,
   makeSessionToken,
   getUserInfoForSessionToken,
   startSession,
-  endSession,
-  setupPwReset,
 }

@@ -205,49 +205,6 @@ export const populateUserStore = () => {
   }
 }
 
-/* passwordReset */
-
-const passwordResetInitiated = () => {
-  return {
-    type: PWRESET_INITIATED,
-  }
-}
-
-const passwordResetSuccess = () => {
-  return {
-    type: PWRESET_SUCCESS,
-  }
-}
-
-const passwordResetError = (err) => {
-  return {
-    type: PWRESET_ERROR,
-    data: err,
-  }
-}
-
-const passwordResetPost = (attrs) => {
-  return api.post("/api/v3/auth/password", attrs)
-}
-
-export const doPasswordReset = (attrs) => {
-  return (dispatch) => {
-    dispatch(passwordResetInitiated())
-    return passwordResetPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          window.location.assign("/")
-        }, 3000)
-
-        return dispatch(passwordResetSuccess())
-      },
-      (err) => dispatch(passwordResetError(err)),
-    )
-  }
-}
-
 /* signout */
 
 const signoutInitiated = () => {

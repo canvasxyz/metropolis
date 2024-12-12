@@ -80,7 +80,6 @@ import {
   handle_GET_votes_me,
   handle_GET_xids,
   handle_GET_zinvites,
-  handle_POST_auth_deregister,
   handle_POST_comments,
   handle_POST_contexts,
   handle_POST_conversation_close,
@@ -120,6 +119,7 @@ import {
   handle_PUT_reports,
   handle_PUT_users,
   handle_GET_fips,
+  handle_POST_auth_deregister,
 } from "./src/server"
 
 import {
@@ -1175,11 +1175,7 @@ const fetchIndexForAdminPage = (
 app.get("^/$", fetchIndexForAdminPage)
 app.get(/^\/about(\/.*)?/, fetchIndexForAdminPage)
 app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage)
 app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/pwreset.*/, fetchIndexForAdminPage)
-app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage)
 app.get(/^\/tos$/, fetchIndexForAdminPage)
 app.get(/^\/privacy$/, fetchIndexForAdminPage)
 app.get(/^\/dashboard(\/.*)?/, fetchIndexForAdminPage)

@@ -98,8 +98,6 @@ import {
   makeSessionToken,
   getUserInfoForSessionToken,
   startSession,
-  endSession,
-  setupPwReset,
 } from "./session"
 
 import {
@@ -2158,6 +2156,7 @@ function doCookieAuth(
       return
     })
 }
+
 async function handle_POST_auth_deregister(
   req: { p: { showPage?: any }; cookies: { [x: string]: any } },
   res: {
@@ -9517,7 +9516,6 @@ export {
   handle_GET_votes_me,
   handle_GET_xids,
   handle_GET_zinvites,
-  handle_POST_auth_deregister,
   handle_POST_comments,
   handle_POST_contexts,
   handle_POST_conversation_close,
@@ -9549,6 +9547,7 @@ export {
   handle_POST_users_invite,
   handle_POST_votes,
   handle_POST_xidWhitelist,
+  handle_POST_auth_deregister,
   handle_POST_zinvites,
   handle_PUT_comments,
   handle_PUT_conversations,
