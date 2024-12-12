@@ -25,7 +25,6 @@ import SignOut from "./pages/landing/signout"
 import CreateUser from "./pages/landing/createuser"
 
 /* conversations */
-import CreateConversation from "./pages/create_conversation"
 import ConversationAdmin from "./pages/admin"
 import Account from "./pages/account"
 import SurveyWithLoader from "./pages/survey/survey_with_loader"
@@ -201,7 +200,6 @@ class App extends React.Component<
                   }
                   return (
                     <Box>
-                      <Route exact path="/create" component={CreateConversation} />
                       <PrivateRoute
                         isLoading={this.isLoading()}
                         authed={this.isAuthed()}
