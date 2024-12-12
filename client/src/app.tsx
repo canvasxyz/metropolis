@@ -145,7 +145,7 @@ class App extends React.Component<
             maxWidth={inDashboard ? "none" : inHomepage ? "62em" : inReport ? "62em" : "48em"}
             pb={inDashboard ? "0" : "4"}
           >
-            {document.location.pathname !== "/about" &&
+            {
               document.location.pathname !== "/" &&
               !document.location.pathname.startsWith("/dashboard") && (
                 <Header isLoggedIn={this.props.isLoggedIn} inSurvey={inSurvey} />
