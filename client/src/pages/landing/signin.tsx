@@ -1,10 +1,8 @@
-/** @jsx jsx */
-
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { doSignin } from "../../actions"
 import { Link, Redirect } from "react-router-dom"
-import { Heading, Box, Text, Button, jsx } from "theme-ui"
+import { Heading, Box, Text, Button, TextField } from "@radix-ui/themes"
 
 import strings from "../../intl"
 import { UrlObject } from "url"
@@ -60,7 +58,7 @@ class SignIn extends React.Component<CreateUserProps> {
   maybeErrorMessage() {
     let markup = <div></div>
     if (this.props.error) {
-      markup = <div sx={{ color: "#d8403a" }}>{strings(this.props.error.responseText)}</div>
+      markup = <Text color="red">{strings(this.props.error.responseText)}</Text>
     }
     return markup
   }
@@ -69,38 +67,16 @@ class SignIn extends React.Component<CreateUserProps> {
     return (
       <Box>
         <form>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="signinEmailInput"
+          <Box my="2">
+            <TextField.Root
               ref={(c) => (this.email = c)}
               placeholder="email"
               type="email"
               autoComplete="off"
             />
           </Box>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="signinPasswordInput"
+          <Box my="2">
+            <TextField.Root
               ref={(c) => (this.password = c)}
               placeholder="password"
               type="password"
@@ -109,22 +85,22 @@ class SignIn extends React.Component<CreateUserProps> {
           </Box>
           {this.maybeErrorMessage()}
           <Button
-            sx={{ mt: [4], my: [2], px: [4] }}
+            mt="4"
+            my="2"
             id="signinButton"
             onClick={this.handleLoginClicked.bind(this)}
-            variant="buttons.disabled"
             disabled
           >
             {this.props.pending ? "Signing in..." : "Sign in"}
           </Button>
-          <Text sx={{ mt: 4 }}>
+          <Text mt="4">
             {"Forgot your password? "}
-            <Link sx={{ variant: "styles.a" }} to={"/pwresetinit"}>
+            <Link to={"/pwresetinit"}>
               Reset Password
             </Link>
           </Text>
-          <Text sx={{ mt: 2, mb: 4 }}>
-            <Link sx={{ variant: "styles.a" }} to={"/createuser"}>
+          <Text mt="2" mb="4">
+            <Link to={"/createuser"}>
               Create Account
             </Link>
           </Text>
@@ -142,7 +118,11 @@ class SignIn extends React.Component<CreateUserProps> {
 
     return (
       <React.Fragment>
-        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
+        <Heading
+          as="h1"
+          my={{initial: "4", md: "5"}}
+          size="6"
+        >
           Sign In
         </Heading>
         {this.drawLoginForm()}
