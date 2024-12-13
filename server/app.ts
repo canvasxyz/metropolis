@@ -81,10 +81,6 @@ import {
   handle_GET_xids,
   handle_GET_zinvites,
   handle_POST_auth_deregister,
-  handle_POST_auth_login,
-  handle_POST_auth_new,
-  handle_POST_auth_password,
-  handle_POST_auth_pwresettoken,
   handle_POST_comments,
   handle_POST_contexts,
   handle_POST_conversation_close,
@@ -149,8 +145,6 @@ import {
   getIntInRange,
   getNumberInRange,
   getOptionalStringLimitLength,
-  getPassword,
-  getPasswordWithCreatePasswordRules,
   getReportIdFetchRid,
   getStringLimitLength,
   getUrlLimitLength,
@@ -299,19 +293,6 @@ app.get(
 )
 
 app.post(
-  "/api/v3/auth/password",
-  need("pwresettoken", getOptionalStringLimitLength(1000), assignToP),
-  need("newPassword", getPasswordWithCreatePasswordRules, assignToP),
-  handle_POST_auth_password as any,
-)
-
-app.post(
-  "/api/v3/auth/pwresettoken",
-  need("email", getEmail, assignToP),
-  handle_POST_auth_pwresettoken as any,
-)
-
-app.post(
   "/api/v3/auth/deregister",
   want("showPage", getStringLimitLength(1, 99), assignToP),
   handle_POST_auth_deregister as any,
@@ -406,13 +387,6 @@ app.post(
 )
 
 app.post(
-  "/api/v3/auth/login",
-  need("password", getPassword, assignToP),
-  want("email", getEmail, assignToP),
-  handle_POST_auth_login as any,
-)
-
-app.post(
   "/api/v3/joinWithInvite",
   authOptional(assignToP),
   need("conversation_id", getConversationIdFetchZid, assignToPCustom("zid")),
@@ -480,21 +454,6 @@ app.get(
   want("report_id", getReportIdFetchRid, assignToPCustom("rid")),
   want("until", getInt, assignToP),
   handle_GET_conversationStats as any,
-)
-
-app.post(
-  "/api/v3/auth/new",
-  want("anon", getBool, assignToP),
-  want("password", getPasswordWithCreatePasswordRules, assignToP),
-  want("password2", getPasswordWithCreatePasswordRules, assignToP),
-  want("email", getOptionalStringLimitLength(999), assignToP),
-  want("hname", getOptionalStringLimitLength(999), assignToP),
-  want("encodedParams", getOptionalStringLimitLength(9999), assignToP), // TODO_SECURITY we need to add an additional key param to ensure this is secure. we don't want anyone adding themselves to other people's site_id groups.
-  want("zinvite", getOptionalStringLimitLength(999), assignToP),
-  want("organization", getOptionalStringLimitLength(999), assignToP),
-  want("gatekeeperTosPrivacy", getBool, assignToP),
-  want("owner", getBool, assignToP, true),
-  handle_POST_auth_new,
 )
 
 app.post(
@@ -1216,11 +1175,7 @@ const fetchIndexForAdminPage = (
 app.get("^/$", fetchIndexForAdminPage)
 app.get(/^\/about(\/.*)?/, fetchIndexForAdminPage)
 app.get(/^\/home(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/signin(\/.*)?/, fetchIndexForAdminPage)
 app.get(/^\/signout(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/createuser(\/.*)?/, fetchIndexForAdminPage)
-app.get(/^\/pwreset.*/, fetchIndexForAdminPage)
-app.get(/^\/pwresetinit.*/, fetchIndexForAdminPage)
 app.get(/^\/tos$/, fetchIndexForAdminPage)
 app.get(/^\/privacy$/, fetchIndexForAdminPage)
 app.get(/^\/dashboard(\/.*)?/, fetchIndexForAdminPage)

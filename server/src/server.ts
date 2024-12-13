@@ -7,7 +7,6 @@ import akismetLib from "akismet"
 import AWS from "aws-sdk"
 import badwords from "badwords/object"
 import async from "async"
-import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import responseTime from "response-time"
 import request from "request-promise" // includes Request, but adds promise methods
@@ -18,7 +17,7 @@ import _ from "underscore"
 import pg from "pg"
 
 import { addInRamMetric, meteredPromise } from "./utils/metered"
-import { generateAndRegisterZinvite, createUser } from "./auth/create-user"
+import { generateAndRegisterZinvite } from "./auth/create-user"
 import { generateToken, generateTokenP } from "./auth/password"
 import {
   query,
@@ -55,7 +54,6 @@ import {
 import {
   createDummyUser,
   getPidPromise,
-  getUserInfoForUid,
   getUserInfoForUid2,
   getUser,
   getXidStuff,
@@ -74,7 +72,6 @@ const devMode = Config.isDevMode
 const escapeLiteral = pg.Client.prototype.escapeLiteral
 
 // TODO: Maybe able to remove
-import { generateHashedPassword } from "./auth/password"
 import {
   COOKIES,
   COOKIES_TO_CLEAR,
@@ -101,9 +98,6 @@ import {
   getUserInfoForSessionToken,
   startSession,
   endSession,
-  setupPwReset,
-  getUidForPwResetToken,
-  clearPwResetToken,
 } from "./session"
 
 import {
@@ -2085,127 +2079,7 @@ function handle_GET_bid(
     })
 }
 
-function handle_POST_auth_password(
-  req: { p: { pwresettoken: any; newPassword: any } },
-  res: {
-    status: (
-      arg0: number,
-    ) => {
-      (): any
-      new (): any
-      json: { (arg0: string): void; new (): any }
-    }
-  },
-) {
-  let pwresettoken = req.p.pwresettoken
-  let newPassword = req.p.newPassword
-
-  getUidForPwResetToken(pwresettoken)
-    .then((userParams: { uid: any }) => {
-      let uid = Number(userParams.uid)
-      generateHashedPassword(
-        newPassword,
-        function (err: any, hashedPassword: any) {
-          return queryP(
-            "insert into jianiuevyew (uid, pwhash) values " +
-              "($1, $2) on conflict (uid) " +
-              "do update set pwhash = excluded.pwhash;",
-            [uid, hashedPassword],
-          ).then(
-            () => {
-              res.status(200).json("Password reset successful.")
-              clearPwResetToken(pwresettoken, function (err: any) {
-                if (err) {
-                  logger.error("polis_err_auth_pwresettoken_clear_fail", err)
-                }
-              })
-            },
-            (err: any) => {
-              fail(res, 500, "Couldn't reset password.", err)
-            },
-          )
-        },
-      )
-    })
-    .catch((err) => {
-      fail(
-        res,
-        500,
-        "Password Reset failed. Couldn't find matching pwresettoken.",
-        err,
-      )
-    })
-}
-
 const getServerNameWithProtocol = Config.getServerNameWithProtocol
-
-async function handle_POST_auth_pwresettoken(
-  req: { p: { email: any } },
-  res: {
-    status: (
-      arg0: number,
-    ) => {
-      (): any
-      new (): any
-      json: { (arg0: string): void; new (): any }
-    }
-  },
-) {
-  let email = req.p.email
-
-  let server = getServerNameWithProtocol(req)
-
-  // let's clear the cookies here, in case something is borked.
-  clearCookies(req, res)
-
-  function finish() {
-    res.status(200).json("Password reset email sent, please check your email.")
-  }
-
-  let uid
-  try {
-    uid = await getUidByEmail(email)
-  } catch (err) {
-    sendPasswordResetEmailFailure(email, server)
-    finish()
-    return
-  }
-
-  const pwresettoken = await setupPwReset(uid)
-  try {
-    // TODO: make this async
-    await sendPasswordResetEmail(uid, pwresettoken, server)
-  } catch (err) {
-    fail(res, 500, "Error: Couldn't send password reset email.", err)
-    return
-  }
-
-  finish()
-}
-
-function sendPasswordResetEmailFailure(email: any, server: any) {
-  let body = `We were unable to find an account registered with the email address: ${email}
-
-You may have used another email address to create your account.
-
-If you need to create a new account, you can do that here ${server}/
-
-Feel free to reply to this email if you need help.`
-
-  return sendTextEmail(polisFromAddress, email, "Password Reset Failed", body)
-}
-
-function getUidByEmail(email: string) {
-  email = email.toLowerCase()
-  return queryP_readOnly("SELECT uid FROM users where LOWER(email) = ($1);", [
-    email,
-  ]).then(function (rows: string | any[]) {
-    if (!rows || !rows.length) {
-      throw new Error("polis_err_no_user_matching_email")
-    }
-    return rows[0].uid
-  })
-}
 
 function clearCookie(
   req: { [key: string]: any; headers?: { origin: string } },
@@ -3133,37 +3007,6 @@ ${message}`
 
   return emailTeam("Polis Bad Problems!!!", body)
 }
-async function sendPasswordResetEmail(
-  uid?: any,
-  pwresettoken?: any,
-  serverName?: any,
-) {
-  const userInfo = (await getUserInfoForUid(uid)) as { hname: any; email: any }
-  if (!userInfo) {
-    throw new Error("missing user info")
-  }
-
-  let body = `Hi ${userInfo.hname},
-
-We have just received a password reset request for ${userInfo.email}
-
-To reset your password, visit this page:
-${serverName}/pwreset/${pwresettoken}
-
-"Thank you for using Metropolis!`
-
-  try {
-    await sendTextEmail(
-      polisFromAddress,
-      userInfo.email,
-      "Polis Password Reset",
-      body,
-    )
-  } catch (err) {
-    logger.error("polis_err_failed_to_email_password_reset_code", err)
-    throw err
-  }
-}
 
 // function sendTextEmailWithPostmark(sender, recipient, subject, text) {
 //   return new Promise(function(resolve, reject) {
@@ -3959,79 +3802,6 @@ function handle_POST_convSubscriptions(
   }
 }
 
-async function handle_POST_auth_login(
-  req: {
-    p: {
-      password: any
-      email: string
-    }
-  },
-  res: {
-    redirect: (arg0: any) => void
-    json: (arg0: { uid?: any; email: any; token: any }) => void
-  },
-) {
-  let password = req.p.password
-  let email = req.p.email || ""
-
-  email = email.toLowerCase()
-  if (!_.isString(password) || !password.length) {
-    fail(res, 403, "polis_err_login_need_password")
-    return
-  }
-
-  let docs
-  try {
-    docs = await queryP("SELECT * FROM users WHERE LOWER(email) = ($1);", [
-      email,
-    ])
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
-    return
-  }
-
-  const uid = docs[0].uid
-
-  let results
-  try {
-    results = await queryP("select pwhash from jianiuevyew where uid = ($1);", [
-      uid,
-    ])
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password", err)
-    return
-  }
-
-  if (!results || results.length === 0) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password")
-    return
-  }
-
-  let hashedPassword = results[0].pwhash
-  try {
-    await bcrypt.compare(password, hashedPassword)
-  } catch (err) {
-    fail(res, 403, "polis_err_login_unknown_user_or_password")
-    return
-  }
-
-  const token = await startSession(uid)
-  const response_data = {
-    uid: uid,
-    email: email,
-    token: token,
-  }
-
-  try {
-    // @ts-ignore
-    await addCookies(req, res, token, uid)
-  } catch (err) {
-    fail(res, 500, "polis_err_adding_cookies", err)
-    return
-  }
-  res.json(response_data)
-} // /api/v3/auth/login
-
 function handle_POST_joinWithInvite(
   req: {
     p: {
@@ -4769,10 +4539,6 @@ function handle_GET_conversationStats(
     })
 }
 
-function handle_POST_auth_new(req: any, res: any) {
-  createUser(req, res)
-} // end /api/v3/auth/new
-
 function handle_POST_tutorial(
   req: { p: { uid?: any; step: any } },
   res: {
@@ -5194,21 +4960,6 @@ function isDuplicateKey(err: {
     err.sqlState === "23505" ||
     (err.messagePrimary && err.messagePrimary.includes("duplicate key value"))
   return isdup
-}
-
-function failWithRetryRequest(res: {
-  setHeader: (arg0: string, arg1: number) => void
-  writeHead: (
-    arg0: number,
-  ) => {
-    (): any
-    new (): any
-    send: { (arg0: number): void; new (): any }
-  }
-}) {
-  res.setHeader("Retry-After", 0)
-  logger.warn("failWithRetryRequest")
-  res.writeHead(500).send(57493875)
 }
 
 function getNumberOfCommentsWithModerationStatus(zid: any, mod: any) {
@@ -9764,11 +9515,6 @@ export {
   handle_GET_votes_me,
   handle_GET_xids,
   handle_GET_zinvites,
-  handle_POST_auth_deregister,
-  handle_POST_auth_login,
-  handle_POST_auth_new,
-  handle_POST_auth_password,
-  handle_POST_auth_pwresettoken,
   handle_POST_comments,
   handle_POST_contexts,
   handle_POST_conversation_close,
@@ -9800,6 +9546,7 @@ export {
   handle_POST_users_invite,
   handle_POST_votes,
   handle_POST_xidWhitelist,
+  handle_POST_auth_deregister,
   handle_POST_zinvites,
   handle_PUT_comments,
   handle_PUT_conversations,

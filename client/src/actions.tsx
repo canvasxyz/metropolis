@@ -131,10 +131,6 @@ export const DATA_EXPORT_STARTED = "DATA_EXPORT_STARTED"
 export const DATA_EXPORT_SUCCESS = "DATA_EXPORT_SUCCESS"
 export const DATA_EXPORT_ERROR = "DATA_EXPORT_ERROR"
 
-export const CREATEUSER_INITIATED = "CREATEUSER_INITIATED"
-// export const CREATEUSER_SUCCESSFUL = "CREATEUSER_SUCCESSFUL";
-export const CREATEUSER_ERROR = "CREATEUSER_ERROR"
-
 export const SIGNIN_INITIATED = "SIGNIN_INITIATED"
 // export const SIGNIN_SUCCESSFUL = "SIGNIN_SUCCESSFUL";
 export const SIGNIN_ERROR = "SIGNIN_ERROR"
@@ -150,10 +146,6 @@ export const PWRESET_INIT_ERROR = "PWRESET_INIT_ERROR"
 export const PWRESET_INITIATED = "PWRESET_INITIATED"
 export const PWRESET_SUCCESS = "PWRESET_SUCCESS"
 export const PWRESET_ERROR = "PWRESET_ERROR"
-
-export const FACEBOOK_SIGNIN_INITIATED = "FACEBOOK_SIGNIN_INITIATED"
-export const FACEBOOK_SIGNIN_SUCCESSFUL = "FACEBOOK_SIGNIN_SUCCESSFUL"
-export const FACEBOOK_SIGNIN_FAILED = "FACEBOOK_SIGNIN_FAILED"
 
 export const SUBMIT_CONTRIB = "SUBMIT_CONTRIB"
 export const SUBMIT_CONTRIB_SUCCESS = "SUBMIT_CONTRIB_SUCCESS"
@@ -209,167 +201,6 @@ export const populateUserStore = () => {
     return fetchUser().then(
       (res) => dispatch(receiveUser(res)),
       (err) => dispatch(userFetchError(err)),
-    )
-  }
-}
-
-/* signin */
-
-const signinInitiated = () => {
-  return {
-    type: SIGNIN_INITIATED,
-  }
-}
-
-// SIGNIN_SUCCESSFUL Not needed since redirecting to clear password from memory
-
-const signinError = (err) => {
-  return {
-    type: SIGNIN_ERROR,
-    data: err,
-  }
-}
-
-const signinPost = (attrs) => {
-  return api.post("/api/v3/auth/login", attrs)
-}
-
-export const doSignin = (attrs) => {
-  return (dispatch) => {
-    dispatch(signinInitiated())
-    return signinPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          dispatch({ type: "signin completed successfully" })
-          window.location.assign("/conversations")
-        }, 3000)
-      },
-      (err) => dispatch(signinError(err)),
-    )
-  }
-}
-
-/* createUser */
-
-const createUserInitiated = () => {
-  return {
-    type: CREATEUSER_INITIATED,
-  }
-}
-
-// SIGNIN_SUCCESSFUL Not needed since redirecting to clear password from memory
-
-const createUserError = (err) => {
-  return {
-    type: CREATEUSER_ERROR,
-    data: err,
-  }
-}
-
-const createUserPost = (attrs) => {
-  return api.post("/api/v3/auth/new", attrs)
-}
-
-export const doCreateUser = (attrs, dest) => {
-  return (dispatch) => {
-    dispatch(createUserInitiated())
-    return createUserPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          window.location = dest || ""
-        }, 3000)
-      },
-      (err) => dispatch(createUserError(err)),
-    )
-  }
-}
-
-/* passwordResetInit */
-
-const passwordResetInitInitiated = () => {
-  return {
-    type: PWRESET_INIT_INITIATED,
-  }
-}
-
-const passwordResetInitSuccess = () => {
-  return {
-    type: PWRESET_INIT_SUCCESS,
-  }
-}
-
-const passwordResetInitError = (err) => {
-  return {
-    type: PWRESET_INIT_ERROR,
-    data: err,
-  }
-}
-
-const passwordResetInitPost = (attrs) => {
-  return api.post("/api/v3/auth/pwresettoken", attrs)
-}
-
-export const doPasswordResetInit = (attrs) => {
-  return (dispatch) => {
-    dispatch(passwordResetInitInitiated())
-    return passwordResetInitPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          window.location.assign("/pwresetinit/done")
-        }, 3000)
-
-        return dispatch(passwordResetInitSuccess())
-      },
-      (err) => dispatch(passwordResetInitError(err)),
-    )
-  }
-}
-
-/* passwordReset */
-
-const passwordResetInitiated = () => {
-  return {
-    type: PWRESET_INITIATED,
-  }
-}
-
-const passwordResetSuccess = () => {
-  return {
-    type: PWRESET_SUCCESS,
-  }
-}
-
-const passwordResetError = (err) => {
-  return {
-    type: PWRESET_ERROR,
-    data: err,
-  }
-}
-
-const passwordResetPost = (attrs) => {
-  return api.post("/api/v3/auth/password", attrs)
-}
-
-export const doPasswordReset = (attrs) => {
-  return (dispatch) => {
-    dispatch(passwordResetInitiated())
-    return passwordResetPost(attrs).then(
-      () => {
-        setTimeout(() => {
-          // Force page to load so we can be sure the password is cleared from memory
-          // delay a bit so the cookie has time to set
-          window.location.assign("/")
-        }, 3000)
-
-        return dispatch(passwordResetSuccess())
-      },
-      (err) => dispatch(passwordResetError(err)),
     )
   }
 }

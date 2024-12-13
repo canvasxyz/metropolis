@@ -16,19 +16,6 @@ import Config from "./config"
 
 const polisDevs = Config.adminUIDs ? JSON.parse(Config.adminUIDs) : []
 
-async function getUserInfoForUid(uid: any) {
-  const results = await pg.queryP_readOnly(
-    "SELECT email, hname from users where uid = $1",
-    [uid],
-  )
-  // what is the point of this????
-  if (results.length == 0) {
-    throw Error()
-  }
-
-  return results[0]
-}
-
 function getUserInfoForUid2(uid: any) {
   return meteredPromise(
     "getUserInfoForUid2",
@@ -310,7 +297,6 @@ export {
   pidCache,
   getXidRecordByXidOwnerId,
   getXidStuff,
-  getUserInfoForUid,
   getUserInfoForUid2,
   getUser,
   createDummyUser,

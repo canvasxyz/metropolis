@@ -218,24 +218,6 @@ function getEmail(s: string) {
   })
 }
 
-function getPassword(s: string) {
-  return new Promise(function (resolve, reject) {
-    if (typeof s !== "string" || s.length > 999 || s.length === 0) {
-      return reject("polis_fail_parse_password")
-    }
-    resolve(s)
-  })
-}
-
-function getPasswordWithCreatePasswordRules(s: any) {
-  return getPassword(s).then(function (s) {
-    if (typeof s !== "string" || s.length < 6) {
-      throw new Error("polis_err_password_too_short")
-    }
-    return s
-  })
-}
-
 function getOptionalStringLimitLength(limit: number) {
   return function (s: string) {
     return new Promise(function (resolve, reject) {
@@ -544,8 +526,6 @@ export {
   getIntInRange,
   getNumberInRange,
   getOptionalStringLimitLength,
-  getPassword,
-  getPasswordWithCreatePasswordRules,
   getReportIdFetchRid,
   getStringLimitLength,
   getUrlLimitLength,
@@ -572,8 +552,6 @@ export default {
   getIntInRange,
   getNumberInRange,
   getOptionalStringLimitLength,
-  getPassword,
-  getPasswordWithCreatePasswordRules,
   getReportIdFetchRid,
   getStringLimitLength,
   getUrlLimitLength,

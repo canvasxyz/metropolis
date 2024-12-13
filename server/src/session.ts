@@ -123,58 +123,6 @@ async function endSession(sessionToken: any) {
   await pg.queryP("delete from auth_tokens where token = ($1);", [sessionToken])
 }
 
-async function setupPwReset(uid: any) {
-  function makePwResetToken() {
-    // These can probably be shortened at some point.
-    return crypto
-      .randomBytes(140)
-      .toString("base64")
-      .replace(/[^A-Za-z0-9]/g, "")
-      .substr(0, 100)
-  }
-  let token = makePwResetToken()
-  await pg.queryP(
-    "insert into pwreset_tokens (uid, token, created) values ($1, $2, default);",
-    [uid, token],
-  )
-}
-
-async function getUidForPwResetToken(pwresettoken: any) {
-  let results
-  try {
-    // TODO "and created > timestamp - x"
-    results = await pg.queryP(
-      "select uid from pwreset_tokens where token = ($1);",
-      [pwresettoken],
-    )
-  } catch (err) {
-    logger.error("pwresettoken_fetch_error", err)
-    throw new Error("pwresettoken_fetch_error")
-  }
-
-  if (results.length == 0) {
-    logger.error("token_expired_or_missing")
-    throw new Error("token_expired_or_missing")
-  }
-
-  let uid = results[0].uid
-  return { uid }
-}
-
-function clearPwResetToken(pwresettoken: any, cb: (arg0: null) => void) {
-  pg.query(
-    "delete from pwreset_tokens where token = ($1);",
-    [pwresettoken],
-    function (errDelToken: any) {
-      if (errDelToken) {
-        cb(errDelToken)
-        return
-      }
-      cb(null)
-    },
-  )
-}
-
 export {
   encrypt,
   decrypt,
@@ -182,7 +130,4 @@ export {
   getUserInfoForSessionToken,
   startSession,
   endSession,
-  setupPwReset,
-  getUidForPwResetToken,
-  clearPwResetToken,
 }

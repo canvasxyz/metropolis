@@ -1,54 +1,6 @@
-import bcrypt from "bcryptjs"
 import crypto from "crypto"
 import _ from "underscore"
 
-import pg from "../db/pg-query"
-
-function generateHashedPassword(
-  password: any,
-  callback: (arg0: string | null, arg1?: string) => void,
-) {
-  bcrypt.genSalt(12, function (errSalt: any, salt: any) {
-    if (errSalt) {
-      return callback("polis_err_salt")
-    }
-    bcrypt.hash(password, salt, function (errHash: any, hashedPassword: any) {
-      if (errHash) {
-        return callback("polis_err_hash")
-      }
-      callback(null, hashedPassword)
-    })
-  })
-}
-
-function checkPassword(uid: any, password: any) {
-  return pg
-    .queryP_readOnly_wRetryIfEmpty(
-      "select pwhash from jianiuevyew where uid = ($1);",
-      [uid],
-    )
-    .then(function (rows: string | any[]) {
-      if (!rows || !rows.length) {
-        return null
-      } else if (!rows[0].pwhash) {
-        return void 0
-      }
-      let hashedPassword = rows[0].pwhash
-      return new Promise(function (resolve, reject) {
-        bcrypt.compare(
-          password,
-          hashedPassword,
-          function (errCompare: any, result: any) {
-            if (errCompare) {
-              reject(errCompare)
-            } else {
-              resolve(result ? "ok" : 0)
-            }
-          },
-        )
-      })
-    })
-}
 
 function generateToken(
   len: any,
@@ -113,11 +65,9 @@ function generateTokenP(len: any, pseudoRandomOk: any) {
   })
 }
 
-export { generateHashedPassword, checkPassword, generateToken, generateTokenP }
+export { generateToken, generateTokenP }
 
 export default {
-  generateHashedPassword,
-  checkPassword,
   generateToken,
   generateTokenP,
 }
