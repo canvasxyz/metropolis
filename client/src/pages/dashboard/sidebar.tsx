@@ -111,7 +111,8 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
   return (
     <Box
       display={mobileMenuOpen ? "block" : { initial: "none", sm: "block" }}
-      width={{ initial: "100%", sm: "36%", md: "340px" }}
+      width={{ initial: "100%", sm: "340px" }}
+      minWidth={{ initial: "100%",  sm: "340px" }}
       maxHeight="100vh"
       overflow="hidden"
       position="relative"

@@ -1,28 +1,22 @@
-/** @jsx jsx */
 import React from "react"
-import { Flex, Box, jsx } from "theme-ui"
+import { Flex, Box, Link as RadixLink } from "@radix-ui/themes"
 
 import { Link } from "react-router-dom"
 
 const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
   return (
     <Flex
-      sx={{
-        margin: `0 auto`,
-        width: "100%",
-        pt: [3, 5],
-        pb: [3, 5],
-        px: [4, 5],
-        mb: [5, 0],
-        borderBottom: ["1px solid lightGray", "none"],
-        justifyContent: inSurvey ? "center" : "space-between",
-      }}
+      m="0 auto"
+      width="100%"
+      pt={{ initial: "3", md: "5" }}
+      pb={{ initial: "3", md: "5" }}
+      px={{ initial: "4", md: "5" }}
+      mb={{ initial: "5", md: "0" }}
+      justify={inSurvey ? "center" : "between"}
     >
-      <Box
-        sx={{
-          position: "relative",
-          marginTop: "3px",
-        }}
+      <Flex
+        position="relative"
+        mt="3px"
       >
         {inSurvey ? (
           <Link
@@ -42,45 +36,60 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
             />
           </Link>
         ) : (
-          <Link to="/">
-            <img
-              src="/foundation.png"
-              width="20"
-              style={{ position: "relative", top: 3, opacity: 0.81 }}
-            />
-          </Link>
+          <Flex gap="1" align="center">
+            <Link to="/">
+              <img
+                src="/foundation.png"
+                width="20"
+                style={{ position: "relative", top: 3, opacity: 0.81 }}
+              />
+            </Link>
+            <RadixLink size="3" weight="medium" asChild>
+              <Link to="/">
+                Fil Poll
+              </Link>
+            </RadixLink>
+          </Flex>
         )}
-        {!inSurvey && (
-          <Link sx={{ variant: "links.nav", ml: "9px", fontWeight: "500" }} to="/">
-            Fil Poll
-          </Link>
-        )}
-      </Box>
+
+      </Flex>
       {!inSurvey && (
-        <Box sx={{ mt: [1] }}>
+        <Box mt="1">
           {isLoggedIn ? (
-            <React.Fragment>
-              <Link sx={{ variant: "links.nav", ml: [4] }} to={`/account`}>
-                Account
-              </Link>
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/signout">
-                Sign out
-              </Link>
-            </React.Fragment>
+            <Flex gap="2">
+              <RadixLink asChild>
+                <Link to={`/account`}>
+                  Account
+                </Link>
+              </RadixLink>
+              <RadixLink asChild>
+                <Link to="/signout">
+                  Sign out
+                </Link>
+              </RadixLink>
+            </Flex>
           ) : (
-            <React.Fragment>
+            <Flex gap="2">
               {/*
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/about">
+              <Link to="/about">
                 About
               </Link>
                */}
-              <Link sx={{ variant: "links.nav", ml: [4] }} to="/">
-                Back home
-              </Link>
-            </React.Fragment>
+              <RadixLink asChild>
+                <Link to="/">
+                  Back home
+                </Link>
+              </RadixLink>
+            </Flex>
           )}
         </Box>
       )}
+      {/* only display lower border on small screens */}
+      <Box
+        display={{ initial: "block", sm: "none" }}
+        style={{
+          borderBottom: "1px solid lightGray",
+        }}></Box>
     </Flex>
   )
 }

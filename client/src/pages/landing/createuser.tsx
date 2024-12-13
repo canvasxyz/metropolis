@@ -1,9 +1,7 @@
-/** @jsx jsx */
-
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { doCreateUser } from "../../actions"
-import { Heading, Box, Button, jsx } from "theme-ui"
+import { Box, Button, Flex, Heading, Text, TextField } from "@radix-ui/themes"
 
 import { Link } from "react-router-dom"
 import strings from "../../intl"
@@ -47,7 +45,7 @@ class CreateUser extends React.Component<CreateUserProps> {
   maybeErrorMessage() {
     let markup = <React.Fragment />
     if (this.props.error) {
-      markup = <div sx={{ color: "#d8403a" }}>{strings(this.props.error.responseText)}</div>
+      markup = <Text color="red">{strings(this.props.error.responseText)}</Text>
     }
     return markup
   }
@@ -55,110 +53,59 @@ class CreateUser extends React.Component<CreateUserProps> {
   drawForm() {
     return (
       <Box>
-        <form sx={{ mb: [4] }}>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="createUserNameInput"
-              ref={(c) => (this.hname = c)}
-              placeholder="name"
-              type="text"
-              autoComplete="name"
-            />
-          </Box>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="createUserEmailInput"
-              ref={(c) => (this.email = c)}
-              placeholder="email"
-              type="email"
-              autoComplete="username"
-            />
-          </Box>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="createUserPasswordInput"
-              ref={(c) => (this.password = c)}
-              placeholder="password"
-              type="password"
-              autoComplete="new-password"
-            />
-          </Box>
-          <Box sx={{ my: [2] }}>
-            <input
-              sx={{
-                fontFamily: "body",
-                fontSize: [2],
-                width: "100%",
-                maxWidth: "35em",
-                borderRadius: 2,
-                padding: [2],
-                border: "1px solid",
-                borderColor: "mediumGray",
-              }}
-              id="createUserPasswordRepeatInput"
-              ref={(c) => (this.password2 = c)}
-              placeholder="repeat password"
-              type="password"
-              autoComplete="new-password"
-            />
-          </Box>
-          {this.maybeErrorMessage()}
+        <Box mb="4" maxWidth="400px">
+          <form>
+            <Flex direction="column" gap="2">
+              <TextField.Root
+                ref={(c) => (this.hname = c)}
+                placeholder="name"
+                autoComplete="name"
+              />
+              <TextField.Root
+                ref={(c) => (this.email = c)}
+                placeholder="email"
+                type="email"
+                autoComplete="username"
+              />
+              <TextField.Root
+                ref={(c) => (this.password = c)}
+                placeholder="password"
+                type="password"
+                autoComplete="new-password"
+              />
+              <TextField.Root
+                ref={(c) => (this.password2 = c)}
+                placeholder="repeatpassword"
+                type="password"
+                autoComplete="new-password"
+              />
+            </Flex>
+            {this.maybeErrorMessage()}
 
-          <Box sx={{ mt: [3], mb: [3] }}>
-            By signing up, you agree to the{" "}
-            <Link sx={{ variant: "styles.a" }} to="tos" tabIndex={110}>
-              terms of service
-            </Link>{" "}
-            and{" "}
-            <Link sx={{ variant: "styles.a" }} to="/privacy" tabIndex={111}>
-              privacy policy
-            </Link>
-            .
-          </Box>
-          <Button
-            sx={{ my: [2], px: [4] }}
-            id="createUserButton"
-            onClick={this.handleLoginClicked.bind(this)}
-            variant="buttons.disabled"
-            disabled
-          >
-            {this.props.pending ? "Creating account..." : "Create account"}
-          </Button>
-        </form>
-        <Box sx={{ mb: [4] }}>
+            <Box mt="3" mb="3">
+              By signing up, you agree to the{" "}
+              <Link to="/tos" tabIndex={110}>
+                terms of service
+              </Link>{" "}
+              and{" "}
+              <Link to="/privacy" tabIndex={111}>
+                privacy policy
+              </Link>
+              .
+            </Box>
+            <Button
+              id="createUserButton"
+              onClick={this.handleLoginClicked.bind(this)}
+              size="3"
+              disabled
+            >
+              {this.props.pending ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+        </Box>
+        <Box mb="4">
           Already have an account?{" "}
           <Link
-            sx={{ variant: "styles.a" }}
             tabIndex={6}
             to={"/signin" + this.getDest()}
             data-section="signup-select"
@@ -173,7 +120,7 @@ class CreateUser extends React.Component<CreateUserProps> {
   render() {
     return (
       <React.Fragment>
-        <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
+        <Heading as="h1" my={{initial: "4", md: "5"}} size="6">
           Create Account
         </Heading>
         {this.drawForm()}

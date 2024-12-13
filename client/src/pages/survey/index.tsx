@@ -1,7 +1,5 @@
-/** @jsx jsx */
-
 import React, { useCallback, useEffect, useState } from "react"
-import { Box, Button, jsx } from "theme-ui"
+import { Box, Button, Text } from "@radix-ui/themes"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
@@ -16,28 +14,6 @@ import { handleSubmitNewComment } from "../../actions"
 // TODO: enforce comment too long on backend
 
 type SurveyState = "loading" | "voting" | "postsurvey"
-
-export const surveyHeading = {
-  fontSize: [4],
-  lineHeight: "1.35",
-  mt: [1, 5],
-  mb: [5],
-}
-
-export const surveyHeadingMini = {
-  fontSize: [3],
-  lineHeight: "1.35",
-  mt: 0,
-  mb: "0.5em",
-}
-
-export const surveyBox = {
-  padding: "26px 32px 24px",
-  border: "1px solid",
-  borderColor: "lighterGray",
-  bg: "bgOffWhite",
-  borderRadius: "8px",
-}
 
 // reorder the next comments according to the backend api
 const selectNextComment = (unvotedComments, setUnvotedComments, conversation_id, withoutTid) => {
@@ -225,11 +201,13 @@ const Survey = ({
           !!user?.email ||
           !!user?.githubUserId ||
           !!user?.xInfo ? (
-            <Box sx={{ pt: [3] }}>
-              <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
-                This is a collective response poll where anyone can contribute additional questions
-                or statements to the discussion thread. If you have one to add, you can submit it
-                here:
+            <Box pt="3">
+              <Box mb="15px">
+                <Text size="2">
+                  This is a collective response poll where anyone can contribute additional questions
+                  or statements to the discussion thread. If you have one to add, you can submit it
+                  here:
+                </Text>
               </Box>
               <SurveyCompose
                 user={user}
@@ -249,14 +227,17 @@ const Survey = ({
               />
             </Box>
           ) : (
-            <Box sx={{ mt: "24px" }}>
-              <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
-                This is a collective response poll where anyone can contribute additional questions
-                or statements to the discussion thread. If you have one to add, log in here:
+            <Box mt="24px">
+              <Box mb="15px">
+                <Text size="2">
+                  This is a collective response poll where anyone can contribute additional questions
+                  or statements to the discussion thread. If you have one to add, log in here:
+                </Text>
               </Box>
               <Button
-                variant="buttons.outlineSecondary"
-                sx={{ py: "6px", fontWeight: 500, width: "100%" }}
+                variant="outline"
+                color="gold"
+                style={{ fontWeight: 500, width: "100%" }}
                 onClick={() =>
                   (document.location = `/api/v3/github_oauth_init?dest=${window.location.href}`)
                 }

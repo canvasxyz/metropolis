@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-use-before-define
 import React, { useState } from "react"
-import { Box, Text, Link } from "theme-ui"
+import { Box, Text, Link } from "@radix-ui/themes"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -36,10 +36,10 @@ export const Collapsible = ({
   const [collapsed, setCollapsed] = useState(shouldCollapse)
 
   return (
-    <Box sx={{ mb: [1] }}>
+    <Box mb="1">
       <Box
         className={collapsed ? "react-markdown css-fade" : "react-markdown"}
-        sx={
+        style={
           collapsed
             ? {
                 wordBreak: "break-word",
@@ -50,7 +50,6 @@ export const Collapsible = ({
                 wordBreak: "break-word",
                 maxHeight: "calc(100vh - 260px)",
                 overflow: "scroll",
-                mb: [1],
               }
         }
       >
@@ -67,7 +66,6 @@ export const Collapsible = ({
             e.target.previousElementSibling.scrollTop = 0
             setCollapsed(!collapsed)
           }}
-          variant="links.primary"
         >
           {collapsed ? "Show more" : "Show less"}
         </Link>
@@ -87,7 +85,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
       target="_blank"
       noreferrer="noreferrer"
       noopener="noopener"
-      sx={{
+      style={{
         display: "block",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -105,7 +103,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
         {fip_version.github_pr && (
           <tr>
             <td width="100">
-              <Text sx={{ fontWeight: "700" }}>PR</Text>
+              <Text weight="bold">PR</Text>
             </td>
             <td>
               <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
@@ -117,7 +115,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
         {discussions && discussions.length > 0 && (
           <tr>
             <td>
-              <Text sx={{ fontWeight: "700" }}>Discussion</Text>
+              <Text weight="bold">Discussion</Text>
             </td>
             <td>{discussions}</td>
           </tr>
@@ -125,7 +123,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
         {fip_version.fip_author && (
           <tr>
             <td>
-              <Text sx={{ fontWeight: "700" }}>Author</Text>
+              <Text weight="bold">Author</Text>
             </td>
             <td>
               {splitAuthors(fip_version.fip_author)?.map((author, i) => {
@@ -156,7 +154,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
           <React.Fragment>
             <tr>
               <td>
-                <Text sx={{ fontWeight: "700" }}>Files Updated</Text>
+                <Text weight="bold">Files Updated</Text>
               </td>
               <td>
                 <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
@@ -169,7 +167,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
         ) : (
           <tr>
             <td style={{ paddingTop: 8 }}>
-              <Text sx={{ fontWeight: "700" }}>Text</Text>
+              <Text weight="bold">Text</Text>
             </td>
             <td style={{ display: "grid", paddingTop: 8 }}>
               {fip_version.fip_content ? (
@@ -179,7 +177,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
                   content={fip_version.fip_content}
                 ></Collapsible>
               ) : (
-                <Box sx={{ pb: [1] }}>
+                <Box pb="1">
                   Could not parse FIP text. Refer to the linked Github PR for more information.
                 </Box>
               )}

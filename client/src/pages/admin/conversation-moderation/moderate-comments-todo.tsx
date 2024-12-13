@@ -7,7 +7,7 @@ import {
 } from "../../../actions"
 import Comment from "./comment"
 import { Comment as CommentType } from "../../../util/types"
-import { Text } from "theme-ui"
+import { Text } from "@radix-ui/themes"
 import { AppDispatch, RootState } from "../../../store"
 
 const connector = connect((state: RootState) => state.mod_comments_unmoderated)
@@ -32,9 +32,9 @@ class ModerateCommentsTodo extends React.Component<ModerateCommentsTodoPropTypes
     return (
       <div>
         {this.props.unmoderated_comments === null ? (
-          <Text sx={{ color: "mediumGray" }}>Loading unmoderated comments...</Text>
+          <Text color="gray">Loading unmoderated comments...</Text>
         ) : this.props.unmoderated_comments.length === 0 ? (
-          <Text sx={{ color: "mediumGray" }}>No comments left to moderate</Text>
+          <Text color="gray">No comments left to moderate</Text>
         ) : (
           this.props.unmoderated_comments.slice(0, max).map((comment, i) => {
             return (

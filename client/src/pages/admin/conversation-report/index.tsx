@@ -1,9 +1,7 @@
-/** @jsx jsx */
-
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
 import { UrlObject } from "url"
-import { Heading, Box, jsx } from "theme-ui"
+import { Heading, Box } from "@radix-ui/themes"
 
 import dateSetupUtil from "../../../util/data-export-date-setup"
 import ComponentHelpers from "../../../util/component-helpers"
@@ -114,11 +112,8 @@ class ConversationStats extends React.Component<
       <div>
         <Heading
           as="h3"
-          sx={{
-            fontSize: [3, null, 4],
-            lineHeight: "body",
-            mb: [3, null, 2],
-          }}
+          size={{initial: "3", md: "4"}}
+          mb={{initial: "3", md: "2"}}
         >
           Report
         </Heading>

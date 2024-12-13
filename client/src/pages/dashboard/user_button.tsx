@@ -7,7 +7,14 @@ import { Box, Button, Text } from "@radix-ui/themes"
 
 export const TopRightFloating = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box position="absolute" top="3" right="3">
+    <Box
+      display="block"
+      ml="auto"
+      width="max-content"
+      position="sticky"
+      top="3"
+      right="3"
+    >
       {children}
     </Box>
   )

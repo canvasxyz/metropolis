@@ -1,11 +1,10 @@
-import { Box } from "theme-ui"
 import React from "react"
 import { ConversationSummary } from "../../reducers/conversations_summary"
 import { useNavigate } from "react-router-dom-v5-compat"
 import { handleCloseConversation, handleReopenConversation } from "../../actions"
 import { useAppDispatch, useAppSelector } from "../../hooks"
 import { TbArchive, TbArchiveOff, TbDots, TbHammer, TbPencil } from "react-icons/tb"
-import { DropdownMenu, IconButton } from "@radix-ui/themes"
+import { Box, DropdownMenu, IconButton } from "@radix-ui/themes"
 
 const ConversationListItemMenu = ({conversation}: {conversation: ConversationSummary}) => {
   const { user } = useAppSelector((state) => state.user)
@@ -19,7 +18,9 @@ const ConversationListItemMenu = ({conversation}: {conversation: ConversationSum
   )
 
   return <Box
-    sx={{ position: "absolute", top: "13px", right: "13px" }}
+    position="absolute"
+    top="13px"
+    right="13px"
     onClick={(e) => e.stopPropagation()}
   >
     <DropdownMenu.Root>

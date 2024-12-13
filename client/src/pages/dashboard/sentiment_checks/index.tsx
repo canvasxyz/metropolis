@@ -1,9 +1,10 @@
 import {
   Button as RadixButton,
   DropdownMenu,
+  Flex,
+  Text,
   TextField,
   Select,
-  Button,
   Box,
 } from "@radix-ui/themes"
 import React, { useState } from "react"
@@ -11,7 +12,6 @@ import { BiFilter } from "react-icons/bi"
 import { TbAdjustmentsHorizontal, TbCalendar, TbRefresh, TbSearch } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
@@ -19,19 +19,12 @@ import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
-import { CreateConversationModal } from "../../CreateConversationModal"
+import { CreateConversationDialog } from "../../CreateConversationDialog"
+
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
   closed: { label: "Closed", color: "gray" },
-}
-
-export const TopRightFloating = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <Box position="absolute" top="54px" right="16px">
-      {children}
-    </Box>
-  )
 }
 
 export default () => {
@@ -40,7 +33,6 @@ export default () => {
     Record<string, boolean>
   >(Object.fromEntries(allStatuses.map((status) => [status, true])))
   const { user } = useAppSelector((state) => state.user)
-  const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const {
     showAuthors,
@@ -118,29 +110,23 @@ export default () => {
 
   return (
     <Box>
-      {user && (
-        <TopRightFloating>
-          <Button
-            variant="surface"
-            radius="large"
-            onClick={() => setCreateConversationModalIsOpen(true)}
-            style={{ cursor: "pointer" }}
-          >
-            <Text sx={{ display: "inline-block" }}>Create a poll</Text>
-          </Button>
-        </TopRightFloating>
-      )}
       <Flex
-        sx={{
-          px: [3],
-          py: [3],
-          pt: [7],
-          flexDirection: "column",
-          gap: [3],
-        }}
+        px="3"
+        py="3"
+        pt="6"
+        direction="column"
+        gap="3"
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
-        <Flex sx={{ gap: [2], width: "100%" }}>
+        <Flex direction="row" align="center">
+          <Text weight="bold" size="4">Sentiment Checks</Text>
+          <Box
+            position="absolute"
+            right="3"
+          >
+            <CreateConversationDialog />
+          </Box>
+        </Flex>
+        <Flex gap="2" width="100%">
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
               placeholder="Search..."
@@ -266,7 +252,7 @@ export default () => {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>
-        <Flex sx={{ flexDirection: "column", gap: [3] }}>
+        <Flex direction="column" gap="3">
           {displayedConversations.map((conversation) => (
             <ConversationEntry
               key={conversation.conversation_id}
@@ -276,10 +262,6 @@ export default () => {
           ))}
         </Flex>
       </Flex>
-      <CreateConversationModal
-        isOpen={createConversationModalIsOpen}
-        setIsOpen={setCreateConversationModalIsOpen}
-      />
     </Box>
   )
 }

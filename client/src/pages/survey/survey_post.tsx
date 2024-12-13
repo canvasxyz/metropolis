@@ -1,12 +1,8 @@
-/** @jsx jsx */
-
 import React from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { TbExternalLink } from "react-icons/tb"
-import { Box, Heading, Button, Text, jsx, Flex } from "theme-ui"
-
-import { surveyBox, surveyHeadingMini } from "./index"
+import { Box, Heading, Button, Text, Flex } from "@radix-ui/themes"
 
 const PostSurvey = ({
   submittedComments,
@@ -26,22 +22,40 @@ const PostSurvey = ({
   postsurvey_redirect: string
 }) => {
   return (
-    <Flex sx={{flexDirection: "column", gap: 3}}>
+    <Flex direction="column" gap="3">
       {postsurvey ? (
-        <Box sx={{ ...surveyBox, pt: [5], pb: [5] }}>
-          <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
+        <Flex
+          p="5"
+          direction="column"
+          gap="3"
+          style={{
+            border: "1px solid",
+            borderColor: "#e2ddd5",
+            backgroundColor: "#faf9f6",
+            borderRadius: "8px"
+          }}>
+          <Heading size="4">
             Nice work!
           </Heading>
           <Text className="react-markdown">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{postsurvey}</ReactMarkdown>
           </Text>
-        </Box>
+        </Flex>
       ) : (
-        <Box sx={{ ...surveyBox, pt: [5] }}>
-          <Heading as="h3" sx={{ ...surveyHeadingMini, fontSize: "22px" }}>
+        <Flex
+          p="5"
+          direction="column"
+          gap="3"
+          style={{
+            border: "1px solid",
+            borderColor: "#e2ddd5",
+            backgroundColor: "#faf9f6",
+            borderRadius: "8px"
+          }}>
+          <Heading size="4">
             You’re done for now!
           </Heading>
-          <Text sx={{ mb: [2] }}>
+          <Text mb="2">
             Congratulations! You’ve voted on{" "}
             <strong>
               {votedComments.length - submittedComments.length} of{" "}
@@ -49,15 +63,14 @@ const PostSurvey = ({
             </strong>{" "}
             statements, and submitted <strong>{submittedComments.length}</strong> of your own.
           </Text>
-          <Text sx={{ mb: [2] }}>
+          <Text mb="2">
             Come back to this page to vote on new statements as they’re written.
           </Text>
-        </Box>
+        </Flex>
       )}
       {postsurvey_redirect && (
         <Button
-          variant="primary"
-          sx={{ width: "100%" }}
+          style={{ width: "100%" }}
           onClick={() => window.open(postsurvey_redirect)}
         >
           Continue to next steps
@@ -67,7 +80,7 @@ const PostSurvey = ({
 
       <Button
         variant="outline"
-        sx={{ width: "100%" }}
+        style={{ width: "100%" }}
         onClick={(e) => {
           e.stopPropagation()
           setVotingAfterPostSurvey(true)

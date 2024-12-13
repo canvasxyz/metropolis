@@ -1,20 +1,11 @@
 import React, { useCallback, useMemo, useState } from "react"
-import { Link, Box, Text, Button } from "theme-ui"
-import Survey, { surveyBox } from "../survey"
+import { Link, Box, Text, Button, Flex } from "@radix-ui/themes"
+import Survey from "../survey"
 import api from "../../util/api"
 import { FipVersion } from "../../util/types"
 import { ReportComment, ReportCommentRow } from "./report_comment"
 import { Link as RouterLink } from "react-router-dom"
 import useSWR from "swr"
-
-const dashboardBox = {
-  bg: "bgWhite",
-  py: "18px",
-  px: "22px",
-  my: [3],
-  lineHeight: 1.35,
-  border: "1px solid #ddd",
-}
 
 type ReportAndSurveyInfoProps = {
   // this type should match both ZidMetadata and ConversationSummary
@@ -77,22 +68,30 @@ const ReportAndSurveyInfo = ({
     ) : 0
   , [reportComments])
 
-  return <Box sx={{ ...dashboardBox, bg: "bgOffWhite" }}>
-    <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
-      <Text sx={{ flex: 1 }}>Polls for this discussion thread</Text>
+  return <Box
+    py="18px"
+    px="22px"
+    my="3"
+    style={{
+      lineHeight: 1.35,
+      border: "1px solid #ddd",
+      backgroundColor: "#faf9f6"
+    }}>
+    <Flex mb="3">
+      <Text weight="bold">Polls for this discussion thread</Text>
+      <Box flexGrow="1"></Box>
       <Link
-        variant="links.a"
         href="#"
         onClick={(e) => {
           e.preventDefault()
           e.stopPropagation()
           setShowReport(!showReport)
         }}
-        sx={{ fontSize: "0.96em" }}
+        weight="bold"
       >
         {showReport ? "Back to voting" : "Preview results"}
       </Link>
-    </Box>
+    </Flex>
     {!showReport ? (
       <Survey
         key={conversation_info.conversation_id}
@@ -108,7 +107,14 @@ const ReportAndSurveyInfo = ({
         {!(isReportLoading || isReportCommentsLoading) && report && (
           <Box>
             {(reportComments || []).length === 0 && (
-              <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500 }}>
+              <Box
+                p="50px 32px"
+                style={{
+                  border: "1px solid",
+                  borderColor: "lighterGray",
+                  backgroundColor: "#faf9f6",
+                  borderRadius: "8px",
+                }}>
                 No responses for this{" "}
                 {conversation_info.fip_version ? "FIP" : "discussion"} yet.
               </Box>
@@ -119,25 +125,21 @@ const ReportAndSurveyInfo = ({
           (reportComments || []).map((c: ReportComment) => (
             <ReportCommentRow key={c.tid} reportComment={c} maxCount={maxCount} />
           ))}
-        <Box
-          sx={{
-            fontSize: "0.94em",
-            mt: "20px",
-            color: "#9f9e9b",
-            fontWeight: 500,
-            textAlign: "center",
-          }}
-        >
+        <Flex mt="20px" align="center">
           {!report && (
             <Box>
-              <Box sx={{ pt: [2], pb: [3] }}>
+              <Box pt="2" pb="3">
                 <Box>A report is only generated once a user has requested it.</Box>
                 <Box>Click continue to generate a report:</Box>
               </Box>
-              <Button variant="buttons.black" onClick={(e) => {
-                e.stopPropagation()
-                generateReport()
-              }} sx={{ mb: [3] }}>
+              <Button
+                color="gray"
+                highContrast mb="3"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  generateReport()
+                }}
+              >
                 Continue to report...
               </Button>
             </Box>
@@ -145,24 +147,23 @@ const ReportAndSurveyInfo = ({
           {report && (
             <React.Fragment>
               <RouterLink to={`/r/${conversation_info?.conversation_id}/${report?.report_id}`}>
-                <Text as="span" variant="links.text">
+                <Text as="span">
                   View full report
                 </Text>
               </RouterLink>
               <Text
                 as="span"
-                variant="links.text"
                 onClick={(e) => {
                   e.stopPropagation()
                   refresh()
                 }}
-                sx={{ ml: [2] }}
+                ml="2"
               >
                 Refresh report
               </Text>
             </React.Fragment>
           )}
-        </Box>
+        </Flex>
       </Box>
     )}
   </Box>
