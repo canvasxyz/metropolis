@@ -14,10 +14,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
       mb={{ initial: "5", md: "0" }}
       justify={inSurvey ? "center" : "between"}
     >
-      <Flex
-        position="relative"
-        mt="3px"
-      >
+      <Flex position="relative" mt="3px">
         {inSurvey ? (
           <Link
             to={document.location.pathname}
@@ -44,28 +41,27 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
                 style={{ position: "relative", top: 3, opacity: 0.81 }}
               />
             </Link>
-            <RadixLink size="3" weight="medium" asChild>
-              <Link to="/">
-                Fil Poll
-              </Link>
+            <RadixLink
+              size="3"
+              weight="medium"
+              style={{ color: "black", marginLeft: "4px", fontWeight: "bold" }}
+              underline="none"
+              asChild
+            >
+              <Link to="/">Fil Poll</Link>
             </RadixLink>
           </Flex>
         )}
-
       </Flex>
       {!inSurvey && (
         <Box mt="1">
           {isLoggedIn ? (
             <Flex gap="2">
               <RadixLink asChild>
-                <Link to={`/account`}>
-                  Account
-                </Link>
+                <Link to={`/account`}>Account</Link>
               </RadixLink>
               <RadixLink asChild>
-                <Link to="/signout">
-                  Sign out
-                </Link>
+                <Link to="/signout">Sign out</Link>
               </RadixLink>
             </Flex>
           ) : (
@@ -76,9 +72,7 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
               </Link>
                */}
               <RadixLink asChild>
-                <Link to="/">
-                  Back home
-                </Link>
+                <Link to="/">Back home</Link>
               </RadixLink>
             </Flex>
           )}
@@ -89,7 +83,8 @@ const Header = ({ isLoggedIn, inSurvey }: { isLoggedIn; inSurvey? }) => {
         display={{ initial: "block", sm: "none" }}
         style={{
           borderBottom: "1px solid lightGray",
-        }}></Box>
+        }}
+      ></Box>
     </Flex>
   )
 }
