@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from "vite"
 import { nodePolyfills } from "vite-plugin-node-polyfills"
+import mdx from '@mdx-js/rollup'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "")
@@ -15,8 +16,7 @@ export default defineConfig(({ mode }) => {
       "process.env.FIP_REPO_OWNER": JSON.stringify(env.FIP_REPO_OWNER),
       "process.env.FIP_REPO_NAME": JSON.stringify(env.FIP_REPO_NAME),
     },
-    plugins: [nodePolyfills({ globals: { Buffer: true } })],
-    assetsInclude: ["**/*.md"],
+    plugins: [nodePolyfills({ globals: { Buffer: true } }), mdx()],
     server: {
       port: 8080,
       proxy: {

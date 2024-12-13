@@ -1,5 +1,5 @@
-import React, { ChangeEventHandler, useRef } from "react"
-import { Box, Text } from "theme-ui"
+import React, { useRef } from "react"
+import { Box, Text } from "@radix-ui/themes"
 
 type CheckboxFieldProps = {
   label: string
@@ -13,7 +13,7 @@ export const CheckboxField = ({ label, subtitle, checked, onCheckedChange }: Che
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <Box sx={{ mb: [3] }}>
+    <Box mb="3">
       <label>
         <input
           ref={inputRef}
@@ -28,7 +28,7 @@ export const CheckboxField = ({ label, subtitle, checked, onCheckedChange }: Che
         />
         &nbsp;<strong>{label}</strong>
       </label>
-      {subtitle && <Text sx={{ display: "inline", ml: [2], color: "lightGray" }}>{subtitle}</Text>}
+      {subtitle && <Text ml="2" color="gray">{subtitle}</Text>}
     </Box>
   )
 }

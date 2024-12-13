@@ -1,9 +1,8 @@
 // Copyright (C) 2012-present, The Authors. This program is free software: you can redistribute it and/or  modify it under the terms of the GNU Affero General Public License, version 3, as published by the Free Software Foundation. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details. You should have received a copy of the GNU Affero General Public License along with this program.  If not, see <http://www.gnu.org/licenses/>.
-/** @jsx jsx */
 
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { Flex, Box, jsx } from "theme-ui"
+import { Flex, Box } from "@radix-ui/themes"
 import { populateZidMetadataStore, resetMetadataStore , populateAllCommentStores, populateVoterStores } from "../../actions"
 import { Switch, Route, Link } from "react-router-dom"
 
@@ -77,13 +76,14 @@ class ConversationAdminContainer extends React.Component<
 
     return (
       <Flex>
-        <Box sx={{ mr: [5], pt: [5], flex: "0 0 275", maxWidth: "50px" }}>
-          <Box sx={{ mb: [3] }}>
+        {/* flex: "0 0 275" */}
+        <Box mr="5" pt="5" maxWidth="50px">
+          <Box mb="3">
             <Link sx={{ variant: url ? "links.nav" : "links.activeNav" }} to={`${match.url}`}>
               Configure
             </Link>
           </Box>
-          <Box sx={{ mb: [3] }}>
+          <Box mb="3">
             <Link
               sx={{
                 variant: url === "comments" ? "links.activeNav" : "links.nav",
@@ -93,7 +93,7 @@ class ConversationAdminContainer extends React.Component<
               Moderate
             </Link>
           </Box>
-          <Box sx={{ mb: [3] }}>
+          <Box mb="3">
             <Link
               sx={{
                 variant: url === "voters" ? "links.activeNav" : "links.nav",
@@ -103,7 +103,7 @@ class ConversationAdminContainer extends React.Component<
               Voters
             </Link>
           </Box>
-          <Box sx={{ mb: [3] }}>
+          <Box mb="3">
             <Link
               sx={{
                 variant: url === "report" ? "links.activeNav" : "links.nav",

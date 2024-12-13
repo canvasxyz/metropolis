@@ -1,7 +1,5 @@
-/** @jsx jsx */
-
 import React, { useState } from "react"
-import { Box, Button, Flex, Text, jsx } from "theme-ui"
+import { Box, Button, Flex, Text } from "@radix-ui/themes"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
 import SurveyCard from "./survey_card"
@@ -29,17 +27,18 @@ const SurveyCards = ({
   const [collapsed, setCollapsed] = useState(true)
 
   return (
-    <Box sx={{ position: "relative" }}>
+    <Box position="relative">
       {unvotedComments.length > 0 && (
         <Box
           className={collapsed && unvotedComments.length > 2 ? "css-fade-more" : ""}
-          sx={collapsed ? { maxHeight: "420px", overflow: "hidden" } : {}}
+          maxHeight={collapsed ? "420px" : "none"}
+          overflow={collapsed ? "hidden" : "visible"}
         >
           {unvotedComments.map((comment, index) => (
             <Box
               key={comment.tid}
-              sx={{
-                mb: "12px",
+              mb="12px"
+              style={{
                 transition: "0.2s ease-in-out",
               }}
             >
@@ -55,50 +54,68 @@ const SurveyCards = ({
         </Box>
       )}
       {unvotedComments.length > 2 && (
-        <Text
-          as="div"
-          sx={{ textAlign: "center", fontWeight: 600, width: "100%", mt: "16px", mb: "10px" }}
-          variant="links.a"
-          onClick={(e) => {
-            e.stopPropagation()
-            setCollapsed(!collapsed)
-          }}
-        >
-          {collapsed
-            ? `Show more comments (${unvotedComments.length} total)`
-            : "Show fewer comments"}
-        </Text>
+        <Box mt="16px" mb="10px" width="100%">
+          <Text
+            as="div"
+            align="center"
+            weight="bold"
+            onClick={(e) => {
+              e.stopPropagation()
+              setCollapsed(!collapsed)
+            }}
+          >
+            {collapsed
+              ? `Show more comments (${unvotedComments.length} total)`
+              : "Show fewer comments"}
+          </Text>
+        </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length === 0 && (
-        <Box sx={{ ...surveyBox, padding: "50px 32px", fontWeight: 500, fontSize: "0.94em" }}>
-          No comments on this poll yet.
+        <Box
+          p="50px 32px"
+          style={{
+            border: "1px solid",
+            backgroundColor: "#faf9f6",
+            borderRadius: "8px",
+          }}
+        >
+          <Text>
+            No comments on this poll yet.
+          </Text>
         </Box>
       )}
       {unvotedComments.length === 0 && votedComments.length !== 0 && (
-        <Flex sx={{flexDirection: "column", gap: 3}}>
+        <Flex direction="column" gap="3">
           <Box
-            sx={{
-              ...surveyBox,
-              bg: "bgWhite",
-              padding: "50px 32px",
-              fontWeight: 500,
-              fontSize: "0.94em",
+            p="50px 32px"
+            style={{
+              border: "1px solid",
+              borderColor: "#e2ddd5",
+              borderRadius: "8px",
+              backgroundColor: "white",
             }}
           >
-            You’ve voted on all {votedComments.length} responses so far.
-            <br />
-            Come back later for more to vote on, or add your own.
+            <Text
+              style={{
+                fontWeight: 500,
+                fontSize: "0.94em"
+              }
+            }>
+              You’ve voted on all {votedComments.length} responses so far.
+              <br />
+              Come back later for more to vote on, or add your own.
+            </Text>
           </Box>
           {(postsurvey || postsurvey_redirect) && (
             <Button
-              variant="primary"
+              size="3"
               onClick={(e) => {
                 e.stopPropagation()
                 postsurvey
                   ? goTo("postsurvey")
                   : window.open(postsurvey_redirect)
               }}
-              sx={{ width: "100%", mb: [3] }}
+              style={{ width: "100%"}}
             >
               Go to next steps
               {!postsurvey && (

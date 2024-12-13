@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { Heading } from "theme-ui"
+import { Heading } from "@radix-ui/themes"
 
 import { doSignout } from "../../actions"
 import { useAppDispatch } from "../../hooks"
@@ -13,7 +13,11 @@ function SignOut() {
 
   return (
     <>
-      <Heading as="h1" sx={{ my: [4, null, 5], fontSize: [6] }}>
+      <Heading
+        as="h1"
+        my={{initial: "4", md: "5"}}
+        size="6"
+      >
         Signing Out...
       </Heading>
       <p>Please wait a second to be signed out.</p>

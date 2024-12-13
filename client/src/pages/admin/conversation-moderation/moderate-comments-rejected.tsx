@@ -3,7 +3,7 @@ import PropTypes from "prop-types"
 import { changeCommentStatusToAccepted, changeCommentCommentIsMeta } from "../../../actions"
 import { ConnectedProps, connect } from "react-redux"
 import Comment from "./comment"
-import { Text } from "theme-ui"
+import { Text } from "@radix-ui/themes"
 import { AppDispatch, RootState } from "../../../store"
 
 const connector = connect((state: RootState) => state.mod_comments_rejected)
@@ -25,9 +25,9 @@ class ModerateCommentsRejected extends React.Component<ModerateCommentsRejectedP
     return (
       <div>
         {this.props.rejected_comments === null ? (
-          <Text sx={{ color: "mediumGray" }}>Loading rejected comments...</Text>
+          <Text color="gray">Loading rejected comments...</Text>
         ) : this.props.rejected_comments.length === 0 ? (
-          <Text sx={{ color: "mediumGray" }}>No rejected comments yet</Text>
+          <Text color="gray">No rejected comments yet</Text>
         ) : (
           this.props.rejected_comments.map((comment, i) => {
             return (

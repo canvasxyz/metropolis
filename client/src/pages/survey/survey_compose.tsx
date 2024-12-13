@@ -1,14 +1,12 @@
 import React, { useRef, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
-import { Link, Box, Heading, Button, Text } from "theme-ui"
+import { Box, Button, Flex, Heading, Text, TextArea } from "@radix-ui/themes"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
-import TextareaAutosize from "react-textarea-autosize"
 
 import type { Comment } from "../../util/types"
 import api from "../../util/api"
-import { surveyHeadingMini } from "./index"
 
 Modal.setAppElement("#root")
 
@@ -101,23 +99,11 @@ const SurveyComposeBox = ({
           marginTop: "2px",
         }}
       />
-      <Box sx={{ flex: 1 }}>
-        <TextareaAutosize
-          style={{
-            fontFamily: "inherit",
-            fontSize: "1em",
-            width: "100%",
-            borderRadius: "3px",
-            padding: "8px",
-            border: "1px solid",
-            borderColor: "lightGray",
-            marginTop: "0px",
-            background: loading ? "#eee" : undefined,
-          }}
+      <Flex flexGrow="1" direction="column" gap="2">
+        <TextArea
+          style={{ width: "100%" }}
           disabled={!!loading}
           rows={2}
-          minRows={2}
-          maxRows={9}
           ref={inputRef}
           placeholder="Your response here"
           defaultValue={cachedComment}
@@ -146,36 +132,37 @@ const SurveyComposeBox = ({
             }
           }}
         />
-        <Box sx={{ mb: [2] }}>
-          <Button
-            variant="primary"
-            sx={{
-              mt: [1],
-              py: "4px",
-              px: "10px",
-              minWidth: "100px",
-              fontSize: "0.98em",
-              fontWeight: 500,
-            }}
-            onClick={(e) => {
-              e.stopPropagation()
-              submitComment(inputRef.current.value, 1)
-                .then(() => {
-                  inputRef.current.value = ""
-                  setError("")
-                  onSubmit()
-                })
-                .finally(() => {
-                  setLoading(false)
-                  inputRef.current.focus()
-                })
-            }}
-          >
+        <Box>
+        <Button
+          onClick={(e) => {
+            e.stopPropagation()
+            submitComment(inputRef.current.value, 1)
+              .then(() => {
+                inputRef.current.value = ""
+                setError("")
+                onSubmit()
+              })
+              .finally(() => {
+                setLoading(false)
+                inputRef.current.focus()
+              })
+          }}
+        >
+          <Text style={{
+            fontSize: "0.98em",
+            fontWeight: 500,
+          }}>
             Submit {!user && "anonymously"}
-          </Button>
+          </Text>
+        </Button>
         </Box>
-        <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
-      </Box>
+        {
+          error &&
+          <Text color="red">
+            {error}
+          </Text>
+        }
+      </Flex>
     </form>
   )
 }
@@ -211,8 +198,7 @@ const SurveyCompose = ({
     <React.Fragment>
       {showAsModal && (
         <Button
-          variant={unvotedComments.length === 0 ? "primary" : "outline"}
-          sx={{ width: "100%", mt: [2] }}
+          variant={unvotedComments.length === 0 ? "classic" : "outline"}
           onClick={() => {
             setIsOpen(true)
           }}
@@ -257,12 +243,14 @@ const SurveyCompose = ({
           }}
           contentLabel="Add new response"
         >
-          <Heading as="h4" sx={surveyHeadingMini}>
+          <Heading as="h4" mt="0" mb="0.5em" size="3" style={{
+            lineHeight: "1.35",
+          }}>
             Add new response
           </Heading>
 
           {help_type !== 0 && (
-            <Text sx={{ mb: [4] }}>
+            <Text mb="4">
               <p>Add your perspectives, experiences, or ideas here. Good responses should:</p>
               <ul>
                 <li>Raise new perspectives</li>

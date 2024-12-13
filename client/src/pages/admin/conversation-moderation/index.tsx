@@ -1,21 +1,17 @@
-/** @jsx jsx */
-
 import ComponentHelpers from "../../../util/component-helpers"
 
 import NoPermission from "../no-permission"
 import React from "react"
 import { ConnectedProps, connect } from "react-redux"
-import { Heading, Flex, Box, jsx } from "theme-ui"
 
 import ModerateCommentsTodo from "./moderate-comments-todo"
 import ModerateCommentsAccepted from "./moderate-comments-accepted"
 import ModerateCommentsRejected from "./moderate-comments-rejected"
 
+import { Heading, Flex, Box, Link as RadixLink } from "@radix-ui/themes"
 import { Switch, Route, Link } from "react-router-dom"
 import { UrlObject } from "url"
 import { AppDispatch, RootState } from "../../../store"
-
-
 
 const connector = connect((state: RootState) =>
   ({
@@ -46,51 +42,55 @@ class CommentModeration extends React.Component<CommentModerationPropTypes> {
       <Box>
         <Heading
           as="h3"
-          sx={{
-            fontSize: [3, null, 4],
-            lineHeight: "body",
-            mb: [3, null, 4],
-          }}
+          size={{initial: "3", md: "4"}}
+          mb={{initial: "3", md: "4"}}
+          style={{ lineHeight: "body" }}
         >
           Moderate
         </Heading>
-        <Flex sx={{ mb: [4] }}>
-          <Link
-            sx={{
-              mr: [4],
-              variant: url ? "links.nav" : "links.activeNav",
-            }}
-            to={`${match.url}`}
+        <Flex mb="4">
+          <RadixLink
+            mr="4"
+            color="gray"
+            weight="bold"
+            underline={url === undefined ? "always" : "hover"}
+            asChild
           >
-            Unmoderated{" "}
-            {this.props.unmoderated.unmoderated_comments
-              ? this.props.unmoderated.unmoderated_comments.length
-              : null}
-          </Link>
-          <Link
-            sx={{
-              mr: [4],
-              variant: url === "accepted" ? "links.activeNav" : "links.nav",
-            }}
-            to={`${match.url}/accepted`}
+            <Link to={`${match.url}`}>
+              Unmoderated{" "}
+              {this.props.unmoderated.unmoderated_comments
+                ? this.props.unmoderated.unmoderated_comments.length
+                : null}
+            </Link>
+          </RadixLink>
+          <RadixLink
+            mr="4"
+            color="gray"
+            weight="bold"
+            underline={url === "accepted" ? "always" : "hover"}
+            asChild
           >
-            Accepted{" "}
-            {this.props.accepted.accepted_comments
-              ? this.props.accepted.accepted_comments.length
-              : null}
-          </Link>
-          <Link
-            sx={{
-              mr: [4],
-              variant: url === "rejected" ? "links.activeNav" : "links.nav",
-            }}
-            to={`${match.url}/rejected`}
+            <Link to={`${match.url}/accepted`}>
+              Accepted{" "}
+              {this.props.accepted.accepted_comments
+                ? this.props.accepted.accepted_comments.length
+                : null}
+            </Link>
+          </RadixLink>
+          <RadixLink
+            mr="4"
+            color="gray"
+            weight="bold"
+            underline={url === "rejected" ? "always" : "hover"}
+            asChild
           >
-            Rejected{" "}
-            {this.props.rejected.rejected_comments
-              ? this.props.rejected.rejected_comments.length
-              : null}
-          </Link>
+            <Link to={`${match.url}/rejected`}>
+              Rejected{" "}
+              {this.props.rejected.rejected_comments
+                ? this.props.rejected.rejected_comments.length
+                : null}
+            </Link>
+          </RadixLink>
         </Flex>
         <Box>
           <Switch>

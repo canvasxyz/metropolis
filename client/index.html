@@ -62,19 +62,23 @@
 
     a {
       text-decoration: none;
-      color: #5f75c9;
+      color: var(--accent-10);
     }
+
     a.link:hover {
       text-decoration: underline;
     }
+
     .contains-links-hover-white a {
       color: #aaa;
     }
+
     .contains-links-hover-white:hover a {
       color: #fff;
     }
+
     .rt-Link:where(:any-link, button) {
-      text-decoration-color: #5d73c9 !important;
+      text-decoration-color: var(--accent-10) !important;
     }
 
     td,
@@ -233,8 +237,6 @@
     .calendar-day-button[data-highlighted] {
       box-shadow: inset 0 0 0 1px var(--accent-10);
     }
-
-
 
     .calendar-day-button[data-range-start],
     .calendar-day-button[data-range-end],

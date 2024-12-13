@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm"
 import markdown from "remark-parse"
 import { remark } from "remark"
 import { unified } from "unified"
-import { Box } from "theme-ui"
+import { Box } from "@radix-ui/themes"
 
 export const extractParagraphByTitle = (markdownText, title) => {
   const tree = unified().use(markdown).parse(markdownText)
@@ -98,7 +98,7 @@ const SimpleSummary = ({ content }: SimpleSummaryProps) => {
   if (extractedData) {
     return <React.Fragment>
       {extractedData.title !== null && <h3>{extractedData.title}</h3>}
-      <Box sx={{mt: [2]}}>
+      <Box mt="2">
         <ReactMarkdown
           skipHtml={true}
           remarkPlugins={[remarkGfm]}

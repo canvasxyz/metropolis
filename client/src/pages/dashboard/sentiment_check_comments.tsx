@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useRef } from "react"
-import { Box, Flex, Image, Link, Text, Button, Textarea } from "theme-ui"
+import { Box, Flex, Link, Text, Button, TextArea } from "@radix-ui/themes"
 import useSWR from "swr"
 import { formatTimeAgo } from "../../util/misc"
 import { useAppSelector } from "../../hooks"
@@ -56,28 +56,22 @@ export const SentimentCheckComments= ({
   }, [])
 
   return (
-    <Flex sx={{ flexDirection: "column", gap: "8px" }}>
+    <Flex direction="column" gap="8px">
       {sentimentComments.length > 0 ? (
         <Flex
-          sx={{
-            flexDirection: "column",
-            gap: "8px",
-          }}
+          direction="column"
+          gap="8px"
         >
           {sentimentComments.map((comment) => (
             <Flex
-              sx={{
-                flexDirection: "column",
-                padding: "8px",
-                gap: "6px",
-              }}
+              direction="column"
+              p="8px"
+              gap="6px"
               key={comment.id}
             >
               <Flex
-                sx={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
+                direction="row"
+                align="center"
               >
                 <Link
                   href={comment.is_deleted ? "#" : `https://github.com/${comment.github_username}`}
@@ -85,16 +79,17 @@ export const SentimentCheckComments= ({
                 >
                   {comment.is_deleted ? (
                     <Box
-                      sx={{
-                        width: "24px",
-                        height: "24px",
+                      width="24px"
+                      height="24px"
+                      mr="9px"
+                      style={{
                         borderRadius: 6,
                         marginRight: "9px",
-                        background: "#ccc",
+                        backgroundColor: "#ccc",
                       }}
                     ></Box>
                   ) : (
-                    <Image
+                    <img
                       src={`https://github.com/${comment.github_username}.png`}
                       width="24"
                       height="24"
@@ -108,35 +103,43 @@ export const SentimentCheckComments= ({
                     />
                   )}
                 </Link>
-                <Text sx={{ flexGrow: 1 }}>
-                  <Text sx={{ fontWeight: 600, mr: "6px" }}>{comment.github_username}</Text>
-                  <Text sx={{ color: "mediumGray" }}>
+                <Box flexGrow="1">
+                  <Text weight="bold" mr="6px">{comment.github_username}</Text>
+                  <Text color="gray">
                     {formatTimeAgo(parseInt(comment.created))}
                   </Text>
-                </Text>
+                </Box>
                 {comment.can_delete && (
-                  <Text
-                    variant="links.textGray"
-                    sx={{ fontWeight: 400 }}
+                  <Link
+                    href="#"
+                    color="gray"
+                    weight="light"
                     onClick={(e) => {
                       e.stopPropagation()
                       deleteComment(comment.id)
                     }}
+                    style={{
+                      cursor: "pointer"
+                    }}
                   >
                     Delete
-                  </Text>
+                  </Link>
                 )}
               </Flex>
-              <Box sx={{ mt: "5px", "white-space": "pre-line" }}>{comment.comment}</Box>
+              <Box
+                mt="5px"
+                style={{ whiteSpace: "pre-line" }}
+              >
+                {comment.comment}
+              </Box>
             </Flex>
           ))}
         </Flex>
       ) : null}
 
-      <Box sx={{ px: "8px", pb: "8px" }}>
-        <Textarea
+      <Flex direction="column" px="8px" pb="8px" gap="2">
+        <TextArea
           disabled={!user}
-          sx={{ borderColor: "lightGray" }}
           placeholder={user ? "Add a comment..." : "Must be signed in to comment"}
           onClick={(e) => {
             e.stopPropagation()
@@ -148,24 +151,22 @@ export const SentimentCheckComments= ({
           rows={2}
           ref={commentTextareaRef}
         />
-        <Flex>
-          <Box sx={{ flex: 1 }}>
-            <Button
-              variant={user ? "buttons.primary" : "buttons.disabled"}
-              onClick={(e) => {
-                e.stopPropagation()
-                if (!comment || comment.trim() === "") return
-                submitComment(comment)
-              }}
-            >
-              Submit
-            </Button>
-          </Box>
-          <Box sx={{ mt: "8px", color: remainingCharCount >= 0 ? "mediumGray" : "mediumRed" }}>
+        <Flex gap="2" align="center">
+          <Button
+            disabled={!user}
+            onClick={(e) => {
+              e.stopPropagation()
+              if (!comment || comment.trim() === "") return
+              submitComment(comment)
+            }}
+          >
+            Submit
+          </Button>
+          <Text color={ remainingCharCount >= 0 ? "gray" : "red"}>
             {remainingCharCount}
-          </Box>
+          </Text>
         </Flex>
-      </Box>
+      </Flex>
     </Flex>
   )
 }

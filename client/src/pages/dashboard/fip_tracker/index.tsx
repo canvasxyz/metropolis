@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
+import { Button as RadixButton, Box, DropdownMenu, Flex, Text, TextField, Select } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
@@ -12,7 +12,6 @@ import {
 } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
-import { Box, Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
 import { FipEntry } from "./fip_entry"
@@ -226,17 +225,15 @@ const FipTracker = () => {
 
   return (
     <Flex
-      sx={{
-        px: [3],
-        py: [3],
-        pt: [7],
-        flexDirection: "column",
-        gap: [3],
-      }}
+      px="3"
+      py="3"
+      pt="6"
+      direction="column"
+      gap="3"
     >
-      <Text sx={{ fontWeight: 600, fontSize: [2] }}>FIP Tracker</Text>
-      <Flex sx={{ gap: [2], width: "100%" }}>
-        <Box sx={{ flexGrow: "1", maxWidth: "400px" }}>
+      <Text weight="bold" size="4">FIP Tracker</Text>
+      <Flex gap="2" width="100%">
+        <Box flexGrow="1" maxWidth="400px">
           <TextField.Root
             placeholder="Search..."
             value={(searchParams as any).get("search") || ""}
@@ -247,7 +244,7 @@ const FipTracker = () => {
             </TextField.Slot>
           </TextField.Root>
         </Box>
-        <Box sx={{ flexGrow: "1" }}></Box>
+        <Box flexGrow="1"></Box>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger>
             <RadixButton variant="surface">
@@ -462,7 +459,7 @@ const FipTracker = () => {
               <RadixButton color="gray" variant="ghost" onClick={resetDisplayOptions}>
                 Reset
               </RadixButton>
-              <Box sx={{ flexGrow: "1" }}></Box>
+              <Box flexGrow="1"></Box>
               <RadixButton variant="ghost" onClick={saveDisplayOptions}>
                 Save as default
               </RadixButton>
@@ -470,7 +467,7 @@ const FipTracker = () => {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
-      <Flex sx={{ flexDirection: "column", gap: "12px" }}>
+      <Flex direction="column" gap="12px">
         {displayedFips.map((conversation) => (
           <FipEntry
             key={conversation.id}

@@ -3,7 +3,7 @@
 import "./report.css"
 
 import React from "react"
-import { Heading, Box } from "theme-ui"
+import { Heading, Box } from "@radix-ui/themes"
 import _ from "lodash"
 
 import DataUtils from "./util/dataUtils"
@@ -431,14 +431,14 @@ class Report extends React.Component<
     if (this.state.error) {
       return (
         <div>
-          <Heading as="h2" sx={{ my: [3] }}>
+          <Heading as="h2" my="3">
             Error Generating Report
           </Heading>
-          <Box sx={{ my: [1] }}>Maybe there hasn't been enough data yet?</Box>
-          <Box sx={{ my: [1] }}>
+          <Box my="1">Maybe there hasn&apos;t been enough data yet?</Box>
+          <Box my="1">
             Reports need have at least 3 voters with different preferences to be generated.
           </Box>
-          <Box as="pre" sx={{ my: [3] }}>
+          <Box my="3">
             <code>{this.state.errorText}</code>
           </Box>
         </div>

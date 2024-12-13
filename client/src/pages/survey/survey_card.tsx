@@ -1,16 +1,13 @@
-/** @jsx jsx */
-
 import $ from "jquery"
 import React, { useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { toast } from "react-hot-toast"
-import { Box, Button, Text, jsx } from "theme-ui"
+import { Box, Button, Flex, Text } from "@radix-ui/themes"
 import { TbThumbUp, TbThumbDown } from "react-icons/tb"
 
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
-import { DropdownMenu } from "../../components/dropdown"
 
 type SurveyCardProps = {
   comment: Comment
@@ -108,106 +105,64 @@ const SurveyCard = ({
   return (
     <Box
       className="survey-card"
-      sx={{
-        position: "relative",
+      position="relative"
+      minHeight={`${cardHeight}`}
+      maxHeight={topCard ? "" : `${cardHeight}`}
+      width="100%"
+      px={{initial:"24px", sm: "32px"}}
+      py="16px"
+      pb="24px"
+      style={{
         border: "1px solid",
         borderColor: "#ddd",
         borderRadius: "2px",
-        bg: "bgWhite",
+        backgroundColor: "white",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
-        minHeight: cardHeight,
-        maxHeight: topCard ? "" : cardHeight,
-        width: "100%",
-        px: ["24px", "32px"],
-        py: ["16px"],
-        pb: ["24px"],
       }}
     >
       <Box>
-        <Text sx={{ display: "block", wordBreak: "break-word", pb: [2] }}>
-          <Box sx={{ fontSize: "0.93em", opacity: 0.8, mb: "12px" }}>
-            {/* <img
-              src={`https://github.com/${comment.github_username}.png`}
-              width="20"
-              height="20"
-              style={{ background: "#fff", border: "1px solid #ddd", borderRadius: 6 }}
-            />
-            <Text sx={{ position: "relative", top: "-4px", ml: "6px" }}>
-              {comment.github_username ?? "Anonymous"}
-              </Text> */}
-          </Box>
-          <Text className="react-markdown-card">
-            <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
-              {txt}
-            </ReactMarkdown>
-          </Text>
+        <Text className="react-markdown-card">
+          <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
+            {txt}
+          </ReactMarkdown>
         </Text>
-        {hasVoted && (
-          <Box>
-            <DropdownMenu
-              rightAlign
-              options={
-                editingVote
-                  ? [
-                      { name: "Agree", onClick: (e) => {
-                        e.stopPropagation()
-                        agree(commentId, e.target)
-                      } },
-                      { name: "Disagree", onClick: (e) => {
-                        e.stopPropagation()
-                        disagree(commentId, e.target)
-                      } },
-                      { name: "Skip", onClick: (e) => {
-                        e.stopPropagation()
-                        skip(commentId, e.target)
-                      } },
-                      {
-                        name: "Cancel",
-                        onClick: (e) => {
-                          e.stopPropagation()
-                          setEditingVote(false)
-                        },
-                      },
-                    ]
-                  : [{ name: "Edit your vote", onClick: () => setEditingVote(true) }]
-              }
-            />
-          </Box>
-        )}
-        <Box sx={{ pt: [2] }}>
+        <Flex pt="2" gap="2">
           <Button
-            variant={voteDisabled ? "voteDisabled" : "vote"}
+            disabled={voteDisabled}
+            color="gold"
+            variant="soft"
             onClick={(e: any) => {
               e.stopPropagation()
               agree(commentId, e.target)
             }}
-            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbUp style={{ width: 18, color: "#2fcc71", position: "relative", top: 1 }} />{" "}
             Agree
           </Button>
           <Button
-            variant={voteDisabled ? "voteDisabled" : "vote"}
+            disabled={voteDisabled}
+            color="gold"
+            variant="soft"
             onClick={(e: any) => {
               e.stopPropagation()
               disagree(commentId, e.target)
             }}
-            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             <TbThumbDown style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}
             Disagree
           </Button>
           <Button
-            variant={voteDisabled ? "voteDisabled" : "vote"}
+            disabled={voteDisabled}
+            color="gold"
+            variant="soft"
             onClick={(e: any) => {
               e.stopPropagation()
               skip(commentId, e.target)
             }}
-            sx={{ mr: [0, 0, 2], mb: [1, 1, 0], width: ["100%", undefined, "initial"] }}
           >
             Skip
           </Button>
-        </Box>
+        </Flex>
       </Box>
     </Box>
   )

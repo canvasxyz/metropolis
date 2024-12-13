@@ -10,8 +10,6 @@ import { IconContext } from "react-icons"
 import "@radix-ui/themes/styles.css"
 import { Theme } from "@radix-ui/themes"
 
-import { ThemeProvider } from "theme-ui"
-import theme from "./theme"
 import App from "./app"
 import { store } from "./store"
 import { CompatRouter } from "react-router-dom-v5-compat"
@@ -20,21 +18,19 @@ class Root extends React.Component {
   render() {
     return (
       <Theme>
-        <ThemeProvider theme={theme}>
-          <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
-            <Provider store={store}>
-              <Router>
-                <CompatRouter>
-                  <Route
-                    render={(routeProps) => {
-                      return <App {...routeProps} />
-                    }}
-                  ></Route>
-                </CompatRouter>
-              </Router>
-            </Provider>
-          </IconContext.Provider>
-        </ThemeProvider>
+        <IconContext.Provider value={{ style: { position: "relative", top: "0.08em" } }}>
+          <Provider store={store}>
+            <Router>
+              <CompatRouter>
+                <Route
+                  render={(routeProps) => {
+                    return <App {...routeProps} />
+                  }}
+                ></Route>
+              </CompatRouter>
+            </Router>
+          </Provider>
+        </IconContext.Provider>
       </Theme>
     )
   }

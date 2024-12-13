@@ -1,6 +1,6 @@
 import React from "react"
 import PropTypes from "prop-types"
-import { Box, Button } from "theme-ui"
+import { Box, Button } from "@radix-ui/themes"
 import api from "../../../util/api"
 import ComponentHelpers from "../../../util/component-helpers"
 import NoPermission from "../no-permission"
@@ -63,7 +63,7 @@ class ReportsList extends React.Component<
 
     return (
       <Box>
-        <Box sx={{ my: [3] }}>
+        <Box my="3">
           {this.state.reports.length === 0 ? (
             <Button onClick={this.createReportClicked.bind(this)}>Create report url</Button>
           ) : (
@@ -76,9 +76,9 @@ class ReportsList extends React.Component<
             </Button>
           )}
         </Box>
-        <Box sx={{ my: [3] }}>
+        <Box my="3">
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/participants.csv?conversation_id=${conversation_id}`
             }}
@@ -86,7 +86,7 @@ class ReportsList extends React.Component<
             Participants (CSV)
           </Button>
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/votes.csv?conversation_id=${conversation_id}`
             }}
@@ -94,7 +94,7 @@ class ReportsList extends React.Component<
             Votes (CSV)
           </Button>
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/comments.csv?conversation_id=${conversation_id}`
             }}
@@ -102,9 +102,9 @@ class ReportsList extends React.Component<
             Comments (CSV)
           </Button>
         </Box>
-        <Box sx={{ my: [3] }}>
+        <Box my="3">
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/participants?conversation_id=${conversation_id}`
             }}
@@ -112,7 +112,7 @@ class ReportsList extends React.Component<
             Participants (JSON)
           </Button>
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/votes?conversation_id=${conversation_id}`
             }}
@@ -120,7 +120,7 @@ class ReportsList extends React.Component<
             Votes (JSON)
           </Button>
           <Button
-            sx={{ mr: [2] }}
+            mr="2"
             onClick={() => {
               document.location = `/api/v3/dataExport/comments?conversation_id=${conversation_id}`
             }}

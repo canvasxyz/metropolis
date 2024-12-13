@@ -1,5 +1,5 @@
 import React from "react"
-import { Text, Flex } from "theme-ui"
+import { Text, Flex } from "@radix-ui/themes"
 
 class NumberCard extends React.Component<
   {
@@ -10,8 +10,8 @@ class NumberCard extends React.Component<
 > {
   render() {
     return (
-      <Flex sx={{ my: [2] }}>
-        <Text sx={{ fontWeight: 700, mr: [2] }}>{this.props.datum}</Text>
+      <Flex my="2">
+        <Text weight="bold" mr="2">{this.props.datum}</Text>
         <Text> {this.props.subheading} </Text>
       </Flex>
     )
