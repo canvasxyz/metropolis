@@ -123,6 +123,7 @@ const FipTracker = () => {
 
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const viewParam = searchParams.get("view") || ""
   const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
@@ -470,6 +471,7 @@ const FipTracker = () => {
       <Flex direction="column" gap="12px">
         {displayedFips.map((conversation) => (
           <FipEntry
+            scrollOnLoad={viewParam === conversation.id.toString()}
             key={conversation.id}
             conversation={conversation}
             showAuthors={showAuthors}

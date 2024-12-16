@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import React, { useState } from "react"
+import React, { MutableRefObject, Ref, RefObject, useEffect, useRef, useState } from "react"
 import { TbArrowUpRight, TbCalendar, TbChevronDown, TbChevronRight } from "react-icons/tb"
 import { Link } from "react-router-dom-v5-compat"
 
@@ -8,6 +8,7 @@ import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
 import SimpleSummary from "./simple_summary"
+import { BiLink } from "react-icons/bi"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || "filecoin-project"
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME || "FIPs"
@@ -67,12 +68,14 @@ const FipEntryInner = ({
 }
 
 export const FipEntry = ({
+  scrollOnLoad,
   conversation,
   showAuthors,
   showCategory,
   showCreationDate,
   showType,
 }: {
+  scrollOnLoad: boolean
   conversation: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
@@ -82,7 +85,15 @@ export const FipEntry = ({
   showCreationDate: boolean
   showType: boolean
 }) => {
+  const ref = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    if (scrollOnLoad && ref.current) {
+      ref.current.scrollIntoView()
+      setIsOpen(true)
+    }
+  }, [])
 
   let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
   if (fipStatusKey === "wip") {
@@ -157,6 +168,7 @@ export const FipEntry = ({
 
   return (
     <div
+      ref={ref}
       style={{
         borderRadius: "8px",
         borderStyle: "solid",
@@ -248,6 +260,24 @@ export const FipEntry = ({
               PR <TbArrowUpRight style={{ position: "relative", top: "2px" }} />
             </Link>
           )}
+          <Link
+              className="link"
+              to={`/dashboard/fip_tracker?view=${conversation.id}`}
+              target="_blank"
+              noreferrer="noreferrer"
+              noopener="noopener"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                display: "block",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                fontSize: "90%",
+                fontWeight: "500",
+              }}
+            >
+            <BiLink style={{top: "0px"}}/>
+          </Link>
         </Flex>
         <Box></Box>
         <Flex
