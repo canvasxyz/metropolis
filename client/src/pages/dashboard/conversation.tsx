@@ -167,13 +167,16 @@ export const DashboardConversation = ({ user }: { user }) => {
             </Box>
           ) : (
             zid_metadata.description && (
-              <Box pt="18px">
-                <Collapsible
-                  title={displayTitle}
-                  key={zid_metadata.conversation_id}
-                  shouldCollapse={false}
-                  content={zid_metadata.description}
-                ></Collapsible>
+              <Box
+                py="10px"
+                px="16px"
+                my="3"
+                style={{
+                  backgroundColor: "white",
+                  lineHeight: 1.35,
+                  border: "1px solid #ddd"
+                }}>
+                  {zid_metadata.description}
               </Box>
             )
           )}
