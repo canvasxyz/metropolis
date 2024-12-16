@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { TbCalendar, TbCaretDown, TbCaretRight } from "react-icons/tb"
 
 import { Badge, Box, Flex, Grid, Text } from "@radix-ui/themes"
@@ -7,17 +7,30 @@ import ReportAndSurveyInfo from "../report_and_survey_info"
 import { SentimentCheckComments } from "../sentiment_check_comments"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
+import { Link } from "react-router-dom-v5-compat"
+import { BiLink } from "react-icons/bi"
 
 export const ConversationEntry = ({
+  scrollOnLoad,
   conversation,
   showCreationDate,
 }: {
+  scrollOnLoad: boolean
   conversation: ConversationSummary & {
     displayed_title: string
   }
   showCreationDate: boolean
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (scrollOnLoad && ref.current) {
+      ref.current.scrollIntoView()
+      setIsOpen(true)
+    }
+  }, [])
+
   const fipAttributes = []
   if (showCreationDate) {
     fipAttributes.push(
@@ -77,6 +90,24 @@ export const ConversationEntry = ({
           <Badge size="2" color={color} variant="surface" radius="full">
             {statusLabel}
           </Badge>
+          <Link
+              className="link"
+              to={`/dashboard/sentiment_checks?view=${conversation.conversation_id}`}
+              target="_blank"
+              noreferrer="noreferrer"
+              noopener="noopener"
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                display: "block",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                fontSize: "90%",
+                fontWeight: "500",
+              }}
+            >
+            <BiLink style={{top: "0px"}}/>
+          </Link>
         </Flex>
         <Box></Box>
         <Flex

@@ -51,6 +51,7 @@ export default () => {
 
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const viewParam = searchParams.get("view") || ""
   const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
@@ -255,6 +256,7 @@ export default () => {
         <Flex direction="column" gap="3">
           {displayedConversations.map((conversation) => (
             <ConversationEntry
+              scrollOnLoad={viewParam === conversation.conversation_id}
               key={conversation.conversation_id}
               conversation={conversation}
               showCreationDate={showCreationDate}
