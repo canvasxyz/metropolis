@@ -21,7 +21,6 @@ import { ConversationEntry } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
 import { CreateConversationDialog } from "../../CreateConversationDialog"
 
-
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
   closed: { label: "Closed", color: "gray" },
@@ -62,7 +61,7 @@ export default () => {
       // and any other extra fields
       const conversations = (await response.json()) as ConversationSummary[]
       const conversationsWithoutFips = conversations.filter(
-        (conversation) => conversation.fip_version === null,
+        (conversation) => conversation.fip_version_id === null,
       )
       const conversationsWithExtraFields = conversationsWithoutFips.map((conversation) => {
         const displayed_title = conversation.topic
@@ -111,19 +110,12 @@ export default () => {
 
   return (
     <Box>
-      <Flex
-        px="3"
-        py="3"
-        pt="6"
-        direction="column"
-        gap="3"
-      >
+      <Flex px="3" py="3" pt="6" direction="column" gap="3">
         <Flex direction="row" align="center">
-          <Text weight="bold" size="4">Sentiment Checks</Text>
-          <Box
-            position="absolute"
-            right="3"
-          >
+          <Text weight="bold" size="4">
+            Discussion Polls
+          </Text>
+          <Box position="absolute" right="3">
             <CreateConversationDialog />
           </Box>
         </Flex>
@@ -153,18 +145,20 @@ export default () => {
                   <TbRefresh /> Status
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent>
-                <ClickableChecklistItem
-                  color={"blue"}
-                  checked={Object.values(selectedConversationStatuses).every((value) => value === true)}
-                  setChecked={(value) => {
-                    setSelectedConversationStatuses(() =>
-                      Object.fromEntries(allStatuses.map((key) => [key, value]),),
-                    )
-                  }}
-                >
-                  All
-                </ClickableChecklistItem>
-                <DropdownMenu.Separator />
+                  <ClickableChecklistItem
+                    color={"blue"}
+                    checked={Object.values(selectedConversationStatuses).every(
+                      (value) => value === true,
+                    )}
+                    setChecked={(value) => {
+                      setSelectedConversationStatuses(() =>
+                        Object.fromEntries(allStatuses.map((key) => [key, value])),
+                      )
+                    }}
+                  >
+                    All
+                  </ClickableChecklistItem>
+                  <DropdownMenu.Separator />
                   {allStatuses.map((status) => (
                     <ClickableChecklistItem
                       key={status}

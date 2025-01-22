@@ -23,9 +23,7 @@ const CreateConversationInner = () => {
   return (
     <Card>
       <Flex gap="3" direction="column">
-        <Heading size="5">
-          Create a sentiment check
-        </Heading>
+        <Heading size="5">Create a discussion poll</Heading>
 
         <Flex gap="1" direction="column">
           <label htmlFor="title">
@@ -79,7 +77,11 @@ Try to be objective in the description. You can add specific opinions as respons
           </Button>
         </Dialog.Close>
 
-        { error && <Text color="red" weight="medium">{error}</Text> }
+        {error && (
+          <Text color="red" weight="medium">
+            {error}
+          </Text>
+        )}
       </Flex>
     </Card>
   )

@@ -108,7 +108,7 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
         <ListingSelector
           to="/dashboard/sentiment_checks"
           iconType={BiSolidBarChartAlt2}
-          label="Sentiment Checks"
+          label="Discussion Polls"
         />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
         <br />
