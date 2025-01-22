@@ -45,32 +45,6 @@ const LastSync = ({
   )
 }
 
-const ViewAllButton = ({ selectedView }: { selectedView: "all" | "fips" | "polls" }) => {
-  const navigate = useNavigate()
-
-  if (selectedView === "all") return null
-
-  return (
-    <Flex justify="center" align="center" p="3">
-      <Button
-        size="3"
-        style={{ width: "100%", height: "37px", fontSize: "0.94em" }}
-        color="gray"
-        variant="soft"
-        onClick={() => {
-          if (selectedView === "fips") {
-            navigate("/dashboard/fip_tracker")
-          } else {
-            navigate("/dashboard/sentiment_checks")
-          }
-        }}
-      >
-        View all
-      </Button>
-    </Flex>
-  )
-}
-
 const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
   const [syncInProgress, setSyncInProgress] = useState(false)
   const [lastSync, setLastSync] = useState<number>()
@@ -112,7 +86,7 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
     <Box
       display={mobileMenuOpen ? "block" : { initial: "none", sm: "block" }}
       width={{ initial: "100%", sm: "340px" }}
-      minWidth={{ initial: "100%",  sm: "340px" }}
+      minWidth={{ initial: "100%", sm: "340px" }}
       maxHeight="100vh"
       overflow="hidden"
       position="relative"
@@ -137,13 +111,8 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
           label="Sentiment Checks"
         />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
-        <Box pl="4" pb="2" pt="16px">
-          <Text size="1" color="gray">
-            Recently Active
-          </Text>
-        </Box>
+        <br />
         <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />
-        <ViewAllButton selectedView={selectedView} />
         <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
       </div>
     </Box>
