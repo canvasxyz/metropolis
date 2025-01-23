@@ -1,22 +1,9 @@
-import React, { useState } from "react"
-import { TbCalendar, TbCaretDown, TbCaretRight } from "react-icons/tb"
+import React from "react"
+import { TbCalendar } from "react-icons/tb"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
-import ReportAndSurveyInfo from "../report_and_survey_info"
-import { DiscussionPollComments } from "../discussion_poll_comments"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
-
-const dashboardBox = {
-  bg: "bgWhite",
-  py: "18px",
-  px: "22px",
-  // my: [3],
-  lineHeight: 1.35,
-  border: "1px solid #ddd",
-}
 
 export const ConversationEntry = ({
   conversation,
@@ -27,7 +14,6 @@ export const ConversationEntry = ({
   }
   showCreationDate: boolean
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
 
   const fipBadges = []
   const fipAttributes = []
@@ -56,7 +42,6 @@ export const ConversationEntry = ({
         padding: "3px 0 6px",
         background: "#fff",
       }}
-      onClick={() => setIsOpen(!isOpen)}
     >
       <Grid
         sx={{
@@ -67,9 +52,8 @@ export const ConversationEntry = ({
           gridRowGap: "10px",
         }}
       >
-        <Flex sx={{ flexDirection: "row", gap: [4], alignItems: "center" }}>
-          {isOpen ? <TbCaretDown /> : <TbCaretRight />}
-        </Flex>
+        {/* grid spacer for first column */}
+        <Box/>
         <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
           <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
             {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
@@ -101,33 +85,6 @@ export const ConversationEntry = ({
           ))}
           <Box sx={{ flexGrow: "1" }}></Box>
         </Flex>
-        { isOpen &&
-          <>
-            <Box></Box>
-            <Box>
-              <ReactMarkdown
-                skipHtml={true}
-                remarkPlugins={[remarkGfm]}
-                linkTarget="_blank"
-                className="react-markdown"
-              >
-                {conversation.description}
-              </ReactMarkdown>
-            </Box>
-            <Box></Box>
-            <ReportAndSurveyInfo conversation_info={conversation}/>
-            <Box></Box>
-            <Box sx={dashboardBox}>
-              <Box sx={{ fontWeight: "bold", pb: [1] }}>Comments</Box>
-              {/* <Box sx={{ color: "mediumGray", pb: [1] }}>
-                Have more to say? You can leave a short comment here.
-                </Box> */}
-              <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <DiscussionPollComments conversationId={conversation.conversation_id} />
-              </Box>
-            </Box>
-          </>
-        }
       </Grid>
     </div>
   )
