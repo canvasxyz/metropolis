@@ -5,7 +5,7 @@ import { Box, Flex, Grid } from "theme-ui"
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import ReportAndSurveyInfo from "../report_and_survey_info"
-import { SentimentCheckComments } from "../sentiment_check_comments"
+import { DiscussionPollComments } from "../discussion_poll_comments"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
@@ -123,7 +123,7 @@ export const ConversationEntry = ({
                 Have more to say? You can leave a short comment here.
                 </Box> */}
               <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <SentimentCheckComments conversationId={conversation.conversation_id} />
+                <DiscussionPollComments conversationId={conversation.conversation_id} />
               </Box>
             </Box>
           </>

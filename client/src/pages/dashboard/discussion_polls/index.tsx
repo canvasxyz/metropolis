@@ -62,7 +62,7 @@ export default () => {
   const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
-    `conversations_summary_sentiment_checks`,
+    `conversations_summary_discussion_polls`,
     async () => {
       const response = await fetch(`/api/v3/conversations_summary`)
       // process the fip_version part if it exists
@@ -139,7 +139,7 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Discussion Polls</Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root

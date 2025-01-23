@@ -10,7 +10,7 @@ import { DashboardUserButton } from "./user_button"
 import { LandingPage } from "./landing_page"
 import { DashboardConversation } from "./conversation"
 import Sidebar from "./sidebar"
-const SentimentChecks = React.lazy(() => import("./sentiment_checks"))
+const DiscussionPolls = React.lazy(() => import("./discussion_polls"))
 const FipTracker = React.lazy(() => import("./fip_tracker/index.js"))
 
 type DashboardProps = {
@@ -45,11 +45,11 @@ const Dashboard = ({ user }: DashboardProps) => {
           <CompatRoutes>
             <CompatRoute path="/" element={<LandingPage />} />
             <CompatRoute
-              path="/sentiment_checks"
+              path="/discussion_polls"
               element={
                 <Suspense>
                   {" "}
-                  <SentimentChecks />
+                  <DiscussionPolls />
                 </Suspense>
               }
             />

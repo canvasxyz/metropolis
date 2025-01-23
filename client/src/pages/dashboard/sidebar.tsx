@@ -104,9 +104,9 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
           </Link>
         </Flex>
         <ListingSelector
-          to="/dashboard/sentiment_checks"
+          to="/dashboard/discussion_polls"
           iconType={BiSolidBarChartAlt2}
-          label="Sentiment Checks"
+          label="Discussion Polls"
         />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
         <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />

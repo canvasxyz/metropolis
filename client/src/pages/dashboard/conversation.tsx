@@ -12,8 +12,8 @@ import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
-import { SentimentCheck } from "./sentiment_check"
-import { SentimentCheckComments } from "./sentiment_check_comments"
+import { DiscussionPoll } from "./discussion_poll"
+import { DiscussionPollComments } from "./discussion_poll_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
 import { MIN_SEED_RESPONSES } from "../../util/misc"
@@ -28,7 +28,7 @@ const dashboardBox = {
   border: "1px solid #ddd",
 }
 
-const SentimentTooltip = () => {
+const DiscussionPollTooltip = () => {
   const [referenceElement, setReferenceElement] = useState(null)
   const [popperElement, setPopperElement] = useState(null)
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
@@ -194,10 +194,10 @@ export const DashboardConversation = ({ user }: { user }) => {
                   mb: [2],
                 }}
               >
-                Sentiment Check
-                <SentimentTooltip />
+                Discussion Poll
+                <DiscussionPollTooltip />
               </Box>
-              <SentimentCheck
+              <DiscussionPoll
                 user={user}
                 zid_metadata={zid_metadata}
                 key={zid_metadata.conversation_id}
@@ -232,7 +232,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 Have more to say? You can leave a short comment here.
                 </Box> */}
               <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <SentimentCheckComments conversationId={zid_metadata.conversation_id} />
+                <DiscussionPollComments conversationId={zid_metadata.conversation_id} />
               </Box>
             </Box>
           )}
