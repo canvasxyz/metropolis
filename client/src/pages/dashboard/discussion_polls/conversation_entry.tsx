@@ -4,6 +4,7 @@ import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
+import { useNavigate } from "react-router-dom-v5-compat"
 
 export const ConversationEntry = ({
   conversation,
@@ -14,6 +15,7 @@ export const ConversationEntry = ({
   }
   showCreationDate: boolean
 }) => {
+  const navigate = useNavigate()
 
   const fipBadges = []
   const fipAttributes = []
@@ -42,6 +44,7 @@ export const ConversationEntry = ({
         padding: "3px 0 6px",
         background: "#fff",
       }}
+      onClick={() => navigate(`/dashboard/c/${conversation.conversation_id}`)}
     >
       <Grid
         sx={{
