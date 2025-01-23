@@ -9,6 +9,7 @@ import { statusOptions } from "./status_options"
 import { FipVersion } from "../../../util/types"
 import { UserInfo } from "./splitAuthors"
 import SimpleSummary from "./simple_summary"
+import { getGitHubPrUrl } from "../../../util/github_pr"
 
 const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || "filecoin-project"
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME || "FIPs"
@@ -227,7 +228,7 @@ export const FipEntry = ({
           {conversation.github_pr && (
             <Link
               className="link"
-              to={conversation.github_pr.url.replace(/\/files$/, "")}
+              to={getGitHubPrUrl(conversation.github_pr)}
               target="_blank"
               noreferrer="noreferrer"
               noopener="noopener"

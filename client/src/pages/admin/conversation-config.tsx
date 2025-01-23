@@ -11,9 +11,7 @@ import { CheckboxField } from "./CheckboxField"
 import api from "../../util/api"
 import { RootState } from "../../store"
 import { useAppDispatch, useAppSelector } from "../../hooks"
-
-const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER
-const FIP_REPO_NAME = process.env.FIP_REPO_NAME
+import { getGitHubPrUrl } from "../../util/github_pr"
 
 const Input = (props: ComponentProps<"input">) => (
   <input
@@ -202,7 +200,7 @@ const ConversationConfig = ({ error }: ConversationConfigProps) => {
                 <Box sx={{ mb: [3] }}>
                   PR{" "}
                   <a
-                    href={`https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/pull/${zid_metadata.fip_version.github_pr.id}`}
+                    href={getGitHubPrUrl(zid_metadata.fip_version.github_pr)}
                   >
                     #{zid_metadata.fip_version.github_pr.id}
                   </a>

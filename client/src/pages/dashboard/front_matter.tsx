@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 
 import { ZidMetadata } from "../../util/types"
+import { getGitHubPrUrl } from "../../util/github_pr"
 
 type FrontmatterProps = { zid_metadata: ZidMetadata }
 
@@ -108,7 +109,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
               <Text sx={{ fontWeight: "700" }}>PR</Text>
             </td>
             <td>
-              <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
+              <Link target="_blank" rel="noopener noreferrer" href={getGitHubPrUrl(fip_version.github_pr)}>
                 {fip_version.github_pr.title} (#{fip_version.github_pr.id})
               </Link>
             </td>
@@ -159,7 +160,7 @@ export const Frontmatter = ({ zid_metadata }: FrontmatterProps) => {
                 <Text sx={{ fontWeight: "700" }}>Files Updated</Text>
               </td>
               <td>
-                <Link target="_blank" rel="noopener noreferrer" href={fip_version.github_pr.url}>
+                <Link target="_blank" rel="noopener noreferrer" href={getGitHubPrUrl(fip_version.github_pr)}>
                   {fip_version.fip_files_updated}
                 </Link>
               </td>

@@ -7848,9 +7848,6 @@ where conversation_sentiment_votes.zid = ($1);`,
         [conv.fip_version.github_pr_id],
       );
       conv.fip_version.github_pr = githubPrRows[0];
-      conv.fip_version.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-    } else {
-      conv.fip_version.github_pr_url = null
     }
   }
 
@@ -7915,12 +7912,6 @@ async function handle_GET_conversations(
     }
 
     conv.is_mod = uid && isAdministrator(uid)
-
-    if (conv.github_pr_id !== null) {
-      conv.github_pr_url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conv.github_pr_id}/files`
-    } else {
-      conv.github_pr_url = null
-    }
 
     // Make sure zid is not exposed
     delete conv.zid
@@ -7994,9 +7985,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     if(fipVersionsById[conversation.fip_version_id]) {
       conversation.fip_version = fipVersionsById[conversation.fip_version_id]
       if (conversation.fip_version.github_pr_id !== null) {
-        const githubPr = githubPrsById[conversation.fip_version.github_pr_id]
-        githubPr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${conversation.fip_version.github_pr_id}/files`
-        conversation.fip_version.github_pr = githubPr
+        conversation.fip_version.github_pr = githubPrsById[conversation.fip_version.github_pr_id]
       }
     } else {
       conversation.fip_version = null
@@ -8028,11 +8017,6 @@ async function handle_GET_fips(req: Request, res: Response) {
     const pr = github_prs_by_id[fip_row.github_pr_id]
     fip_row.github_pr = pr || null
     delete fip_row.github_pr_id
-
-
-    if (fip_row.github_pr !== null) {
-      fip_row.github_pr.url = `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/pull/${fip_row.github_pr.id}/files`
-    }
   }
 
   return res.json(fip_rows)
