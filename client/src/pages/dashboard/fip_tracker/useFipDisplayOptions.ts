@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { toast } from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 
 export const useFipDisplayOptions = () => {
@@ -24,14 +25,16 @@ export const useFipDisplayOptions = () => {
   const [sortBy, setSortBy] = useState<"desc" | "asc">(initialSavedDisplayOptions.sortBy)
 
   const resetDisplayOptions = () => {
+    toast.success("Reset saved display options for FIP Tracker")
     setShowAuthors(initialSavedDisplayOptions.showAuthors)
     setShowCategory(initialSavedDisplayOptions.showCategory)
     setShowCreationDate(initialSavedDisplayOptions.showCreationDate)
     setShowType(initialSavedDisplayOptions.showType)
-    setSortBy(initialSavedDisplayOptions)
+    setSortBy(initialSavedDisplayOptions.sortBy)
   }
 
   const saveDisplayOptions = () => {
+    toast.success("Saved display options for FIP Tracker")
     setSavedDisplayOptions(
       JSON.stringify({ showAuthors, showCategory, showCreationDate, showType, sortBy }),
     )
