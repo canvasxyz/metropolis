@@ -168,7 +168,7 @@ const FipTracker = () => {
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
-        !conversation.displayed_title.toLowerCase().includes(searchParam.toLowerCase())
+        !(conversation.displayed_title || "").toLowerCase().includes(searchParam.toLowerCase())
       ) {
         return false
       }
