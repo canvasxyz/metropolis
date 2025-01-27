@@ -7871,7 +7871,7 @@ where conversation_sentiment_votes.zid = ($1);`,
   conv.translations = translations
   const ownerInfo = await getUserInfoForUid2(conv.owner)
 
-  let ownername = ownerInfo.hname
+  conv.ownername = ownerInfo.hname
   if (convHasMetadata) {
     conv.hasMetadata = true
   }
