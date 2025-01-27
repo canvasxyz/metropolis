@@ -24,10 +24,11 @@ export const useFipDisplayOptions = () => {
   const [sortBy, setSortBy] = useState<"desc" | "asc">(initialSavedDisplayOptions.sortBy)
 
   const resetDisplayOptions = () => {
-    setShowAuthors(true)
-    setShowCategory(true)
-    setShowCreationDate(true)
-    setShowType(true)
+    setShowAuthors(initialSavedDisplayOptions.showAuthors)
+    setShowCategory(initialSavedDisplayOptions.showCategory)
+    setShowCreationDate(initialSavedDisplayOptions.showCreationDate)
+    setShowType(initialSavedDisplayOptions.showType)
+    setSortBy(initialSavedDisplayOptions)
   }
 
   const saveDisplayOptions = () => {
