@@ -43,7 +43,7 @@ const ConversationsList = ({
 
   return (
     <React.Fragment>
-      <Flex justify="center" pt="0px" pb="8px" mx="16px">
+      <Flex justify="center" pt="8px" pb="6px" mx="16px">
         <Button
           className="left-group-button"
           variant="outline"
