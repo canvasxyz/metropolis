@@ -111,11 +111,11 @@ class Report extends React.Component<
       conversation_id: conversation_id,
     })
   }
+
   getConversation(conversation_id) {
-    return net.polisGet("/api/v3/conversations", {
-      conversation_id: conversation_id,
-    })
+    return net.polisGet(`/api/v3/conversation/${conversation_id}`)
   }
+
   getReport(report_id) {
     return net
       .polisGet("/api/v3/reports", {
