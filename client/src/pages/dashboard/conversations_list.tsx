@@ -1,14 +1,10 @@
 import useSWR from "swr"
-import React, { useState, useEffect } from "react"
-import { useLocalStorage } from "usehooks-ts"
-import { Button, Box, Link } from "theme-ui"
-import { TbExternalLink, TbFocus } from "react-icons/tb"
-import { BiSolidBarChartAlt2 } from "react-icons/bi"
+import React from "react"
 
 import { MIN_SEED_RESPONSES } from "../../util/misc"
 import ConversationListItem from "./conversation_list_item"
 import { ConversationSummary } from "../../reducers/conversations_summary"
-import { Badge, Box, Button, Flex } from "@radix-ui/themes"
+import { Badge, Button, Flex } from "@radix-ui/themes"
 
 const ConversationsList = ({
   selectedView,

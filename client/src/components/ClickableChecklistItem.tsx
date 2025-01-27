@@ -1,4 +1,4 @@
-import { Link, Box, Button, Checkbox, DropdownMenu, Flex } from "@radix-ui/themes"
+import { Link, Box, Checkbox, DropdownMenu, Flex } from "@radix-ui/themes"
 import React, { ReactNode, useRef } from "react"
 
 export const ClickableChecklistItem = ({
