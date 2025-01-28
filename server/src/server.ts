@@ -8004,7 +8004,6 @@ async function handle_GET_fips(req: Request, res: Response) {
   // pagination and filtering happens here
   const fip_rows = await queryP_readOnly(`SELECT * FROM fip_versions;`, [])
 
-  // const fip_version_ids = fip_rows.map((fip: any) => fip.id)
   const github_pr_ids = fip_rows.map((fip: any) => fip.github_pr_id).filter((id: any) => id !== -1)
 
   const github_prs_by_id: Record<string, any> = {}
@@ -8013,10 +8012,20 @@ async function handle_GET_fips(req: Request, res: Response) {
     github_prs_by_id[pr_row.id] = pr_row
   }
 
+  const fip_version_ids = fip_rows.map((fip: any) => fip.id)
+  const conversations_by_id: Record<string, any> = {}
+  const conversation_rows = await queryP_readOnly(`SELECT * FROM conversations WHERE fip_version_id = ANY($1::integer[]);`, [fip_version_ids])
+  for(const conversation_row of conversation_rows) {
+    conversations_by_id[conversation_row.zid] = conversation_row
+  }
+
   for(const fip_row of fip_rows) {
     const pr = github_prs_by_id[fip_row.github_pr_id]
     fip_row.github_pr = pr || null
     delete fip_row.github_pr_id
+
+    const conversation = conversations_by_id[fip_row.id]
+    fip_row.conversation = conversation || null
   }
 
   return res.json(fip_rows)
