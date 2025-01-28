@@ -19,6 +19,7 @@ import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
+import { MIN_SEED_RESPONSES } from "../../../util/misc"
 import { CreateConversationModal } from "../../CreateConversationModal"
 import { useDiscussionPollDisplayOptions } from "./useDiscussionPollDisplayOptions"
 
@@ -39,7 +40,10 @@ export default () => {
   const allStatuses = ["open", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
-  >(Object.fromEntries(allStatuses.map((status) => [status, true])))
+  >({
+    open: true,
+    closed: false
+  })
   const { user } = useAppSelector((state) => state.user)
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
@@ -85,6 +89,11 @@ export default () => {
 
   const displayedConversations = (conversations || [])
     .filter((conversation) => {
+      // Filter out conversations with insufficient seed responses
+      if (conversation.comment_count < MIN_SEED_RESPONSES) {
+        return false
+      }
+
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
