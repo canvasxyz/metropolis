@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import { Button as RadixButton, DropdownMenu, TextField, Select } from "@radix-ui/themes"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { BiFilter } from "react-icons/bi"
 import {
   TbAdjustmentsHorizontal,
@@ -157,16 +157,22 @@ const FipTracker = () => {
     return isNaN(parsed) ? 0 : parsed
   }
 
-  let sortFunction
-  if (sortBy === "asc") {
-    sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? 1 : -1)
-  } else if (sortBy === "desc") {
-    sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? -1 : 1)
-  } else {
-    sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
-  }
+  const sortedFipVersions = useMemo(() => {
+    let sortFunction
+    if (sortBy === "asc") {
+      sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? 1 : -1)
+    } else if (sortBy === "desc") {
+      sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? -1 : 1)
+    } else {
+      sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
+    }
+    return (fip_versions || []).toSorted(sortFunction)
+  }, [fip_versions, sortBy])
 
-  const displayedFips = (fip_versions || [])
+  const { displayedFips, archivedCount, hiddenCount} = useMemo(() => {
+    let archivedCount = 0
+    let hiddenCount = 0
+    const displayedFips = sortedFipVersions
     .filter((fip_version) => {
       // the conversation's displayed title must include the search string, if it is given
       if (
@@ -223,9 +229,36 @@ const FipTracker = () => {
         }
       }
 
+      if(fip_version.conversation) {
+        let hasMatchingFilter = false
+        if(!fip_version.conversation.is_archived && !fip_version.conversation.is_hidden) {
+          hasMatchingFilter = true
+        } else {
+          if(fip_version.conversation.is_archived) {
+            archivedCount ++
+            if(showArchived) hasMatchingFilter = true
+          }
+          if(fip_version.conversation.is_hidden) {
+            hiddenCount ++
+            if(showHidden) hasMatchingFilter = true
+          }
+        }
+        if(!hasMatchingFilter) return false
+      }
+
       return true
     })
-    .toSorted(sortFunction)
+    return { displayedFips, archivedCount, hiddenCount }
+  }, [
+    sortedFipVersions,
+    searchParam,
+    unlabeledAuthorDeselected,
+    deselectedFipAuthors,
+    deselectedFipTypes,
+    showHidden,
+    showArchived,
+    rangeValue
+  ])
 
   return (
     <Flex
@@ -422,7 +455,7 @@ const FipTracker = () => {
                 setShowArchived(value)
               }}
             >
-              Show Archived
+              Show Archived ({archivedCount})
             </ClickableChecklistItem>
             <ClickableChecklistItem
               color={"blue"}
@@ -431,7 +464,7 @@ const FipTracker = () => {
                 setShowHidden(value)
               }}
             >
-              Show Hidden
+              Show Hidden ({hiddenCount})
             </ClickableChecklistItem>
           </DropdownMenu.Content>
         </DropdownMenu.Root>

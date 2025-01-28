@@ -196,6 +196,8 @@ export const FipEntry = ({
           >
             {fip_version.fip_number ? String(fip_version.fip_number).padStart(4, "0") : "Draft"}
           </Text>
+          <Text color="gray">{fip_version.conversation?.is_archived  && "(ARCHIVED)" }</Text>
+          <Text color="gray">{fip_version.conversation?.is_hidden && "(HIDDEN)" }</Text>
           <Text style={{ flex: 1, lineHeight: 1.3, fontWeight: 500 }}>
             {fip_version.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
           </Text>

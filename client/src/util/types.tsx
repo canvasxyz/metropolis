@@ -1,3 +1,5 @@
+import { ConversationSummary } from "../reducers/conversations_summary"
+
 export type GitHubPr = {
   id: number
   repo_name: string
@@ -28,6 +30,7 @@ export type FipVersion = {
   fip_status: string | null,
   fip_title: string | null,
   fip_type: string | null
+  conversation: ConversationSummary | null
 }
 
 export type User = {
