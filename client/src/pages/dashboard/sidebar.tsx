@@ -98,13 +98,18 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
           display: "flex",
         }}
       >
-        <Flex width="100%" pt="14px" pb="20px" px="18px" align="center">
+        <Flex width="100%" pt="20px" pb="24px" px="18px" align="center">
           <Link href="/dashboard" underline="none">
             <LogoBlock />
           </Link>
         </Flex>
-        <ListingSelector to="/dashboard/polls" iconType={BiSolidBarChartAlt2} label="Polls" />
+        <ListingSelector
+          to="/dashboard/sentiment"
+          iconType={BiSolidBarChartAlt2}
+          label="Sentiment Checks"
+        />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
+        <br />
         <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />
         <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
       </div>
