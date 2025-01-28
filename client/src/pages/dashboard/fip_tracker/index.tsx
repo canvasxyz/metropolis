@@ -102,9 +102,7 @@ function processFipVersions(data: FipVersion[]) {
 const FipTracker = () => {
   const allFipStatuses = Object.keys(statusOptions)
   const [selectedFipStatuses, setSelectedFipStatuses] = useState<Record<string, boolean>>(
-    Object.fromEntries(
-      allFipStatuses.map((status) => [status, true])
-    )
+    Object.fromEntries(allFipStatuses.map((status) => [status, true])),
   )
 
   const {
@@ -328,12 +326,12 @@ const FipTracker = () => {
                 <TbRefresh /> Status
               </DropdownMenu.SubTrigger>
               <DropdownMenu.SubContent>
-              <ClickableChecklistItem
+                <ClickableChecklistItem
                   color={"blue"}
                   checked={Object.values(selectedFipStatuses).every((value) => value === true)}
                   setChecked={(value) => {
                     setSelectedFipStatuses(() =>
-                      Object.fromEntries(allFipStatuses.map((key) => [key, value]),),
+                      Object.fromEntries(allFipStatuses.map((key) => [key, value])),
                     )
                   }}
                 >
@@ -351,9 +349,7 @@ const FipTracker = () => {
                     showOnly={true}
                     selectOnly={() => {
                       setSelectedFipStatuses(() =>
-                        Object.fromEntries(
-                          allFipStatuses.map((key) => [key, key === fipStatus]),
-                        ),
+                        Object.fromEntries(allFipStatuses.map((key) => [key, key === fipStatus])),
                       )
                     }}
                   >
@@ -383,7 +379,7 @@ const FipTracker = () => {
                   checked={Object.values(deselectedFipTypes).every((value) => value !== true)}
                   setChecked={(value) => {
                     setDeselectedFipTypes(() =>
-                      Object.fromEntries(allFipTypes.map((key) => [key, !value]),),
+                      Object.fromEntries(allFipTypes.map((key) => [key, !value])),
                     )
                   }}
                 >
@@ -399,13 +395,11 @@ const FipTracker = () => {
                       setDeselectedFipTypes((prev) => ({ ...prev, [fipType]: !value }))
                     }}
                     showOnly={true}
-                      selectOnly={() => {
-                        setDeselectedFipTypes(() =>
-                          Object.fromEntries(
-                            allFipTypes.map((key) => [key, key !== fipType]),
-                          ),
-                        )
-                      }}
+                    selectOnly={() => {
+                      setDeselectedFipTypes(() =>
+                        Object.fromEntries(allFipTypes.map((key) => [key, key !== fipType])),
+                      )
+                    }}
                   >
                     {fipType}
                   </ClickableChecklistItem>
@@ -470,7 +464,7 @@ const FipTracker = () => {
           </DropdownMenu.Content>
         </DropdownMenu.Root>
       </Flex>
-      <Flex sx={{ flexDirection: "column", gap: "12px" }}>
+      <Flex sx={{ flexDirection: "column", gap: [2] }}>
         {displayedFips.map((conversation) => (
           <FipEntry
             key={conversation.id}

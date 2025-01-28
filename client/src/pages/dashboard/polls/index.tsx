@@ -42,7 +42,7 @@ export default () => {
     Record<string, boolean>
   >({
     open: true,
-    closed: false
+    closed: false,
   })
   const { user } = useAppSelector((state) => state.user)
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
@@ -61,10 +61,7 @@ export default () => {
       // process the fip_version part if it exists
       // and any other extra fields
       const conversations = (await response.json()) as ConversationSummary[]
-      const conversationsWithoutFips = conversations.filter(
-        (conversation) => conversation.fip_version === null,
-      )
-      const conversationsWithExtraFields = conversationsWithoutFips.map((conversation) => {
+      const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
         return { ...conversation, displayed_title }
@@ -90,7 +87,7 @@ export default () => {
   const displayedConversations = (conversations || [])
     .filter((conversation) => {
       // Filter out conversations with insufficient seed responses
-      if (conversation.comment_count < MIN_SEED_RESPONSES) {
+      if (!conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES) {
         return false
       }
 
@@ -137,7 +134,7 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Polls</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks & Open-ended Polls</Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
@@ -251,7 +248,7 @@ export default () => {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>
-        <Flex sx={{ flexDirection: "column", gap: [3] }}>
+        <Flex sx={{ flexDirection: "column", gap: [2] }}>
           {displayedConversations.map((conversation) => (
             <ConversationEntry
               key={conversation.conversation_id}

@@ -104,7 +104,7 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
           </Link>
         </Flex>
         <ListingSelector
-          to="/dashboard/sentiment"
+          to="/dashboard/polls"
           iconType={BiSolidBarChartAlt2}
           label="Sentiment Checks"
         />
