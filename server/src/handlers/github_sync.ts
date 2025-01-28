@@ -46,7 +46,7 @@ type FIPFrontmatterData = {
 type PullRequest =
   Endpoints["GET /repos/{owner}/{repo}/pulls"]["response"]["data"][0];
 
-const extra = "GIT_EXEC_PATH=/app/.apt/usr/lib/git-core";
+const extra = os.platform() === 'darwin' ? '' : 'GIT_EXEC_PATH=/app/.apt/usr/lib/git-core';
 
 const DISCUSSION_REGEX = new RegExp(
   `https://github.com/${process.env.FIP_REPO_OWNER}/${process.env.FIP_REPO_NAME}/discussions/(\\d+)`,
