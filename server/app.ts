@@ -41,7 +41,6 @@ import {
   handle_GET_contexts,
   handle_GET_conversationPreloadInfo,
   handle_GET_conversation,
-  handle_GET_conversations,
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,
@@ -958,14 +957,6 @@ app.get(
   moveToBody,
   authOptional(assignToP),
   handle_GET_conversation as any,
-)
-
-app.get(
-  "/api/v3/conversations",
-  moveToBody,
-  authOptional(assignToP),
-  want("limit", getIntInRange(1, 9999), assignToP), // not allowing a super high limit to prevent DOS attacks
-  handle_GET_conversations,
 )
 
 app.get(
