@@ -33,70 +33,70 @@ function processFipVersions(data: FipVersion[]) {
   const allFipAuthors: Map<string, UserInfo> = new Map()
 
   // don't show fips that don't have a fip status
-  const conversationsWithStatuses = data.filter((conversation) => conversation.fip_status !== null)
+  const fipVersionsWithStatuses = data.filter((fip_version) => fip_version.fip_status !== null)
 
-  const conversations = conversationsWithStatuses.map((conversation) => {
+  const fip_versions = fipVersionsWithStatuses.map((fip_version) => {
     // parse fip type
     let fip_type = ""
     const fip_categories = []
 
-    if (conversation.fip_type.indexOf("Core") !== -1) {
+    if (fip_version.fip_type.indexOf("Core") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Core")
     }
-    if (conversation.fip_type.indexOf("Networking") !== -1) {
+    if (fip_version.fip_type.indexOf("Networking") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Networking")
     }
-    if (conversation.fip_type.indexOf("Interface") !== -1) {
+    if (fip_version.fip_type.indexOf("Interface") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Interface")
     }
-    if (conversation.fip_type.indexOf("Informational") !== -1) {
+    if (fip_version.fip_type.indexOf("Informational") !== -1) {
       fip_type = "Technical"
       fip_categories.push("Informational")
     }
 
-    if (conversation.fip_type.indexOf("Technical") !== -1) {
+    if (fip_version.fip_type.indexOf("Technical") !== -1) {
       fip_type = "Technical"
     }
 
-    if (conversation.fip_type.indexOf("Organizational") !== -1) {
+    if (fip_version.fip_type.indexOf("Organizational") !== -1) {
       fip_type = "Organizational"
     }
 
-    if (conversation.fip_type.indexOf("FRC") !== -1) {
+    if (fip_version.fip_type.indexOf("FRC") !== -1) {
       fip_type = "FRC"
     }
 
-    if (conversation.fip_type.indexOf("Standards") !== -1) {
+    if (fip_version.fip_type.indexOf("Standards") !== -1) {
       fip_type = "Standards"
     }
 
-    if (conversation.fip_type.indexOf("N/A") !== -1) {
+    if (fip_version.fip_type.indexOf("N/A") !== -1) {
       fip_type = "N/A"
     }
 
     allFipTypesSet.add(fip_type)
 
-    const authors = splitAuthors(conversation.fip_author) || []
+    const authors = splitAuthors(fip_version.fip_author) || []
     for (const author of authors) {
       allFipAuthors[getAuthorKey(author)] = author
     }
 
     return {
-      ...conversation,
+      ...fip_version,
       fip_authors: authors,
       fip_type,
       fip_category: fip_categories.join(", "),
-      displayed_title: conversation.fip_title || conversation.github_pr.title,
+      displayed_title: fip_version.fip_title || fip_version.github_pr.title,
     }
   })
 
   const allFipTypes = Array.from(allFipTypesSet)
   allFipTypes.sort((a, b) => a.localeCompare(b))
 
-  return { conversations, allFipTypes, allFipAuthors }
+  return { fip_versions, allFipTypes, allFipAuthors }
 }
 
 const FipTracker = () => {
@@ -135,13 +135,16 @@ const FipTracker = () => {
     },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
-  const { conversations, allFipTypes, allFipAuthors } = data || {}
+  const { fip_versions, allFipTypes, allFipAuthors } = data || {}
 
   const [deselectedFipTypes, setDeselectedFipTypes] = useState<Record<string, boolean>>({})
   const [deselectedFipAuthors, setDeselectedFipAuthors] = useState<Record<string, boolean>>({})
   const [unlabeledAuthorDeselected, setUnlabeledAuthorDeselected] = useState<boolean>(false)
 
   const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
+
+  const [showArchived, setShowArchived] = useState(false)
+  const [showHidden, setShowHidden] = useState(false)
 
   const getFipCreated = (c) => {
     // Clean up some bad dates
@@ -163,24 +166,24 @@ const FipTracker = () => {
     sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
   }
 
-  const displayedFips = (conversations || [])
-    .filter((conversation) => {
+  const displayedFips = (fip_versions || [])
+    .filter((fip_version) => {
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
-        !(conversation.displayed_title || "").toLowerCase().includes(searchParam.toLowerCase())
+        !(fip_version.displayed_title || "").toLowerCase().includes(searchParam.toLowerCase())
       ) {
         return false
       }
 
       // the conversation must have one of the selected fip authors
-      if (conversation.fip_authors.length === 0) {
+      if (fip_version.fip_authors.length === 0) {
         if (unlabeledAuthorDeselected) {
           return false
         }
       } else {
         let hasMatchingFipAuthor = false
-        for (const fipAuthor of conversation.fip_authors) {
+        for (const fipAuthor of fip_version.fip_authors) {
           const key = getAuthorKey(fipAuthor)
           if (deselectedFipAuthors[key] !== true) {
             hasMatchingFipAuthor = true
@@ -192,13 +195,13 @@ const FipTracker = () => {
         }
       }
 
-      if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+      if (fip_version.github_pr?.merged_at || fip_version.github_pr?.closed_at) {
         // conversation is closed
         if (!selectedFipStatuses.closed) {
           return false
         }
-      } else if (conversation.fip_status) {
-        let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+      } else if (fip_version.fip_status) {
+        let fipStatusKey = fip_version.fip_status.toLowerCase().replace(" ", "-")
         if (fipStatusKey === "wip") {
           fipStatusKey = "draft"
         }
@@ -209,13 +212,13 @@ const FipTracker = () => {
       }
 
       // the conversation's fip type must be one of the selected fip types
-      if (conversation.fip_type && deselectedFipTypes[conversation.fip_type]) {
+      if (fip_version.fip_type && deselectedFipTypes[fip_version.fip_type]) {
         return false
       }
 
       if (rangeValue.start && rangeValue.end) {
-        const conversationDate = new Date(Date.parse(conversation.fip_created))
-        if (conversationDate < rangeValue.start || conversationDate > rangeValue.end) {
+        const fipVersionCreatedDate = new Date(Date.parse(fip_version.fip_created))
+        if (fipVersionCreatedDate < rangeValue.start || fipVersionCreatedDate > rangeValue.end) {
           return false
         }
       }
@@ -471,10 +474,10 @@ const FipTracker = () => {
         </DropdownMenu.Root>
       </Flex>
       <Flex sx={{ flexDirection: "column", gap: "12px" }}>
-        {displayedFips.map((conversation) => (
+        {displayedFips.map((fip_version) => (
           <FipEntry
-            key={conversation.id}
-            conversation={conversation}
+            key={fip_version.id}
+            fip_version={fip_version}
             showAuthors={showAuthors}
             showCategory={showCategory}
             showCreationDate={showCreationDate}

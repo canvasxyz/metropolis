@@ -15,9 +15,9 @@ const FIP_REPO_OWNER = process.env.FIP_REPO_OWNER || "filecoin-project"
 const FIP_REPO_NAME = process.env.FIP_REPO_NAME || "FIPs"
 
 const FipEntryInner = ({
-  conversation,
+  fip_version,
 }: {
-  conversation: FipVersion & {
+  fip_version: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
   }
@@ -28,9 +28,9 @@ const FipEntryInner = ({
       {/* display the simple summary if possible otherwise display the whole fip description */}
       <Box sx={{ mb: "6px" }}>
         <h3 style={{ margin: "14px 0 10px" }}>Authors</h3>
-        {conversation.fip_authors.length === 0
-          ? conversation.fip_author
-          : conversation.fip_authors.map((author, i) => {
+        {fip_version.fip_authors.length === 0
+          ? fip_version.fip_author
+          : fip_version.fip_authors.map((author, i) => {
               return (
                 <React.Fragment key={author.username || author.email || author.name}>
                   {author.username ? (
@@ -47,7 +47,7 @@ const FipEntryInner = ({
                   ) : (
                     author.email
                   )}
-                  {i < conversation.fip_authors.length - 1 ? ", " : ""}
+                  {i < fip_version.fip_authors.length - 1 ? ", " : ""}
                 </React.Fragment>
               )
             })}
@@ -61,7 +61,7 @@ const FipEntryInner = ({
             }
           }}
         >
-          <SimpleSummary content={conversation.fip_content} />
+          <SimpleSummary content={fip_version.fip_content} />
         </div>
       </Box>
     </>
@@ -69,13 +69,13 @@ const FipEntryInner = ({
 }
 
 export const FipEntry = ({
-  conversation,
+  fip_version,
   showAuthors,
   showCategory,
   showCreationDate,
   showType,
 }: {
-  conversation: FipVersion & {
+  fip_version: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
   }
@@ -86,13 +86,13 @@ export const FipEntry = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+  let fipStatusKey = fip_version.fip_status.toLowerCase().replace(" ", "-")
   if (fipStatusKey === "wip") {
     fipStatusKey = "draft"
-  } else if (!conversation.fip_status) {
+  } else if (!fip_version.fip_status) {
     fipStatusKey = "unknown"
   }
-  if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+  if (fip_version.github_pr?.merged_at || fip_version.github_pr?.closed_at) {
     fipStatusKey = "closed"
   }
 
@@ -102,7 +102,7 @@ export const FipEntry = ({
     : fipStatusKey
 
   const fipBadges = []
-  if (showType && conversation.fip_type) {
+  if (showType && fip_version.fip_type) {
     fipBadges.push(
       <Badge
         key="type"
@@ -113,11 +113,11 @@ export const FipEntry = ({
           boxShadow: "inset 0 0 0 1px var(--accent-a5)",
         }}
       >
-        {conversation.fip_type}
+        {fip_version.fip_type}
       </Badge>,
     )
   }
-  if (showCategory && conversation.fip_category) {
+  if (showCategory && fip_version.fip_category) {
     fipBadges.push(
       <Badge
         key="category"
@@ -128,15 +128,15 @@ export const FipEntry = ({
           boxShadow: "inset 0 0 0 1px var(--accent-a5)",
         }}
       >
-        {conversation.fip_category}
+        {fip_version.fip_category}
       </Badge>,
     )
   }
 
   let fileUrl = null
-  if (conversation.github_pr === null) {
+  if (fip_version.github_pr === null) {
     // file link
-    const updatedFiles = (conversation.fip_files_updated || "").split("\n")
+    const updatedFiles = (fip_version.fip_files_updated || "").split("\n")
     if (updatedFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
       const updatedFile = updatedFiles[0]
@@ -146,7 +146,7 @@ export const FipEntry = ({
       fileUrl = `https://github.com/${FIP_REPO_OWNER}/${FIP_REPO_NAME}/blob/master/${updatedFile}`
     }
 
-    const createdFiles = (conversation.fip_files_created || "").split("\n")
+    const createdFiles = (fip_version.fip_files_created || "").split("\n")
     if (createdFiles.length > 0) {
       // strip leading and trailing slashes and join the rest
       const createdFile = createdFiles[0]
@@ -194,10 +194,10 @@ export const FipEntry = ({
               flex: "0 0 auto",
             }}
           >
-            {conversation.fip_number ? String(conversation.fip_number).padStart(4, "0") : "Draft"}
+            {fip_version.fip_number ? String(fip_version.fip_number).padStart(4, "0") : "Draft"}
           </Text>
           <Text style={{ flex: 1, lineHeight: 1.3, fontWeight: 500 }}>
-            {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
+            {fip_version.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
           </Text>
           <Badge size="2" color={fipStatusInfo.color} variant="surface" radius="full">
             {fipStatusLabel}
@@ -225,10 +225,10 @@ export const FipEntry = ({
               GitHub <TbArrowUpRight sx={{ position: "relative", top: "2px" }} />
             </Link>
           )}
-          {conversation.github_pr && (
+          {fip_version.github_pr && (
             <Link
               className="link"
-              to={getGitHubPrUrl(conversation.github_pr)}
+              to={getGitHubPrUrl(fip_version.github_pr)}
               target="_blank"
               noreferrer="noreferrer"
               noopener="noopener"
@@ -276,7 +276,7 @@ export const FipEntry = ({
                 }}
               >
                 <TbCalendar />
-                <Text> {dayjs(conversation.fip_created).format("YYYY-MM-DD")}</Text>
+                <Text> {dayjs(fip_version.fip_created).format("YYYY-MM-DD")}</Text>
               </Flex>
             </Text>
           )}
@@ -296,14 +296,14 @@ export const FipEntry = ({
                 </Text>
               )}
               <Text sx={{ whiteSpace: "nowrap" }}>
-                {conversation.fip_authors.length} author
-                {conversation.fip_authors.length > 1 ? "s" : ""}
+                {fip_version.fip_authors.length} author
+                {fip_version.fip_authors.length > 1 ? "s" : ""}
               </Text>
             </Text>
           )}
           <Box sx={{ flexGrow: "1" }}></Box>
         </Flex>
-        {isOpen && <FipEntryInner conversation={conversation} />}
+        {isOpen && <FipEntryInner fip_version={fip_version} />}
       </Grid>
     </div>
   )
