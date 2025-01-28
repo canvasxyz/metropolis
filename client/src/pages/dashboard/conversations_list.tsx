@@ -46,10 +46,10 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "all" ? "blue" : "gray"}
           onClick={() => setSelectedView("all")}
-          style={{ flex: "1", borderRadius: "8px 0 0 8px", position: "relative", left: "1px" }}
+          style={{ width: "20%", borderRadius: "8px 0 0 8px", position: "relative", left: "1px" }}
         >
           All
-          <Badge
+          {/* <Badge
             key="type"
             size="1"
             radius="full"
@@ -58,7 +58,7 @@ const ConversationsList = ({
             }}
           >
             {allConversations.length}
-          </Badge>
+          </Badge> */}
         </Button>
         <Button
           className="center-group-button"
@@ -66,9 +66,9 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "fips" ? "blue" : "gray"}
           onClick={() => setSelectedView("fips")}
-          style={{ flex: "1", borderRadius: "0 0 0 0", borderLeft: 0 }}
+          style={{ width: "48%", borderRadius: "0 0 0 0", borderLeft: 0 }}
         >
-          FIPs
+          Signaling
           <Badge
             key="type"
             size="1"
@@ -86,7 +86,7 @@ const ConversationsList = ({
           size="3"
           color={selectedView === "polls" ? "blue" : "gray"}
           onClick={() => setSelectedView("polls")}
-          style={{ flex: "1", borderRadius: "0 8px 8px 0", position: "relative", left: "-1px" }}
+          style={{ width: "32%", borderRadius: "0 8px 8px 0", position: "relative", left: "-1px" }}
         >
           Polls
           <Badge

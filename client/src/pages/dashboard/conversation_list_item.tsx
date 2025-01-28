@@ -27,6 +27,28 @@ const ViewCount = ({
   return <Text>{Math.max(viewCount, initialViewCount)}</Text>
 }
 
+export const getColorForConversation = (conversation: ConversationSummary) => {
+  const githubPr = conversation.fip_version?.github_pr
+  if (githubPr) {
+    // conversation is a github pr
+    if (githubPr.merged_at) {
+      return "#9C73EF"
+    } else if (githubPr.closed_at) {
+      return "#E55E51"
+    } else {
+      // pr is open
+      if (githubPr.is_draft) {
+        return "#868D96"
+      } else {
+        return "#64B75D"
+      }
+    }
+  } else {
+    // conversation is not a pr
+    return "#0090ff"
+  }
+}
+
 export const getIconForConversation = (conversation: ConversationSummary) => {
   const githubPr = conversation.fip_version?.github_pr
   if (githubPr) {

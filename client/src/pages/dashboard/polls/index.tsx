@@ -134,7 +134,7 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks & Open-ended Polls</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks: Signaling & Polls</Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
