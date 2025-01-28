@@ -8016,6 +8016,7 @@ async function handle_GET_fips(req: Request, res: Response) {
   const conversations_by_id: Record<string, any> = {}
   const conversation_rows = await queryP_readOnly(`SELECT * FROM conversations WHERE fip_version_id = ANY($1::integer[]);`, [fip_version_ids])
   for(const conversation_row of conversation_rows) {
+    delete conversation_row.zid
     conversations_by_id[conversation_row.zid] = conversation_row
   }
 
