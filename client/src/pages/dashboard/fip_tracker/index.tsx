@@ -415,6 +415,24 @@ const FipTracker = () => {
                 ))}
               </DropdownMenu.SubContent>
             </DropdownMenu.Sub>
+            <ClickableChecklistItem
+              color={"blue"}
+              checked={showArchived}
+              setChecked={(value) => {
+                setShowArchived(value)
+              }}
+            >
+              Show Archived
+            </ClickableChecklistItem>
+            <ClickableChecklistItem
+              color={"blue"}
+              checked={showHidden}
+              setChecked={(value) => {
+                setShowHidden(value)
+              }}
+            >
+              Show Hidden
+            </ClickableChecklistItem>
           </DropdownMenu.Content>
         </DropdownMenu.Root>
         <DropdownMenu.Root>
