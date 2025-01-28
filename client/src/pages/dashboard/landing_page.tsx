@@ -87,7 +87,7 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                     <Text style={{ lineHeight: "1.35" }}>
                       {fipVersion.fip_number ? (
                         <Text style={{ lineHeight: "1.35" }}>
-                          FIP-String(fipVersion.fip_number).padStart(4, "0"):{" "}
+                          FIP-{String(fipVersion.fip_number).padStart(4, "0")}:{" "}
                         </Text>
                       ) : (
                         ""
