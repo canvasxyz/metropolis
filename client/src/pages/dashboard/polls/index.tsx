@@ -43,12 +43,8 @@ export default () => {
   const { user } = useAppSelector((state) => state.user)
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
-  const {
-    sortBy,
-    setSortBy,
-    resetDisplayOptions,
-    saveDisplayOptions,
-  } = useDiscussionPollDisplayOptions()
+  const { sortBy, setSortBy, resetDisplayOptions, saveDisplayOptions } =
+    useDiscussionPollDisplayOptions()
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -132,7 +128,7 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Discussion Polls</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Polls</Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
@@ -159,18 +155,20 @@ export default () => {
                   <TbRefresh /> Status
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent>
-                <ClickableChecklistItem
-                  color={"blue"}
-                  checked={Object.values(selectedConversationStatuses).every((value) => value === true)}
-                  setChecked={(value) => {
-                    setSelectedConversationStatuses(() =>
-                      Object.fromEntries(allStatuses.map((key) => [key, value]),),
-                    )
-                  }}
-                >
-                  All
-                </ClickableChecklistItem>
-                <DropdownMenu.Separator />
+                  <ClickableChecklistItem
+                    color={"blue"}
+                    checked={Object.values(selectedConversationStatuses).every(
+                      (value) => value === true,
+                    )}
+                    setChecked={(value) => {
+                      setSelectedConversationStatuses(() =>
+                        Object.fromEntries(allStatuses.map((key) => [key, value])),
+                      )
+                    }}
+                  >
+                    All
+                  </ClickableChecklistItem>
+                  <DropdownMenu.Separator />
                   {allStatuses.map((status) => (
                     <ClickableChecklistItem
                       key={status}

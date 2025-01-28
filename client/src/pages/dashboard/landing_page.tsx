@@ -149,7 +149,7 @@ export const LandingPage = () => {
                   <Text weight="bold" style={{ "line-height": "1.35" }}>
                     Initiate discussions, collect feedback, and respond to polls
                   </Text>{" "}
-                  on open-ended thoughts or ideas.
+                  on open-ended ideas.
                 </Box>
               </Flex>
               <Separator size="4" />

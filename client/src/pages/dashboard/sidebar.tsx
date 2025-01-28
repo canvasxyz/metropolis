@@ -103,11 +103,7 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
             <LogoBlock />
           </Link>
         </Flex>
-        <ListingSelector
-          to="/dashboard/discussion_polls"
-          iconType={BiSolidBarChartAlt2}
-          label="Discussion Polls"
-        />
+        <ListingSelector to="/dashboard/polls" iconType={BiSolidBarChartAlt2} label="Polls" />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />
         <ConversationsList selectedView={selectedView} setSelectedView={setSelectedView} />
         <LastSync lastSync={lastSync} syncInProgress={syncInProgress} syncPRs={syncPRs} />
