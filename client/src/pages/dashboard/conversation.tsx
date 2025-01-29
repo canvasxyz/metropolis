@@ -194,7 +194,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                   mb: [2],
                 }}
               >
-                Discussion Poll
+                Poll
                 <DiscussionPollTooltip />
               </Box>
               <DiscussionPoll

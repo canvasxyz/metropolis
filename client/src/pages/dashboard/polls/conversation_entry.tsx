@@ -1,9 +1,10 @@
 import React from "react"
-import { TbCalendar } from "react-icons/tb"
+import { TbCalendar, TbUser, TbEye } from "react-icons/tb"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
+import { getIconForConversation, getColorForConversation } from "../conversation_list_item"
 import { useNavigate } from "react-router-dom-v5-compat"
 
 export const ConversationEntry = ({
@@ -17,7 +18,6 @@ export const ConversationEntry = ({
 }) => {
   const navigate = useNavigate()
 
-  const fipBadges = []
   const fipAttributes = []
   if (showCreationDate) {
     fipAttributes.push(
@@ -28,8 +28,24 @@ export const ConversationEntry = ({
     )
   }
 
-  const color = conversation.is_archived ? "gray" : "blue"
   const statusLabel = conversation.is_archived ? "Archived" : "Active"
+  const voterCount = conversation.participant_count || conversation.sentiment_count || 0
+  const viewCount = conversation.view_count || 0
+
+  fipAttributes.push(
+    <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+      <TbEye style={{ position: "relative", top: "2px", marginRight: "1px" }} /> {viewCount} view
+      {viewCount !== 1 ? "s" : ""}
+    </Flex>,
+  )
+
+  if (voterCount) {
+    fipAttributes.push(
+      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+        <Text>{voterCount} voted</Text>
+      </Flex>,
+    )
+  }
 
   return (
     <div
@@ -40,7 +56,7 @@ export const ConversationEntry = ({
         borderWidth: "1px",
         borderLeftWidth: "4px",
         // this uses the color palette defined by radix-ui
-        borderColor: color === "gray" ? `#ccc` : `var(--${color}-10)`,
+        borderColor: conversation.is_archived ? `#ccc` : getColorForConversation(conversation),
         padding: "3px 0 6px",
         background: "#fff",
       }}
@@ -49,28 +65,42 @@ export const ConversationEntry = ({
       <Grid
         sx={{
           margin: "10px",
-          gridTemplateColumns: "20px 1fr",
+          gridTemplateColumns: "10px 1fr",
           gridRow: "auto auto",
           gridColumnGap: "20px",
-          gridRowGap: "10px",
+          gridRowGap: "4px",
+          px: "10px",
         }}
       >
         {/* grid spacer for first column */}
-        <Box/>
-        <Flex sx={{ flexDirection: "row", gap: [3], alignItems: "center" }}>
+        <Box>
+          <div style={conversation.is_archived ? { filter: "grayscale(100%)" } : {}}>
+            {getIconForConversation(conversation)}
+          </div>
+        </Box>
+        <Flex sx={{ flexDirection: "row", gap: [1], alignItems: "center" }}>
           <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
-            {conversation.displayed_title || <Text sx={{ color: "#84817D" }}>Untitled</Text>}
+            {conversation.displayed_title ??
+              (conversation.fip_version ? (
+                conversation.fip_version.fip_title
+              ) : (
+                <Text sx={{ color: "#84817D" }}>Untitled</Text>
+              ))}
           </Text>
-          <Badge size="2" color={color} variant="surface" radius="full">
+          <Badge
+            size="2"
+            color={conversation.is_archived ? "gray" : "blue"}
+            variant="surface"
+            radius="full"
+          >
             {statusLabel}
           </Badge>
         </Flex>
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
-          {fipBadges}
           {fipAttributes.map((attr, i) => (
             <Text key={i} style={{ fontSize: "94%", opacity: 0.7, whiteSpace: "nowrap" }}>
-              {fipBadges.length > 0 || i > 0 && (
+              {i > 0 && (
                 <Text
                   style={{
                     marginLeft: "2px",

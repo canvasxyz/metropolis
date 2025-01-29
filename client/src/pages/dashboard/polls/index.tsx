@@ -19,6 +19,7 @@ import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
+import { MIN_SEED_RESPONSES } from "../../../util/misc"
 import { CreateConversationModal } from "../../CreateConversationModal"
 import { useDiscussionPollDisplayOptions } from "./useDiscussionPollDisplayOptions"
 
@@ -39,16 +40,15 @@ export default () => {
   const allStatuses = ["open", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
-  >(Object.fromEntries(allStatuses.map((status) => [status, true])))
+  >({
+    open: true,
+    closed: false,
+  })
   const { user } = useAppSelector((state) => state.user)
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
-  const {
-    sortBy,
-    setSortBy,
-    resetDisplayOptions,
-    saveDisplayOptions,
-  } = useDiscussionPollDisplayOptions()
+  const { sortBy, setSortBy, resetDisplayOptions, saveDisplayOptions } =
+    useDiscussionPollDisplayOptions()
 
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -61,10 +61,7 @@ export default () => {
       // process the fip_version part if it exists
       // and any other extra fields
       const conversations = (await response.json()) as ConversationSummary[]
-      const conversationsWithoutFips = conversations.filter(
-        (conversation) => conversation.fip_version === null,
-      )
-      const conversationsWithExtraFields = conversationsWithoutFips.map((conversation) => {
+      const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
         return { ...conversation, displayed_title }
@@ -89,6 +86,11 @@ export default () => {
 
   const displayedConversations = (conversations || [])
     .filter((conversation) => {
+      // Filter out conversations with insufficient seed responses
+      if (!conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES) {
+        return false
+      }
+
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
@@ -132,7 +134,7 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Discussion Polls</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks: Signaling & Polls</Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root
@@ -159,18 +161,20 @@ export default () => {
                   <TbRefresh /> Status
                 </DropdownMenu.SubTrigger>
                 <DropdownMenu.SubContent>
-                <ClickableChecklistItem
-                  color={"blue"}
-                  checked={Object.values(selectedConversationStatuses).every((value) => value === true)}
-                  setChecked={(value) => {
-                    setSelectedConversationStatuses(() =>
-                      Object.fromEntries(allStatuses.map((key) => [key, value]),),
-                    )
-                  }}
-                >
-                  All
-                </ClickableChecklistItem>
-                <DropdownMenu.Separator />
+                  <ClickableChecklistItem
+                    color={"blue"}
+                    checked={Object.values(selectedConversationStatuses).every(
+                      (value) => value === true,
+                    )}
+                    setChecked={(value) => {
+                      setSelectedConversationStatuses(() =>
+                        Object.fromEntries(allStatuses.map((key) => [key, value])),
+                      )
+                    }}
+                  >
+                    All
+                  </ClickableChecklistItem>
+                  <DropdownMenu.Separator />
                   {allStatuses.map((status) => (
                     <ClickableChecklistItem
                       key={status}
@@ -244,7 +248,7 @@ export default () => {
             </DropdownMenu.Content>
           </DropdownMenu.Root>
         </Flex>
-        <Flex sx={{ flexDirection: "column", gap: [3] }}>
+        <Flex sx={{ flexDirection: "column", gap: [2] }}>
           {displayedConversations.map((conversation) => (
             <ConversationEntry
               key={conversation.conversation_id}

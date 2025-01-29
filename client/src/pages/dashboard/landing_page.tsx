@@ -85,13 +85,13 @@ const ConversationsPreview = ({ conversations }: { conversations: ConversationSu
                 <Box>
                   {fipVersion ? (
                     <Text style={{ lineHeight: "1.35" }}>
-                      <Text weight="bold" style={{ lineHeight: "1.35" }}>
-                        FIP
-                        {fipVersion.fip_number
-                          ? String(fipVersion.fip_number).padStart(4, "0")
-                          : ""}
-                        :{" "}
-                      </Text>
+                      {fipVersion.fip_number ? (
+                        <Text style={{ lineHeight: "1.35" }}>
+                          FIP-{String(fipVersion.fip_number).padStart(4, "0")}:{" "}
+                        </Text>
+                      ) : (
+                        ""
+                      )}
                       {fipVersion.fip_title || fipVersion.github_pr?.title}
                     </Text>
                   ) : (
@@ -145,15 +145,15 @@ export const LandingPage = () => {
                     <BiSolidBarChartAlt2 color="#0090ff" />
                   </Text>
                 </Box>
-                <Box style={{ "line-height": "1.35" }}>
-                  <Text weight="bold" style={{ "line-height": "1.35" }}>
+                <Box style={{ lineHeight: "1.35" }}>
+                  <Text weight="bold" style={{ lineHeight: "1.35" }}>
                     Initiate discussions, collect feedback, and respond to polls
                   </Text>{" "}
-                  on open-ended thoughts or ideas.
+                  on open-ended ideas.
                 </Box>
               </Flex>
               <Separator size="4" />
-              <Text style={{ "line-height": "1.35" }}>
+              <Text style={{ lineHeight: "1.35" }}>
                 The following discussion polls have been active recently:
               </Text>
               <ConversationsPreview
@@ -178,15 +178,15 @@ export const LandingPage = () => {
                     <TbGitPullRequest color="#3fba50" />
                   </Text>
                 </Box>
-                <Box style={{ "line-height": "1.35" }}>
-                  <Text weight="bold" style={{ "line-height": "1.35" }}>
+                <Box style={{ lineHeight: "1.35" }}>
+                  <Text weight="bold" style={{ lineHeight: "1.35" }}>
                     Signal your position
                   </Text>{" "}
                   on FIPs through sentiment checks.
                 </Box>
               </Flex>
               <Separator size="4" />
-              <Text style={{ "line-height": "1.35" }}>
+              <Text style={{ lineHeight: "1.35" }}>
                 The following FIPs are currently open for sentiment checks:
               </Text>
               <ConversationsPreview

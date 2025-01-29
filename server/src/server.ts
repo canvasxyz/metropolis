@@ -7868,7 +7868,7 @@ where conversation_sentiment_votes.zid = ($1);`,
   conv.translations = translations
   const ownerInfo = await getUserInfoForUid2(conv.owner)
 
-  let ownername = ownerInfo.hname
+  conv.ownername = ownerInfo.hname
   if (convHasMetadata) {
     conv.hasMetadata = true
   }
@@ -7876,55 +7876,6 @@ where conversation_sentiment_votes.zid = ($1);`,
   conv.is_owner = uid && (await isOwner(zid, uid))
   delete conv.uid // conv.owner is what you want, uid shouldn't be returned.
   return conv
-}
-
-async function handle_GET_conversations(
-  req: {
-    p: {
-      uid: number
-      limit?: number
-    }
-  },
-  res: any,
-) {
-  const uid = req.p.uid
-
-  const query =
-    "SELECT conversations.*, users.hname, users.github_username, zinvites.zinvite as conversation_id FROM conversations JOIN users ON conversations.owner = users.uid JOIN zinvites ON conversations.zid = zinvites.zid LIMIT $1;"
-  // TODO paginate
-  const limit = req.p.limit || 999
-
-  let conversationsResult
-  try {
-    conversationsResult = await queryP_readOnly(query.toString(), [limit])
-  } catch (err) {
-    fail(res, 500, "polis_err_get_conversations", err)
-    return
-  }
-
-  conversationsResult.forEach(function (conv) {
-    conv.created = Number(conv.created)
-    conv.modified = Number(conv.modified)
-
-    // if there is no topic, provide a UTC timstamp instead
-    if (_.isUndefined(conv.topic) || conv.topic === "") {
-      conv.topic = new Date(conv.created).toUTCString()
-    }
-
-    conv.is_mod = uid && isAdministrator(uid)
-
-    // Make sure zid is not exposed
-    delete conv.zid
-
-    delete conv.is_anon
-    delete conv.is_public
-    if (conv.context === "") {
-      delete conv.context
-    }
-    return conv
-  })
-
-  res.status(200).json(conversationsResult)
 }
 
 async function handle_GET_conversations_summary(req: Request, res: Response) {
@@ -9718,7 +9669,6 @@ export {
   handle_GET_contexts,
   handle_GET_conversationPreloadInfo,
   handle_GET_conversation,
-  handle_GET_conversations,
   handle_GET_conversationsRecentActivity,
   handle_GET_conversationsRecentlyStarted,
   handle_GET_conversationStats,

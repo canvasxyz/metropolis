@@ -17,8 +17,6 @@ export const CREATE_NEW_CONVERSATION = "CREATE_NEW_CONVERSATION"
 export const CREATE_NEW_CONVERSATION_SUCCESS = "CREATE_NEW_CONVERSATION_SUCCESS"
 export const CREATE_NEW_CONVERSATION_ERROR = "CREATE_NEW_CONVERSATION_ERROR"
 
-export const REQUEST_CONVERSATIONS = "REQUEST_CONVERSATIONS"
-export const RECEIVE_CONVERSATIONS = "RECEIVE_CONVERSATIONS"
 export const CONVERSATIONS_FETCH_ERROR = "CONVERSATIONS_FETCH_ERROR"
 
 export const REQUEST_CONVERSATION_VOTERS = "REQUEST_CONVERSATION_VOTERS"
@@ -29,11 +27,6 @@ export const CLOSE_CONVERSATION_SUCCESS = "CLOSE_CONVERSATION_SUCCESS"
 export const CLOSE_CONVERSATION_ERROR = "CLOSE_CONVERSATION_ERROR"
 export const REOPEN_CONVERSATION_SUCCESS = "REOPEN_CONVERSATION_SUCCESS"
 export const REOPEN_CONVERSATION_ERROR = "REOPEN_CONVERSATION_ERROR"
-
-export const MODERATE_CONVERSATION_SUCCESS = "MODERATE_CONVERSATION_SUCCESS"
-export const MODERATE_CONVERSATION_ERROR = "MODERATE_CONVERSATION_ERROR"
-export const UNMODERATE_CONVERSATION_SUCCESS = "UNMODERATE_CONVERSATION_SUCCESS"
-export const UNMODERATE_CONVERSATION_ERROR = "UNMODERATE_CONVERSATION_ERROR"
 
 /* zid for clarity - this is conversation config */
 export const REQUEST_ZID_METADATA = "REQUEST_ZID_METADATA"
@@ -417,42 +410,6 @@ export const doSignout = (dest) => {
   }
 }
 
-/* Conversations */
-
-const requestConversations = () => {
-  return {
-    type: REQUEST_CONVERSATIONS,
-  }
-}
-
-const receiveConversations = (data) => {
-  return {
-    type: RECEIVE_CONVERSATIONS,
-    data: data,
-  }
-}
-
-const conversationsError = (err) => {
-  return {
-    type: CONVERSATIONS_FETCH_ERROR,
-    data: err,
-  }
-}
-
-const fetchConversations = () => {
-  return $.get("/api/v3/conversations?include_all_conversations_i_am_in=true")
-}
-
-export const populateConversationsStore = () => {
-  return (dispatch) => {
-    dispatch(requestConversations())
-    return fetchConversations().then(
-      (res) => dispatch(receiveConversations(res)),
-      (err) => dispatch(conversationsError(err)),
-    )
-  }
-}
-
 /* zid metadata */
 
 const requestZidMetadata = (conversation_id) => {
@@ -668,11 +625,9 @@ export const handleModerateConversation = (conversation_id) => {
   return (dispatch) => {
     return postModerateConversation(conversation_id).then(
       (res) => {
-        dispatch({ type: MODERATE_CONVERSATION_SUCCESS, data: conversation_id })
         dispatch(populateZidMetadataStore(conversation_id, true))
         return res
       },
-      (err) => dispatch({ type: MODERATE_CONVERSATION_ERROR, data: err }),
     )
   }
 }
@@ -687,11 +642,10 @@ export const handleUnmoderateConversation = (conversation_id) => {
   return (dispatch) => {
     return postUnmoderateConversation(conversation_id).then(
       (res) => {
-        dispatch({ type: UNMODERATE_CONVERSATION_SUCCESS, data: conversation_id })
         dispatch(populateZidMetadataStore(conversation_id, true))
         return res
       },
-      (err) => dispatch({ type: UNMODERATE_CONVERSATION_ERROR, data: err }),
+      () => {},
     )
   }
 }
