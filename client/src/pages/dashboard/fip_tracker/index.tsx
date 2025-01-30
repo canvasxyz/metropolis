@@ -22,76 +22,115 @@ import { DatePicker, DateRange } from "./date_picker"
 import { FipVersion } from "../../../util/types"
 import { getAuthorKey, splitAuthors, UserInfo } from "./splitAuthors"
 
+function cleanFipType(originalFipType: string) {
+  let fip_type = ""
+  const fip_categories = []
+
+  if (originalFipType.indexOf("Core") !== -1) {
+    fip_type = "Technical"
+    fip_categories.push("Core")
+  }
+  if (originalFipType.indexOf("Networking") !== -1) {
+    fip_type = "Technical"
+    fip_categories.push("Networking")
+  }
+  if (originalFipType.indexOf("Interface") !== -1) {
+    fip_type = "Technical"
+    fip_categories.push("Interface")
+  }
+  if (originalFipType.indexOf("Informational") !== -1) {
+    fip_type = "Technical"
+    fip_categories.push("Informational")
+  }
+
+  if (originalFipType.indexOf("Technical") !== -1) {
+    fip_type = "Technical"
+  }
+
+  if (originalFipType.indexOf("Organizational") !== -1) {
+    fip_type = "Organizational"
+  }
+
+  if (originalFipType.indexOf("FRC") !== -1) {
+    fip_type = "FRC"
+  }
+
+  if (originalFipType.indexOf("Standards") !== -1) {
+    fip_type = "Standards"
+  }
+
+  if (originalFipType.indexOf("N/A") !== -1) {
+    fip_type = "N/A"
+  }
+
+  return { fip_type, fip_category: fip_categories.join(", ") }
+}
+
 function processFipVersions(data: FipVersion[]) {
   if (!data) {
     return {}
   }
 
+  // these two objects are used to populate the options in the filter menus
   const allFipTypesSet = new Set<string | null>()
-
-  // map holding all fip authors
   const allFipAuthors: Map<string, UserInfo> = new Map()
 
-  // don't show fips that don't have a fip status
-  const conversationsWithStatuses = data.filter((conversation) => conversation.fip_status !== null)
+  // filter the fip versions so that we try to have at most one fip version per fip_number
+  const conversations = Object
+    .entries(Object.groupBy(data, (fip_version) => fip_version.fip_number))
+    .map(([fip_number, rows]) => {
+      if(fip_number === "null" || fip_number === "0") {
+        // return all open fip_versions where the fip_number is null/zero
+        return rows.filter((row) => !row.github_pr?.merged_at && !row.github_pr?.closed_at)
+      }
 
-  const conversations = conversationsWithStatuses.map((conversation) => {
-    // parse fip type
-    let fip_type = ""
-    const fip_categories = []
+      // if there is a fip_version without a PR then just return this
+      const rowWithNullGithubPr = rows.find((fip_version) => fip_version.github_pr === null)
+      if(rowWithNullGithubPr) {
+        return [rowWithNullGithubPr]
+      }
 
-    if (conversation.fip_type.indexOf("Core") !== -1) {
-      fip_type = "Technical"
-      fip_categories.push("Core")
-    }
-    if (conversation.fip_type.indexOf("Networking") !== -1) {
-      fip_type = "Technical"
-      fip_categories.push("Networking")
-    }
-    if (conversation.fip_type.indexOf("Interface") !== -1) {
-      fip_type = "Technical"
-      fip_categories.push("Interface")
-    }
-    if (conversation.fip_type.indexOf("Informational") !== -1) {
-      fip_type = "Technical"
-      fip_categories.push("Informational")
-    }
+      // try to return the open PRs if there are any
+      const rowsWithOpenPrs = rows.filter((row) => !row.github_pr?.merged_at && !row.github_pr?.closed_at)
+      if(rowsWithOpenPrs.length > 0) {
+        return rowsWithOpenPrs
+      }
 
-    if (conversation.fip_type.indexOf("Technical") !== -1) {
-      fip_type = "Technical"
-    }
+      // otherwise return the closed PRs
+      return rows
+    })
+    .flat()
+    // don't show fips that don't have a fip status
+    .filter((conversation) => conversation.fip_status !== null)
+    // transform the individual records and collect the filter options (allFipAuthors, allFipTypesSet, etc)
+    .map((conversation) => {
+      const { fip_type, fip_category } = cleanFipType(conversation.fip_type)
+      allFipTypesSet.add(fip_type)
 
-    if (conversation.fip_type.indexOf("Organizational") !== -1) {
-      fip_type = "Organizational"
-    }
+      const authors = splitAuthors(conversation.fip_author) || []
+      for (const author of authors) {
+        allFipAuthors[getAuthorKey(author)] = author
+      }
 
-    if (conversation.fip_type.indexOf("FRC") !== -1) {
-      fip_type = "FRC"
-    }
+      let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
+      if (fipStatusKey === "wip") {
+        fipStatusKey = "draft"
+      } else if (!conversation.fip_status) {
+        fipStatusKey = "unknown"
+      }
+      if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
+        fipStatusKey = "closed"
+      }
 
-    if (conversation.fip_type.indexOf("Standards") !== -1) {
-      fip_type = "Standards"
-    }
-
-    if (conversation.fip_type.indexOf("N/A") !== -1) {
-      fip_type = "N/A"
-    }
-
-    allFipTypesSet.add(fip_type)
-
-    const authors = splitAuthors(conversation.fip_author) || []
-    for (const author of authors) {
-      allFipAuthors[getAuthorKey(author)] = author
-    }
-
-    return {
-      ...conversation,
-      fip_authors: authors,
-      fip_type,
-      fip_category: fip_categories.join(", "),
-      displayed_title: conversation.fip_title || conversation.github_pr.title,
-    }
-  })
+      return {
+        ...conversation,
+        fip_authors: authors,
+        fip_type,
+        fipStatusKey,
+        fip_category,
+        displayed_title: conversation.fip_title || conversation.github_pr.title,
+      }
+    })
 
   const allFipTypes = Array.from(allFipTypesSet)
   allFipTypes.sort((a, b) => a.localeCompare(b))
