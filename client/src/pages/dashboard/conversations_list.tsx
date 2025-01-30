@@ -68,7 +68,7 @@ const ConversationsList = ({
           onClick={() => setSelectedView("fips")}
           style={{ width: "48%", borderRadius: "0 0 0 0", borderLeft: 0 }}
         >
-          Signaling
+          Sentiment
           <Badge
             key="type"
             size="1"

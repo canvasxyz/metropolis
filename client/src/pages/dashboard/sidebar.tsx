@@ -5,7 +5,7 @@ import { formatTimeAgo } from "../../util/misc"
 import Spinner from "../../components/spinner"
 import api from "../../util/api"
 import ConversationsList from "./conversations_list"
-import { BiSolidBarChartAlt2 } from "react-icons/bi"
+import { BiSolidBarChartAlt2, BiGitPullRequest } from "react-icons/bi"
 import { ListingSelector } from "./listing_selector"
 import { TbFocus } from "react-icons/tb"
 import { Box, Flex, Link, Text } from "@radix-ui/themes"
@@ -106,6 +106,11 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
         <ListingSelector
           to="/dashboard/polls"
           iconType={BiSolidBarChartAlt2}
+          label="Discussion Polls"
+        />
+        <ListingSelector
+          to="/dashboard/sentiment"
+          iconType={BiGitPullRequest}
           label="Sentiment Checks"
         />
         <ListingSelector to="/dashboard/fip_tracker" iconType={TbFocus} label="FIP Tracker" />

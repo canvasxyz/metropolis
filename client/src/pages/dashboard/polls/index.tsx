@@ -36,7 +36,7 @@ export const TopRightFloating = ({ children }: { children: React.ReactNode }) =>
   )
 }
 
-export default () => {
+export default ({ only }: { only: string }) => {
   const allStatuses = ["open", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
@@ -55,12 +55,17 @@ export default () => {
   const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
-    `conversations_summary_discussion_polls`,
+    `conversations_summary_discussion_polls_${only}`,
     async () => {
       const response = await fetch(`/api/v3/conversations_summary`)
       // process the fip_version part if it exists
       // and any other extra fields
-      const conversations = (await response.json()) as ConversationSummary[]
+      const conversations = (await response.json()).filter((c) => {
+        if (only === "polls") return !c.fip_version_id
+        if (only === "sentiment") return !!c.fip_version_id
+        return true
+      }) as ConversationSummary[]
+
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
@@ -113,7 +118,7 @@ export default () => {
 
   return (
     <Box>
-      {user && (
+      {user && only === "polls" && (
         <TopRightFloating>
           <Button
             variant="surface"
@@ -134,7 +139,9 @@ export default () => {
           gap: [3],
         }}
       >
-        <Text sx={{ fontWeight: 600, fontSize: [2] }}>Sentiment Checks: Signaling & Polls</Text>
+        <Text sx={{ fontWeight: 600, fontSize: [2] }}>
+          {only === "polls" ? <>Discussion Polls</> : <>Sentiment Checks</>}
+        </Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">
             <TextField.Root

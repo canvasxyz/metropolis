@@ -49,7 +49,16 @@ const Dashboard = ({ user }: DashboardProps) => {
               element={
                 <Suspense>
                   {" "}
-                  <DiscussionPolls />
+                  <DiscussionPolls only="polls" />
+                </Suspense>
+              }
+            />
+            <CompatRoute
+              path="/sentiment"
+              element={
+                <Suspense>
+                  {" "}
+                  <DiscussionPolls only="sentiment" />
                 </Suspense>
               }
             />
