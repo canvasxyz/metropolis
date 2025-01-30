@@ -140,7 +140,7 @@ export default ({ only }: { only: string }) => {
         }}
       >
         <Text sx={{ fontWeight: 600, fontSize: [2] }}>
-          {only === "polls" ? <>Discussion Polls</> : <>Sentiment Checks</>}
+          {only === "polls" ? <>Discussion Polling</> : <>Sentiment Checks</>}
         </Text>
         <Flex sx={{ gap: [2], width: "100%" }}>
           <Box flexGrow="1" maxWidth="400px">

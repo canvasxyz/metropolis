@@ -106,7 +106,7 @@ const Sidebar = ({ mobileMenuOpen }: { mobileMenuOpen: boolean }) => {
         <ListingSelector
           to="/dashboard/polls"
           iconType={BiSolidBarChartAlt2}
-          label="Discussion Polls"
+          label="Discussion Polling"
         />
         <ListingSelector
           to="/dashboard/sentiment"
