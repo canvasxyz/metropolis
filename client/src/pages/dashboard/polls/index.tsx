@@ -159,60 +159,42 @@ export default ({ only }: { only: string }) => {
             <DropdownMenu.Trigger>
               <RadixButton variant="surface">
                 <BiFilter size="1.1em" style={{ color: "var(--accent-a11)", top: "-1px" }} />
-                Filters
+                {selectedConversationStatuses.open && selectedConversationStatuses.closed
+                  ? "Filter: All"
+                  : selectedConversationStatuses.open
+                    ? "Filter: Open"
+                    : selectedConversationStatuses.closed
+                      ? "Filter: Closed"
+                      : "Filter: None"}
               </RadixButton>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Sub>
-                <DropdownMenu.SubTrigger>
-                  <TbRefresh /> Status
-                </DropdownMenu.SubTrigger>
-                <DropdownMenu.SubContent>
-                  <ClickableChecklistItem
-                    color={"blue"}
-                    checked={Object.values(selectedConversationStatuses).every(
-                      (value) => value === true,
-                    )}
-                    setChecked={(value) => {
-                      setSelectedConversationStatuses(() =>
-                        Object.fromEntries(allStatuses.map((key) => [key, value])),
-                      )
-                    }}
-                  >
-                    All
-                  </ClickableChecklistItem>
-                  <DropdownMenu.Separator />
-                  {allStatuses.map((status) => (
-                    <ClickableChecklistItem
-                      key={status}
-                      color={conversationStatusOptions[status].color}
-                      checked={selectedConversationStatuses[status]}
-                      setChecked={(value) => {
-                        setSelectedConversationStatuses((prev) => ({ ...prev, [status]: value }))
-                      }}
-                      showOnly={true}
-                      selectOnly={() => {
-                        setSelectedConversationStatuses(() =>
-                          Object.fromEntries(allStatuses.map((key) => [key, key === status])),
-                        )
-                      }}
-                    >
-                      {conversationStatusOptions[status].label}
-                    </ClickableChecklistItem>
-                  ))}
-                </DropdownMenu.SubContent>
-              </DropdownMenu.Sub>
-              <DropdownMenu.Sub>
-                <DropdownMenu.SubTrigger>
-                  <TbCalendar /> Date
-                </DropdownMenu.SubTrigger>
-                <DropdownMenu.SubContent>
-                  <DatePicker
-                    rangeValue={rangeValue}
-                    onRangeValueChange={(range) => setRangeValue(range)}
-                  />
-                </DropdownMenu.SubContent>
-              </DropdownMenu.Sub>
+              <ClickableChecklistItem
+                color={"blue"}
+                checked={Object.values(selectedConversationStatuses).every(
+                  (value) => value === true,
+                )}
+                setChecked={(value) => {
+                  setSelectedConversationStatuses(() =>
+                    Object.fromEntries(allStatuses.map((key) => [key, value])),
+                  )
+                }}
+              >
+                All
+              </ClickableChecklistItem>
+              <DropdownMenu.Separator />
+              {allStatuses.map((status) => (
+                <ClickableChecklistItem
+                  key={status}
+                  color={conversationStatusOptions[status].color}
+                  checked={selectedConversationStatuses[status]}
+                  setChecked={(value) => {
+                    setSelectedConversationStatuses((prev) => ({ ...prev, [status]: value }))
+                  }}
+                >
+                  {conversationStatusOptions[status].label}
+                </ClickableChecklistItem>
+              ))}
             </DropdownMenu.Content>
           </DropdownMenu.Root>
           <DropdownMenu.Root>
@@ -263,6 +245,9 @@ export default ({ only }: { only: string }) => {
               showCreationDate={true}
             />
           ))}
+          {displayedConversations.length === 0 && data?.conversations && (
+            <Text color="gray">None matching filters</Text>
+          )}
         </Flex>
       </Flex>
       <CreateConversationModal

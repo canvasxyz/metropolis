@@ -51,14 +51,20 @@ const ConversationCard = ({
   </div>
 )
 
-const ConversationsPreview = ({ conversations }: { conversations: ConversationSummary[] }) => {
+const ConversationsPreview = ({
+  conversations,
+  emptyPlaceholder,
+}: {
+  conversations: ConversationSummary[]
+  emptyPlaceholder: string
+}) => {
   const hist = useHistory()
 
   return (
     <Flex direction="column" gap="3">
       {conversations.length === 0 && (
         <Box mt="3" mb="3">
-          <Text color="gray">None found</Text>
+          <Text color="gray">{emptyPlaceholder}</Text>
         </Box>
       )}
       {conversations.map((c) => {
@@ -157,6 +163,7 @@ export const LandingPage = () => {
                 The following discussion polls have been active recently:
               </Text>
               <ConversationsPreview
+                emptyPlaceholder="No open polls"
                 conversations={conversations
                   .filter(
                     (c) =>
@@ -190,6 +197,7 @@ export const LandingPage = () => {
                 The following FIPs are currently open for sentiment checks:
               </Text>
               <ConversationsPreview
+                emptyPlaceholder="No FIPs found"
                 conversations={conversations
                   .filter(
                     (c) =>
