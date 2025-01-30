@@ -25,7 +25,8 @@ const ConversationsList = ({
   const conversations = data || []
 
   const allConversations = conversations.filter(
-    (c) => c.fip_version || c.comment_count >= MIN_SEED_RESPONSES,
+    (c) =>
+      c.fip_version || (!c.fip_version && c.comment_count >= MIN_SEED_RESPONSES && !c.is_archived),
   )
   const fips = conversations.filter((c) => c.fip_version)
   const polls = conversations.filter(
