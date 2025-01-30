@@ -10,7 +10,7 @@ export const useFipDisplayOptions = () => {
       showCreationDate: true,
       showType: true,
       showCategory: true,
-      sortBy: "desc"
+      sortBy: "fip_number_desc",
     }),
   )
   const initialSavedDisplayOptions = JSON.parse(savedDisplayOptions)
@@ -21,8 +21,9 @@ export const useFipDisplayOptions = () => {
   const [showType, setShowType] = useState(initialSavedDisplayOptions.showType)
   const [showCategory, setShowCategory] = useState(initialSavedDisplayOptions.showCategory)
 
-
-  const [sortBy, setSortBy] = useState<"desc" | "asc">(initialSavedDisplayOptions.sortBy)
+  const [sortBy, setSortBy] = useState<"desc" | "asc" | "fip_number_asc" | "fip_number_desc">(
+    initialSavedDisplayOptions.sortBy,
+  )
 
   const resetDisplayOptions = () => {
     toast.success("Reset saved display options for FIP Tracker")

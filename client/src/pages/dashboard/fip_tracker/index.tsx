@@ -76,23 +76,26 @@ function processFipVersions(data: FipVersion[]) {
   const allFipAuthors: Map<string, UserInfo> = new Map()
 
   // filter the fip versions so that we try to have at most one fip version per fip_number
-  const conversations = Object
-    .entries(Object.groupBy(data, (fip_version) => fip_version.fip_number))
+  const conversations = Object.entries(
+    Object.groupBy(data, (fip_version) => fip_version.fip_number),
+  )
     .map(([fip_number, rows]) => {
-      if(fip_number === "null" || fip_number === "0") {
+      if (fip_number === "null" || fip_number === "0") {
         // return all open fip_versions where the fip_number is null/zero
         return rows.filter((row) => !row.github_pr?.merged_at && !row.github_pr?.closed_at)
       }
 
       // if there is a fip_version without a PR then just return this
       const rowWithNullGithubPr = rows.find((fip_version) => fip_version.github_pr === null)
-      if(rowWithNullGithubPr) {
+      if (rowWithNullGithubPr) {
         return [rowWithNullGithubPr]
       }
 
       // try to return the open PRs if there are any
-      const rowsWithOpenPrs = rows.filter((row) => !row.github_pr?.merged_at && !row.github_pr?.closed_at)
-      if(rowsWithOpenPrs.length > 0) {
+      const rowsWithOpenPrs = rows.filter(
+        (row) => !row.github_pr?.merged_at && !row.github_pr?.closed_at,
+      )
+      if (rowsWithOpenPrs.length > 0) {
         return rowsWithOpenPrs
       }
 
@@ -197,8 +200,17 @@ const FipTracker = () => {
     sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? 1 : -1)
   } else if (sortBy === "desc") {
     sortFunction = (c1, c2) => (getFipCreated(c1) > getFipCreated(c2) ? -1 : 1)
+  } else if (sortBy === "fip_number_asc") {
+    sortFunction = (c1, c2) => (c1.fip_number === null ? 1 : c1.fip_number > c2.fip_number ? 1 : -1)
   } else {
-    sortFunction = (c1, c2) => (c1.fip_number > c2.fip_number ? 1 : -1)
+    sortFunction = (c1, c2) =>
+      c1.fip_number === null
+        ? -1
+        : c1.fip_number === 9999
+          ? 1
+          : c1.fip_number < c2.fip_number
+            ? 1
+            : -1
   }
 
   const displayedFips = (conversations || [])
@@ -459,16 +471,19 @@ const FipTracker = () => {
             <DropdownMenu.Label>
               Sort by&nbsp;
               <Select.Root
-                defaultValue={sortBy || "desc"}
+                defaultValue={sortBy || "fip_number_desc"}
                 value={sortBy}
-                onValueChange={(v) => setSortBy(v as "asc" | "desc")}
+                onValueChange={(v) =>
+                  setSortBy(v as "asc" | "desc" | "fip_number_asc" | "fip_number_desc")
+                }
               >
                 <Select.Trigger />
                 <Select.Content>
                   <Select.Group>
+                    <Select.Item value="fip_number_desc">FIP number descending</Select.Item>
+                    <Select.Item value="fip_number_asc">FIP number ascending</Select.Item>
                     <Select.Item value="desc">Newest to Oldest</Select.Item>
                     <Select.Item value="asc">Oldest to Newest</Select.Item>
-                    <Select.Item value="fip_number_asc">FIP number ascending</Select.Item>
                   </Select.Group>
                 </Select.Content>
               </Select.Root>
