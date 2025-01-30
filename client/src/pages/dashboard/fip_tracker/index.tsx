@@ -99,6 +99,7 @@ function processFipVersions(data: FipVersion[]) {
       // otherwise return the closed PRs
       return rows
     })
+    // flatten the groups so that we have a list of fip_versions entries
     .flat()
     // don't show fips that don't have a fip status
     .filter((conversation) => conversation.fip_status !== null)
