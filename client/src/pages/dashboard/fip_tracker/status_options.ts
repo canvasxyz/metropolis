@@ -1,4 +1,5 @@
-export const statusOptions = {
+type Color = "gray" | "gold" | "bronze" | "brown" | "yellow" | "amber" | "orange" | "tomato" | "red" | "ruby" | "crimson" | "pink" | "plum" | "purple" | "violet" | "iris" | "indigo" | "blue" | "cyan" | "teal" | "jade" | "green" | "grass" | "lime" | "mint" | "sky"
+export const statusOptions: Record<string, {label: string, color: Color }> = {
   draft: {
     label: "Draft",
     color: "gray",
@@ -33,7 +34,7 @@ export const statusOptions = {
   },
   unknown: {
     label: "Unknown",
-    color: "slate",
+    color: "gray",
   },
   closed: {
     label: "Closed",

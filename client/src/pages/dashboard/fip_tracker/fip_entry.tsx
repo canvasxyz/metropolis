@@ -78,6 +78,7 @@ export const FipEntry = ({
   conversation: FipVersion & {
     displayed_title: string
     fip_authors: UserInfo[]
+    fipStatusKey: keyof typeof statusOptions
   }
   showAuthors: boolean
   showCategory: boolean
@@ -86,20 +87,10 @@ export const FipEntry = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
-  let fipStatusKey = conversation.fip_status.toLowerCase().replace(" ", "-")
-  if (fipStatusKey === "wip") {
-    fipStatusKey = "draft"
-  } else if (!conversation.fip_status) {
-    fipStatusKey = "unknown"
-  }
-  if (conversation.github_pr?.merged_at || conversation.github_pr?.closed_at) {
-    fipStatusKey = "closed"
-  }
-
-  const fipStatusInfo = fipStatusKey ? statusOptions[fipStatusKey] : statusOptions.draft
-  const fipStatusLabel = statusOptions[fipStatusKey]
-    ? statusOptions[fipStatusKey].label
-    : fipStatusKey
+  const fipStatusInfo = conversation.fipStatusKey ? statusOptions[conversation.fipStatusKey] : statusOptions.draft
+    const fipStatusLabel = statusOptions[conversation.fipStatusKey]
+      ? statusOptions[conversation.fipStatusKey].label
+      : conversation.fipStatusKey
 
   const fipBadges = []
   if (showType && conversation.fip_type) {
