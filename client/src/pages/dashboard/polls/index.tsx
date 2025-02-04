@@ -58,7 +58,7 @@ export default ({ only }: { only: string }) => {
   // We want to display the polls as an "infinite scrolling list"
   // The `scrollCursor` is the number of entries we want to display at a time
   // When the user scrolls to the bottom of the list, this cursor is incremented to add more items
-  const [numEntriesToShow, setNumEntriesToShow] = useState(0)
+  const [scrollCursor, setScrollCursor] = useState(0)
   const scrollPageSize = 10
 
   const { data } = useSWR(
@@ -122,7 +122,7 @@ export default ({ only }: { only: string }) => {
       return true
     })
     .toSorted(sortFunction)
-    .slice(0, numEntriesToShow + scrollPageSize)
+    .slice(0, scrollCursor + scrollPageSize)
 
 
   return (
@@ -158,7 +158,7 @@ export default ({ only }: { only: string }) => {
               placeholder="Search..."
               value={(searchParams as any).get("search") || ""}
               onChange={(e) => {
-                setNumEntriesToShow(0)
+                setScrollCursor(0)
                 setSearchParams({ search: e.target.value })
               }}
             >
@@ -188,7 +188,7 @@ export default ({ only }: { only: string }) => {
                   (value) => value === true,
                 )}
                 setChecked={(value) => {
-                  setNumEntriesToShow(0)
+                  setScrollCursor(0)
                   setSelectedConversationStatuses(() =>
                     Object.fromEntries(allStatuses.map((key) => [key, value])),
                   )
@@ -203,7 +203,7 @@ export default ({ only }: { only: string }) => {
                   color={conversationStatusOptions[status].color}
                   checked={selectedConversationStatuses[status]}
                   setChecked={(value) => {
-                    setNumEntriesToShow(0)
+                    setScrollCursor(0)
                     setSelectedConversationStatuses((prev) => ({ ...prev, [status]: value }))
                   }}
                 >
@@ -227,7 +227,7 @@ export default ({ only }: { only: string }) => {
                   value={sortBy}
                   onValueChange={(v) => {
                     setSortBy(v as "asc" | "desc")
-                    setNumEntriesToShow(0)
+                    setScrollCursor(0)
                   }}
                 >
                   <Select.Trigger />
@@ -267,7 +267,7 @@ export default ({ only }: { only: string }) => {
             <Text color="gray">None matching filters</Text>
           )}
         </Flex>
-        <Box top="-20px"><IsVisibleObserver callback={() => setNumEntriesToShow((oldValue) => oldValue + scrollPageSize)}/></Box>
+        <Box top="-20px"><IsVisibleObserver callback={() => setScrollCursor((oldValue) => oldValue + scrollPageSize)}/></Box>
       </Flex>
       <CreateConversationModal
         isOpen={createConversationModalIsOpen}
