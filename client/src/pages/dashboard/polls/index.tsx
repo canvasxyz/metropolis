@@ -53,13 +53,13 @@ export default ({ only }: { only: string }) => {
 
   const [searchParams, setSearchParams] = useSearchParams()
 
+  const searchParam = searchParams.get("search") || ""
+
   // We want to display the polls as an "infinite scrolling list"
   // The `scrollCursor` is the number of entries we want to display at a time
   // When the user scrolls to the bottom of the list, this cursor is incremented to add more items
   const [numEntriesToShow, setNumEntriesToShow] = useState(0)
   const scrollPageSize = 10
-
-  const searchParam = searchParams.get("search") || ""
 
   const { data } = useSWR(
     `conversations_summary_discussion_polls_${only}`,
