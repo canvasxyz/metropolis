@@ -25,7 +25,7 @@ import { useDiscussionPollDisplayOptions } from "./useDiscussionPollDisplayOptio
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
-  needs_responses: { label: "Needs Responses", color: "red"},
+  needs_responses: { label: "Needs Seed Responses", color: "red"},
   closed: { label: "Closed", color: "gray" },
 }
 
