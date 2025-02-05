@@ -29,6 +29,22 @@ const conversationStatusOptions = {
   closed: { label: "Closed", color: "gray" },
 }
 
+const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Record<keyof typeof conversationStatusOptions, boolean>) => {
+  const entries = Object.entries(selectedConversationStatuses)
+  const selectedEntries = entries.filter(([,v]) => v)
+
+  if (selectedEntries.length === 0) {
+    return "None"
+  } else if (selectedEntries.length === entries.length) {
+    return "All"
+  } else {
+    return selectedEntries
+      .map(([k,]) => conversationStatusOptions[k].label)
+      .toSorted()
+      .join(", ")
+  }
+}
+
 export const TopRightFloating = ({ children }: { children: React.ReactNode }) => {
   return (
     <Box position="absolute" top="54px" right="16px">
@@ -70,7 +86,11 @@ export default ({ only }: { only: string }) => {
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
-        return { ...conversation, displayed_title }
+        const conversation_status = conversation.is_archived ? "closed" :
+          !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
+          "open"
+
+        return { ...conversation, displayed_title, conversation_status }
       })
       return { conversations: conversationsWithExtraFields }
     },
@@ -100,11 +120,7 @@ export default ({ only }: { only: string }) => {
         return false
       }
 
-      const conversationStatus =
-        conversation.is_archived ? "closed" :
-        !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
-        "open"
-      if (!selectedConversationStatuses[conversationStatus]) {
+      if (!selectedConversationStatuses[conversation.conversation_status]) {
         return false
       }
 
@@ -155,13 +171,7 @@ export default ({ only }: { only: string }) => {
             <DropdownMenu.Trigger>
               <RadixButton variant="surface">
                 <BiFilter size="1.1em" style={{ color: "var(--accent-a11)", top: "-1px" }} />
-                {selectedConversationStatuses.open && selectedConversationStatuses.closed
-                  ? "Filter: All"
-                  : selectedConversationStatuses.open
-                    ? "Filter: Open"
-                    : selectedConversationStatuses.closed
-                      ? "Filter: Closed"
-                      : "Filter: None"}
+                { `Filter: ${getSelectedConversationStatusesLabel(selectedConversationStatuses)}`}
               </RadixButton>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
