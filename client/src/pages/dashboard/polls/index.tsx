@@ -25,6 +25,7 @@ import { useDiscussionPollDisplayOptions } from "./useDiscussionPollDisplayOptio
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
+  needs_responses: { label: "Needs Responses", color: "red"},
   closed: { label: "Closed", color: "gray" },
 }
 
@@ -37,7 +38,7 @@ export const TopRightFloating = ({ children }: { children: React.ReactNode }) =>
 }
 
 export default ({ only }: { only: string }) => {
-  const allStatuses = ["open", "closed"]
+  const allStatuses = ["open", "needs_responses", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
   >({
@@ -91,11 +92,6 @@ export default ({ only }: { only: string }) => {
 
   const displayedConversations = (conversations || [])
     .filter((conversation) => {
-      // Filter out conversations with insufficient seed responses
-      if (!conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES) {
-        return false
-      }
-
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
@@ -104,11 +100,11 @@ export default ({ only }: { only: string }) => {
         return false
       }
 
-      if (conversation.is_archived && !selectedConversationStatuses.closed) {
-        return false
-      }
-
-      if (!conversation.is_archived && !selectedConversationStatuses.open) {
+      const conversationStatus =
+        conversation.is_archived ? "closed" :
+        !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
+        "open"
+      if (!selectedConversationStatuses[conversationStatus]) {
         return false
       }
 
