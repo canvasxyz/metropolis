@@ -91,7 +91,7 @@ export const ConversationEntry = ({
               ))}
             {
               conversation.conversation_status === "needs_responses" &&
-              <Text ml="3" color="red" style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
+              <Text ml="3" color="red" >
                 (Needs seed responses)
               </Text>
             }
