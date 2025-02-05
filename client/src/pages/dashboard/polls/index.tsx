@@ -17,7 +17,7 @@ import { ClickableChecklistItem } from "../../../components/ClickableChecklistIt
 import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
 import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
-import { ConversationEntry } from "./conversation_entry"
+import { ConversationEntry, ConversationStatus } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
 import { MIN_SEED_RESPONSES } from "../../../util/misc"
 import { CreateConversationModal } from "../../CreateConversationModal"
@@ -29,7 +29,7 @@ const conversationStatusOptions = {
   closed: { label: "Closed", color: "gray" },
 }
 
-const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Record<keyof typeof conversationStatusOptions, boolean>) => {
+const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Record<ConversationStatus, boolean>) => {
   const entries = Object.entries(selectedConversationStatuses)
   const selectedEntries = entries.filter(([,v]) => v)
 
@@ -86,7 +86,7 @@ export default ({ only }: { only: string }) => {
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
-        const conversation_status = conversation.is_archived ? "closed" :
+        const conversation_status: ConversationStatus = conversation.is_archived ? "closed" :
           !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
           "open"
 
