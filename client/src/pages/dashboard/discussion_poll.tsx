@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useState } from "react"
+import { useState } from "react"
 import { Button, Box, Text, Flex, jsx } from "theme-ui"
 import {
   TbCheck,
@@ -96,6 +96,7 @@ export const DiscussionPoll = ({
               pointerEvents: !user?.uid ? "none" : undefined,
               ...likedStyles,
             }}
+            disabled={updating}
             onClick={voteLike}
           >
             <TbMoodSmileBeam
@@ -148,6 +149,7 @@ export const DiscussionPoll = ({
               pointerEvents: !user?.uid ? "none" : undefined,
               ...dislikedStyles,
             }}
+            disabled={updating}
             onClick={voteDislike}
           >
             <TbMoodSad style={{ width: 18, color: "#e74b3c", position: "relative", top: 2 }} />{" "}

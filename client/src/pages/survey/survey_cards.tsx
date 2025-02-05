@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import React, { useState } from "react"
+import { useState } from "react"
 import { Box, Button, Flex, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
@@ -35,7 +35,7 @@ const SurveyCards = ({
           className={collapsed && unvotedComments.length > 2 ? "css-fade-more" : ""}
           sx={collapsed ? { maxHeight: "420px", overflow: "hidden" } : {}}
         >
-          {unvotedComments.map((comment, index) => (
+          {unvotedComments.map((comment) => (
             <Box
               key={comment.tid}
               sx={{

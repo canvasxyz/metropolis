@@ -8,14 +8,12 @@ import {
 } from "@radix-ui/themes"
 import React, { useState } from "react"
 import { BiFilter } from "react-icons/bi"
-import { TbAdjustmentsHorizontal, TbCalendar, TbRefresh, TbSearch } from "react-icons/tb"
+import { TbAdjustmentsHorizontal, TbSearch } from "react-icons/tb"
 import { useSearchParams } from "react-router-dom-v5-compat"
 import useSWR from "swr"
 import { Flex, Text } from "theme-ui"
 
 import { ClickableChecklistItem } from "../../../components/ClickableChecklistItem"
-import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
-import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { ConversationEntry, ConversationStatus } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
@@ -105,8 +103,6 @@ export default ({ only }: { only: string }) => {
   )
 
   const conversations = data?.conversations || []
-
-  const [rangeValue, setRangeValue] = useState<DateRange>({ start: null, end: null })
 
   let sortFunction
   if (sortBy === "asc") {

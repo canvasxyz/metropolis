@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react"
 import { useLocalStorage } from "usehooks-ts"
 import { TbMessageDots } from "react-icons/tb"
-import { Link, Box, Heading, Button, Text } from "theme-ui"
+import { Box, Heading, Button, Text } from "theme-ui"
 import { toast } from "react-hot-toast"
 import Modal from "react-modal"
 import TextareaAutosize from "react-textarea-autosize"

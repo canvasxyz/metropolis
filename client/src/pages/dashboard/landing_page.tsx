@@ -6,9 +6,7 @@ import { Link as RouterLink, useHistory } from "react-router-dom"
 import { Box, Container, Flex, Grid, Separator, Text } from "@radix-ui/themes"
 
 import useSWR from "swr"
-import { useAppSelector } from "../../hooks"
 import { ConversationSummary } from "../../reducers/conversations_summary"
-import { RootState } from "../../store"
 import { formatTimeAgo, MIN_SEED_RESPONSES } from "../../util/misc"
 import { getIconForConversation } from "./conversation_list_item"
 

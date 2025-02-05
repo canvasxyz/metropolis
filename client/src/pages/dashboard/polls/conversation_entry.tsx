@@ -1,5 +1,5 @@
 import React from "react"
-import { TbCalendar, TbUser, TbEye } from "react-icons/tb"
+import { TbCalendar, TbEye } from "react-icons/tb"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text } from "@radix-ui/themes"
