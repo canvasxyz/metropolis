@@ -7,11 +7,14 @@ import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { getIconForConversation, getColorForConversation } from "../conversation_list_item"
 import { useNavigate } from "react-router-dom-v5-compat"
 
+export type ConversationStatus = "open" | "needs_responses" | "closed"
+
 export const ConversationEntry = ({
   conversation,
   showCreationDate,
 }: {
   conversation: ConversationSummary & {
+    conversation_status: ConversationStatus
     displayed_title: string
   }
   showCreationDate: boolean
@@ -86,6 +89,12 @@ export const ConversationEntry = ({
               ) : (
                 <Text sx={{ color: "#84817D" }}>Untitled</Text>
               ))}
+            {
+              conversation.conversation_status === "needs_responses" &&
+              <Text ml="3" color="red" >
+                (Needs seed responses)
+              </Text>
+            }
           </Text>
           <Badge
             size="2"

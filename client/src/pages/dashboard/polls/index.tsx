@@ -17,7 +17,7 @@ import { ClickableChecklistItem } from "../../../components/ClickableChecklistIt
 import { useFipDisplayOptions } from "../fip_tracker/useFipDisplayOptions"
 import { DatePicker, DateRange } from "../fip_tracker/date_picker"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
-import { ConversationEntry } from "./conversation_entry"
+import { ConversationEntry, ConversationStatus } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
 import { MIN_SEED_RESPONSES } from "../../../util/misc"
 import { CreateConversationModal } from "../../CreateConversationModal"
@@ -26,7 +26,24 @@ import { IsVisibleObserver } from "../../../components/IsVisibleObserver"
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
+  needs_responses: { label: "Needs Seed Responses", color: "red"},
   closed: { label: "Closed", color: "gray" },
+}
+
+const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Record<ConversationStatus, boolean>) => {
+  const entries = Object.entries(selectedConversationStatuses)
+  const selectedEntries = entries.filter(([,v]) => v)
+
+  if (selectedEntries.length === 0) {
+    return "None"
+  } else if (selectedEntries.length === entries.length) {
+    return "All"
+  } else {
+    return selectedEntries
+      .map(([k,]) => conversationStatusOptions[k].label)
+      .toSorted()
+      .join(", ")
+  }
 }
 
 export const TopRightFloating = ({ children }: { children: React.ReactNode }) => {
@@ -38,7 +55,7 @@ export const TopRightFloating = ({ children }: { children: React.ReactNode }) =>
 }
 
 export default ({ only }: { only: string }) => {
-  const allStatuses = ["open", "closed"]
+  const allStatuses = ["open", "needs_responses", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
   >({
@@ -76,7 +93,11 @@ export default ({ only }: { only: string }) => {
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
-        return { ...conversation, displayed_title }
+        const conversation_status: ConversationStatus = conversation.is_archived ? "closed" :
+          !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
+          "open"
+
+        return { ...conversation, displayed_title, conversation_status }
       })
       return { conversations: conversationsWithExtraFields }
     },
@@ -98,11 +119,6 @@ export default ({ only }: { only: string }) => {
 
   const displayedConversations = (conversations || [])
     .filter((conversation) => {
-      // Filter out conversations with insufficient seed responses
-      if (!conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES) {
-        return false
-      }
-
       // the conversation's displayed title must include the search string, if it is given
       if (
         searchParam &&
@@ -111,11 +127,7 @@ export default ({ only }: { only: string }) => {
         return false
       }
 
-      if (conversation.is_archived && !selectedConversationStatuses.closed) {
-        return false
-      }
-
-      if (!conversation.is_archived && !selectedConversationStatuses.open) {
+      if (!selectedConversationStatuses[conversation.conversation_status]) {
         return false
       }
 
@@ -172,13 +184,7 @@ export default ({ only }: { only: string }) => {
             <DropdownMenu.Trigger>
               <RadixButton variant="surface">
                 <BiFilter size="1.1em" style={{ color: "var(--accent-a11)", top: "-1px" }} />
-                {selectedConversationStatuses.open && selectedConversationStatuses.closed
-                  ? "Filter: All"
-                  : selectedConversationStatuses.open
-                    ? "Filter: Open"
-                    : selectedConversationStatuses.closed
-                      ? "Filter: Closed"
-                      : "Filter: None"}
+                { `Filter: ${getSelectedConversationStatusesLabel(selectedConversationStatuses)}`}
               </RadixButton>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
