@@ -17,6 +17,7 @@ export const ConversationEntry = ({
   showCreationDate,
   user,
   type,
+  allTags = [],
 }: {
   conversation: ConversationSummary & {
     conversation_status: ConversationStatus
@@ -25,6 +26,7 @@ export const ConversationEntry = ({
   showCreationDate: boolean
   user
   type: "polls" | "sentiment"
+  allTags?: string[]
 }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -135,14 +137,42 @@ export const ConversationEntry = ({
                   </Badge>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
+                  {allTags.length > 0 && (
+                    <>
+                      {allTags.map((tag) => (
+                        <DropdownMenu.Item
+                          key={tag}
+                          onClick={() => {
+                            dispatch(handleTagConversation(conversation.conversation_id, tag))
+                          }}
+                        >
+                          {tag}
+                        </DropdownMenu.Item>
+                      ))}
+                      <DropdownMenu.Separator />
+                    </>
+                  )}
                   <DropdownMenu.Item
-                    onClick={(e) => {
+                    onClick={() => {
                       const tag = prompt("Enter a tag:")
-                      dispatch(handleTagConversation(conversation.conversation_id, tag))
+                      if (tag) dispatch(handleTagConversation(conversation.conversation_id, tag))
                     }}
                   >
                     New tag...
                   </DropdownMenu.Item>
+                  {conversation.tags && (
+                    <>
+                      <DropdownMenu.Separator />
+                      <DropdownMenu.Item
+                        onClick={() => {
+                          dispatch(handleTagConversation(conversation.conversation_id, ""))
+                        }}
+                        color="red"
+                      >
+                        Clear Tag
+                      </DropdownMenu.Item>
+                    </>
+                  )}
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             </Box>

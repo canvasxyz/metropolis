@@ -90,6 +90,19 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
         return true
       }) as ConversationSummary[]
 
+      // Extract all unique tags from conversations
+      const tagSet = new Set<string>()
+      conversations.forEach((conversation) => {
+        if (conversation.tags) {
+          // Split tags by comma and trim whitespace
+          const tagArray = conversation.tags.split(',').map(tag => tag.trim())
+          tagArray.forEach(tag => {
+            if (tag) tagSet.add(tag)
+          })
+        }
+      })
+      const allTags = Array.from(tagSet).sort()
+
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
@@ -101,7 +114,7 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
 
         return { ...conversation, displayed_title, conversation_status }
       })
-      return { conversations: conversationsWithExtraFields }
+      return { conversations: conversationsWithExtraFields, allTags }
     },
     { keepPreviousData: true, focusThrottleInterval: 500 },
   )
@@ -268,6 +281,7 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
               showCreationDate={true}
               user={user}
               type={only}
+              allTags={data?.allTags || []}
             />
           ))}
           {displayedConversations.length === 0 && data?.conversations && (
