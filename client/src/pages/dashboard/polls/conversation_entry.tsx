@@ -8,6 +8,7 @@ import { getIconForConversation, getColorForConversation } from "../conversation
 import { useNavigate } from "react-router-dom-v5-compat"
 import { handleTagConversation } from "../../../actions"
 import { useAppDispatch } from "../../../hooks"
+import ConversationListItemMenu from "../conversation_list_item_menu"
 
 export type ConversationStatus = "open" | "needs_responses" | "closed"
 
@@ -15,13 +16,15 @@ export const ConversationEntry = ({
   conversation,
   showCreationDate,
   user,
+  type,
 }: {
   conversation: ConversationSummary & {
     conversation_status: ConversationStatus
     displayed_title: string
   }
   showCreationDate: boolean
-  user: { isRepoCollaborator: boolean }
+  user
+  type: "polls" | "discussion"
 }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -94,7 +97,7 @@ export const ConversationEntry = ({
             {getIconForConversation(conversation)}
           </div>
         </Box>
-        <Flex sx={{ flexDirection: "row", gap: [1], alignItems: "center" }}>
+        <Flex sx={{ position: "relative", flexDirection: "row", gap: [1], alignItems: "center" }}>
           <Text style={{ flex: 1, lineHeight: 1.3, fontSize: "95%", fontWeight: 500 }}>
             {conversation.displayed_title ??
               (conversation.fip_version ? (
@@ -116,9 +119,8 @@ export const ConversationEntry = ({
           >
             {statusLabel}
           </Badge> */}
-          
 
-          {user?.isRepoCollaborator && (
+          {type === "polls" && user?.isRepoCollaborator && (
             <Box onClick={(e) => e.stopPropagation()}>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
@@ -144,6 +146,10 @@ export const ConversationEntry = ({
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             </Box>
+          )}
+
+          {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
+            <ConversationListItemMenu conversation={conversation} />
           )}
         </Flex>
         <Box></Box>

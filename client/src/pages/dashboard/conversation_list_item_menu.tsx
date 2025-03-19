@@ -7,68 +7,76 @@ import { useAppDispatch, useAppSelector } from "../../hooks"
 import { TbArchive, TbArchiveOff, TbDots, TbHammer, TbPencil } from "react-icons/tb"
 import { DropdownMenu, IconButton } from "@radix-ui/themes"
 
-const ConversationListItemMenu = ({conversation}: {conversation: ConversationSummary}) => {
+const ConversationListItemMenu = ({
+  conversation,
+  sidebar,
+}: {
+  conversation: ConversationSummary
+  sidebar?: boolean
+}) => {
   const { user } = useAppSelector((state) => state.user)
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
 
-  const canCloseConversation = user && (
-    user.uid === conversation.owner ||
-    user.isRepoCollaborator ||
-    user.isAdmin
-  )
+  const canCloseConversation =
+    user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin)
 
-  return <Box
-    sx={{ position: "absolute", top: "13px", right: "13px" }}
-    onClick={(e) => e.stopPropagation()}
-  >
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger>
-        <IconButton variant="ghost" size="1">
-          <TbDots />
-        </IconButton>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content>
-        <DropdownMenu.Item
-          onClick={(e) => {
-            e.stopPropagation()
-            navigate(`/m/${conversation.conversation_id}`)
-          }}
-        >
-          <TbPencil /> Edit
-        </DropdownMenu.Item>
-
-        <DropdownMenu.Item
-          onClick={(e) => {
-            e.stopPropagation()
-            navigate(`/m/${conversation.conversation_id}/comments`)
-          }}
-        >
-          <TbHammer /> Moderate comments
-        </DropdownMenu.Item>
-
-        {
-          canCloseConversation &&
+  return (
+    <Box
+      sx={
+        sidebar
+          ? { position: "absolute", top: "13px", right: "13px" }
+          : { marginLeft: "10px", position: "relative", top: "5px" }
+      }
+      onClick={(e) => e.stopPropagation()}
+    >
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger>
+          <IconButton variant="ghost" size="1">
+            <TbDots />
+          </IconButton>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content>
           <DropdownMenu.Item
-            onClick={() => {
-              if (conversation.is_archived) {
-                if (!confirm("Reopen this discussion?")) return
-                dispatch(handleReopenConversation(conversation.conversation_id))
-                location.reload()
-              } else {
-                if (!confirm("Close this discussion?")) return
-                dispatch(handleCloseConversation(conversation.conversation_id))
-                location.reload()
-              }
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/m/${conversation.conversation_id}`)
             }}
           >
-            {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
-            {conversation.is_archived ? "Reopen" : "Close"}
+            <TbPencil /> Edit
           </DropdownMenu.Item>
-        }
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
-  </Box>
+
+          <DropdownMenu.Item
+            onClick={(e) => {
+              e.stopPropagation()
+              navigate(`/m/${conversation.conversation_id}/comments`)
+            }}
+          >
+            <TbHammer /> Moderate comments
+          </DropdownMenu.Item>
+
+          {canCloseConversation && (
+            <DropdownMenu.Item
+              onClick={() => {
+                if (conversation.is_archived) {
+                  if (!confirm("Reopen this discussion?")) return
+                  dispatch(handleReopenConversation(conversation.conversation_id))
+                  location.reload()
+                } else {
+                  if (!confirm("Close this discussion?")) return
+                  dispatch(handleCloseConversation(conversation.conversation_id))
+                  location.reload()
+                }
+              }}
+            >
+              {conversation.is_archived ? <TbArchiveOff /> : <TbArchive />}{" "}
+              {conversation.is_archived ? "Reopen" : "Close"}
+            </DropdownMenu.Item>
+          )}
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    </Box>
+  )
 }
 
 export default ConversationListItemMenu

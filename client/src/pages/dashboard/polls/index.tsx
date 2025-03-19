@@ -52,7 +52,7 @@ export const TopRightFloating = ({ children }: { children: React.ReactNode }) =>
   )
 }
 
-export default ({ only }: { only: string }) => {
+export default ({ only }: { only: "polls" | "discussion" }) => {
   const allStatuses = ["open", "needs_responses", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>
@@ -264,6 +264,7 @@ export default ({ only }: { only: string }) => {
               conversation={conversation}
               showCreationDate={true}
               user={user}
+              type={only}
             />
           ))}
           {displayedConversations.length === 0 && data?.conversations && (

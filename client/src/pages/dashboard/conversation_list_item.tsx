@@ -141,7 +141,7 @@ const ConversationListItem = ({ conversation, initialViewCount }: ConversationLi
             </Box>
           </Flex>
           {user && (user.uid === conversation.owner || user.isRepoCollaborator || user.isAdmin) && (
-            <ConversationListItemMenu conversation={conversation} />
+            <ConversationListItemMenu conversation={conversation} sidebar={true} />
           )}
         </Box>
       )}

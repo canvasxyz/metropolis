@@ -5,7 +5,7 @@ import { Link as RouterLink, useLocation } from "react-router-dom"
 import { MIN_SEED_RESPONSES } from "../../util/misc"
 import ConversationListItem from "./conversation_list_item"
 import { ConversationSummary } from "../../reducers/conversations_summary"
-import { Badge, Button, Flex } from "@radix-ui/themes"
+import { Badge, Button, Flex, Text } from "@radix-ui/themes"
 
 const ConversationsList = ({
   selectedView,
@@ -30,9 +30,10 @@ const ConversationsList = ({
 
   const allConversations = conversations.filter(
     (c) =>
-      c.fip_version || (!c.fip_version && c.comment_count >= MIN_SEED_RESPONSES && !c.is_archived),
+      (c.fip_version && !c.is_archived) ||
+      (!c.fip_version && c.comment_count >= MIN_SEED_RESPONSES && !c.is_archived),
   )
-  const fips = conversations.filter((c) => c.fip_version)
+  const fips = conversations.filter((c) => c.fip_version && !c.is_archived)
   const polls = conversations.filter(
     (c) => c.fip_version === null && c.comment_count >= MIN_SEED_RESPONSES && !c.is_archived,
   )
@@ -123,6 +124,11 @@ const ConversationsList = ({
             initialViewCount={conversation.view_count}
           />
         ))}
+        {conversationsToDisplay.length === 0 && (
+          <Text color="gray" my="3" align="center" width="100%">
+            None open right now
+          </Text>
+        )}
       </Flex>
 
       {selectedView !== "all" && !isOnTargetPage && (
