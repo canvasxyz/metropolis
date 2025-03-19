@@ -54,7 +54,7 @@ export const TopRightFloating = ({ children }: { children: React.ReactNode }) =>
   )
 }
 
-export default ({ only }: { only: "polls" | "discussion" }) => {
+export default ({ only }: { only: "polls" | "sentiment" }) => {
   const allStatuses = ["open", "needs_responses", "closed"]
   const [selectedConversationStatuses, setSelectedConversationStatuses] = useState<
     Record<string, boolean>

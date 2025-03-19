@@ -24,7 +24,7 @@ export const ConversationEntry = ({
   }
   showCreationDate: boolean
   user
-  type: "polls" | "discussion"
+  type: "polls" | "sentiment"
 }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
@@ -120,7 +120,7 @@ export const ConversationEntry = ({
             {statusLabel}
           </Badge> */}
 
-          {type === "polls" && user?.isRepoCollaborator && (
+          {type === "sentiment" && user?.isRepoCollaborator && (
             <Box onClick={(e) => e.stopPropagation()}>
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
@@ -131,7 +131,7 @@ export const ConversationEntry = ({
                     radius="full"
                     style={{ cursor: "pointer", position: "relative", left: "3px" }}
                   >
-                    Add tag
+                    Set Tag
                   </Badge>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
@@ -141,7 +141,7 @@ export const ConversationEntry = ({
                       dispatch(handleTagConversation(conversation.conversation_id, tag))
                     }}
                   >
-                    New tag
+                    New tag...
                   </DropdownMenu.Item>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
