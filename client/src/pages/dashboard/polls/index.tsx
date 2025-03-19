@@ -24,13 +24,15 @@ import { IsVisibleObserver } from "../../../components/IsVisibleObserver"
 
 const conversationStatusOptions = {
   open: { label: "Open", color: "blue" },
-  needs_responses: { label: "Needs Seed Responses", color: "red"},
+  needs_responses: { label: "Needs Seed Responses", color: "red" },
   closed: { label: "Closed", color: "gray" },
 }
 
-const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Record<ConversationStatus, boolean>) => {
+const getSelectedConversationStatusesLabel = (
+  selectedConversationStatuses: Record<ConversationStatus, boolean>,
+) => {
   const entries = Object.entries(selectedConversationStatuses)
-  const selectedEntries = entries.filter(([,v]) => v)
+  const selectedEntries = entries.filter(([, v]) => v)
 
   if (selectedEntries.length === 0) {
     return "None"
@@ -38,7 +40,7 @@ const getSelectedConversationStatusesLabel = (selectedConversationStatuses: Reco
     return "All"
   } else {
     return selectedEntries
-      .map(([k,]) => conversationStatusOptions[k].label)
+      .map(([k]) => conversationStatusOptions[k].label)
       .toSorted()
       .join(", ")
   }
@@ -91,9 +93,11 @@ export default ({ only }: { only: "polls" | "discussion" }) => {
       const conversationsWithExtraFields = conversations.map((conversation) => {
         const displayed_title = conversation.topic
 
-        const conversation_status: ConversationStatus = conversation.is_archived ? "closed" :
-          !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES ? "needs_responses" :
-          "open"
+        const conversation_status: ConversationStatus = conversation.is_archived
+          ? "closed"
+          : !conversation.fip_version && conversation.comment_count < MIN_SEED_RESPONSES
+            ? "needs_responses"
+            : "open"
 
         return { ...conversation, displayed_title, conversation_status }
       })
@@ -131,7 +135,6 @@ export default ({ only }: { only: "polls" | "discussion" }) => {
     })
     .toSorted(sortFunction)
     .slice(0, scrollCursor + scrollPageSize)
-
 
   return (
     <Box>
@@ -180,7 +183,7 @@ export default ({ only }: { only: "polls" | "discussion" }) => {
             <DropdownMenu.Trigger>
               <RadixButton variant="surface">
                 <BiFilter size="1.1em" style={{ color: "var(--accent-a11)", top: "-1px" }} />
-                { `Filter: ${getSelectedConversationStatusesLabel(selectedConversationStatuses)}`}
+                {`Filter: ${getSelectedConversationStatusesLabel(selectedConversationStatuses)}`}
               </RadixButton>
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
@@ -268,10 +271,31 @@ export default ({ only }: { only: "polls" | "discussion" }) => {
             />
           ))}
           {displayedConversations.length === 0 && data?.conversations && (
-            <Text color="gray">None matching filters</Text>
+            <Flex sx={{ alignItems: "center", gap: 2 }}>
+              <Text color="gray">None matching filters</Text>{" "}
+              <Button
+                size="1"
+                variant="outline"
+                color="gray"
+                sx={{ marginTop: "2px" }}
+                onClick={() => {
+                  setScrollCursor(0)
+                  setSearchParams({})
+                  setSelectedConversationStatuses(() =>
+                    Object.fromEntries(allStatuses.map((key) => [key, true])),
+                  )
+                }}
+              >
+                Clear all filters
+              </Button>
+            </Flex>
           )}
         </Flex>
-        <Box top="-20px"><IsVisibleObserver callback={() => setScrollCursor((oldValue) => oldValue + scrollPageSize)}/></Box>
+        <Box top="-20px">
+          <IsVisibleObserver
+            callback={() => setScrollCursor((oldValue) => oldValue + scrollPageSize)}
+          />
+        </Box>
       </Flex>
       <CreateConversationModal
         isOpen={createConversationModalIsOpen}
