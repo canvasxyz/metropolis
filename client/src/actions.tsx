@@ -28,6 +28,9 @@ export const CLOSE_CONVERSATION_ERROR = "CLOSE_CONVERSATION_ERROR"
 export const REOPEN_CONVERSATION_SUCCESS = "REOPEN_CONVERSATION_SUCCESS"
 export const REOPEN_CONVERSATION_ERROR = "REOPEN_CONVERSATION_ERROR"
 
+export const TAG_CONVERSATION_SUCCESS = "TAG_CONVERSATION_SUCCESS"
+export const TAG_CONVERSATION_ERROR = "TAG_CONVERSATION_ERROR"
+
 /* zid for clarity - this is conversation config */
 export const REQUEST_ZID_METADATA = "REQUEST_ZID_METADATA"
 export const RECEIVE_ZID_METADATA = "RECEIVE_ZID_METADATA"
@@ -615,6 +618,26 @@ export const handleReopenConversation = (conversation_id) => {
   }
 }
 
+const postTagConversation = (conversation_id, tag) => {
+  return api.post("/api/v3/conversation/tag", {
+    conversation_id,
+    tag,
+  })
+}
+
+export const handleTagConversation = (conversation_id, tag) => {
+  return (dispatch) => {
+    return postTagConversation(conversation_id, tag).then(
+      (res) => {
+        dispatch({ type: TAG_CONVERSATION_SUCCESS, data: conversation_id })
+        dispatch(populateZidMetadataStore(conversation_id, true))
+        return res
+      },
+      (err) => dispatch({ type: TAG_CONVERSATION_ERROR, data: err }),
+    )
+  }
+}
+
 const postModerateConversation = (conversation_id) => {
   return api.post("/api/v3/conversation/moderate", {
     conversation_id,
@@ -623,12 +646,10 @@ const postModerateConversation = (conversation_id) => {
 
 export const handleModerateConversation = (conversation_id) => {
   return (dispatch) => {
-    return postModerateConversation(conversation_id).then(
-      (res) => {
-        dispatch(populateZidMetadataStore(conversation_id, true))
-        return res
-      },
-    )
+    return postModerateConversation(conversation_id).then((res) => {
+      dispatch(populateZidMetadataStore(conversation_id, true))
+      return res
+    })
   }
 }
 

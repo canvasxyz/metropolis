@@ -263,6 +263,7 @@ export default ({ only }: { only: string }) => {
               key={conversation.conversation_id}
               conversation={conversation}
               showCreationDate={true}
+              user={user}
             />
           ))}
           {displayedConversations.length === 0 && data?.conversations && (

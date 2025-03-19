@@ -19,4 +19,5 @@ export type ConversationSummary = {
   postsurvey_limit: string | null
   postsurvey_redirect: string | null
   auth_needed_to_write: boolean
+  tags: string | null
 }

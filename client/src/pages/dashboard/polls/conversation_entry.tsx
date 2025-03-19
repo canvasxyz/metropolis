@@ -2,24 +2,29 @@ import React from "react"
 import { TbCalendar, TbEye } from "react-icons/tb"
 import { Box, Flex, Grid } from "theme-ui"
 
-import { Badge, Text } from "@radix-ui/themes"
+import { Badge, Text, DropdownMenu } from "@radix-ui/themes"
 import { ConversationSummary } from "../../../reducers/conversations_summary"
 import { getIconForConversation, getColorForConversation } from "../conversation_list_item"
 import { useNavigate } from "react-router-dom-v5-compat"
+import { handleTagConversation } from "../../../actions"
+import { useAppDispatch } from "../../../hooks"
 
 export type ConversationStatus = "open" | "needs_responses" | "closed"
 
 export const ConversationEntry = ({
   conversation,
   showCreationDate,
+  user,
 }: {
   conversation: ConversationSummary & {
     conversation_status: ConversationStatus
     displayed_title: string
   }
   showCreationDate: boolean
+  user: { isRepoCollaborator: boolean }
 }) => {
   const navigate = useNavigate()
+  const dispatch = useAppDispatch()
 
   const fipAttributes = []
   if (showCreationDate) {
@@ -46,6 +51,14 @@ export const ConversationEntry = ({
     fipAttributes.push(
       <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
         <Text>{voterCount} voted</Text>
+      </Flex>,
+    )
+  }
+
+  if (conversation.tags) {
+    fipAttributes.push(
+      <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
+        <Text sx={{ fontWeight: "500" }}>{conversation.tags}</Text>
       </Flex>,
     )
   }
@@ -89,12 +102,11 @@ export const ConversationEntry = ({
               ) : (
                 <Text sx={{ color: "#84817D" }}>Untitled</Text>
               ))}
-            {
-              conversation.conversation_status === "needs_responses" &&
-              <Text ml="3" color="red" >
+            {conversation.conversation_status === "needs_responses" && (
+              <Text ml="3" color="red">
                 (Needs seed responses)
               </Text>
-            }
+            )}
           </Text>
           <Badge
             size="2"
@@ -125,7 +137,36 @@ export const ConversationEntry = ({
               {attr}
             </Text>
           ))}
+
           <Box sx={{ flexGrow: "1" }}></Box>
+
+          {user?.isRepoCollaborator && (
+            <Box onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
+                  <Badge
+                    size="1"
+                    color="gray"
+                    variant="soft"
+                    radius="full"
+                    style={{ cursor: "pointer", position: "relative", top: "2px" }}
+                  >
+                    Add tag
+                  </Badge>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item
+                    onClick={(e) => {
+                      const tag = prompt("Enter a tag:")
+                      dispatch(handleTagConversation(conversation.conversation_id, tag))
+                    }}
+                  >
+                    New tag
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </Box>
+          )}
         </Flex>
       </Grid>
     </div>

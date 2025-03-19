@@ -6848,6 +6848,47 @@ async function handle_POST_conversation_reopen(
     })
 }
 
+async function handle_POST_conversation_tag(
+  req: { p: { zid: any; uid?: any, tag: string } },
+  res: {
+    status: (
+      arg0: number,
+    ) => {
+      (): any
+      new (): any
+      json: { (arg0: any): void; new (): any }
+    }
+  },
+) {
+  let q = "select * from conversations where zid = ($1)"
+  let params = [req.p.zid]
+  if (!isAdministrator(req.p.uid) && !(await isRepoCollaborator(req.p.uid))) {
+    q = q + " and owner = ($2)"
+    params.push(req.p.uid)
+  }
+  queryP(q, params)
+    .then(function (rows: string | any[]) {
+      if (!rows || !rows.length) {
+        fail(res, 500, "polis_err_closing_conversation_no_such_conversation")
+        return
+      }
+      let conv = rows[0]
+      queryP("update conversations set tags = ($1) where zid = ($2);", [
+        req.p.tag,
+        conv.zid,
+      ])
+        .then(function () {
+          res.status(200).json({})
+        })
+        .catch(function (err: any) {
+          fail(res, 500, "polis_err_tag_conversation2", err)
+        })
+    })
+    .catch(function (err: any) {
+      fail(res, 500, "polis_err_tag_conversation", err)
+    })
+}
+
 async function handle_POST_conversation_moderate(
   req: { p: { zid: any; uid?: any } },
   res: {
@@ -7900,6 +7941,7 @@ async function handle_GET_conversations_summary(req: Request, res: Response) {
     cast(comment_counts.comment_count as INTEGER),
     cast(sentiment_counts.sentiment_count as INTEGER),
     conversations.owner,
+    conversations.tags,
     zinvites.zinvite as conversation_id
   FROM
     conversations
@@ -9707,6 +9749,7 @@ export {
   handle_POST_contexts,
   handle_POST_conversation_close,
   handle_POST_conversation_reopen,
+  handle_POST_conversation_tag,
   handle_POST_conversation_moderate,
   handle_POST_conversation_unmoderate,
   handle_POST_conversation_sentiment,
