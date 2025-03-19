@@ -1,5 +1,6 @@
 import useSWR from "swr"
 import React from "react"
+import { Link as RouterLink, useLocation } from "react-router-dom"
 
 import { MIN_SEED_RESPONSES } from "../../util/misc"
 import ConversationListItem from "./conversation_list_item"
@@ -13,6 +14,9 @@ const ConversationsList = ({
   selectedView: "all" | "fips" | "polls"
   setSelectedView: (view: "all" | "fips" | "polls") => void
 }) => {
+  const location = useLocation()
+  const currentPath = location.pathname
+
   const { data } = useSWR(
     `conversations_summary`,
     async () => {
@@ -37,6 +41,15 @@ const ConversationsList = ({
     selectedView === "all" ? allConversations : selectedView === "fips" ? fips : polls
 
   const conversationsToDisplay = filteredConversations.slice(0, 5)
+
+  // Define target paths
+  const sentimentPath = "/dashboard/sentiment"
+  const pollsPath = "/dashboard/polls"
+
+  // Check if we're already on the target page
+  const isOnTargetPage =
+    (selectedView === "fips" && currentPath === sentimentPath) ||
+    (selectedView === "polls" && currentPath === pollsPath)
 
   return (
     <React.Fragment>
@@ -111,6 +124,16 @@ const ConversationsList = ({
           />
         ))}
       </Flex>
+
+      {selectedView !== "all" && !isOnTargetPage && (
+        <Flex p="8px" mx="16px" mb="8px">
+          <Button size="3" variant="outline" color="blue" style={{ width: "100%" }} asChild>
+            <RouterLink to={selectedView === "fips" ? sentimentPath : pollsPath}>
+              View all {selectedView === "fips" ? "sentiment checks" : "polls"}
+            </RouterLink>
+          </Button>
+        </Flex>
+      )}
     </React.Fragment>
   )
 }
