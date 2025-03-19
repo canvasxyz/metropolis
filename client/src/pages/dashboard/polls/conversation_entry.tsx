@@ -108,14 +108,43 @@ export const ConversationEntry = ({
               </Text>
             )}
           </Text>
-          <Badge
+          {/* <Badge
             size="2"
             color={conversation.is_archived ? "gray" : "blue"}
             variant="surface"
             radius="full"
           >
             {statusLabel}
-          </Badge>
+          </Badge> */}
+          
+
+          {user?.isRepoCollaborator && (
+            <Box onClick={(e) => e.stopPropagation()}>
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
+                  <Badge
+                    size="1"
+                    color="gray"
+                    variant="soft"
+                    radius="full"
+                    style={{ cursor: "pointer", position: "relative", left: "3px" }}
+                  >
+                    Add tag
+                  </Badge>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item
+                    onClick={(e) => {
+                      const tag = prompt("Enter a tag:")
+                      dispatch(handleTagConversation(conversation.conversation_id, tag))
+                    }}
+                  >
+                    New tag
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            </Box>
+          )}
         </Flex>
         <Box></Box>
         <Flex sx={{ flexDirection: "row", gap: [2], alignItems: "center", fontSize: "90%" }}>
@@ -137,36 +166,6 @@ export const ConversationEntry = ({
               {attr}
             </Text>
           ))}
-
-          <Box sx={{ flexGrow: "1" }}></Box>
-
-          {user?.isRepoCollaborator && (
-            <Box onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
-                  <Badge
-                    size="1"
-                    color="gray"
-                    variant="soft"
-                    radius="full"
-                    style={{ cursor: "pointer", position: "relative", top: "2px" }}
-                  >
-                    Add tag
-                  </Badge>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Content>
-                  <DropdownMenu.Item
-                    onClick={(e) => {
-                      const tag = prompt("Enter a tag:")
-                      dispatch(handleTagConversation(conversation.conversation_id, tag))
-                    }}
-                  >
-                    New tag
-                  </DropdownMenu.Item>
-                </DropdownMenu.Content>
-              </DropdownMenu.Root>
-            </Box>
-          )}
         </Flex>
       </Grid>
     </div>
