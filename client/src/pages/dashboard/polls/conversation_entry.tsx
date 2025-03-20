@@ -1,5 +1,5 @@
 import React from "react"
-import { TbCalendar, TbEye } from "react-icons/tb"
+import { TbCalendar, TbEye, TbTag } from "react-icons/tb"
 import { Box, Flex, Grid } from "theme-ui"
 
 import { Badge, Text, DropdownMenu } from "@radix-ui/themes"
@@ -66,7 +66,10 @@ export const ConversationEntry = ({
   if (conversation.tags) {
     fipAttributes.push(
       <Flex sx={{ display: "inline-block", alignItems: "center", gap: [1], whiteSpace: "nowrap" }}>
-        <Text sx={{ fontWeight: "500" }}>{conversation.tags}</Text>
+        <Text style={{ fontWeight: "600", color: "#131313" }}>
+          <TbTag style={{ position: "relative", top: "2px", marginRight: "1px" }} />
+          {" "}{conversation.tags}
+        </Text>
       </Flex>,
     )
   }
@@ -83,6 +86,7 @@ export const ConversationEntry = ({
         borderColor: conversation.is_archived ? `#ccc` : getColorForConversation(conversation),
         padding: "3px 0 6px",
         background: "#fff",
+        overflow: "hidden",
       }}
       onClick={() => navigate(`/dashboard/c/${conversation.conversation_id}`)}
     >
@@ -146,10 +150,10 @@ export const ConversationEntry = ({
                         <DropdownMenu.Item
                           key={tag}
                           onClick={() => {
-                            setMenuOpen(false);
+                            setMenuOpen(false)
                             dispatch(handleTagConversation(conversation.conversation_id, tag))
                               .then(() => refetchPolls())
-                              .catch(error => console.error("Error tagging conversation:", error));
+                              .catch((error) => console.error("Error tagging conversation:", error))
                           }}
                         >
                           {tag}
@@ -161,11 +165,11 @@ export const ConversationEntry = ({
                   <DropdownMenu.Item
                     onClick={() => {
                       const tag = prompt("Enter a tag:")
-                      setMenuOpen(false);
+                      setMenuOpen(false)
                       if (tag) {
                         dispatch(handleTagConversation(conversation.conversation_id, tag))
                           .then(() => refetchPolls())
-                          .catch(error => console.error("Error tagging conversation:", error));
+                          .catch((error) => console.error("Error tagging conversation:", error))
                       }
                     }}
                   >
@@ -176,10 +180,10 @@ export const ConversationEntry = ({
                       <DropdownMenu.Separator />
                       <DropdownMenu.Item
                         onClick={() => {
-                          setMenuOpen(false);
+                          setMenuOpen(false)
                           dispatch(handleTagConversation(conversation.conversation_id, ""))
                             .then(() => refetchPolls())
-                            .catch(error => console.error("Error clearing tag:", error));
+                            .catch((error) => console.error("Error clearing tag:", error))
                         }}
                         color="red"
                       >

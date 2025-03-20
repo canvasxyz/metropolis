@@ -50,14 +50,14 @@ const Dashboard = ({ user }: DashboardProps) => {
               left: mobileMenuOpen ? "316px" : "16px",
               zIndex: 1000,
               cursor: "pointer",
-              backgroundColor: "#3f4346",
+              backgroundColor: "#3a5bc8",
               color: "white",
               width: "40px",
               height: "40px",
               borderRadius: "50%",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.15)",
               textAlign: "center",
               paddingTop: "7px"
             }}
