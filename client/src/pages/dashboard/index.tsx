@@ -3,7 +3,9 @@
 import React, { Suspense, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { Route as CompatRoute, Routes as CompatRoutes } from "react-router-dom-v5-compat"
-import { Box, Flex, jsx } from "theme-ui"
+import { TbMenu2 } from "react-icons/tb"
+import { Box, Flex } from "@radix-ui/themes"
+import { jsx } from "theme-ui"
 
 import { User } from "../../util/types"
 import { DashboardUserButton } from "./user_button"
@@ -29,18 +31,40 @@ const Dashboard = ({ user }: DashboardProps) => {
   }, [location])
 
   return (
-    <Box sx={{ height: "calc(100vh - 1px)" }}>
-      <Flex sx={{ display: "flex", height: "100%" }}>
+    <Box style={{ height: "calc(100vh - 1px)" }}>
+      <Flex style={{ height: "100%" }}>
         <Sidebar mobileMenuOpen={mobileMenuOpen} />
         <Box
-          sx={{
-            display: [mobileMenuOpen ? "none" : "block", "block"],
+          style={{
             overflowY: "scroll",
             flex: 1,
             position: "relative",
-            bg: "#F9F9FB",
+            background: "#F9F9FB",
           }}
         >
+          <Box
+            display={{ initial: 'block', sm: 'none' }}
+            style={{
+              position: "fixed",
+              top: "16px",
+              left: mobileMenuOpen ? "316px" : "16px",
+              zIndex: 1000,
+              cursor: "pointer",
+              backgroundColor: "#3f4346",
+              color: "white",
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+              textAlign: "center",
+              paddingTop: "7px"
+            }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <TbMenu2 size={23} />
+          </Box>
           <DashboardUserButton />
           <CompatRoutes>
             <CompatRoute path="/" element={<LandingPage />} />
