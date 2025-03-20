@@ -18,6 +18,7 @@ export const ConversationEntry = ({
   user,
   type,
   allTags = [],
+  refetchPolls,
 }: {
   conversation: ConversationSummary & {
     conversation_status: ConversationStatus
@@ -27,9 +28,11 @@ export const ConversationEntry = ({
   user
   type: "polls" | "sentiment"
   allTags?: string[]
+  refetchPolls: () => void
 }) => {
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
+  const [menuOpen, setMenuOpen] = React.useState(false)
 
   const fipAttributes = []
   if (showCreationDate) {
@@ -124,7 +127,7 @@ export const ConversationEntry = ({
 
           {type === "sentiment" && user?.isRepoCollaborator && (
             <Box onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu.Root>
+              <DropdownMenu.Root open={menuOpen} onOpenChange={setMenuOpen}>
                 <DropdownMenu.Trigger onClick={(e) => e.stopPropagation()}>
                   <Badge
                     size="1"
@@ -143,7 +146,10 @@ export const ConversationEntry = ({
                         <DropdownMenu.Item
                           key={tag}
                           onClick={() => {
+                            setMenuOpen(false);
                             dispatch(handleTagConversation(conversation.conversation_id, tag))
+                              .then(() => refetchPolls())
+                              .catch(error => console.error("Error tagging conversation:", error));
                           }}
                         >
                           {tag}
@@ -155,7 +161,12 @@ export const ConversationEntry = ({
                   <DropdownMenu.Item
                     onClick={() => {
                       const tag = prompt("Enter a tag:")
-                      if (tag) dispatch(handleTagConversation(conversation.conversation_id, tag))
+                      setMenuOpen(false);
+                      if (tag) {
+                        dispatch(handleTagConversation(conversation.conversation_id, tag))
+                          .then(() => refetchPolls())
+                          .catch(error => console.error("Error tagging conversation:", error));
+                      }
                     }}
                   >
                     New tag...
@@ -165,7 +176,10 @@ export const ConversationEntry = ({
                       <DropdownMenu.Separator />
                       <DropdownMenu.Item
                         onClick={() => {
+                          setMenuOpen(false);
                           dispatch(handleTagConversation(conversation.conversation_id, ""))
+                            .then(() => refetchPolls())
+                            .catch(error => console.error("Error clearing tag:", error));
                         }}
                         color="red"
                       >

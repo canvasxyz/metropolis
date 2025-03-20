@@ -78,7 +78,7 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
   const [scrollCursor, setScrollCursor] = useState(0)
   const scrollPageSize = 10
 
-  const { data } = useSWR(
+  const { data, mutate: refetchPolls } = useSWR(
     `conversations_summary_discussion_polls_${only}`,
     async () => {
       const response = await fetch(`/api/v3/conversations_summary`)
@@ -282,6 +282,7 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
               user={user}
               type={only}
               allTags={data?.allTags || []}
+              refetchPolls={refetchPolls}
             />
           ))}
           {displayedConversations.length === 0 && data?.conversations && (
