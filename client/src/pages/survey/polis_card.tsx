@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import $ from "jquery"
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { toast } from "react-hot-toast"
@@ -30,6 +30,37 @@ export const PolisSurveyCard = ({
   const { tid: commentId, txt } = comment
 
   const [editingVote, setEditingVote] = useState(false)
+  const agreeButtonRef = React.useRef<HTMLButtonElement>(null)
+  const disagreeButtonRef = React.useRef<HTMLButtonElement>(null)
+  const skipButtonRef = React.useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (voteDisabled) return
+
+      // Don't trigger hotkeys if user is typing in an input or textarea
+      const target = event.target as HTMLElement
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA") return
+
+      switch (event.key.toLowerCase()) {
+        case "a":
+          agreeButtonRef.current?.focus()
+          break
+        case "d":
+          disagreeButtonRef.current?.focus()
+          break
+        case "s":
+          skipButtonRef.current?.focus()
+          break
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyPress)
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress)
+    }
+  }, [commentId, voteDisabled])
 
   const animateOut = (target) =>
     new Promise<void>((resolve) => {
@@ -148,18 +179,27 @@ export const PolisSurveyCard = ({
               options={
                 editingVote
                   ? [
-                      { name: "Agree", onClick: (e) => {
-                        e.stopPropagation()
-                        agree(commentId, e.target)
-                      } },
-                      { name: "Disagree", onClick: (e) => {
-                        e.stopPropagation()
-                        disagree(commentId, e.target)
-                      } },
-                      { name: "Skip", onClick: (e) => {
-                        e.stopPropagation()
-                        skip(commentId, e.target)
-                      } },
+                      {
+                        name: "Agree",
+                        onClick: (e) => {
+                          e.stopPropagation()
+                          agree(commentId, e.target)
+                        },
+                      },
+                      {
+                        name: "Disagree",
+                        onClick: (e) => {
+                          e.stopPropagation()
+                          disagree(commentId, e.target)
+                        },
+                      },
+                      {
+                        name: "Skip",
+                        onClick: (e) => {
+                          e.stopPropagation()
+                          skip(commentId, e.target)
+                        },
+                      },
                       {
                         name: "Cancel",
                         onClick: (e) => {
@@ -175,6 +215,7 @@ export const PolisSurveyCard = ({
         )}
         <Box sx={{ pt: [2] }}>
           <Button
+            ref={agreeButtonRef}
             variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => {
               e.stopPropagation()
@@ -186,6 +227,7 @@ export const PolisSurveyCard = ({
             Agree
           </Button>
           <Button
+            ref={disagreeButtonRef}
             variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => {
               e.stopPropagation()
@@ -197,6 +239,7 @@ export const PolisSurveyCard = ({
             Disagree
           </Button>
           <Button
+            ref={skipButtonRef}
             variant={voteDisabled ? "voteDisabled" : "vote"}
             onClick={(e: any) => {
               e.stopPropagation()
