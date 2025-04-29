@@ -82,6 +82,9 @@ const SurveyComposeBox = ({
           setUnvotedComments([comment, ...unvotedComments])
           setSubmittedComments([comment, ...submittedComments])
           toast.success("Response added")
+          setTimeout(() => {
+            inputRef.current?.focus()
+          }, 0)
 
           resolve()
         }),
@@ -119,7 +122,7 @@ const SurveyComposeBox = ({
           minRows={2}
           maxRows={9}
           ref={inputRef}
-          placeholder="Your response here"
+          placeholder="Add a statement to the poll"
           defaultValue={cachedComment}
           onBlur={() => {
             setCachedComment(inputRef.current.value)
@@ -152,10 +155,10 @@ const SurveyComposeBox = ({
             sx={{
               mt: [1],
               py: "4px",
-              px: "10px",
-              minWidth: "100px",
-              fontSize: "0.98em",
+              px: "3",
+              fontSize: "0.95em",
               fontWeight: 500,
+              borderRadius: 5,
             }}
             onClick={(e) => {
               e.stopPropagation()
@@ -171,7 +174,7 @@ const SurveyComposeBox = ({
                 })
             }}
           >
-            Submit {!user && "anonymously"}
+            Add to poll {!user && "anonymously"}
           </Button>
         </Box>
         <Box>{error && <Box sx={{ mt: [2], color: "mediumRed" }}>{error}</Box>}</Box>
@@ -180,7 +183,7 @@ const SurveyComposeBox = ({
   )
 }
 
-const SurveyCompose = ({
+const PolisSurveyCompose = ({
   user,
   votedComments,
   unvotedComments,
@@ -288,4 +291,4 @@ const SurveyCompose = ({
   )
 }
 
-export default SurveyCompose
+export default PolisSurveyCompose

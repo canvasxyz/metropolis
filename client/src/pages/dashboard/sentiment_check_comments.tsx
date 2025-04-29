@@ -8,7 +8,7 @@ const MAX_COMMENT_LENGTH = 150
 
 const fetcher = (url) => fetch(url).then((r) => r.json())
 
-export const DiscussionPollComments= ({
+export const SentimentCheckComments = ({
   conversationId,
 }: { conversationId: string }) => {
   const { user } = useAppSelector((state) => state.user)

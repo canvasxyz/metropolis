@@ -16,7 +16,7 @@ import { ZidMetadata } from "../../util/types"
 const LIKE_VOTE = "like"
 const DISLIKE_VOTE = "dislike"
 
-export const DiscussionPoll = ({
+export const SentimentCheck = ({
   user,
   zid_metadata,
 }: {

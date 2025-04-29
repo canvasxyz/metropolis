@@ -1,5 +1,5 @@
 import React from "react"
-import Survey from "."
+import PolisSurvey from "."
 import useSWR from "swr"
 import { ZidMetadata } from "../../util/types"
 
@@ -17,7 +17,7 @@ const SurveyWithLoader = ({ match }: SurveyProps) => {
 
   // don't return anything if data not loaded yet
   if(data) {
-    return <Survey
+    return <PolisSurvey
       conversation_id={match.params.conversation_id}
       help_type={data.help_type}
       postsurvey={data.postsurvey}

@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Box, Button, Flex, Text, jsx } from "theme-ui"
 import { TbExternalLink } from "react-icons/tb"
 import { surveyBox } from "./index"
-import SurveyCard from "./survey_card"
+import PolisSurveyCard from "./polis_card"
 
-const SurveyCards = ({
+const PolisSurveyCards = ({
   conversation_id,
   votedComments,
   unvotedComments,
@@ -43,7 +43,7 @@ const SurveyCards = ({
                 transition: "0.2s ease-in-out",
               }}
             >
-              <SurveyCard
+              <PolisSurveyCard
                 comment={comment}
                 conversationId={conversation_id}
                 onVoted={onVoted}
@@ -112,4 +112,4 @@ const SurveyCards = ({
   )
 }
 
-export default SurveyCards
+export default PolisSurveyCards

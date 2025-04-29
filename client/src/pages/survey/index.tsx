@@ -6,8 +6,8 @@ import { Box, Button, jsx } from "theme-ui"
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
 
-import SurveyCards from "./survey_cards"
-import SurveyCompose from "./survey_compose"
+import PolisSurveyCards from "./polis_cards"
+import PolisSurveyCompose from "./survey_compose"
 import PostSurvey from "./survey_post"
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
@@ -74,7 +74,7 @@ type SurveyProps = {
   auth_needed_to_write: boolean
 }
 
-const Survey = ({
+const PolisSurvey = ({
   conversation_id,
   help_type,
   postsurvey,
@@ -173,7 +173,7 @@ const Survey = ({
     <Box>
       {state === "voting" && (
         <React.Fragment>
-          <SurveyCards
+          <PolisSurveyCards
             votedComments={votedComments}
             unvotedComments={unvotedComments}
             goTo={goTo}
@@ -227,11 +227,10 @@ const Survey = ({
           !!user?.xInfo ? (
             <Box sx={{ pt: [3] }}>
               <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
-                This is a collective response poll where anyone can contribute additional questions
-                or statements to the discussion thread. If you have one to add, you can submit it
-                here:
+                Are your perspectives or experiences missing from this conversation? If so, add them
+                in the box below — one at a time.
               </Box>
-              <SurveyCompose
+              <PolisSurveyCompose
                 user={user}
                 key={conversation_id}
                 votedComments={votedComments}
@@ -251,8 +250,8 @@ const Survey = ({
           ) : (
             <Box sx={{ mt: "24px" }}>
               <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
-                This is a collective response poll where anyone can contribute additional questions
-                or statements to the discussion thread. If you have one to add, log in here:
+                Are your perspectives or experiences missing from this conversation? If so, add them
+                in the box below — one at a time.
               </Box>
               <Button
                 variant="buttons.outlineSecondary"
@@ -273,4 +272,4 @@ const Survey = ({
   )
 }
 
-export default Survey
+export default PolisSurvey

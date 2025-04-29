@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react"
 import { Link, Box, Text, Button } from "theme-ui"
-import Survey, { surveyBox } from "../survey"
+import PolisSurvey, { surveyBox } from "../survey"
 import api from "../../util/api"
 import { FipVersion } from "../../util/types"
 import { ReportComment, ReportCommentRow } from "./report_comment"
@@ -94,7 +94,7 @@ const ReportAndSurveyInfo = ({
       </Link>
     </Box>
     {!showReport ? (
-      <Survey
+      <PolisSurvey
         key={conversation_info.conversation_id}
         conversation_id={conversation_info.conversation_id}
         help_type={conversation_info.help_type}

@@ -19,7 +19,7 @@ import { ConversationEntry, ConversationStatus } from "./conversation_entry"
 import { useAppSelector } from "../../../hooks"
 import { MIN_SEED_RESPONSES } from "../../../util/misc"
 import { CreateConversationModal } from "../../CreateConversationModal"
-import { useDiscussionPollDisplayOptions } from "./useDiscussionPollDisplayOptions"
+import { useInformationalPollDisplayOptions } from "./useInformationalPollDisplayOptions"
 import { IsVisibleObserver } from "../../../components/IsVisibleObserver"
 
 const conversationStatusOptions = {
@@ -66,7 +66,7 @@ export default ({ only }: { only: "polls" | "sentiment" }) => {
   const [createConversationModalIsOpen, setCreateConversationModalIsOpen] = useState(false)
 
   const { sortBy, setSortBy, resetDisplayOptions, saveDisplayOptions } =
-    useDiscussionPollDisplayOptions()
+    useInformationalPollDisplayOptions()
 
   const [searchParams, setSearchParams] = useSearchParams()
 

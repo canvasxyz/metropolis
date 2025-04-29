@@ -12,8 +12,8 @@ import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import { surveyBox } from "../survey"
 import { populateZidMetadataStore } from "../../actions"
-import { DiscussionPoll } from "./discussion_poll"
-import { DiscussionPollComments } from "./discussion_poll_comments"
+import { SentimentCheck } from "./sentiment_check"
+import { SentimentCheckComments } from "./sentiment_check_comments"
 import { Frontmatter, Collapsible } from "./front_matter"
 import { incrementViewCount, useViewCount } from "../../reducers/view_counts"
 import { MIN_SEED_RESPONSES } from "../../util/misc"
@@ -28,7 +28,7 @@ const dashboardBox = {
   border: "1px solid #ddd",
 }
 
-const DiscussionPollTooltip = () => {
+const InformationalPollTooltip = () => {
   const [referenceElement, setReferenceElement] = useState(null)
   const [popperElement, setPopperElement] = useState(null)
   const { styles, attributes } = usePopper(referenceElement, popperElement, {
@@ -105,7 +105,11 @@ export const DashboardConversation = ({ user }: { user }) => {
   }, [zidMetadataError])
 
   if (Object.keys(zid_metadata).length === 0) {
-    return <Box>Loading...</Box>
+    return (
+      <Box my="8" style={{ textAlign: "center" }}>
+        Loading...
+      </Box>
+    )
   }
 
   const displayTitle = zid_metadata.fip_version
@@ -194,10 +198,10 @@ export const DashboardConversation = ({ user }: { user }) => {
                   mb: [2],
                 }}
               >
-                Poll
-                <DiscussionPollTooltip />
+                Sentiment Check
+                <InformationalPollTooltip />
               </Box>
-              <DiscussionPoll
+              <SentimentCheck
                 user={user}
                 zid_metadata={zid_metadata}
                 key={zid_metadata.conversation_id}
@@ -218,10 +222,10 @@ export const DashboardConversation = ({ user }: { user }) => {
                 }}
               >
                 <Box sx={{ fontWeight: 600, mb: [1] }}>
-                  <TbExclamationCircle /> Example Responses Required
+                  <TbExclamationCircle /> Seed Responses Required
                 </Box>
-                You should fill in at least {MIN_SEED_RESPONSES} example responses for readers to
-                vote on. This poll will be hidden from other viewers until then.
+                Please enter at least {MIN_SEED_RESPONSES} seed responses, so this poll can be shown
+                on the front page.
               </Box>
             )}
           {!zid_metadata.fip_version && <ReportAndSurveyInfo conversation_info={zid_metadata} />}
@@ -232,7 +236,7 @@ export const DashboardConversation = ({ user }: { user }) => {
                 Have more to say? You can leave a short comment here.
                 </Box> */}
               <Box sx={{ mx: "-8px", pt: "8px" }}>
-                <DiscussionPollComments conversationId={zid_metadata.conversation_id} />
+                <SentimentCheckComments conversationId={zid_metadata.conversation_id} />
               </Box>
             </Box>
           )}

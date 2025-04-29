@@ -12,7 +12,7 @@ import api from "../../util/api"
 import type { Comment } from "../../util/types"
 import { DropdownMenu } from "../../components/dropdown"
 
-type SurveyCardProps = {
+type PolisSurveyCardProps = {
   comment: Comment
   conversationId: string
   onVoted: (commentId: string) => void
@@ -22,7 +22,7 @@ type SurveyCardProps = {
   voteDisabled: boolean
 }
 
-const SurveyCard = ({
+const PolisSurveyCard = ({
   comment,
   conversationId,
   onVoted,
@@ -30,7 +30,7 @@ const SurveyCard = ({
   cardHeight,
   topCard,
   voteDisabled,
-}: SurveyCardProps) => {
+}: PolisSurveyCardProps) => {
   const { tid: commentId, txt } = comment
 
   const [editingVote, setEditingVote] = useState(false)
@@ -213,4 +213,4 @@ const SurveyCard = ({
   )
 }
 
-export default SurveyCard
+export default PolisSurveyCard

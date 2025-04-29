@@ -2,9 +2,9 @@ import { useState } from "react"
 import { toast } from "react-hot-toast"
 import { useLocalStorage } from "usehooks-ts"
 
-export const useDiscussionPollDisplayOptions = () => {
+export const useInformationalPollDisplayOptions = () => {
   const [savedDisplayOptions, setSavedDisplayOptions] = useLocalStorage(
-    "discussionPollDisplayOptions",
+    "informationalPollDisplayOptions",
     JSON.stringify({
       sortBy: "desc"
     }),

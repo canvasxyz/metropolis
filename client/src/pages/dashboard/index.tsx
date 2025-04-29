@@ -12,7 +12,7 @@ import { DashboardUserButton } from "./user_button"
 import { LandingPage } from "./landing_page"
 import { DashboardConversation } from "./conversation"
 import Sidebar from "./sidebar"
-const DiscussionPolls = React.lazy(() => import("./polls"))
+const InformationalPolls = React.lazy(() => import("./polls"))
 const FipTracker = React.lazy(() => import("./fip_tracker/index.js"))
 
 type DashboardProps = {
@@ -73,7 +73,7 @@ const Dashboard = ({ user }: DashboardProps) => {
               element={
                 <Suspense>
                   {" "}
-                  <DiscussionPolls only="polls" />
+                  <InformationalPolls only="polls" />
                 </Suspense>
               }
             />
@@ -82,7 +82,7 @@ const Dashboard = ({ user }: DashboardProps) => {
               element={
                 <Suspense>
                   {" "}
-                  <DiscussionPolls only="sentiment" />
+                  <InformationalPolls only="sentiment" />
                 </Suspense>
               }
             />
