@@ -12,7 +12,7 @@ import { surveyHeadingMini } from "./index"
 
 Modal.setAppElement("#root")
 
-const SurveyComposeBox = ({
+export const SurveyComposeBox = ({
   user,
   unvotedComments,
   setUnvotedComments,
@@ -93,17 +93,6 @@ const SurveyComposeBox = ({
 
   return (
     <form onSubmit={(e) => e.preventDefault()} style={{ display: "flex" }}>
-      <img
-        src={user && `https://github.com/${user?.githubUsername}.png`}
-        width="34"
-        height="34"
-        style={{
-          borderRadius: 6,
-          marginRight: "8px",
-          background: "#ccc",
-          marginTop: "2px",
-        }}
-      />
       <Box sx={{ flex: 1 }}>
         <TextareaAutosize
           style={{
@@ -118,8 +107,8 @@ const SurveyComposeBox = ({
             background: loading ? "#eee" : undefined,
           }}
           disabled={!!loading}
-          rows={2}
-          minRows={2}
+          rows={3}
+          minRows={3}
           maxRows={9}
           ref={inputRef}
           placeholder="Add a statement to the poll"
@@ -156,7 +145,7 @@ const SurveyComposeBox = ({
               mt: [1],
               py: "4px",
               px: "3",
-              fontSize: "0.95em",
+              fontSize: "0.92em",
               fontWeight: 500,
               borderRadius: 5,
             }}
@@ -183,7 +172,7 @@ const SurveyComposeBox = ({
   )
 }
 
-const PolisSurveyCompose = ({
+export const PolisSurveyCompose = ({
   user,
   votedComments,
   unvotedComments,
@@ -290,5 +279,3 @@ const PolisSurveyCompose = ({
     </React.Fragment>
   )
 }
-
-export default PolisSurveyCompose

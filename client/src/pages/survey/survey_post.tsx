@@ -8,7 +8,7 @@ import { Box, Heading, Button, Text, jsx, Flex } from "theme-ui"
 
 import { surveyBox, surveyHeadingMini } from "./index"
 
-const PostSurvey = ({
+export const PolisPostSurvey = ({
   submittedComments,
   votedComments,
   unvotedComments,
@@ -79,4 +79,3 @@ const PostSurvey = ({
     </Flex>
   )
 }
-export default PostSurvey

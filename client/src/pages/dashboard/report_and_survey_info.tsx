@@ -48,13 +48,16 @@ const ReportAndSurveyInfo = ({
     mutate: mutateReportComments,
     isLoading: isReportCommentsLoading,
   } = useSWR(report?.report_id, async (report_id) => {
-    return await api.get("/api/v3/comments", {
+    const reportComments = await api.get("/api/v3/comments", {
       conversation_id: conversation_info.conversation_id,
       report_id,
       mod_gt: -1,
       moderation: true,
       include_voting_patterns: true,
     })
+    reportComments.sort((a, b) => b.agree_count + b.disagree_count - (a.agree_count + a.disagree_count))
+    console.log(reportComments)
+    return reportComments
   })
 
   const generateReport = useCallback(async () => {
@@ -78,8 +81,10 @@ const ReportAndSurveyInfo = ({
   , [reportComments])
 
   return <Box sx={{ ...dashboardBox, bg: "bgOffWhite" }}>
-    <Box sx={{ display: "flex", fontWeight: 700, mb: [3] }}>
-      <Text sx={{ flex: 1 }}>Polls for this discussion thread</Text>
+    <Box mb="3" sx={{ display: "flex", fontWeight: 700 }}>
+      <Text sx={{ flex: 1 }}>
+        {showReport ? <>Preview Results</> : <>Informational Polling</>}
+      </Text>
       <Link
         variant="links.a"
         href="#"
@@ -93,6 +98,17 @@ const ReportAndSurveyInfo = ({
         {showReport ? "Back to voting" : "Preview results"}
       </Link>
     </Box>
+    {!showReport &&
+      <Box mb="3" sx={{ fontSize: "0.94em" }}>
+        Vote on comments from the community, and feel free to skip comments you're not sure about.
+        After voting, you can check where you stand relative to others.
+      </Box>
+    }
+    {showReport &&
+      <Box mb="3" sx={{ fontSize: "0.94em" }}>
+        How did people vote on this issue? You can also view a full report once enough people have voted.
+      </Box>
+    }
     {!showReport ? (
       <PolisSurvey
         key={conversation_info.conversation_id}

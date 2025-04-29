@@ -131,11 +131,11 @@ export const DashboardConversation = ({ user }: { user }) => {
             maxWidth: "760px",
           }}
         >
-          <Heading as="h2" sx={{ mb: [2] }}>
+          <Heading as="h2">
             {displayTitle}
           </Heading>
           {zid_metadata.fip_version?.github_pr?.submitter && (
-            <Box>
+            <Box sx={{ mt: 2 }}>
               Created by{" "}
               <Link
                 variant="links.a"

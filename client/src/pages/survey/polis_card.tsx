@@ -5,7 +5,7 @@ import React, { useState } from "react"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { toast } from "react-hot-toast"
-import { Box, Button, Text, jsx } from "theme-ui"
+import { Box, Flex, Button, Text, jsx } from "theme-ui"
 import { TbThumbUp, TbThumbDown } from "react-icons/tb"
 
 import api from "../../util/api"
@@ -17,18 +17,14 @@ type PolisSurveyCardProps = {
   conversationId: string
   onVoted: (commentId: string) => void
   hasVoted: boolean
-  cardHeight?: number
-  topCard?: boolean
   voteDisabled: boolean
 }
 
-const PolisSurveyCard = ({
+export const PolisSurveyCard = ({
   comment,
   conversationId,
   onVoted,
   hasVoted,
-  cardHeight,
-  topCard,
   voteDisabled,
 }: PolisSurveyCardProps) => {
   const { tid: commentId, txt } = comment
@@ -106,7 +102,7 @@ const PolisSurveyCard = ({
   }
 
   return (
-    <Box
+    <Flex
       className="survey-card"
       sx={{
         position: "relative",
@@ -115,15 +111,16 @@ const PolisSurveyCard = ({
         borderRadius: "2px",
         bg: "bgWhite",
         boxShadow: "1px 1px 4px rgba(0,0,0,0.04)",
-        minHeight: cardHeight,
-        maxHeight: topCard ? "" : cardHeight,
+        minHeight: 140,
+        overflow: "scroll",
         width: "100%",
         px: ["24px", "32px"],
         py: ["16px"],
         pb: ["24px"],
+        flexDirection: "column",
       }}
     >
-      <Box>
+      <Box sx={{ flex: 1 }}>
         <Text sx={{ display: "block", wordBreak: "break-word", pb: [2] }}>
           <Box sx={{ fontSize: "0.93em", opacity: 0.8, mb: "12px" }}>
             {/* <img
@@ -136,12 +133,14 @@ const PolisSurveyCard = ({
               {comment.github_username ?? "Anonymous"}
               </Text> */}
           </Box>
-          <Text className="react-markdown-card">
+          <Text className="react-markdown-card" sx={{ fontSize: "1.1em" }}>
             <ReactMarkdown remarkPlugins={[remarkGfm]} linkTarget="_blank">
               {txt}
             </ReactMarkdown>
           </Text>
         </Text>
+      </Box>
+      <Box>
         {hasVoted && (
           <Box>
             <DropdownMenu
@@ -209,8 +208,6 @@ const PolisSurveyCard = ({
           </Button>
         </Box>
       </Box>
-    </Box>
+    </Flex>
   )
 }
-
-export default PolisSurveyCard

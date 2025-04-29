@@ -6,9 +6,9 @@ import { Box, Button, jsx } from "theme-ui"
 import api from "../../util/api"
 import type { Comment } from "../../util/types"
 
-import PolisSurveyCards from "./polis_cards"
-import PolisSurveyCompose from "./survey_compose"
-import PostSurvey from "./survey_post"
+import { PolisSurveyCards } from "./polis_cards"
+import { PolisSurveyCompose } from "./survey_compose"
+import { PolisPostSurvey } from "./survey_post"
 import { RootState } from "../../store"
 import { useAppSelector, useAppDispatch } from "../../hooks"
 import { handleSubmitNewComment } from "../../actions"
@@ -208,7 +208,7 @@ const PolisSurvey = ({
         </React.Fragment>
       )}
       {state === "postsurvey" && (
-        <PostSurvey
+        <PolisPostSurvey
           votedComments={votedComments}
           unvotedComments={unvotedComments}
           submittedComments={submittedComments}
@@ -220,7 +220,7 @@ const PolisSurvey = ({
       )}
 
       {state === "voting" && (
-        <Box>
+        <Box sx={{ position: "relative", zIndex: 10, marginTop: "10px" }}>
           {!auth_needed_to_write ||
           !!user?.email ||
           !!user?.githubUserId ||
@@ -228,7 +228,7 @@ const PolisSurvey = ({
             <Box sx={{ pt: [3] }}>
               <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
                 Are your perspectives or experiences missing from this conversation? If so, add them
-                in the box below — one at a time.
+                in the box below, one at a time. Others will vote on each statement individually.
               </Box>
               <PolisSurveyCompose
                 user={user}
@@ -251,7 +251,7 @@ const PolisSurvey = ({
             <Box sx={{ mt: "24px" }}>
               <Box sx={{ fontSize: "0.94em", mb: "15px" }}>
                 Are your perspectives or experiences missing from this conversation? If so, add them
-                in the box below — one at a time.
+                in the box below, one at a time. Others will vote on each statement individually.
               </Box>
               <Button
                 variant="buttons.outlineSecondary"
