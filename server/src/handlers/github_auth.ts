@@ -12,7 +12,10 @@ import Config from "../config"
 export const DEFAULT_REPO_COLLABORATORS = [
   "raykyri",
   "kaitlin-beegle",
-  "luckyparadise",
+  "Tanisha-fil",
+  "lanzafame",
+  "ianconsolata",
+  "dannyob",
 ]
 
 /** api handlers for performing a github authentication flow */
