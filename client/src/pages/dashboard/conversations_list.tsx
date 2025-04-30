@@ -131,11 +131,19 @@ const ConversationsList = ({
         )}
       </Flex>
 
-      {selectedView !== "all" && !isOnTargetPage && (
+      {selectedView !== "all" && (
         <Flex p="8px" mx="16px" mb="8px">
-          <Button size="3" variant="outline" color="blue" style={{ width: "100%" }} asChild>
+          <Button
+            size="3"
+            variant="outline"
+            color="blue"
+            style={{ width: "100%" }}
+            asChild
+            disabled={isOnTargetPage}
+          >
             <RouterLink to={selectedView === "fips" ? sentimentPath : pollsPath}>
-              View all {selectedView === "fips" ? "sentiment checks" : "polls"}
+              View{isOnTargetPage ? "ing" : ""} all{" "}
+              {selectedView === "fips" ? "sentiment checks" : "polls"}
             </RouterLink>
           </Button>
         </Flex>
